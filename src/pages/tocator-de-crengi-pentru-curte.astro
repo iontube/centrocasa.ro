@@ -1,0 +1,248 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Tocator de crengi pentru curte",
+  excerpt: "Daca vrei un tocator de crengi pentru curte care sa te ajute rapid si eficient, iti recomand sa te uiti la modelele electrice cu cutite, mai ales daca ai crengi de pana la 4-5 cm grosime. Sunt mai silentioase, mai usor de manevrat si mai accesibile ca pret, perfecte pentru o curte de dimensiuni medii. Daca ai de tocat lemne mai groase si in cantitati mari, atunci un tocator pe benzina e solutia, dar pregateste-te pentru zgomot si un pret pe masura.",
+  image: "/images/articles/tocator-de-crengi-pentru-curte.webp",
+  category: "Gradinarit si Unelte",
+  categorySlug: "gradinarit-unelte",
+  date: "2026-02-19T13:17:41.857Z",
+  modifiedDate: "2026-02-19T13:17:41.857Z",
+  author: "Andrei Marinescu",
+  authorRole: "Expert Gradinarit",
+  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
+};
+
+const faq = [
+  { question: "cat costa un tocator de crengi pentru curte", answer: "Un tocator de crengi pentru curte electric de calitate, bun pentru uz casnic, costa intre 800 si 1500 lei. Modelele electrice mai simple pot fi gasite si sub 800 lei, dar sunt mai putin performante. Tocatoarele pe benzina incep de la aproximativ 1500-2000 lei si pot ajunge la peste 5000 lei pentru modele profesionale." },
+  { question: "care e diferenta intre tocatoare electrice si pe benzina", answer: "Principala diferenta este puterea si mobilitatea. Tocatoarele electrice sunt mai silentioase, mai usoare si mai ieftine, ideale pentru crengi de pana la 4-5 cm, dar necesita priza. Cele pe benzina sunt mai puternice, toaca diametre mai mari (5-8 cm+), sunt independente de priza, dar sunt mai zgomotoase, mai grele si mai scumpe." },
+  { question: "merita sa cumpar un tocator de crengi pentru curte?", answer: "Da, merita daca ai o curte cu multi pomi, arbusti sau gard viu pe care il tunzi regulat. Un tocator de crengi pentru curte te ajuta sa reduci volumul deseurilor lemnoase, transformandu-le in material pentru compost sau mulci, economisind timp si efort la transportul lor." },
+  { question: "ce tocator de crengi pentru curte e mai bun, electric sau pe benzina", answer: "Pentru majoritatea gradinilor de dimensiuni medii, un tocator electric de 2000-2500W este mai bun. Este mai usor de utilizat, mai silentios si mai accesibil. Daca ai de procesat cantitati mari de crengi groase si lemnoase, sau lucrezi pe teren fara acces la curent, atunci un model pe benzina este superior." },
+  { question: "ce diametru maxim poate toca un tocator de crengi electric", answer: "Majoritatea tocatoarelor electrice pentru uz casnic pot toca crengi cu diametrul maxim intre 3 si 4.5 cm. Modelele mai puternice pot ajunge la 5 cm, dar rareori depasesc aceasta valoare. Este important sa verifici specificatiile producatorului pentru fiecare model in parte." },
+  { question: "cum se intretine un tocator de crengi pentru curte", answer: "Intretinerea unui tocator de crengi pentru curte depinde de tipul motorizarii. La cele electrice, curata cutitele si interiorul dupa fiecare utilizare. La cele pe benzina, pe langa curatare, schimba uleiul regulat, verifica filtrul de aer si bujia. Asigura-te ca depozitezi aparatul intr-un loc uscat." },
+  { question: "unde gasesc piese de schimb pentru tocator de crengi", answer: "Piese de schimb precum cutite, curele sau filtre se gasesc de obicei la magazinele specializate in unelte de gradina, service-urile autorizate ale marcilor respective (ex: service Bosch, Stihl) sau online, pe site-uri mari de comert electronic care vand piese de schimb pentru unelte de gradina." },
+  { question: "cat dureaza sa tocesti crengile cu un tocator electric", answer: "Timpul necesar variaza mult in functie de cantitatea de crengi, diametrul lor si eficienta tocatorului. Pentru o curte de dimensiuni medii, cu crengi de pana la 4 cm, procesul poate dura intre 30 de minute si 2 ore. Modelele mai performante si cu un diametru de tocare mai mare vor finaliza lucrarea mai rapid." }
+];
+
+const toc = [
+  { title: "Cel mai bun tocator de crengi pentru curte: Recomandarea mea de prieten", id: "cel-mai-bun-tocator-de-crengi-pentru-curte-recomandarea-mea-de-prieten" },
+  { title: "Top 4 tocatoare de crengi pentru curte: Ce merita banii", id: "top-4-tocatoare-de-crengi-pentru-curte-ce-merita-banii" },
+  { title: "Cum sa alegi tocatorul de crengi pentru curte potrivit", id: "cum-sa-alegi-tocatorul-de-crengi-pentru-curte-potrivit" },
+  { title: "Electric vs. Benzina: Duel pe tocator de crengi pentru curte", id: "electric-vs-benzina-duel-pe-tocator-de-crengi-pentru-curte" },
+  { title: "Greseli de evitat cand cumperi si folosesti un tocator de crengi pentru curte", id: "greseli-de-evitat-cand-cumperi-si-folosesti-un-tocator-de-crengi-pentru-curte" },
+  { title: "Verdict pe buget: Ce tocator de crengi pentru curte cumperi?", id: "verdict-pe-buget-ce-tocator-de-crengi-pentru-curte-cumperi" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Tocator de crengi pentru curte - CentroCasa"
+  description="Daca vrei un tocator de crengi pentru curte care sa te ajute rapid si eficient, iti recomand sa te uiti la modelele electrice cu cutite, mai ales daca ai crengi de pana la 4-5 cm grosime. Sunt mai silentioase, mai usor de manevrat si mai accesibile ca pret, perfecte pentru o curte de dimensiuni medii. Daca ai de tocat lemne mai groase si in cantitati mari, atunci un tocator pe benzina e solutia, dar pregateste-te pentru zgomot si un pret pe masura."
+  image="/images/articles/tocator-de-crengi-pentru-curte.webp"
+  type="article"
+  publishedTime="2026-02-19T13:17:41.857Z"
+  modifiedTime="2026-02-19T13:17:41.857Z"
+  author="Andrei Marinescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Tocator de crengi pentru curte</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
+        <span class="article-date">19 februarie 2026</span>
+      </div>
+      <h1 class="article-title">Tocator de crengi pentru curte</h1>
+    </header>
+
+    <!-- Featured Image -->
+    
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="cel-mai-bun-tocator-de-crengi-pentru-curte-recomandarea-mea-de-prieten">
+        <h2>Cel mai bun tocator de crengi pentru curte: Recomandarea mea de prieten</h2>
+        <p>Bon, uite care-i treaba cu <strong>tocatorul de crengi pentru curte</strong>. Daca ma intrebi pe mine, si vrei ceva bun fara sa dai faliment, mergi pe mana unui model electric, cu sistem de taiere prin cutite. Alea sunt cele mai practice pentru o curte normala. Nu te astepta sa toace lemne de stejar groase cat bratul, alea sunt pentru profesionisti sau pentru cei cu livezi imense. Dar pentru crengile de la pomi, gard viu, arbusti – alea pe care le strangi dupa o curatare – e perfect.</p><p>Am avut un model de la Bosch, acum vreo 3 ani, unul mai solidut, 2500W, si si-a facut treaba impecabil. Tocat crengi de pana la 4 cm fara probleme. Era si destul de silentios, comparativ cu ce am mai auzit pe la vecini cu alea pe benzina. Si ca greutate, il puteai misca relativ usor prin curte. Partea buna e ca, daca se blocheaza, majoritatea au un buton de revers, deci nu trebuie sa desfaci juma de aparat.</p><p>Acum, daca ai de spart lemne mai mari, sau pur si simplu ai o gramada de material lemnos de prelucrat, atunci trebuie sa te uiti la cele pe benzina. Alea au putere mai mare, pot toca diametre mai groase, uneori pana la 7-8 cm, depinde de model. Dar sunt zgomotoase rau de tot, vibreaza, consuma benzina si ulei, si sunt mult mai grele. Plus ca intretinerea lor e mai complexa. Deci, pentru o curte de-a dreptul, nu pentru o exploatare forestiera, electricul e rege.</p><p>Ca pret, un electric bun te duce undeva pe la 800-1500 lei. Cele pe benzina, de la 1500 lei in sus, si pot ajunge si la 4000-5000 lei pentru modele profesionale. Ma rog, depinde ce vrei sa faci cu el, dar pentru uz casnic, un electric de 2000W+ e aur curat.</p>
+      </section>
+
+      <section id="top-4-tocatoare-de-crengi-pentru-curte-ce-merita-banii">
+        <h2>Top 4 tocatoare de crengi pentru curte: Ce merita banii</h2>
+        <p>Bun, hai sa vedem cateva optiuni concrete pentru un <strong>tocator de crengi pentru curte</strong>, ca sa nu zici ca vorbesc doar in general. Am ales modele care au un raport bun calitate-pret si sunt potrivite pentru uz casnic.</p><h3>1. Bosch AXT 25 TC (Electric)</h3><p>Asta e un fel de etalon pentru mine cand vine vorba de electrice. L-am vazut in actiune la un prieten si am ramas impresionat. Sistemul de taiere e cu turbina (de unde si TC-ul, cred), si toaca crengi de pana la 40 mm grosime. E destul de rapid, nu face asa mult zgomot, si are un sistem de autocuratare, ceea ce e super comod. E mai scump, undeva pe la 1400-1600 lei, dar isi merita fiecare banut daca vrei fiabilitate.</p><ul><li><strong>Avantaje:</strong> Foarte eficient la tocat, sistem de autocuratare, destul de silentios, manevrabil.</li><li><strong>Dezavantaje:</strong> Pretul e mai ridicat, nu toaca crengi foarte groase (max 4 cm).</li></ul><h3>2. Einhell GC-KS 2540 (Electric)</h3><p>Daca vrei ceva mai accesibil, Einhell e o optiune buna. Modelul asta e tot electric, cu cutite, si duce crengi pana la 40 mm. Nu e la fel de rapid sau de silentios ca Bosch-ul, dar isi face treaba. E mai usor, deci mai usor de mutat. L-am vazut si la un alt prieten, si a fost multumit pentru ce ofera la pretul lui, undeva pe la 800-1000 lei.</p><ul><li><strong>Avantaje:</strong> Pret bun, usor de manevrat, destul de puternic pentru diametrul specificat.</li><li><strong>Dezavantaje:</strong> Mai zgomotos decat modelele premium, sistemul de colectare (daca vine cu el) e mai simplu.</li></ul><h3>3. Makita UD2500 (Electric)</h3><p>Makita e un nume greu in scule, si tocatorul lor nu face exceptie. E un model robust, tot electric, cu cutite, bun pentru crengi de pana la 45 mm. Are un design mai solid, pare mai durabil. Pretul e undeva pe la 1200-1400 lei. Nu am apucat sa-l testez personal pe termen lung, dar din ce am vazut la un vecin, e o masina serioasa.</p><ul><li><strong>Avantaje:</strong> Constructie robusta, putere buna, toaca relativ gros.</li><li><strong>Dezavantaje:</strong> Mai greu decat alte modele electrice, pretul e pe partea mai ridicata.</li></ul><h3>4. Stihl GHE 135.0 (Benzina)</h3><p>Acum, daca ai nevoie neaparat de putere si nu te deranjeaza zgomotul si vibratiile, Stihl e o alegere sigura. Asta e deja alt nivel. E pe benzina, deci toaca crengi mult mai groase, pana la 50 mm, uneori chiar si mai mult, depinde cum sunt aruncate. E facut sa reziste, dar si pretul reflecta asta, sare de 2000 lei, ajungand si la 3000 lei in functie de motorizare.</p><ul><li><strong>Avantaje:</strong> Putere mare, toaca diametre mari, ideal pentru suprafete mari sau crengi lemnoase.</li><li><strong>Dezavantaje:</strong> Foarte zgomotos, greu, consuma benzina, intretinere mai complicata, pret ridicat.</li></ul><p>Astea sunt doar cateva exemple, piata e plina. Important e sa te gandesti la ce ai tu nevoie in curte, nu sa iei cel mai scump sau cel mai ieftin.</p>
+      </section>
+
+      <section id="cum-sa-alegi-tocatorul-de-crengi-pentru-curte-potrivit">
+        <h2>Cum sa alegi tocatorul de crengi pentru curte potrivit</h2>
+        <p>Alegerea unui <strong>tocator de crengi pentru curte</strong> nu e chiar asa complicata daca stii ce sa urmaresti. Hai sa o luam pe puncte, ca sa fie clar.</p><h3>Tipul de motorizare: Electric vs. Benzina</h3><p>Asta e prima mare diferenta. <br><strong>Electric:</strong> Bun pentru crengi de pana la 4-5 cm, mai silentios, mai usor, mai ieftin, mai putina intretinere. Perfect pentru curti medii, fara pretentii de exploatare forestiera. Daca ai priza in curte, e ideal. Dezavantajul e puterea limitata si necesitatea cablului.</p><p><strong>Benzina:</strong> Putere mare, toaca si diametre mai groase (5-8 cm+), independent de priza. Ideal pentru suprafete mari, crengi lemnoase, sau daca vrei sa il folosesti departe de casa. Dezavantajele sunt zgomotul infernal, vibratiile, greutatea, consumul de combustibil si intretinerea mai complexa (ulei, filtre, bujie).</p><h3>Sistemul de taiere: Cutite vs. Turbine/Frezare</h3><p>Aici sunt doua mari familii:</p><p><strong>Cutite (lame):</strong> Cele mai comune la electrice. Taie crengile ca un foarfece. Sunt rapide, fac un material mai marunt, bun pentru compost. Daca dai de ceva mai tare, pot sare sau se pot bloca.</p><p><strong>Turbina/Frezare (roller):</strong> Mai intalnite la cele puternice, pe benzina, sau la modele electrice premium. Au un sistem de frezare care macina crengile. Materialul rezultat e mai grosier, dar pot lua si diametre mai mari, chiar si crengi uscate si lemnoase. Sunt mai lente, dar mai puternice.</p><h3>Diametrul maxim de tocare</h3><p>Asta e crucial. Uita-te la specificatii si gandeste-te la ce ai tu in curte. Daca ai doar crengi subtiri de la vie sau gard viu, un 2-3 cm e suficient. Daca ai pomi fructiferi pe care ii tunzi des, probabil ai nevoie de 4-5 cm. Daca ai multa vegetatie lemnoasa si groasa, atunci te uiti la 6-8 cm, dar probabil vei merge pe benzina.</p><p>Am patit sa iau unul care zicea ca toaca 4 cm, dar abia ducea 3 cm. Deci, lasa 1 cm marja de siguranta.</p><h3>Puterea motorului (W sau CP)</h3><p>La electrice, puterea se masoara in Watti (W). Cu cat mai multi, cu atat mai bine. Sub 1800W e cam slabut pentru ceva serios. 2000-2500W e un punct bun pentru uz casnic. La cele pe benzina, e in Caluti Putere (CP). Peste 5 CP e deja o masina serioasa.</p><h3>Greutatea si manevrabilitatea</h3><p>Daca ai o curte mare si trebuie sa il muti des, greutatea conteaza. Cele electrice sunt, in general, mai usoare. Uita-te si la rotile pe care le are. Unii au roti mari, pneumatice, care trec mai usor peste denivelari.</p><h3>Sistemul de colectare</h3><p>Unele vin cu un sac colector, altele nu. Materialul tocat cade pe jos, si apoi il aduni. E mai comod sa aiba un sac, sau un sertar, din care sa poti goli usor. Daca vrei sa il folosesti imediat ca mulci, atunci nu conteaza atat de mult.</p><p>Deci, stai putin, gandeste-te: cat de mari sunt crengile? cat de des il vei folosi? cat de mare e curtea? astea sunt intrebarile cheie.</p>
+      </section>
+
+      <section id="electric-vs-benzina-duel-pe-tocator-de-crengi-pentru-curte">
+        <h2>Electric vs. Benzina: Duel pe tocator de crengi pentru curte</h2>
+        <p>Hai sa facem lumina intre cele doua mari tabere cand vine vorba de un <strong>tocator de crengi pentru curte</strong>: electricele si cele pe benzina. Stai sa vezi, nu-i chiar asa complicat.</p><h3>Tocatoarele electrice: Avantaje si dezavantaje</h3><p><strong>Avantaje:</strong></p><ul><li><strong>Pret:</strong> Sunt semnificativ mai ieftine. Un model bun te scoate din buzunar cu 800-1500 lei.</li><li><strong>Zgomot:</strong> Mult mai silentioase. Poti lucra dimineata sau seara fara sa deranjezi tot cartierul.</li><li><strong>Greutate:</strong> Sunt mai usoare, deci mai usor de manevrat prin curte, de urcat pe scari (daca ai nevoie).</li><li><strong>Intretinere:</strong> Aproape zero. Nu trebuie sa te complici cu benzina, ulei, filtre. Doar cureti cutitele ocazional.</li><li><strong>Ecologie:</strong> Nu polueaza direct, depinde de sursa de curent.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Putere:</strong> Sunt limitate la diametre mai mici, de obicei pana la 4-5 cm maxim. Nu fac fata crengilor groase, lemnoase.</li><li><strong>Mobilitate:</strong> Ai nevoie de o priza in apropiere sau de un prelungitor lung, ceea ce poate fi incomod.</li><li><strong>Durabilitate pe termen lung:</strong> Unele modele mai ieftine pot ceda mai repede daca sunt suprasolicitate.</li></ul><h3>Tocatoarele pe benzina: Avantaje si dezavantaje</h3><p><strong>Avantaje:</strong></p><ul><li><strong>Putere:</strong> Aici e punctul lor forte. Pot toaca diametre mult mai mari, de la 5-6 cm pana la 8-10 cm, si fac fata si materialului mai uscat, mai lemnos.</li><li><strong>Mobilitate:</strong> Sunt independente de priza. Le poti folosi oriunde in curte sau pe teren.</li><li><strong>Productivitate:</strong> Datorita puterii, pot procesa cantitati mari de material intr-un timp scurt.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Pret:</strong> Sunt mult mai scumpe, pornind de la 1500-2000 lei si ajungand la mii de lei pentru modele profesionale.</li><li><strong>Zgomot:</strong> Sunt extrem de zgomotoase. Teoretic, ar trebui sa porti protectie auditiva.</li><li><strong>Greutate:</strong> Sunt mult mai grele si mai greu de manevrat.</li><li><strong>Intretinere:</strong> Necesita intretinere regulata: schimb de ulei, curatare filtru aer, verificare bujie, amestec benzina-ulei (la motoarele in doi timpi).</li><li><strong>Poluare:</strong> Polueaza mai mult prin arderea combustibilului.</li></ul><p><strong>Verdictul meu?</strong> Daca ai o curte obisnuita, cu crengi de la pomi fructiferi, gard viu, si nu vrei sa faci o mica padure din ele, un <strong>tocator de crengi pentru curte</strong> electric, undeva la 2000-2500W, e cea mai buna investitie. Nu te complica cu benzina daca nu ai nevoie neaparat de puterea aia.</p>
+      </section>
+
+      <section id="greseli-de-evitat-cand-cumperi-si-folosesti-un-tocator-de-crengi-pentru-curte">
+        <h2>Greseli de evitat cand cumperi si folosesti un tocator de crengi pentru curte</h2>
+        <p>Na, ca am ajuns si la partea cu ce NU trebuie sa faci. Ca sa nu arzi banii pe fereastra sau sa te trezesti cu un aparat care sta degeaba in magazie.</p><h3>1. Sa iei cel mai ieftin model</h3><p>Stiu, tentatia e mare. Dar cele sub 500-600 lei, mai ales electrice, sunt de obicei foarte slabe. Nu toaca cum trebuie, se blocheaza des, si cel mai probabil o sa te enervezi si o sa-l arunci. Mai bine mai strangi niste bani si iei ceva decent, care sa te tina.</p><h3>2. Sa ignori diametrul maxim de tocare</h3><p>Asta am zis si mai sus, dar e asa important ca merită repetat. Daca scrie 4 cm, nu te astepta sa toace crengi de 5 cm. O sa-l strici. Gandeste-te la cea mai groasa creanga pe care o ai frecvent si ia un tocator cu o marja de siguranta de cel putin 1 cm.</p><h3>3. Sa nu citesti manualul</h3><p>Zic si eu, ca omul. Multi deschid cutia, baga in priza si dau drumul la treaba. Dar sunt chestii importante in manual: cum se intretine, cum se curata, ce sa faci daca se blocheaza, cum sa introduci crengile in siguranta. E bine sa stii.</p><h3>4. Sa bagi crengi cu pamant sau pietre</h3><p>Asta e siguranta de distrugere a cutitelor. Ai strans crengile de pe jos? Curata-le de pamant, pietricele, nisip. Altfel, o sa toceasca si alea, si o sa se toceasca si cutitele mult mai repede. Si zgomotul o sa fie de nedescris.</p><h3>5. Sa bagi prea multe crengi odata</h3><p>Mai ales la cele electrice, nu forta. Introdu crengile una cate una sau doua cate doua, in functie de cum cere aparatul. Daca bagi un manunchi deodata, o sa se blocheze imediat. Rabdare, ca nu alergi nicaieri.</p><h3>6. Sa nu cureti aparatul dupa folosire</h3><p>Dupa ce ai terminat, curata cutitele, gura de alimentare, sacul colector. Ramurile uscate pot ramane lipite, si la urmatoarea utilizare o sa fie mai greu. Si o sa previi rugina, mai ales pe cutite.</p><p>Si inca un pont: daca vrei sa faci compost din resturile tocate, amesteca crengile mai lemnoase cu cele mai verzi, umede. Asa fermenteaza mai bine.</p>
+      </section>
+
+      <section id="verdict-pe-buget-ce-tocator-de-crengi-pentru-curte-cumperi">
+        <h2>Verdict pe buget: Ce tocator de crengi pentru curte cumperi?</h2>
+        <p>Ok, hai sa vedem cum alegi un <strong>tocator de crengi pentru curte</strong> in functie de cati bani esti dispus sa investesti. Nu exista o solutie universala, dar asta te poate ghida.</p><h3>Buget mic (Sub 800 lei)</h3><p>In zona asta, te uiti strict la modele electrice, de obicei cu putere mai mica (1800-2000W). O sa gasesti marci mai putin cunoscute, sau modele de baza de la producatori mai mari. Sunt bune pentru crengi foarte subtiri, de pana in 3 cm.</p>
+        <p>Nu te astepta la minuni, nu vor toaca rapid si s-ar putea sa se blocheze daca le fortezi. Sunt ok daca ai de curatat doar cativa arbusti sau cateva crengi subtiri, o data pe an. O sa fie probabil si mai zgomotoase si mai greu de manevrat.</p>
+        <p>Cauta ceva cu pareri bune, chiar si in zona asta ieftina.</p><h3>Buget mediu (800 - 1500 lei)</h3><p>Aici incepe distractia. Poti lua un <strong>tocator de crengi pentru curte</strong> electric foarte bun, de la producatori de renume (Bosch, Makita, Einhell mai solid), cu putere de 2200-2500W. Acestea pot toca crengi de pana la 4-4.5 cm, sunt mai rapide, mai silentioase si mai fiabile. Multe vin cu sisteme de siguranta si functii suplimentare, cum ar fi autocuratarea sau sistemul de revers. Asta e zona ideala pentru majoritatea gradinilor. Investitia se vede in performanta si durabilitate.</p><h3>Buget mare (Peste 1500 lei)</h3><p>Daca bugetul iti permite, aici ai doua optiuni.</p><p><strong>1. Electric premium:</strong> Poti lua un model electric de top, cu putere foarte mare, sistem de taiere performant (gen turbina), si constructie robusta. Acestea pot duce crengi de 4.5-5 cm fara probleme si sunt facute sa reziste zeci de ani.</p><p><strong>2. Benzina entry-level/mediu:</strong> Sau te poti uita la modele pe benzina, de la producatori ca Stihl, Husqvarna, sau marci cunoscute pentru motoare. Acestea o sa toace crengi de 5-7 cm, sunt independente de priza si pot lucra in conditii mai grele. Dar, cum am zis, pregateste-te pentru zgomot, vibratii si mai multa munca la intretinere.</p><p>Indiferent de buget, incearca sa te orientezi spre marci cunoscute, cu service in tara, daca se poate. E mai sigur pe termen lung.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                cat costa un tocator de crengi pentru curte
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un <strong>tocator de crengi pentru curte</strong> electric de calitate, bun pentru uz casnic, costa intre 800 si 1500 lei. Modelele electrice mai simple pot fi gasite si sub 800 lei, dar sunt mai putin performante. Tocatoarele pe benzina incep de la aproximativ 1500-2000 lei si pot ajunge la peste 5000 lei pentru modele profesionale.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                care e diferenta intre tocatoare electrice si pe benzina
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Principala diferenta este puterea si mobilitatea. Tocatoarele electrice sunt mai silentioase, mai usoare si mai ieftine, ideale pentru crengi de pana la 4-5 cm, dar necesita priza. Cele pe benzina sunt mai puternice, toaca diametre mai mari (5-8 cm+), sunt independente de priza, dar sunt mai zgomotoase, mai grele si mai scumpe.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                merita sa cumpar un tocator de crengi pentru curte?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, merita daca ai o curte cu multi pomi, arbusti sau gard viu pe care il tunzi regulat. Un <strong>tocator de crengi pentru curte</strong> te ajuta sa reduci volumul deseurilor lemnoase, transformandu-le in material pentru compost sau mulci, economisind timp si efort la transportul lor.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                ce tocator de crengi pentru curte e mai bun, electric sau pe benzina
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru majoritatea gradinilor de dimensiuni medii, un tocator electric de 2000-2500W este mai bun. Este mai usor de utilizat, mai silentios si mai accesibil. Daca ai de procesat cantitati mari de crengi groase si lemnoase, sau lucrezi pe teren fara acces la curent, atunci un model pe benzina este superior.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                ce diametru maxim poate toca un tocator de crengi electric
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Majoritatea tocatoarelor electrice pentru uz casnic pot toca crengi cu diametrul maxim intre 3 si 4.5 cm. Modelele mai puternice pot ajunge la 5 cm, dar rareori depasesc aceasta valoare. Este important sa verifici specificatiile producatorului pentru fiecare model in parte.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                cum se intretine un tocator de crengi pentru curte
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Intretinerea unui <strong>tocator de crengi pentru curte</strong> depinde de tipul motorizarii. La cele electrice, curata cutitele si interiorul dupa fiecare utilizare. La cele pe benzina, pe langa curatare, schimba uleiul regulat, verifica filtrul de aer si bujia. Asigura-te ca depozitezi aparatul intr-un loc uscat.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-6">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                unde gasesc piese de schimb pentru tocator de crengi
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Piese de schimb precum cutite, curele sau filtre se gasesc de obicei la magazinele specializate in unelte de gradina, service-urile autorizate ale marcilor respective (ex: service Bosch, Stihl) sau online, pe site-uri mari de comert electronic care vand piese de schimb pentru unelte de gradina.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-7">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                cat dureaza sa tocesti crengile cu un tocator electric
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Timpul necesar variaza mult in functie de cantitatea de crengi, diametrul lor si eficienta tocatorului. Pentru o curte de dimensiuni medii, cu crengi de pana la 4 cm, procesul poate dura intre 30 de minute si 2 ore. Modelele mai performante si cu un diametru de tocare mai mare vor finaliza lucrarea mai rapid.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">AM</div>
+      <div class="author-info">
+        <h4>Andrei Marinescu</h4>
+        <p class="author-role">Expert Gradinarit</p>
+        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="tocator-de-crengi-pentru-curte"
+      currentCategory="gradinarit-unelte"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

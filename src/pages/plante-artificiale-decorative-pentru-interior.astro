@@ -1,0 +1,263 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Plante artificiale decorative pentru interior",
+  excerpt: "Daca iti doresti sa aduci un strop de verdeata in casa ta, dar nu ai timp sau nu ai deloc mana forte pentru plante vii, astazi vorbim despre o alternativa care a evoluat enorm: plantele artificiale decorative. Nu te gandi la vechile imitatii din plastic, ci la solutii care pot pacali ochiul si pot infrumuseta orice colt al casei tale.",
+  image: "/images/articles/plante-artificiale-decorative-pentru-interior.webp",
+  category: "Decoratiuni Casa",
+  categorySlug: "decoratiuni-casa",
+  date: "2026-01-19T09:15:45.052Z",
+  modifiedDate: "2026-01-31T09:15:45.684Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Cat de des trebuie curatate plantele artificiale?", answer: "Ideal ar fi sa le stergi de praf o data pe saptamana sau la doua saptamani cu o carpa moale, uscata sau usor umeda. Daca sunt amplasate intr-un loc unde se aduna mai mult praf, curatarea poate fi necesara mai des. O data pe luna, sau de cate ori simti nevoia, le poti clati usor sub dus cu apa calduta si un pic de detergent de vase, apoi le lasi sa se usuce complet la aer." },
+  { question: "Pot plantele artificiale sa se decoloreze in soare?", answer: "Da, absolut. La fel cum se intampla cu multe materiale, expunerea prelungita la lumina directa a soarelui poate duce la decolorarea frunzelor si a tijelor. De aceea, mi se pare important sa le plasezi in zone unde nu sunt direct luminate de soare, sau sa alegi modele tratate UV, desi acestea sunt mai rare si mai scumpe." },
+  { question: "Ce fac daca o frunza de la o planta artificiala se rupe?", answer: "In functie de tipul plantei si de modul in care sunt prinse frunzele, uneori le poti lipi la loc cu un adeziv puternic, cum ar fi un adeziv pentru materiale textile sau un lipici universal. Daca planta este mai complexa, poti incerca sa cauti o frunza de rezerva sau sa o inlocuiesti cu o frunza de la o alta planta artificiala mai veche sau deteriorata." },
+  { question: "Sunt plantele artificiale ieftine o alegere buna?", answer: "Din experienta mea, plantele artificiale foarte ieftine sunt rareori o alegere buna pe termen lung. De obicei, materialele sunt de proasta calitate, aspectul este artificial (plastic lucios, culori nenaturale) si nu rezista in timp. Recomand sa investesti un pic mai mult intr-o planta de calitate medie spre buna, care va arata mult mai bine si va rezista mai mult." },
+  { question: "Pot folosi plante artificiale in baie sau bucatarie?", answer: "Da, plantele artificiale sunt o optiune excelenta pentru baie si bucatarie, mai ales daca aceste incaperi nu au multa lumina naturala. In baie, umiditatea ridicata nu le afecteaza, iar in bucatarie pot adauga un strop de culoare si prospetime. Asigura-te doar ca le cureti periodic, pentru a elimina eventualele mirosuri sau depuneri de grasime." },
+  { question: "Cum pot face o planta artificiala sa arate mai natural?", answer: "Secretul sta in detalii. Aranjeaza frunzele si tijele pentru a crea un aspect mai dinamic si mai putin uniform. Foloseste un ghiveci decorativ, nu cel simplu de transport. Poti adauga pamant decorativ, pietricele sau muschi uscat in ghiveci pentru a acoperi baza. Unele plante artificiale au frunze care pot fi modelate usor, asa ca nu ezita sa le sculptezi putin pana obtii aspectul dorit." }
+];
+
+const toc = [
+  { title: "De ce plante artificiale? O solutie pentru oricine isi doreste verdeata in casa", id: "de-ce-plante-artificiale-o-solutie-pentru-oricine-isi-doreste-verdeata-in-casa" },
+  { title: "Top 5 Plante Artificiale Decorative care mi-au atras atentia", id: "top-5-plante-artificiale-decorative-care-mi-au-atras-atentia" },
+  { title: "Cum alegi verdele perfect pentru casa ta - Ghid practic", id: "cum-alegi-verdele-perfect-pentru-casa-ta-ghid-practic" },
+  { title: "Avantaje si Dezavantaje: E aur curat sau doar o iluzie?", id: "avantaje-si-dezavantaje-e-aur-curat-sau-doar-o-iluzie" },
+  { title: "Trucuri din experienta: Cum sa le faci sa arate wow", id: "trucuri-din-experienta-cum-sa-le-faci-sa-arate-wow" },
+  { title: "Parerea mea: Sunt plantele artificiale o alegere buna? Da, dar cu cap!", id: "parerea-mea-sunt-plantele-artificiale-o-alegere-buna-da-dar-cu-cap" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Plante artificiale decorative pentru interior - CentroCasa"
+  description="Daca iti doresti sa aduci un strop de verdeata in casa ta, dar nu ai timp sau nu ai deloc mana forte pentru plante vii, astazi vorbim despre o alternativa care a evoluat enorm: plantele artificiale decorative. Nu te gandi la vechile imitatii din plastic, ci la solutii care pot pacali ochiul si pot infrumuseta orice colt al casei tale."
+  image="/images/articles/plante-artificiale-decorative-pentru-interior.webp"
+  type="article"
+  publishedTime="2026-01-19T09:15:45.052Z"
+  modifiedTime="2026-01-31T09:15:45.684Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Plante artificiale decorative pentru interior</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
+        <span class="article-date">24 ianuarie 2026</span>
+      </div>
+      <h1 class="article-title">Plante artificiale decorative pentru interior</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/plante-artificiale-decorative-pentru-interior.webp" alt="Plante artificiale decorative pentru interior" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-plante-artificiale-o-solutie-pentru-oricine-isi-doreste-verdeata-in-casa">
+        <h2>De ce plante artificiale? O solutie pentru oricine isi doreste verdeata in casa</h2>
+        <p>Hei prietene! Stiu ca uneori ideea de a avea plante vii in casa poate parea intimidanta. Fie ca ai un program super incarcat, fie ca pur si simplu nu ai "mana forte" pentru plante, s-ar putea sa te fi gandit ca verdeleata nu e pentru tine. Ei bine, gresit! In ultimii ani, plantele artificiale au facut pasi uriasi inainte.</p>
+        <p>Nu mai vorbim de acele imitatii lucioase, din plastic ieftin, care stau praduite in colturi. Astazi, vorbim despre plante artificiale care arata incredibil de realist, care pot aduce textura, culoare si o atmosfera placuta in orice spatiu. Din experienta mea, sunt perfecte pentru persoanele care calatoresc mult, pentru cei care locuiesc in apartamente fara multa lumina naturala sau pur si simplu pentru cei care vor un decor fara griji.</p>
+        <p>Nu ai nevoie de apa, de soare, de pamant special... doar de un pic de prafuit ocazional. Mi se pare o solutie geniala pentru a revitaliza un hol intunecat, pentru a da un pic de viata biroului de acasa sau pentru a completa un aranjament de mobilier. Si sincer, cand vezi cat de bine arata unele modele, iti vine sa le cumperi pe toate! Nu te lasa pacalit de prejudecati, plantele artificiale de astazi sunt o optiune serioasa pentru decorul casei tale.</p>
+      </section>
+
+      <section id="top-5-plante-artificiale-decorative-care-mi-au-atras-atentia">
+        <h2>Top 5 Plante Artificiale Decorative care mi-au atras atentia</h2>
+        <p>Am testat si am vazut o gramada de plante artificiale, si pot sa spun ca unele chiar ies in evidenta. Am ales cateva optiuni care mi s-au parut ca ofera cel mai bun raport calitate-pret si un aspect cat mai natural:</p>
+        <p>1.  <strong>Ficus Lyrata (Chitară) artificial:</strong> Acesta este un "must-have" in multe case acum, si pe buna dreptate. Frunzele mari, in forma de vioara, dau un aer modern si sofisticat. Am vazut modele cu tulpina de 1.5m pana la 2m, cu frunze din material textil de buna calitate, care chiar imita textura pieloasa a celor vii.</p>
+        <p>Multe vin si cu un ghiveci simplu, negru, pe care il poti inlocui cu unul ceramic mai elegant. Pretul pentru un ficus de 1.5m incepe de la aproximativ 200-300 RON, insa modelele mai mari, cu aspect foarte realist, pot ajunge si la 500-700 RON. Imi place la acest model ca poate transforma instantaneu un colt gol.</p>
+        <p>2.  <strong>Monstera Deliciosa artificială:</strong> Un alt "trend-setter" in decorul de interior. Frunzele mari, cu acele "taieturi" specifice, aduc un vibe tropical si relaxant. Am gasit modele cu 3-5 tije, cu frunze lucioase sau mate, in functie de preferinte. Cele cu aspect mai mat si usor "ridat" mi se par mai realiste. Cele de dimensiuni medii, cam 80-100cm inaltime, se invart pe la 150-250 RON. Cele mai mari, cu multe frunze si ramificatii, pot trece de 400 RON.</p>
+        <p>3.  <strong>Bambus artificial (in ghiveci sau ca paravan):</strong> Daca vrei sa creezi o atmosfera zen sau sa delimitezi un spatiu, bambusul artificial e o alegere excelenta. Am vazut tije de bambus grupate in ghivece mari, care arata foarte bine langa o fereastra sau intr-un hol. De asemenea, paravanele din bambus artificial, fie ca sunt pliate, fie ca sunt dispuse pe un cadru, sunt practice si estetice.</p>
+        <p>Un grup de tije de bambus in ghiveci de 1.2m poate fi in jur de 180-280 RON. Paravanele sunt mai scumpe, incepand de la 300-400 RON.</p>
+        <p>4.  <strong>Plante suculente si cactusi artificiali:</strong> Pentru cei care iubesc "micile comori" verzi, dar nu au rabdare sa le ingrijeasca, suculentele si cactusi artificiali sunt perfecti. Vin intr-o varietate uriasa de forme si culori. De multe ori sunt vandute in seturi mici, cu ghivece simpatice, gata de pus pe birou sau pe o etajera. Un set de 3-5 suculente mici, cu ghivece, poate fi gasit si cu 50-100 RON. Cele mai mari, cu aspect mai elaborat, pot ajunge la 150 RON.</p>
+        <p>5.  <strong>Eucalipt artificial (crengute sau buchete):</strong> Eucaliptul, cu frunzele sale argintii sau verzui, aduce un plus de delicatete si prospetime. Crengutele de eucalipt artificial sunt incredibil de versatile. Le poti pune intr-o vaza simpla, le poti integra in buchete de flori artificiale sau le poti folosi pentru a crea coronite decorative. Pretul pentru un buchet de eucalipt artificial de calitate buna este undeva intre 60-120 RON, in functie de marime si numarul de crengute.</p>
+      </section>
+
+      <section id="cum-alegi-verdele-perfect-pentru-casa-ta-ghid-practic">
+        <h2>Cum alegi "verdele" perfect pentru casa ta? Ghid practic</h2>
+        <p>Alegerea plantelor artificiale potrivite poate parea simpla, dar sunt cateva aspecte la care eu m-as uita atent, ca sa nu dau banii degeaba pe ceva ce nu arata bine. In primul rand, <strong>materialul</strong>. Asta e cel mai important.</p>
+        <p>Azi, plantele bune sunt facute din materiale textile (matase, poliester de calitate), uneori cu inserții de silicon sau cauciuc pentru a imita mai bine textura. Evita plasticul lucios, ala se vede de la o posta ca e artificial. Verifica daca frunzele sunt bine prinse de tije si daca nu au defecte de fabricatie.</p>
+        <p>Un alt aspect important este <strong>realismul</strong>. Uita-te la detalii: venaturile frunzelor, cum sunt dispuse pe tije, daca au mici "imperfețiuni" naturale. Unele plante artificiale au si "praf" sau "pete" subtile care le fac sa para mai autentice.</p>
+        <p>Gandeste-te si la <strong>dimensiune si proportie</strong>. O planta prea mare intr-un spatiu mic va fi sufocanta, iar una prea mica intr-un living spatios se va pierde. Masoara spatiul unde vrei sa o pui si cauta ceva ce se potriveste.</p>
+        <p>Nu uita de <strong>ghiveci</strong>! Multe plante vin in ghivece simple, de transport. E bine sa te gandesti daca vrei sa le schimbi cu unele mai decorative, care sa se potriveasca stilului tau de amenajare. Culorile sunt si ele importante.</p>
+        <p>Incearca sa alegi nuante cat mai naturale. Unele plante artificiale au culori prea aprinse sau prea uniforme, ceea ce le trage in jos. Si la final, dar nu cel din urma, <strong>bugetul</strong>.</p>
+        <p>Pretul variaza enorm in functie de calitate, marime si brand. Eu as recomanda sa investesti un pic mai mult intr-o piesa centrala, cum ar fi un ficus mare, si sa completezi cu piese mai mici si mai accesibile. Nu te grabi, cauta oferte si compara preturile intre diferite magazine online si fizice.</p>
+        <p>Sper ca aceste sfaturi sa te ajute sa faci alegerea potrivita!</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-e-aur-curat-sau-doar-o-iluzie">
+        <h2>Avantaje si Dezavantaje: E aur curat sau doar o iluzie?</h2>
+        <p>Cand vine vorba de plante artificiale, parerile sunt impartite. Dar, din experienta mea, beneficiile sunt destul de evidente, desi exista si cateva puncte slabe pe care ar trebui sa le luam in considerare.</p>
+        <p><strong>Avantaje:</strong></p>
+        <p><strong>Intretinere zero:</strong> Acesta e probabil cel mai mare avantaj. Nu trebuie sa le uzi, sa le fertilizezi, sa le schimbi pamantul sau sa te ingrijorezi de lumina. Sunt perfecte pentru persoanele ocupate, pentru cei care calatoresc des sau pentru cei care pur si simplu nu au timp sau inclinatie pentru ingrijirea plantelor vii.</p>
+        <p><strong>Durabilitate:</strong> Odata achizitionate, plantele artificiale de calitate pot rezista ani de zile, fara sa-si piarda aspectul, atata timp cat sunt ingrijite corespunzator (prafuite). Spre deosebire de plantele vii, care pot muri din diverse motive, cele artificiale sunt o investitie pe termen lung.</p>
+        <p><strong>Solutie pentru spatii cu lumina redusa:</strong> Ai un hol intunecat, o baie fara geam sau un birou unde lumina naturala e la minimum? Plantele artificiale sunt raspunsul. Ele pot aduce verdeata si viata in orice colt al casei, indiferent de conditiile de lumina.</p>
+        <p><strong>Varietate si disponibilitate:</strong> Poti gasi aproape orice tip de planta, in orice dimensiune, indiferent de sezon. Vrei o planta tropicala rara iarna? Nicio problema! Poti crea aranjamente complexe si personalizate, fara sa te limitezi la ce creste in zona ta sau la ce este disponibil in pepiniere.</p>
+        <p><strong>Hipoalergenice:</strong> Pentru persoanele cu alergii la polen sau la anumite tipuri de flori, plantele artificiale sunt o alternativa excelenta pentru a se bucura de frumusetea plantelor fara riscuri.</p>
+        <p><strong>Dezavantaje:</strong></p>
+        <p><strong>Aspectul:</strong> Chiar si cele mai bune plante artificiale pot fi identificate ca atare de catre un ochi mai atent. Unele materiale pot parea prea lucioase, prea uniforme sau pur si simplu "moarte". Este important sa alegi produse de calitate pentru a minimiza acest aspect.</p>
+        <p><strong>Potențialul de a aduna praf:</strong> Fara a fi udate, plantele artificiale pot acumula praf in timp, ceea ce le poate face sa para mai vechi si mai neatractive. Necesita o curatare periodica, fie prin stergere cu o carpa umeda, fie prin pulverizare cu apa.</p>
+        <p><strong>Costul initial:</strong> Plantele artificiale de calitate, care arata natural, pot fi destul de scumpe. O piesa deosebita, mare si bine realizata, poate costa la fel de mult sau chiar mai mult decat o planta vie de dimensiuni similare.</p>
+        <p><strong>Lipsa beneficiilor pentru aer:</strong> Spre deosebire de plantele vii, cele artificiale nu purifica aerul si nu produc oxigen. Acesta este un dezavantaj major pentru cei care cauta beneficiile de mediu ale plantelor.</p>
+        <p><strong>Pot fi considerate "false" sau "artificiale":</strong> Pentru unii oameni, ideea de a avea "fake plants" in casa este pur si simplu neplacuta. Preferinta pentru naturalețe este o chestiune de gust personal.</p>
+      </section>
+
+      <section id="trucuri-din-experienta-cum-sa-le-faci-sa-arate-wow">
+        <h2>Trucuri din experienta: Cum sa le faci sa arate "wow!"</h2>
+        <p>Am invatat cateva "secrete" in timp despre cum sa fac plantele artificiale sa arate cat mai bine si sa se integreze perfect in decorul casei. Nu e suficient sa le cumperi si sa le arunci pe un raft, trebuie sa le acorzi un pic de atentie. In primul rand, <strong>nu le lasa sa stea "ca din cutie"</strong>.</p>
+        <p>Multe plante artificiale vin presate in ambalaj. Ia-ti cateva minute sa "aranjezi" frunzele, sa le deschizi, sa le "aerisesti". Unele tije pot fi indoite sau modelate usor pentru a da un aspect mai natural, mai "haotic" si mai dinamic.</p>
+        <p>Eu imi petrec uneori 10-15 minute cu o planta noua, "sculptand-o" putin pana cand imi place cum arata. Un alt truc pe care il folosesc des este <strong>combinarea cu elemente naturale</strong>. Nu te sfii sa pui o crenguta artificiala de eucalipt langa cateva flori uscate sau sa combini o planta artificiala cu cateva ghivece cu plante vii mai mici.</p>
+        <p>Acest mix creeaza un echilibru si face ca si planta artificiala sa para mai putin "singura" si mai integrata in mediul natural. <strong>Ghiveciul face diferenta!</strong> Am spus-o si mai sus, dar merita repetat. Un ghiveci simplu, de plastic, poate strica complet aspectul unei plante altfel frumoase. Investeste intr-un ghiveci ceramic, de pamant, sau unul din ratan, care sa se potriveasca stilului tau.</p>
+        <p>Poate chiar sa pui cateva pietre decorative sau muschi uscat in ghiveci, pentru a acoperi pamantul (cel artificial, evident!) si a da un aspect mai finisat. <strong>Plasarea strategica</strong> este esentiala. Nu pune o planta artificiala intr-o pozitie unde lumina directa a soarelui o va lovi constant. Asta poate duce la decolorare in timp.</p>
+        <p>Alege colturi mai umbroase, unde plantele vii s-ar chinui, dar unde o planta artificiala va straluci. De asemenea, gandeste-te la inaltime. O planta mai inalta langa o canapea sau un fotoliu poate crea un punct focal interesant, iar una mai mica pe o etajera poate adauga un strop de culoare.</p>
+        <p>Si nu uita de <strong>curatare</strong>! Un prafuit regulat cu o carpa moale sau cu un pamatuf special pentru praf face minuni. Daca sunt mai murdare, le poti clati usor sub dus, cu apa calduta, si apoi le lasi sa se usuce complet la aer (nu in soare direct!).</p>
+      </section>
+
+      <section id="parerea-mea-sunt-plantele-artificiale-o-alegere-buna-da-dar-cu-cap">
+        <h2>Parerea mea: Sunt plantele artificiale o alegere buna? Da, dar cu cap!</h2>
+        <p>Dupa atatia ani in care am vazut si am testat tot felul de produse pentru casa, pot sa spun cu mana pe inima ca plantele artificiale de astazi sunt o revolutie in decorul de interior. Mi se pare incredibil cum tehnologia a avansat si a reusit sa creeze produse care imita atat de bine natura. Totusi, nu as recomanda sa inlocuiesti complet plantele vii cu cele artificiale, mai ales daca ai posibilitatea sa le ingrijesti pe cele vii.</p>
+        <p>Plantele vii aduc o energie aparte, un sentiment de prospetime si, sa fim sinceri, purifica si aerul. Dar, pentru momentele in care asta nu e posibil, plantele artificiale sunt o solutie fantastica. Secretul sta in <strong>alegerea potrivita</strong>.</p>
+        <p>Nu te arunca la prima oferta ieftina. Cauta produse de calitate, cu aspect cat mai natural. Investeste intr-o piesa centrala care sa arate spectaculos si completeaza cu accente mai mici.</p>
+        <p>Nu te astepta la miracole de la cele mai ieftine modele. Gandeste-te la ele ca la niste accesorii de decor, la fel ca o perna decorativa sau o vaza. Daca sunt alese corect, pot transforma complet un spatiu.</p>
+        <p>Eu am cateva "plante vedeta" in casa, pe care le rotesc prin diverse camere in functie de sezon sau de starea mea de spirit. Si sincer, de fiecare data cand vine cineva nou, ma intreaba "Ce planta frumoasa ai!" Si eu zambesc si raspund "E artificiala!". Surpriza lor e mereu pe masura.</p>
+        <p>Asa ca, da, le recomand cu caldura, atat timp cat stii ce cumperi si cum sa le integrezi in decorul tau. Bucura-te de verdeata, indiferent de cum ajunge ea in casa ta!</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de des trebuie curatate plantele artificiale?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Ideal ar fi sa le stergi de praf o data pe saptamana sau la doua saptamani cu o carpa moale, uscata sau usor umeda. Daca sunt amplasate intr-un loc unde se aduna mai mult praf, curatarea poate fi necesara mai des. O data pe luna, sau de cate ori simti nevoia, le poti clati usor sub dus cu apa calduta si un pic de detergent de vase, apoi le lasi sa se usuce complet la aer.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot plantele artificiale sa se decoloreze in soare?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, absolut. La fel cum se intampla cu multe materiale, expunerea prelungita la lumina directa a soarelui poate duce la decolorarea frunzelor si a tijelor. De aceea, mi se pare important sa le plasezi in zone unde nu sunt direct luminate de soare, sau sa alegi modele tratate UV, desi acestea sunt mai rare si mai scumpe.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce fac daca o frunza de la o planta artificiala se rupe?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                In functie de tipul plantei si de modul in care sunt prinse frunzele, uneori le poti lipi la loc cu un adeziv puternic, cum ar fi un adeziv pentru materiale textile sau un lipici universal. Daca planta este mai complexa, poti incerca sa cauti o frunza de rezerva sau sa o inlocuiesti cu o frunza de la o alta planta artificiala mai veche sau deteriorata.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Sunt plantele artificiale ieftine o alegere buna?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Din experienta mea, plantele artificiale foarte ieftine sunt rareori o alegere buna pe termen lung. De obicei, materialele sunt de proasta calitate, aspectul este artificial (plastic lucios, culori nenaturale) si nu rezista in timp. Recomand sa investesti un pic mai mult intr-o planta de calitate medie spre buna, care va arata mult mai bine si va rezista mai mult.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot folosi plante artificiale in baie sau bucatarie?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, plantele artificiale sunt o optiune excelenta pentru baie si bucatarie, mai ales daca aceste incaperi nu au multa lumina naturala. In baie, umiditatea ridicata nu le afecteaza, iar in bucatarie pot adauga un strop de culoare si prospetime. Asigura-te doar ca le cureti periodic, pentru a elimina eventualele mirosuri sau depuneri de grasime.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum pot face o planta artificiala sa arate mai natural?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Secretul sta in detalii. Aranjeaza frunzele si tijele pentru a crea un aspect mai dinamic si mai putin uniform. Foloseste un ghiveci decorativ, nu cel simplu de transport. Poti adauga pamant decorativ, pietricele sau muschi uscat in ghiveci pentru a acoperi baza. Unele plante artificiale au frunze care pot fi modelate usor, asa ca nu ezita sa le "sculptezi" putin pana obtii aspectul dorit.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="plante-artificiale-decorative-pentru-interior"
+      currentCategory="decoratiuni-casa"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

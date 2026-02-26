@@ -1,0 +1,274 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Corpuri de iluminat pentru living modern",
+  excerpt: "Alegerea corpurilor de iluminat potrivite pentru livingul modern poate transforma complet atmosfera unei case. Nu e vorba doar de lumina, ci si de stil si functionalitate. Hai sa vedem cum putem face cea mai buna alegere, ca sa ne simtim cu adevarat acasa.",
+  image: "/images/articles/corpuri-de-iluminat-pentru-living-modern.webp",
+  category: "Decoratiuni Casa",
+  categorySlug: "decoratiuni-casa",
+  date: "2026-01-10T13:59:37.157Z",
+  modifiedDate: "2026-01-28T13:59:37.052Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Ce inseamna lumina calda, neutra si rece pentru becuri?", answer: "Temperatura de culoare a becurilor se masoara in Kelvin (K). Lumina calda (sub 3300K) este asemanatoare cu lumina unui bec incandescent, fiind galbuie si relaxanta, ideala pentru living sau dormitor. Lumina neutra (3300K - 5300K) este mai alba, apropiata de lumina naturala a zilei, potrivita pentru bucatarii sau bai. Lumina rece (peste 5300K) este alb-albasturie, energizanta, recomandata pentru spatii de lucru sau garaje." },
+  { question: "Pot folosi becuri LED in toate corpurile de iluminat?", answer: "Da, in general, poti folosi becuri LED in majoritatea corpurilor de iluminat, atat timp cat soclul becului este compatibil (E27, E14, GU10 etc.). LED-urile sunt eficiente energetic, au o durata de viata lunga si sunt disponibile intr-o varietate mare de forme si temperaturi de culoare. Verifica specificatiile corpului de iluminat pentru a te asigura ca becul ales este potrivit." },
+  { question: "Cat de important este indicele de redare a culorilor (CRI) la becurile pentru living?", answer: "Indicele de Redare a Culorilor (CRI) arata cat de fidel sunt redate culorile obiectelor sub lumina unui bec, comparativ cu lumina naturala. Pentru living, un CRI de peste 80 este bun, dar un CRI de 90+ este ideal pentru a te asigura ca tapetul, mobilierul si decoratiunile tale arata exact asa cum trebuie, fara distorsiuni de culoare. Un CRI mai mare contribuie la o atmosfera mai placuta si mai naturala." },
+  { question: "Am un living mic. Ce tipuri de corpuri de iluminat ar trebui sa evit?", answer: "Pentru un living mic, ar trebui sa eviti corpurile de iluminat prea masive si aglomerate. Lustrele foarte mari, cu multe brate si ornamente, pot copleși spațiul. De asemenea, evită lampadarele cu baze foarte largi care ocupă mult loc pe podea. Concentrează-te pe soluții mai discrete, cum ar fi aplice de perete, spoturi incastrate (dacă ai posibilitatea), sau o lustră suspendată cu un design minimalist, dar cu o prezență vizuală plăcută. Iluminatul stratificat, cu mai multe surse mici, funcționează mult mai bine într-un spațiu restrâns decât o singură sursă puternică." },
+  { question: "Cum pot masca cablurile de la lampadare sau veioze?", answer: "Masarea cablurilor este importanta pentru un aspect curat. Poti folosi cleme autoadezive pentru a lipi cablurile de perete, ghidandu-le pe langa plinta sau pe sub mobilier. Exista si tuburi sau spirale de mascare a cablurilor, care pot fi vopsite in culoarea peretelui pentru a deveni aproape invizibile. Daca ai posibilitatea, trage cablurile prin perete sau prin podea, dar asta presupune lucrari mai ample. O solutie eleganta este si sa asezi mobilierul astfel incat sa acopere cablurile." },
+  { question: "Ce inseamna lumina indirecta si cand este recomandata?", answer: "Lumina indirecta este lumina care este reflectata de pe o suprafata (tavan, perete) inainte de a ajunge in camera. Corpurile de iluminat care creeaza lumina indirecta, cum ar fi aplicele de perete sau anumite lampadare cu abajururi opace in partea de sus, emit lumina in sus sau in spate. Aceasta lumina este foarte blanda, difuza, nu creeaza umbre puternice si reduce oboseala ochilor. Este ideala pentru crearea unei atmosfere relaxante, pentru iluminatul ambiental si pentru a da un aspect elegant si sofisticat livingului, mai ales seara." }
+];
+
+const toc = [
+  { title: "De ce conteaza iluminatul in livingul modern?", id: "de-ce-conteaza-iluminatul-in-livingul-modern" },
+  { title: "Top optiuni de corpuri de iluminat pentru living modern", id: "top-optiuni-de-corpuri-de-iluminat-pentru-living-modern" },
+  { title: "Cum alegi corect corpurile de iluminat potrivite", id: "cum-alegi-corect-corpurile-de-iluminat-potrivite" },
+  { title: "Avantaje și dezavantaje ale soluțiilor de iluminat moderne", id: "avantaje-si-dezavantaje-ale-solutiilor-de-iluminat-moderne" },
+  { title: "Sfaturi practice de la un vechi renovator", id: "sfaturi-practice-de-la-un-vechi-renovator" },
+  { title: "Parerea mea: Alege lumina care te face fericit", id: "parerea-mea-alege-lumina-care-te-face-fericit" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Corpuri de iluminat pentru living modern - CentroCasa"
+  description="Alegerea corpurilor de iluminat potrivite pentru livingul modern poate transforma complet atmosfera unei case. Nu e vorba doar de lumina, ci si de stil si functionalitate. Hai sa vedem cum putem face cea mai buna alegere, ca sa ne simtim cu adevarat acasa."
+  image="/images/articles/corpuri-de-iluminat-pentru-living-modern.webp"
+  type="article"
+  publishedTime="2026-01-10T13:59:37.157Z"
+  modifiedTime="2026-01-28T13:59:37.052Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Corpuri de iluminat pentru living modern</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
+        <span class="article-date">24 ianuarie 2026</span>
+      </div>
+      <h1 class="article-title">Corpuri de iluminat pentru living modern</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/corpuri-de-iluminat-pentru-living-modern.webp" alt="Corpuri de iluminat pentru living modern" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-conteaza-iluminatul-in-livingul-modern">
+        <h2>De ce conteaza iluminatul in livingul modern?</h2>
+        <p>Salutare! Daca te gandesti sa-ti reamenajezi livingul sau pur si simplu vrei sa aduci un suflu nou, iluminatul este unul dintre cele mai importante aspecte pe care ar trebui sa le iei in calcul. Am facut asta de multe ori, si pot sa-ti spun sincer ca un corp de iluminat bine ales poate face minuni. Un living modern nu inseamna doar mobilier minimalist si culori neutre, ci si o atmosfera creata prin lumina.</p>
+        <p>Gândește-te la el ca la o piesa de mobilier in sine, care poate accentua sau dimpotriva, poate ascunde anumite elemente de design. Pentru cine e potrivit? Pai, pentru oricine isi doreste un spatiu primitor, functional si stilat. Fie ca locuiesti singur, ca ai o familie numeroasa sau ca primesti des prieteni, lumina potrivita te ajuta sa creezi un ambient perfect pentru fiecare ocazie.</p>
+        <p>Poate vrei sa citesti o carte intr-un fotoliu confortabil, sa te uiti la un film cu familia sau sa organizezi o seara de jocuri cu prietenii. Toate aceste activitati necesita un tip de iluminat diferit. Un corp de iluminat bine pozitionat si cu intensitatea potrivita face diferenta intre un spatiu anost si unul plin de viata.</p>
+        <p>Am observat de multe ori cum un simplu lustru sau o veioza discreta pot schimba complet percepția unui living. Nu uita ca lumina are si un rol practic, ajutandu-te sa navighezi prin camera, sa gasesti lucruri sau sa lucrezi la birou, daca ai unul integrat. Deci, e mai mult decat un simplu bec in tavan.</p>
+        <p>E despre a crea o experienta.</p>
+      </section>
+
+      <section id="top-optiuni-de-corpuri-de-iluminat-pentru-living-modern">
+        <h2>Top optiuni de corpuri de iluminat pentru living modern</h2>
+        <p>Dupa ce am testat si analizat diverse variante, am ajuns la cateva recomandari care mi se par deosebit de potrivite pentru un living modern. Nu e usor sa alegi, pentru ca piata e plina de produse, dar uite ce mi-a atras mie atentia:</p>
+        <p>1.  <strong>Lustra suspendata minimalistă:</strong> Acestea sunt adesea piese statement, dar intr-un stil curat. Caută modele cu linii simple, din metal negru mat, auriu sau alb, eventual cu difuzoare din sticlă opală sau chiar fără abajur, unde becul devine parte din design. Sunt perfecte deasupra mesei de cafea sau a unei zone de relaxare.</p>
+        <p>Un model bun, cum ar fi cel de la brandul X (nume generic, ca sa nu fac reclama directa), cu un diametru de 40-50 cm, ar costa undeva intre 300 si 800 RON, in functie de material si finisaj. Mi se pare ca ofera un punct focal interesant fara sa incarce spatiul.</p>
+        <p>2.  <strong>Lampadar de podea cu braț reglabil:</strong> Acestea sunt incredibil de versatile. Le poti pozitiona langa canapea sau fotoliu pentru a crea un colt de citit. Multe au un design modern, cu baze solide si un brat care iti permite sa dirijezi lumina exact unde ai nevoie.</p>
+        <p>Am gasit modele foarte stilate, din metal negru sau cromat, cu un bec LED de 10-15W, care lumineaza suficient. Preturi? Intre 200 si 600 RON. Sunt un must-have, din punctul meu de vedere, pentru ca iti ofera flexibilitate.</p>
+        <p>3.  <strong>Aplice de perete cu lumină indirectă:</strong> Acestea sunt grozave pentru a crea o atmosfera ambientala. Lumina se reflecta in perete, oferind o stralucire blânda, fara umbre puternice. Cauta modele cubice sau cilindrice, din gips sau metal, care pot fi vopsite in culoarea peretelui pentru un aspect integrat.</p>
+        <p>Sunt ideale pentru a ilumina un perete cu galerie de arta sau pur si simplu pentru a adauga un strat de lumina. Un set de doua aplice ar putea costa intre 150 si 400 RON. Imi place ca nu ocupa spatiu pe podea sau pe masute.</p>
+        <p>4.  <strong>Spoturi incastrate (downlights) reglabile:</strong> Daca vrei un aspect ultra-modern si discret, spoturile incastrate sunt o optiune excelenta. Cele reglabile iti permit sa directionezi lumina catre anumite zone sau obiecte. Foloseste-le strategic, nu doar imprastiate haotic.</p>
+        <p>Un set de 4-6 spoturi LED, cu o temperatura de culoare calda (2700K-3000K), ar putea fi in jur de 200-500 RON. Am observat ca se potrivesc cel mai bine in plafoanele false, dar exista si variante pentru tavanul normal.</p>
+        <p>5.  <strong>Lămpi de masă cu design sculptural:</strong> Nu subestima puterea unei lămpi de masă bine alese! Poate fi o piesa de artă în sine. Caută forme geometrice, materiale neconvenționale (ceramică, beton, lemn) sau finisaje interesante. Sunt perfecte pe comode, etajere sau noptiere. Un model deosebit, cu un bec LED de 5-8W, poate costa intre 150 si 500 RON. Adug o nota personala si un plus de caldura.</p>
+      </section>
+
+      <section id="cum-alegi-corect-corpurile-de-iluminat-potrivite">
+        <h2>Cum alegi corect corpurile de iluminat potrivite</h2>
+        <p>Alegerea corpurilor de iluminat potrivite pentru livingul tău modern implică mai mult decât să te uiți la cât de frumos arată o lustră într-un catalog. Din experiența mea, sunt câțiva pași esențiali pe care îi recomand oricui. În primul rând, gândește-te la <strong>funcționalitatea</strong> livingului tău. Ce faci cel mai des aici? Citești? Vrei să te relaxezi? Lucrezi? Ai nevoie de o lumină generală puternică, sau mai degrabă de zone de lumină focalizată? Un living modern are nevoie de <strong>iluminat stratificat</strong>, adică să combini mai multe surse de lumină.</p>
+        <p>Asta înseamnă: lumină ambientală (cea generală, de la lustră sau spoturi), lumină de lucru (pentru citit, cusut, etc., de la lampadare sau veioze) și lumină de accent (pentru a scoate în evidență tablouri, plante, texturi).</p>
+        <p>Apoi, ia în calcul <strong>dimensiunea camerei</strong>. Un living mare va necesita o lustră mai impunătoare sau mai multe surse de lumină, în timp ce un living mic poate fi copleșit de un corp de iluminat prea masiv. Măsoară spațiul și gândește-te la proporții.</p>
+        <p>Următorul aspect important este <strong>stilul de design interior</strong>. Un living modern se pretează la linii curate, forme geometrice, materiale precum metalul, sticla, betonul. Evită ornamentele excesive sau stilurile prea clasice.</p>
+        <p>Culoarea corpului de iluminat ar trebui să se potrivească cu paleta cromatică a camerei, fie că alegi să fie o piesă de accent (auriu, negru lucios) sau să se integreze discret (alb mat, gri). Nu uita de <strong>temperatura de culoare a becurilor</strong>. Pentru living, cel mai potrivit este un bec cu lumină caldă (2700K - 3000K), care creează o atmosferă relaxantă și primitoare.</p>
+        <p>Lumina rece (peste 4000K) este mai potrivită pentru spații de lucru sau bucătării.</p>
+        <p><strong>Tehnologia LED</strong> este, evident, cea mai bună alegere. Este eficientă energetic, are o durată de viață lungă și oferă o varietate mare de forme și intensități. Verifică <strong>intensitatea luminoasă</strong> (exprimată în Lumeni) și alege becuri cu o intensitate potrivită pentru fiecare tip de lumină.</p>
+        <p>Pentru iluminatul general, ai nevoie de mai mulți Lumeni decât pentru o lampă de citit. În cele din urmă, <strong>bugetul</strong>. Stabilește-ți un buget realist. Poți găsi soluții excelente și la prețuri accesibile, dar și piese de designer care pot costa o avere.</p>
+        <p>Nu te grăbi, compară prețuri și citește recenzii. Am învățat pe pielea mea că uneori, o investiție puțin mai mare într-un corp de iluminat de calitate se amortizează în timp prin durabilitate și aspect.</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-ale-solutiilor-de-iluminat-moderne">
+        <h2>Avantaje și dezavantaje ale soluțiilor de iluminat moderne</h2>
+        <p>Fiecare tip de corp de iluminat vine cu plusurile și minusurile sale, și e bine să le cunoști înainte de a te hotărî. Hai să luăm pe rând câteva din cele mai populare opțiuni pentru livingurile moderne.</p>
+        <p><strong>Lustrele suspendate:</strong></p>
+        <p><strong>Avantaje:</strong> Pot fi piese de design impresionante, adaugă un punct focal vizual puternic, distribuie lumina pe o zonă mai largă, pot fi reglabile pe înălțime (unele modele). Sunt ideale deasupra meselor de cafea sau a zonelor de conversație.</p>
+        <p><strong>Dezavantaje:</strong> Pot fi prea dominante într-un living mic, instalarea lor poate fi uneori mai complicată (necesită gaură în tavan), necesită becuri potrivite pentru a nu crea orbire directă.</p>
+        <p><strong>Lampadarele de podea:</strong></p>
+        <p><strong>Avantaje:</strong> Foarte flexibile, pot fi mutate ușor în funcție de nevoi, oferă lumină direcționată (perfecte pentru citit), adaugă un strat suplimentar de lumină ambientală, ocupă spațiu minim pe podea.</p>
+        <p><strong>Dezavantaje:</strong> Lumina emisă este de obicei mai concentrată, nu pot ilumina la fel de eficient întreaga cameră, pot deveni un obstacol dacă sunt plasate prost.</p>
+        <p><strong>Aplicele de perete:</strong></p>
+        <p><strong>Avantaje:</strong> Creează o atmosferă elegantă și difuză, economisesc spațiu pe podea și pe suprafețele orizontale, pot fi folosite pentru a evidenția elemente arhitecturale sau de decor, oferă lumină indirectă plăcută.</p>
+        <p><strong>Dezavantaje:</strong> Nu oferă lumină puternică de lucru, instalarea necesită modificări la instalația electrică (dacă nu există deja puncte de lumină), pot fi limitate ca stil dacă nu sunt alese cu grijă.</p>
+        <p><strong>Spoturile incastrate (downlights):</strong></p>
+        <p><strong>Avantaje:</strong> Aspect minimalist și integrat, oferă o lumină uniformă pe o suprafață mare (dacă sunt multe), pot fi reglabile pentru a direcționa lumina, nu ocupă deloc spațiu vizual.</p>
+        <p><strong>Dezavantaje:</strong> Instalarea este cea mai complicată și necesită tavan fals sau modificări majore, pot crea un aspect rece dacă nu sunt combinate cu alte surse de lumină, lumina directă poate fi orbitoare dacă nu sunt bine poziționate sau dacă becurile nu sunt mate.</p>
+        <p><strong>Lămpile de masă:</strong></p>
+        <p><strong>Avantaje:</strong> Adaugă personalitate și stil, oferă lumină de accent sau de lucru, pot fi mutate ușor, creează puncte de interes vizual pe suprafețe orizontale.</p>
+        <p><strong>Dezavantaje:</strong> Ocupă spațiu pe masă sau comodă, lumina este de obicei concentrată pe o zonă mică, necesită o priză în apropiere.</p>
+        <p>Din experiența mea, cea mai bună abordare este să combini cel puțin 2-3 dintre aceste tipuri de iluminat pentru a obține un rezultat echilibrat și funcțional. De exemplu, o lustră centrală pentru iluminatul general, un lampadar lângă canapea pentru citit și câteva aplice pe perete pentru atmosferă.</p>
+      </section>
+
+      <section id="sfaturi-practice-de-la-un-vechi-renovator">
+        <h2>Sfaturi practice de la un "vechi" renovator</h2>
+        <p>Am trecut prin suficiente renovări și amenajări ca să știu că detaliile fac diferența, mai ales când vine vorba de iluminat. Așa că, iată câteva trucuri și sfaturi pe care le folosesc mereu și care sper să-ți fie de ajutor:</p>
+        <p>1.  <strong>Nu te teme să combini stiluri (cu grijă!):</strong> Un living modern nu înseamnă neapărat totul la fel, ca scos din fabrică. Poți combina o lustră minimalistă din metal cu o lampă de masă din ceramică cu un design interesant. Important e ca piesele să aibă o anumită coerență, fie prin culoare, fie prin material, fie prin forma lor generală. Nu pune o lustră barocă peste o canapea din piele minimalistă, de exemplu.</p>
+        <p>2.  <strong>Reglarea intensității luminii (dimmere):</strong> Acesta este, pentru mine, un element esențial pentru un living modern. Un dimmer îți permite să ajustezi intensitatea luminii în funcție de momentul zilei sau de activitate. Seara, când vrei să te relaxezi, reduci intensitatea pentru o atmosferă intimă.</p>
+        <p>Dimineata, când ai nevoie de mai multă lumină pentru a te trezi, o crești. Multe lustre și chiar și unele lampadare moderne vin cu această funcționalitate, sau poți instala un dimmer separat pe circuitul de iluminat.</p>
+        <p>3.  <strong>Gândește-te la umbre:</strong> Umbrele pot fi prietenii tăi sau dușmanii tăi. Un iluminat prost poziționat poate crea umbre deranjante pe pereți sau pe suprafața de lucru. Pe de altă parte, umbrele pot adăuga profunzime și interes unui spațiu. Folosește lumina de accent pentru a crea jocuri de lumini și umbre pe texturi sau obiecte decorative. Când alegi lustrele, uită-te la cum distribuie lumina – dacă e directă, difuză, sau dacă creează modele pe tavan.</p>
+        <p>4.  <strong>Becurile inteligente (smart bulbs):</strong> Dacă ești pasionat de tehnologie, becurile inteligente pot fi o investiție grozavă. Le poți controla prin aplicație pe telefon, le poți schimba culoarea (unele modele), le poți programa să se aprindă/stingă la anumul ore sau să reacționeze la comenzi vocale. Pot fi o soluție excelentă pentru a crea diverse scene de iluminat pentru diferite ocazii – o seară de film, o petrecere, sau pur și simplu relaxare.</p>
+        <p>5.  <strong>Întreținerea:</strong> Nu uita că și corpurile de iluminat au nevoie de întreținere. Praful acumulat pe abajururi sau pe suprafețele metalice poate diminua intensitatea luminii și poate da un aspect neîngrijit. Curăță-le periodic, conform instrucțiunilor producătorului. Becurile LED au o durată de viață lungă, dar e bine să ai la îndemână câteva becuri de rezervă, mai ales dacă folosești modele mai specifice.</p>
+        <p>6.  <strong>Poziționarea corectă a prizelor:</strong> Când renovezi, gândește-te de unde vor veni alimentate lămpile de masă și lampadarele. Asigură-te că ai suficiente prize în locurile strategice, sau că poți masca cablurile discret. Un cablu care atârnă inestetic poate strica complet imaginea unui living modern.</p>
+      </section>
+
+      <section id="parerea-mea-alege-lumina-care-te-face-fericit">
+        <h2>Parerea mea: Alege lumina care te face fericit</h2>
+        <p>După atâția ani de experiență cu case, cu design interior și cu produse pentru casă, am ajuns la o concluzie simplă, dar esențială: iluminatul nu este doar despre funcționalitate, ci mai ales despre <strong>starea de bine</strong>. Un living modern, din punctul meu de vedere, nu trebuie să fie rece sau steril, ci un spațiu în care te simți confortabil, relaxat și inspirat. Corpurile de iluminat sunt cele care creează acea atmosferă.</p>
+        <p>Mi se pare că cele mai reușite livinguri moderne sunt cele în care iluminatul este gândit ca un întreg, ca un sistem. Nu te rezuma la o singură sursă de lumină. Combină o lustră centrală cu un design interesant (poate ceva cu linii geometrice, din metal negru sau auriu) cu un lampadar elegant lângă fotoliul preferat, unde poți citi seara.</p>
+        <p>Adaugă câteva aplice pe perete pentru a crea un ambient cald, difuz, care să spaționeze lumina generală. Și nu uita de mici accente – o lampă de masă pe o comodă, cu un abajur din material textil sau o formă sculpturală, poate face minuni.</p>
+        <p>Personal, îmi place la nebunie să folosesc lumina pentru a evidenția texturi. Un perete cu cărămidă aparentă, un tapet cu un model interesant sau chiar o plantă de interior pot prinde viață cu ajutorul luminii potrivite. Asta înseamnă lumini de accent, direcționate strategic. Nu te teme să experimentezi!</p>
+        <p>Când vine vorba de alegerea propriu-zisă, îmi place să recomand produse care oferă un bun raport calitate-preț. Nu întotdeauna cel mai scump este și cel mai bun. Am testat și produse mai accesibile care arată fantastic și își fac treaba perfect.</p>
+        <p>Caută branduri care au recenzii bune, verifică materialele din care sunt făcute și, dacă ai posibilitatea, vezi-le în realitate înainte de a cumpăra. Un corp de iluminat bun este o investiție pe termen lung, care îți va aduce bucurie și confort în fiecare zi.</p>
+        <p>În final, cel mai important criteriu este cum te face să te simți lumina respectivă. Deschide-ți sufletul către varietate, gândește-te la cum vrei să arate seara livingul tău, când te întorci obosit de la muncă, sau cum vrei să fie atmosfera când vin prietenii în vizită. Alege corpurile de iluminat care îți aduc zâmbetul pe buze și transformă-ți livingul într-un spațiu pe care îl iubești cu adevărat.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce inseamna lumina calda, neutra si rece pentru becuri?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Temperatura de culoare a becurilor se masoara in Kelvin (K). Lumina calda (sub 3300K) este asemanatoare cu lumina unui bec incandescent, fiind galbuie si relaxanta, ideala pentru living sau dormitor. Lumina neutra (3300K - 5300K) este mai alba, apropiata de lumina naturala a zilei, potrivita pentru bucatarii sau bai. Lumina rece (peste 5300K) este alb-albasturie, energizanta, recomandata pentru spatii de lucru sau garaje.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot folosi becuri LED in toate corpurile de iluminat?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, in general, poti folosi becuri LED in majoritatea corpurilor de iluminat, atat timp cat soclul becului este compatibil (E27, E14, GU10 etc.). LED-urile sunt eficiente energetic, au o durata de viata lunga si sunt disponibile intr-o varietate mare de forme si temperaturi de culoare. Verifica specificatiile corpului de iluminat pentru a te asigura ca becul ales este potrivit.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de important este indicele de redare a culorilor (CRI) la becurile pentru living?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Indicele de Redare a Culorilor (CRI) arata cat de fidel sunt redate culorile obiectelor sub lumina unui bec, comparativ cu lumina naturala. Pentru living, un CRI de peste 80 este bun, dar un CRI de 90+ este ideal pentru a te asigura ca tapetul, mobilierul si decoratiunile tale arata exact asa cum trebuie, fara distorsiuni de culoare. Un CRI mai mare contribuie la o atmosfera mai placuta si mai naturala.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Am un living mic. Ce tipuri de corpuri de iluminat ar trebui sa evit?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru un living mic, ar trebui sa eviti corpurile de iluminat prea masive si aglomerate. Lustrele foarte mari, cu multe brate si ornamente, pot copleși spațiul. De asemenea, evită lampadarele cu baze foarte largi care ocupă mult loc pe podea. Concentrează-te pe soluții mai discrete, cum ar fi aplice de perete, spoturi incastrate (dacă ai posibilitatea), sau o lustră suspendată cu un design minimalist, dar cu o prezență vizuală plăcută. Iluminatul stratificat, cu mai multe surse mici, funcționează mult mai bine într-un spațiu restrâns decât o singură sursă puternică.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum pot masca cablurile de la lampadare sau veioze?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Masarea cablurilor este importanta pentru un aspect curat. Poti folosi cleme autoadezive pentru a lipi cablurile de perete, ghidandu-le pe langa plinta sau pe sub mobilier. Exista si tuburi sau spirale de mascare a cablurilor, care pot fi vopsite in culoarea peretelui pentru a deveni aproape invizibile. Daca ai posibilitatea, trage cablurile prin perete sau prin podea, dar asta presupune lucrari mai ample. O solutie eleganta este si sa asezi mobilierul astfel incat sa acopere cablurile.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce inseamna lumina indirecta si cand este recomandata?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Lumina indirecta este lumina care este reflectata de pe o suprafata (tavan, perete) inainte de a ajunge in camera. Corpurile de iluminat care creeaza lumina indirecta, cum ar fi aplicele de perete sau anumite lampadare cu abajururi opace in partea de sus, emit lumina in sus sau in spate. Aceasta lumina este foarte blanda, difuza, nu creeaza umbre puternice si reduce oboseala ochilor. Este ideala pentru crearea unei atmosfere relaxante, pentru iluminatul ambiental si pentru a da un aspect elegant si sofisticat livingului, mai ales seara.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="corpuri-de-iluminat-pentru-living-modern"
+      currentCategory="decoratiuni-casa"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

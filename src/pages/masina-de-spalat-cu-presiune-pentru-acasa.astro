@@ -1,0 +1,273 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Masina de spalat cu presiune pentru acasa",
+  excerpt: "Stii cum e cand iarba a crescut prea mult si terasa a prins un strat de praf si murdarie? Sau cand masina a ajuns sa arate de parca a trecut printr-o furtuna de nisip? Ei bine, o masina de spalat cu presiune poate fi salvatoare. Eu am testat destule ca sa-ti spun ce conteaza cu adevarat.",
+  image: "/images/articles/masina-de-spalat-cu-presiune-pentru-acasa.webp",
+  category: "Curatenie si Intretinere",
+  categorySlug: "curatenie-intretinere",
+  date: "2026-01-15T11:07:41.105Z",
+  modifiedDate: "2026-01-30T11:07:41.368Z",
+  author: "Elena Dragomir",
+  authorRole: "Consultant Amenajari",
+  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
+};
+
+const faq = [
+  { question: "Pot folosi o masina de spalat cu presiune pentru a curata jantele masinii?", answer: "Absolut! Masinile de spalat cu presiune sunt excelente pentru curatat jantele. Totusi, tine cont sa folosesti o duza cu jet mai lat si o presiune moderata, mai ales daca jantele sunt vopsite sau au un finisaj special. Nu te apropia prea mult si, daca ai posibilitatea, foloseste o perie moale pentru a freca zonele mai murdare inainte de clatirea cu presiune. Evita duzele cu jet punctiform pe jante." },
+  { question: "Ce fel de apa pot folosi?", answer: "Poti folosi apa de la robinet fara probleme. Daca ai o sursa de apa din fantana sau put, asigura-te ca este filtrata, pentru a preveni infundarea pompei cu impuritati. Unele modele permit si aspirarea apei dintr-un bazin sau galeata, dar si aici e important filtrul de admisie." },
+  { question: "Ce inseamna Full Control la Karcher?", answer: "Sistemul Full Control de la Karcher inseamna ca pe pistolul de pulverizare ai un display LED care iti arata presiunea selectata si iti permite sa o ajustezi direct de acolo, prin apasarea unor butoane. De asemenea, indicatiile de pe maner iti spun ce duza sa folosesti pentru ce tip de curatare (de exemplu, detergent, suprafata, masina). E un sistem foarte intuitiv care te ajuta sa nu gresesti setarile." },
+  { question: "Pot spala cu presiune si mobila de gradina din lemn?", answer: "Da, dar cu multa precautie. Lemnul netratat sau vopsit corespunzator poate fi deteriorat de un jet prea puternic. Foloseste o presiune mai mica, o duza cu jet lat (ventilator) si tine aparatul la o distanta mai mare. Testeaza pe o zona ascunsa inainte. Uneori, o perie moale si apa cu sapun pot fi suficiente si mai sigure pentru anumit tip de mobilier." },
+  { question: "Cat de zgomotoase sunt aceste masini?", answer: "Sunt destul de zgomotoase, ca majoritatea aparatelor electrice care folosesc motoare puternice. Depinde mult de model, dar te poti astepta la un nivel de zgomot similar cu cel al unui aspirator puternic sau chiar mai mult. Daca stai la bloc, e bine sa le folosesti in timpul zilei, in intervalele orare acceptate de regulamentul asociatiei, pentru a nu deranja vecinii." },
+  { question: "Ce accesorii sunt esentiale pentru uz casnic?", answer: "Pentru uz casnic, accesoriile cele mai utile sunt: o duza reglabila (cu jet plat si punctiform), o perie rotativa sau o perie pentru curatat terase (daca ai terasa), si o lance de spumare (pentru a aplica detergent pe masina). Celelalte accesorii, cum ar fi perii speciale sau furtunuri de prelungire, sunt mai mult optionale, in functie de nevoile specifice." }
+];
+
+const toc = [
+  { title: "De ce ai avea nevoie de o masina de spalat cu presiune acasa?", id: "de-ce-ai-avea-nevoie-de-o-masina-de-spalat-cu-presiune-acasa" },
+  { title: "Topul meu: 3 masini de spalat cu presiune pe care le-as recomanda", id: "topul-meu-3-masini-de-spalat-cu-presiune-pe-care-le-as-recomanda" },
+  { title: "Cum alegi masina potrivita pentru nevoile tale?", id: "cum-alegi-masina-potrivita-pentru-nevoile-tale" },
+  { title: "Avantaje si dezavantaje: Ce ar trebui sa stii?", id: "avantaje-si-dezavantaje-ce-ar-trebui-sa-stii" },
+  { title: "Sfaturi practice din experienta mea", id: "sfaturi-practice-din-experienta-mea" },
+  { title: "Parerea mea: ce conteaza cu adevarat la final", id: "parerea-mea-ce-conteaza-cu-adevarat-la-final" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Masina de spalat cu presiune pentru acasa - CentroCasa"
+  description="Stii cum e cand iarba a crescut prea mult si terasa a prins un strat de praf si murdarie? Sau cand masina a ajuns sa arate de parca a trecut printr-o furtuna de nisip? Ei bine, o masina de spalat cu presiune poate fi salvatoare. Eu am testat destule ca sa-ti spun ce conteaza cu adevarat."
+  image="/images/articles/masina-de-spalat-cu-presiune-pentru-acasa.webp"
+  type="article"
+  publishedTime="2026-01-15T11:07:41.105Z"
+  modifiedTime="2026-01-30T11:07:41.368Z"
+  author="Elena Dragomir"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Masina de spalat cu presiune pentru acasa</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/curatenie-intretinere/" class="article-category">Curatenie si Intretinere</a>
+        <span class="article-date">24 ianuarie 2026</span>
+      </div>
+      <h1 class="article-title">Masina de spalat cu presiune pentru acasa</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/masina-de-spalat-cu-presiune-pentru-acasa.webp" alt="Masina de spalat cu presiune pentru acasa" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-ai-avea-nevoie-de-o-masina-de-spalat-cu-presiune-acasa">
+        <h2>De ce ai avea nevoie de o masina de spalat cu presiune acasa?</h2>
+        <p>Hai sa fim sinceri, curatenia casei si a curtii poate deveni o corvoada. Dar ce te faci cand mizeria e mai incapatanata? Aici intervine o masina de spalat cu presiune. Nu e doar un jet de apa, e o unealta care te ajuta sa cureti eficient suprafete pe care altfel le-ai freca ore in sir.</p>
+        <p>M-am gandit mult la asta si am ajuns la concluzia ca e perfecta pentru oricine are o curte, o terasa, o masina sau pur si simplu vrea sa scape de murdaria persistenta. Gandeste-te la fatada casei, la gard, la mobilierul de exterior, la alei... toate astea prind viata cu o curatare ca la carte. Eu personal am gasit-o indispensabila pentru a reda stralucirea mobilierului de gradina, care dupa un sezon de stat afara, arata de multe ori jalnic.</p>
+        <p>Si nu te gandi ca trebuie sa fii un profesionist ca sa o folosesti. Majoritatea modelelor pentru uz casnic sunt gandite sa fie cat mai intuitive.</p>
+        <p>Pentru cei care locuiesc la bloc, dar au un balcon generos sau o boxa unde isi tin bicicleta sau alte echipamente, o masina de spalat cu presiune compacta poate fi o solutie buna pentru a le mentine curate. De asemenea, daca esti pasionat de curatat jantele masinii sau vrei sa-i dai un refresh rapid, te va ajuta enorm. Am vazut prieteni care o folosesc si pentru a curata gratarul dupa un barbecue, o treaba care in mod normal ar fi fost mult mai greoaie.</p>
+        <p>Deci, pe scurt, daca vrei sa economisesti timp si efort la capitolul curatenie exterioara si nu numai, o astfel de masina e o investitie care merita. Nu e vorba doar de estetica, ci si de mentinerea in buna stare a materialelor, prevenind deteriorarea cauzata de praf, mucegai sau alte impuritati.</p>
+      </section>
+
+      <section id="topul-meu-3-masini-de-spalat-cu-presiune-pe-care-le-as-recomanda">
+        <h2>Topul meu: 3 masini de spalat cu presiune pe care le-as recomanda</h2>
+        <p>Dupa ce am pus mana pe destule modele, am identificat cateva care mi s-au parut cu adevarat bune pentru uz casnic. Nu vorbim de aparate profesionale, ci de cele care fac fata sarcinilor obisnuite din curte.</p>
+        <p>1.  <strong>Karcher K4 Full Control</strong>: Asta e un clasic si pe buna dreptate. Mi se pare ca are un echilibru fantastic intre putere si usurinta in utilizare. Presiunea ajunge pana la 130 bar, ceea ce e suficient pentru majoritatea treburilor.</p>
+        <p>Ce-mi place mult la ea e sistemul Full Control: are un pistol cu display LED unde vezi exact presiunea pe care o setezi, si poti ajusta jetul din mers. Vine cu diverse accesorii, inclusiv o perie rotativa pentru murdarie mai grea. E robusta, usor de manevrat si destul de silentioasa pentru cat de puternica e.</p>
+        <p>Pretul ei e undeva in jur de 1100-1300 RON, in functie de oferta.</p>
+        <p>2.  <strong>Bosch Aquatak AQT 37-13+</strong>: Bosch nu dezamageste niciodata. Acest model are 130 bar presiune maxima si un debit de apa de 370 litri pe ora. M-a impresionat cat de usor se monteaza si cat de compacta e, desi are o putere buna.</p>
+        <p>Jetul e puternic si eficient, ideal pentru curatat terase, masini, garduri. Vine cu o duza reglabila, o perie de terasa si o duza de spumare pentru sampon. Mi se pare o optiune excelenta pentru cine cauta un brand de incredere si performante solide.</p>
+        <p>O gasesti de obicei in jur de 900-1100 RON.</p>
+        <p>3.  <strong>Stihl RE 98</strong>: Pentru cei care au nevoie de ceva mai portabil, dar totusi capabil, Stihl RE 98 e o alegere buna. Are 100 bar presiune, ceea ce e mai putin decat celelalte doua, dar e suficient pentru curatarea rapida a bicicletei, a mobilierului de gradina sau a unei alei. E usoara, compacta si usor de depozitat.</p>
+        <p>Sistemul de conectare a furtunului e simplu. Nu are atatea functii sofisticate ca Karcher, dar face treaba bine si e un brand pe care te poti baza pentru durabilitate. Pretul ei este mai accesibil, in jur de 600-800 RON.</p>
+        <p>Acestea sunt modele pe care le-am folosit si mi s-au parut fiabile si eficiente pentru uz casnic. Bineinteles, exista si optiuni mai ieftine, dar adesea vin cu compromisuri la capitolul putere, durabilitate sau accesorii.</p>
+      </section>
+
+      <section id="cum-alegi-masina-potrivita-pentru-nevoile-tale">
+        <h2>Cum alegi masina potrivita pentru nevoile tale?</h2>
+        <p>Alegerea unei masini de spalat cu presiune poate parea complicata la prima vedere, dar daca stii la ce sa te uiti, devine mult mai simplu. Eu am invatat din experienta ca nu trebuie sa te lasi intimidat de specificatii, ci sa te gandesti ce vei curata cel mai des. Iata cateva aspecte importante pe care eu le iau in considerare:</p>
+        <p><strong>Presiunea (bar)</strong>: Acesta e cel mai important parametru. Pentru uz casnic, o presiune de <strong>100-130 bar</strong> este de obicei suficienta. Daca ai de curatat mizerie persistenta, cum ar fi mucegai pe fatada sau pete vechi pe terasa, mergi spre modele cu presiune mai mare. Daca o vei folosi mai mult pentru a da o clatire rapida masinii sau bicicletei, nici 80-100 bar nu e rau.</p>
+        <p><strong>Debit de apa (litri pe ora)</strong>: Arata cat de multa apa poate pompa masina. Un debit mai mare inseamna o curatare mai rapida, deoarece apa curata mai mult intr-un timp dat. Pentru acasa, un debit de <strong>350-450 litri/ora</strong> e un punct bun de plecare. Daca ai de curatat suprafete mari, cum ar fi o curte intreaga, un debit mai mare te va ajuta.</p>
+        <p><strong>Puterea motorului (kW)</strong>: De regula, un motor mai puternic inseamna si o presiune si un debit mai mare. Modelele pentru uz casnic au motoare intre <strong>1.4 kW si 2 kW</strong>. Daca vrei o masina care sa faca fata treburilor mai grele, cauta una cu un motor de cel putin 1.7-1.8 kW.</p>
+        <p><strong>Tipul pompei</strong>: Pompele din metal sunt mult mai durabile decat cele din plastic. Daca vrei o masina care sa te tina ani buni, verifica din ce material e facuta pompa. Cele de la brandurile mai cunoscute (Karcher, Bosch, Stihl) folosesc de obicei materiale de calitate.</p>
+        <p><strong>Accesorii incluse</strong>: Ce vine la pachet conteaza mult. Daca vei curata masina, vei vrea o duza de spumare. Pentru terase, o perie rotativa sau o perie speciala pentru curatat suprafete plane e foarte utila. O lance cu jet reglabil iti ofera flexibilitate. Verifica ce accesorii sunt incluse si daca se pot achizitiona separat si ce pret au.</p>
+        <p><strong>Lungimea furtunului si a cablului de alimentare</strong>: Un furtun mai lung (ideal peste 6-7 metri) si un cablu de alimentare generos iti ofera mai multa libertate de miscare. E frustrant sa fii mereu dependent de priza sau sa te chinui sa ajungi in toate colturile.</p>
+        <p><strong>Sistemul de depozitare</strong>: Multe modele vin cu suporturi pentru accesorii si un loc unde sa infasori cablul si furtunul. Asta e un plus mare pentru organizare si pentru a nu le pierde.</p>
+        <p><strong>Greutate si mobilitate</strong>: Daca vei muta masina des, cauta un model mai usor si cu roti. Cele mai grele pot fi mai puternice, dar devin incomode daca nu ai o suprafata plana pe care sa le tarasti.</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-ce-ar-trebui-sa-stii">
+        <h2>Avantaje si dezavantaje: Ce ar trebui sa stii?</h2>
+        <p>Ca orice unealta, si o masina de spalat cu presiune are partea ei buna si mai putin buna. Din experienta mea, e bine sa le stii pe amandoua inainte de a te hotari.</p>
+        <p><strong>Avantaje:</strong></p>
+        <p><strong>Curatare eficienta si rapida</strong>: Asta e principalul motiv pentru care o cumperi. Murdaria, mucegaiul, petele de pe terasa, de pe gard, de pe masina dispar mult mai repede si mai usor decat cu o perie si un furtun clasic. Gandeste-te la cat timp economisesti.</p>
+        <p><strong>Versatilitate</strong>: Poate fi folosita pentru o multitudine de sarcini: curatat masina, bicicleta, mobila de gradina, terasa, alei, gard, fatada casei (cu grija!), jante, gratar, si chiar si pentru a curata uneltele de gradina. E o unealta multi-scop.</p>
+        <p><strong>Economie de apa (in anumite cazuri)</strong>: Desi pare contraintuitiv, un jet de presiune poate curata o suprafata mare folosind mai putina apa decat un furtun clasic, daca e folosit corect. Asta se datoreaza concentrarii apei intr-un jet puternic.</p>
+        <p><strong>Indepartarea mizeriei persistente</strong>: Mucegaiul, algele, petele de ulei de pe alee sau de pe pavaj sunt indepartate mult mai usor cu presiune.</p>
+        <p><strong>Revitalizarea suprafetelor</strong>: O curatare cu presiune poate reda stralucirea si aspectul nou suprafetelor care au fost afectate de intemperii sau de timp.</p>
+        <p><strong>Dezavantaje:</strong></p>
+        <p><strong>Costul initial</strong>: O masina de spalat cu presiune de calitate nu e chiar ieftina. Modelele bune incep de la 500-600 RON si pot ajunge la peste 1500 RON.</p>
+        <p><strong>Necesita spatiu de depozitare</strong>: Nu sunt cele mai compacte aparate, mai ales daca ai multe accesorii. Ai nevoie de un loc unde sa le tii, preferabil ferite de intemperii.</p>
+        <p><strong>Consumul de energie electrica</strong>: Functioneaza pe baza de curent electric, deci va adauga ceva la factura la curent, mai ales daca o folosesti des.</p>
+        <p><strong>Pot fi daunatoare anumite suprafete</strong>: Daca folosesti o presiune prea mare sau o duza nepotrivita pe suprafete delicate (lemn netratat, vopsea veche, tencuiala deteriorata), le poti deteriora. Trebuie sa fii atent si sa testezi pe o zona mai putin vizibila.</p>
+        <p><strong>Zgomotul</strong>: Multe dintre ele pot fi destul de zgomotoase, asa ca e bine sa tii cont de vecini, mai ales daca locuiesti la bloc sau intr-o zona dens populata. E indicat sa le folosesti in timpul zilei.</p>
+        <p><strong>Necesita atentie la utilizare</strong>: Nu e un aparat pe care sa-l folosesti fara sa te gandesti. Jetul puternic poate fi periculos daca nu esti atent, mai ales in preajma copiilor sau a animalelor de companie. Si, cum ziceam, pot deteriora suprafete daca nu esti corect. </p>
+      </section>
+
+      <section id="sfaturi-practice-din-experienta-mea">
+        <h2>Sfaturi practice din experienta mea</h2>
+        <p>Am trecut prin multe cu masinile astea de spalat, asa ca am adunat cateva ponturi care mi-au facut viata mai usoara si mi-au ajutat sa obtin rezultate mai bune. Sper sa-ti fie de folos si tie:</p>
+        <p><strong>Citeste manualul!</strong> Stiu, pare plictisitor, dar e cel mai bun prieten al tau. Fiecare masina e putin diferita, iar manualul iti spune exact cum sa o folosesti in siguranta si cum sa obtii cele mai bune rezultate. Nu sari peste el.</p>
+        <p><strong>Foloseste detergenti specifici</strong>: Daca vrei sa cureti masina sau sa dai un luciu aparte terasei, foloseste detergenti dedicati pentru masinile de spalat cu presiune. Sunt formulati sa faca spuma buna si sa fie eficienti, fara sa deterioreze aparatul sau suprafetele.</p>
+        <p><strong>Incepe cu presiunea cea mai mica</strong>: Cand cureti o suprafata noua sau una despre care nu esti sigur cat de rezistenta e, incepe cu presiunea cea mai mica si cu o duza mai larga. Testeaza pe o zona mica, ascunsa. Daca vezi ca nu curata suficient, creste presiunea treptat sau schimba duza. E mai usor sa adaugi presiune decat sa repari o suprafata deteriorata.</p>
+        <p><strong>Foloseste duza potrivita</strong>: Duzele sunt ca niste unelte diferite. Duza cu jet plat (ventilator) e buna pentru suprafete mari, cum ar fi terasa sau fatada. Duza cu jet rotativ (turbo) e excelenta pentru mizerie incapatanata, dar nu o folosi pe suprafete delicate. Duza cu jet punctual e pentru pete foarte mici si grele, dar trebuie folosita cu mare atentie.</p>
+        <p><strong>Curata lancea si duzele dupa fiecare utilizare</strong>: Acestea se pot infunda usor cu mizerie sau depuneri. O curatare rapida cu o perie mica sau cu apa curata le va prelungi viata si va asigura un jet bun data viitoare.</p>
+        <p><strong>Depoziteaza corect</strong>: Dupa ce ai terminat, goleste complet apa din pompa si furtun. Asta previne inghetarea iarna si deteriorarea componentelor. Infasoara furtunul si cablul ordonat si depoziteaza masina intr-un loc uscat, ferit de intemperii.</p>
+        <p><strong>Nu lasa masina sa functioneze fara apa</strong>: Daca furtunul de admisie se scoate din apa, masina poate lua aer si se poate supraincalzi sau deteriora. Asigura-te mereu ca e scufundata in apa sau ca sistemul e plin.</p>
+        <p><strong>Atentie la furtunul de admisie</strong>: Daca folosești apa dintr-o galeata sau un bazin, furtunul de admisie trebuie sa aiba un filtru. Asta previne intrarea mizeriei in pompa. Si, de regula, furtunurile de admisie sunt mai flexibile decat cele de presiune.</p>
+        <p><strong>Foloseste prelungitoare de calitate (daca e cazul)</strong>: Daca ai nevoie sa folosesti un prelungitor electric, alege unul de calitate, cu sectiune de conductor groasa, pentru a nu suprasolicita motorul masinii.</p>
+      </section>
+
+      <section id="parerea-mea-ce-conteaza-cu-adevarat-la-final">
+        <h2>Parerea mea: ce conteaza cu adevarat la final</h2>
+        <p>Dupa atatia ani de testat si folosit diverse masini de spalat cu presiune, am ajuns la o concluzie simpla: nu exista o masina "perfecta" pentru toata lumea, ci doar masina "potrivita" pentru nevoile tale. Si asta e cel mai important lucru de retinut. Pentru mine, personal, ce conteaza cel mai mult e sa fie fiabila, sa aiba suficienta putere pentru ce am eu de facut prin curte si sa fie usor de manevrat.</p>
+        <p>Nu am nevoie de tot felul de functii complicate, dar apreciez un sistem de control intuitiv, cum am vazut la Karcher K4. Imi place la o masina de spalat cu presiune sa fie robusta, sa nu pară ca se va strica dupa primul sezon. Materialele din care e facuta pompa si corpul conteaza enorm pentru mine.</p>
+        <p>Am testat si modele mult mai ieftine, si pot sa spun ca diferenta se vede. Cele ieftine se strica mai repede, au presiune mai mica sau fac un zgomot infernal.</p>
+        <p>As recomanda oricui se gandeste sa-si ia una sa se gandeasca bine la ce va folosi cel mai mult. Daca ai o masina pe care vrei sa o cureti rapid, o bicicleta sau cateva ghivece, nu ai nevoie de un monstru de 150 bar. Un model mai mic si mai accesibil o sa-ti faca treaba.</p>
+        <p>Dar daca vrei sa cureti o terasa mare, o fatada sau sa scapi de petele de mucegai de pe gard, atunci investeste intr-un model cu putere mai mare si accesorii potrivite. Calitatea accesoriilor face si ea o mare diferenta. Un furtun lung si flexibil, o lance ergonomica, duze eficiente – toate astea contribuie la o experienta placuta.</p>
+        <p>In final, cred ca cea mai buna masina de spalat cu presiune pentru acasa este cea care isi face treaba eficient, care te ajuta sa economisesti timp si efort, si care te tine ani buni fara probleme. Brandurile consacrate au adesea un pret mai mare, dar vine cu o garantie implicita de calitate si durabilitate. E o investitie, si ca orice investitie, merita sa te gandesti bine la ce cumperi.</p>
+        <p>Eu, daca ar fi sa aleg acum, as merge tot pe un Karcher sau un Bosch, undeva in zona de 130 bar, cu accesorii de baza, dar de calitate. Nu uita, si intretinerea corecta ii prelungeste viata!</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot folosi o masina de spalat cu presiune pentru a curata jantele masinii?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Absolut! Masinile de spalat cu presiune sunt excelente pentru curatat jantele. Totusi, tine cont sa folosesti o duza cu jet mai lat si o presiune moderata, mai ales daca jantele sunt vopsite sau au un finisaj special. Nu te apropia prea mult si, daca ai posibilitatea, foloseste o perie moale pentru a freca zonele mai murdare inainte de clatirea cu presiune. Evita duzele cu jet punctiform pe jante.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce fel de apa pot folosi?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Poti folosi apa de la robinet fara probleme. Daca ai o sursa de apa din fantana sau put, asigura-te ca este filtrata, pentru a preveni infundarea pompei cu impuritati. Unele modele permit si aspirarea apei dintr-un bazin sau galeata, dar si aici e important filtrul de admisie.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce inseamna "Full Control" la Karcher?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Sistemul "Full Control" de la Karcher inseamna ca pe pistolul de pulverizare ai un display LED care iti arata presiunea selectata si iti permite sa o ajustezi direct de acolo, prin apasarea unor butoane. De asemenea, indicatiile de pe maner iti spun ce duza sa folosesti pentru ce tip de curatare (de exemplu, "detergent", "suprafata", "masina"). E un sistem foarte intuitiv care te ajuta sa nu gresesti setarile.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot spala cu presiune si mobila de gradina din lemn?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, dar cu multa precautie. Lemnul netratat sau vopsit corespunzator poate fi deteriorat de un jet prea puternic. Foloseste o presiune mai mica, o duza cu jet lat (ventilator) si tine aparatul la o distanta mai mare. Testeaza pe o zona ascunsa inainte. Uneori, o perie moale si apa cu sapun pot fi suficiente si mai sigure pentru anumit tip de mobilier.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de zgomotoase sunt aceste masini?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Sunt destul de zgomotoase, ca majoritatea aparatelor electrice care folosesc motoare puternice. Depinde mult de model, dar te poti astepta la un nivel de zgomot similar cu cel al unui aspirator puternic sau chiar mai mult. Daca stai la bloc, e bine sa le folosesti in timpul zilei, in intervalele orare acceptate de regulamentul asociatiei, pentru a nu deranja vecinii.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce accesorii sunt esentiale pentru uz casnic?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru uz casnic, accesoriile cele mai utile sunt: o duza reglabila (cu jet plat si punctiform), o perie rotativa sau o perie pentru curatat terase (daca ai terasa), si o lance de spumare (pentru a aplica detergent pe masina). Celelalte accesorii, cum ar fi perii speciale sau furtunuri de prelungire, sunt mai mult optionale, in functie de nevoile specifice.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">ED</div>
+      <div class="author-info">
+        <h4>Elena Dragomir</h4>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="masina-de-spalat-cu-presiune-pentru-acasa"
+      currentCategory="curatenie-intretinere"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

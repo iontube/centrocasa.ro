@@ -1,0 +1,268 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Set masa si scaune pentru gradina",
+  excerpt: "Daca te gandesti sa-ti amenajezi un colt de relaxare afara, un set de masa si scaune pentru gradina e piesa centrala. E locul unde vei savura cafeaua de dimineata, vei petrece timp cu cei dragi sau pur si simplu te vei bucura de aer curat. Alegerea potrivita poate transforma spatiul tau exterior intr-o oaza de confort.",
+  image: "/images/articles/set-masa-si-scaune-pentru-gradina.webp",
+  category: "Mobilier Gradina",
+  categorySlug: "mobilier-gradina",
+  date: "2026-01-20T12:32:16.789Z",
+  modifiedDate: "2026-01-31T12:32:16.263Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Cat de des trebuie intretinut mobilierul de gradina din lemn?", answer: "Mobilierul din lemn masiv, mai ales cel expus la soare si ploaie, ar trebui tratat cel putin o data pe an, de preferat la inceputul si sfarsitul sezonului de utilizare. Acest tratament presupune curatarea lemnului, aplicarea unui strat de ulei specific pentru lemn de exterior si, uneori, a unui lac protector. Acest proces previne uscarea, craparea si decolorarea lemnului, prelungindu-i durata de viata considerabil." },
+  { question: "Pot lasa mobilierul de gradina afara pe timp de iarna?", answer: "Depinde foarte mult de material. Mobilierul din ratan sintetic, aluminiu sau plastic de calitate superioara poate fi lasat afara peste iarna, insa este recomandat sa fie acoperit cu huse de protectie. Mobilierul din fier forjat sau lemn, mai ales daca nu a fost tratat corespunzator, nu este recomandat sa fie lasat afara fara o protectie serioasa, deoarece umezeala si inghetul pot deteriora materialul." },
+  { question: "Ce inseamna ratan sintetic si de ce e atat de popular?", answer: "Ratanul sintetic, cunoscut si sub denumirea de poliratan, este un material plastic (de obicei polietilena) impletit, care imita aspectul ratanului natural. Este foarte popular pentru ca este extrem de rezistent la intemperii (soare, ploaie, umiditate), nu se decoloreaza, nu putrezeste si este foarte usor de curatat. In plus, este mai accesibil decat ratanul natural si are o durata de viata lunga." },
+  { question: "Ce fel de perne sunt cele mai potrivite pentru exterior?", answer: "Cele mai potrivite perne pentru exterior sunt cele confectionate din materiale rezistente la apa si la razele UV, cum ar fi poliesterul tratat sau acrilicul. Cauta perne cu umplutura care nu absoarbe apa usor (de exemplu, spuma cu celula inchisa) si care se usuca rapid. De asemenea, este util ca husele sa fie detasabile si lavabile pentru o curatare facila." },
+  { question: "Cum pot curata petele de mucegai de pe mobilierul de gradina?", answer: "Pentru petele de mucegai, cel mai bine este sa folosesti o solutie de apa cu otet alb (o parte otet la doua parti apa) sau o solutie delicata de sapun si apa. Freaca usor zona afectata cu o perie moale sau un burete. Dupa ce ai curatat, clateste bine cu apa curata si lasa mobilierul sa se usuce complet la soare. Evita produsele chimice agresive care pot deteriora materialul." },
+  { question: "Exista seturi de masa si scaune all-inclusive pentru gradina?", answer: "Termenul all-inclusive se refera mai mult la pachetele turistice, dar in contextul mobilierului de gradina, poti gasi seturi care includ masa, scaune, si uneori chiar si perne, umbrela sau alte accesorii. Acestea sunt gandite sa fie o solutie completa pentru amenajarea unui spatiu exterior. Totusi, chiar si in aceste seturi, calitatea pernelor sau a accesoriilor poate varia, asa ca e bine sa verifici specificatiile." }
+];
+
+const toc = [
+  { title: "De ce un set masa si scaune pentru gradina e o idee excelenta?", id: "de-ce-un-set-masa-si-scaune-pentru-gradina-e-o-idee-excelenta" },
+  { title: "Topul meu: Seturi masa si scaune pentru gradina pe care le-as recomanda", id: "topul-meu-seturi-masa-si-scaune-pentru-gradina-pe-care-le-as-recomanda" },
+  { title: "Cum alegi corect setul de masa si scaune pentru gradina ta", id: "cum-alegi-corect-setul-de-masa-si-scaune-pentru-gradina-ta" },
+  { title: "Avantaje si dezavantaje: Ce trebuie sa stii", id: "avantaje-si-dezavantaje-ce-trebuie-sa-stii" },
+  { title: "Sfaturi practice din experienta mea", id: "sfaturi-practice-din-experienta-mea" },
+  { title: "Parerea mea finala: Ce recomand", id: "parerea-mea-finala-ce-recomand" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Set masa si scaune pentru gradina - CentroCasa"
+  description="Daca te gandesti sa-ti amenajezi un colt de relaxare afara, un set de masa si scaune pentru gradina e piesa centrala. E locul unde vei savura cafeaua de dimineata, vei petrece timp cu cei dragi sau pur si simplu te vei bucura de aer curat. Alegerea potrivita poate transforma spatiul tau exterior intr-o oaza de confort."
+  image="/images/articles/set-masa-si-scaune-pentru-gradina.webp"
+  type="article"
+  publishedTime="2026-01-20T12:32:16.789Z"
+  modifiedTime="2026-01-31T12:32:16.263Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Set masa si scaune pentru gradina</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
+        <span class="article-date">24 ianuarie 2026</span>
+      </div>
+      <h1 class="article-title">Set masa si scaune pentru gradina</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/set-masa-si-scaune-pentru-gradina.webp" alt="Set masa si scaune pentru gradina" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-un-set-masa-si-scaune-pentru-gradina-e-o-idee-excelenta">
+        <h2>De ce un set masa si scaune pentru gradina e o idee excelenta?</h2>
+        <p>Salutare! Dupa atatia ani de umblat prin case si gradini, pot sa spun cu mana pe inima ca un set de masa si scaune pentru exterior e una dintre cele mai bune investitii pe care le poti face. Nu vorbim doar de un simplu mobilier, ci de o invitatie la relaxare, la momente frumoase petrecute afara. Gandeste-te: o cafea savurata in liniste dimineata, cu ciripit de pasarele, o cina in aer liber cu prietenii, sau pur si simplu un loc unde copiii se pot juca in siguranta pe afara.</p>
+        <p>E practic o extensie a casei tale, un spatiu unde poti respira mai usor si te poti deconecta de la agitatia zilnica. Pentru cine e potrivit? Practic pentru oricine are un mic balcon, o terasa, o curte sau chiar si o gradina mai mare. Chiar si un spatiu mic poate fi transformat intr-un loc primitor cu ajutorul unui set compact.</p>
+        <p>E ideal pentru familii, cupluri, sau chiar si pentru persoanele care locuiesc singure si vor sa se bucure de natura. E acel element care da personalitate spatiului tau exterior si il face mai primitor. Nu neglija acest aspect cand vine vorba de amenajarea casei tale, pentru ca el aduce un plus de confort si bucurie pe care greu il gasesti in alta parte.</p>
+      </section>
+
+      <section id="topul-meu-seturi-masa-si-scaune-pentru-gradina-pe-care-le-as-recomanda">
+        <h2>Topul meu: Seturi masa si scaune pentru gradina pe care le-as recomanda</h2>
+        <p>Am testat destul de multe variante de-a lungul timpului, asa ca am o parere destul de clara despre ce e bun si ce nu. Iata cateva optiuni care mi s-au parut excelente, fiecare cu farmecul ei:</p>
+        <p>1.  <strong>Set din Ratan Sintetic cu Masuta de Cafea (ex: Keter Corfu Box/Set Indiana)</strong></p>
+        <p><strong>Ce imi place:</strong> E un clasic pentru ca e extrem de rezistent la intemperii, usor de curatat (un prosop umed e suficient) si arata foarte bine. Ratanul sintetic imita perfect lemnul, dar fara bataia de cap a intretinerii. Masuta de cafea e de obicei compacta, perfecta pentru o carte, o bautura sau cateva gustari. Multe modele vin si cu perne, ceea ce adauga un plus de confort.</p>
+        <p><strong>Specificatii:</strong> Se gaseste in diverse culori (gri, maro, antracit), de obicei pentru 2-4 persoane. Materialul e polipropilena de inalta calitate. Pretul variaza intre 700 - 1500 RON, in functie de numarul de piese si brand.</p>
+        <p>2.  <strong>Set din Lemn Masiv (ex: Teak sau Salcam)</strong></p>
+        <p><strong>Ce imi place:</strong> Nimic nu se compara cu senzatia si aspectul natural al lemnului. Un set din lemn masiv aduce o nota de eleganta si caldura in orice gradina. Lemnul de tec sau salcam e ideal pentru ca e rezistent la umezeala si insecte. Cu o intretinere corecta, poate dura ani buni.</p>
+        <p><strong>Specificatii:</strong> Se gaseste in configuratii de la 2 la 8+ persoane. Lemnul de tec e cel mai scump, dar si cel mai durabil (preturi de la 2000 RON in sus). Salcamul e o alternativa mai accesibila (incepand de la 1000 RON), dar necesita tratament anual. Este important sa fie tratat cu ulei pentru lemn la inceputul si sfarsitul sezonului.</p>
+        <p>3.  <strong>Set din Metal (Aluminiu sau Fier Forjat)</strong></p>
+        <p><strong>Ce imi place:</strong> Metalul, mai ales aluminiul, e o optiune usoara si rezistenta la rugina. Fierul forjat are un farmec aparte, clasic, dar e mai greu si poate necesita tratament anti-rugina. Aceste seturi sunt adesea simple, cu un design minimalist, dar pot fi si foarte ornate, in cazul fierului forjat.</p>
+        <p><strong>Specificatii:</strong> Aluminiul e usor de mutat si nu ruginește (preturi de la 800 RON). Fierul forjat e mai greu, dar confera un aer mediteranean (preturi de la 1200 RON). Se potrivesc bine cu perne colorate pentru a adauga un plus de confort.</p>
+        <p>4.  <strong>Set Pliabil din Plastic/Polipropilena</strong></p>
+        <p><strong>Ce imi place:</strong> Daca spatiul e o problema sau vrei flexibilitate, un set pliabil e solutia. Le poti depozita usor iarna sau cand nu le folosesti. Sunt ieftine, usoare si usor de curatat.</p>
+        <p><strong>Specificatii:</strong> De obicei, pentru 2-4 persoane. Preturi foarte accesibile, de la 200 la 600 RON. Sunt ideale pentru balcoane mici sau pentru a fi scoase la ocazie.</p>
+      </section>
+
+      <section id="cum-alegi-corect-setul-de-masa-si-scaune-pentru-gradina-ta">
+        <h2>Cum alegi corect setul de masa si scaune pentru gradina ta</h2>
+        <p>Alegerea setului perfect poate parea complicata, dar daca te gandesti la cateva aspecte cheie, totul devine mult mai simplu. Din experienta mea, primele lucruri la care te uiti sunt:</p>
+        <p><strong>Spatiul disponibil:</strong> Asta e cel mai important. Masoara cu atentie locul unde vrei sa pui setul. Nu vrei sa ajungi acasa cu un set imens care nu incape sau, dimpotriva, unul prea mic care pare pierdut in spatiu. Gandeste-te la cat loc iti trebuie pentru a te misca in jurul mesei si scaunelor. Un set pentru 4 persoane poate ocupa, de exemplu, 2x1.5 metri, dar asta variaza enorm in functie de design.</p>
+        <p><strong>Materialul:</strong> Fiecare material are avantajele si dezavantajele lui. Daca vrei intretinere minima, mergi pe ratan sintetic sau aluminiu. Daca iubesti aspectul natural si esti dispus sa acorzi putina atentie, lemnul masiv e o alegere superba. Plasticul e cel mai accesibil, dar poate fi mai putin durabil si estetic.</p>
+        <p><strong>Stilul:</strong> Gandeste-te la cum arata casa si gradina ta. Vrei ceva modern, rustic, clasic? Setul de masa si scaune ar trebui sa completeze stilul general. Un set din fier forjat arata grozav langa o casa cu arhitectura clasica, in timp ce ratanul sintetic se potriveste cu un design mai contemporan.</p>
+        <p><strong>Confortul:</strong> Nu uita ca vei petrece timp acolo! Scaunele trebuie sa fie confortabile. Verifica daca au perne, daca spatarul e la unghiul potrivit. Unele scaune au si cotiere, ceea ce poate fi un mare plus. Daca optezi pentru un set fara perne, gandeste-te la costul si disponibilitatea acestora.</p>
+        <p><strong>Durabilitatea si intretinerea:</strong> Cat de mult vrei sa te ocupi de intretinere? Lemnul necesita tratament anual, metalul poate rugini daca nu e protejat corespunzator, in timp ce ratanul sintetic sau plasticul necesita doar o curatare ocazionala. Verifica garantia oferita de producator.</p>
+        <p><strong>Bugetul:</strong> Stabileste-ti un buget de la inceput. Pretul unui set poate varia de la cateva sute de lei la cateva mii, in functie de material, brand si dimensiune. Nu uita sa incluzi in calcul si costul pernelor sau al tratamentelor de intretinere, daca e cazul.</p>
+        <p><strong>Functionalitatea:</strong> Ai nevoie de o masa mare pentru cine formale sau una mica pentru cafea? Vrei scaune care se pot baga sub masa pentru a economisi spatiu? Gandeste-te la cum vei folosi cel mai des setul.</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-ce-trebuie-sa-stii">
+        <h2>Avantaje si dezavantaje: Ce trebuie sa stii</h2>
+        <p>Fiecare tip de mobilier pentru gradina vine cu plusurile si minusurile lui, iar seturile de masa si scaune nu fac exceptie. E bine sa le cunosti dinainte ca sa nu ai surprize neplacute:</p>
+        <p><strong>Avantaje Generale:</strong></p>
+        <p><strong>Crearea unui spatiu dedicat:</strong> Principalul avantaj e ca iti ofera un loc special amenajat pentru relaxare, servirea mesei sau socializare in aer liber. Tranforma o simpla curte intr-un "colt de living" exterior.</p>
+        <p><strong>Imbunatatirea esteticii:</strong> Un set frumos ales poate ridica considerabil aspectul gradinii sau terasei, adaugand stil si personalitate.</p>
+        <p><strong>Flexibilitate:</strong> Multe seturi sunt suficient de usoare pentru a fi mutate, permitandu-ti sa schimbi aranjamentul sau sa le muti la soare/umbra dupa cum doresti.</p>
+        <p><strong>Confort:</strong> Cand sunt echipate cu perne, scaunele devin extrem de confortabile, transformand timpul petrecut afara intr-o experienta placuta.</p>
+        <p><strong>Crearea amintirilor:</strong> Aceste spatii devin fundalul multor amintiri frumoase, fie ca e vorba de sarbatori in familie, seri cu prietenii sau momente linistite cu o carte.</p>
+        <p><strong>Dezavantaje Generale:</strong></p>
+        <p><strong>Intretinerea:</strong> In functie de material, pot necesita intretinere regulata (curatare, tratament, protejare). Neglijarea intretinerii poate duce la deteriorarea prematura.</p>
+        <p><strong>Durabilitatea in conditii meteo nefavorabile:</strong> Ploaia, soarele puternic, inghetul pot afecta materialele, mai ales daca nu sunt protejate corespunzator. Unele materiale pot decolora sau crapa.</p>
+        <p><strong>Spatiul de depozitare:</strong> In afara sezonului, daca nu sunt rezistente la intemperii, pot necesita spatiu de depozitare, ceea ce poate fi o problema pentru cei cu putin loc.</p>
+        <p><strong>Costul initial:</strong> Un set de calitate poate reprezenta o investitie initiala destul de mare, desi pe termen lung se poate dovedi rentabil.</p>
+        <p><strong>Potrivirea cu spatiul:</strong> Daca nu masori corect, risti sa achizitionezi un set prea mare sau prea mic, care sa nu se potriveasca estetic sau functional cu spatiul tau.</p>
+      </section>
+
+      <section id="sfaturi-practice-din-experienta-mea">
+        <h2>Sfaturi practice din experienta mea</h2>
+        <p>Dupa atatia ani in domeniu, am invatat cateva trucuri care te pot scuti de batai de cap si te ajuta sa faci cea mai buna alegere. Iata ce mi se pare mie important:</p>
+        <p><strong>Nu te grabi cu alegerea pernelor:</strong> Daca setul nu vine cu perne, acorda-le atentie la fel de mare ca si mobilierului. Alege materiale rezistente la apa si UV, care se usuca rapid si sunt usor de curatat. Culorile vii pot aduce un plus de veselie, dar cele deschise se pot murdari mai usor. Gandeste-te la ce se potriveste cu restul decorului.</p>
+        <p><strong>Protejeaza-l iarna:</strong> Chiar si cele mai rezistente materiale beneficiaza de o protectie suplimentara peste iarna. Daca nu ai un spatiu de depozitare, investeste in huse de protectie impermeabile. Acestea vor prelungi durata de viata a setului si il vor proteja de intemperii, mucegai si praf.</p>
+        <p><strong>Curata regulat:</strong> Nu astepta sa se murdareasca prea tare. O curatare rapida saptamanal, mai ales daca ai copii sau animale de companie, e mult mai usor de facut si mentine mobilierul in stare buna. Foloseste solutii de curatare blande, specifice materialului.</p>
+        <p><strong>Ia in calcul si alte accesorii:</strong> Un set de masa si scaune e baza, dar gandeste-te si la umbrela de soare, covorase pentru exterior, felinare sau chiar si o lada pentru depozitat pernele. Acestea completeaza amenajarea si o fac mai functionala si mai primitoare.</p>
+        <p><strong>Cumpara in extrasezon:</strong> Daca ai posibilitatea, achizitionarea mobilierului de gradina la sfarsitul verii sau in toamna poate aduce reduceri semnificative. Magazinele vor sa scape de stocuri pentru a face loc noilor colectii.</p>
+        <p><strong>Testeaza inainte de a cumpara (daca e posibil):</strong> Daca mergi in magazin, aseaza-te pe scaune, vezi cum te simti. Incearca sa misti masa, sa vezi cat de stabila e. Pozele online pot fi inselatoare, asa ca experienta directa e de nepretuit.</p>
+        <p><strong>Nu uita de suruburi si imbinari:</strong> La seturile care necesita montaj, verifica ca toate suruburile sunt bine stranse si ca imbinarile sunt solide. Un set bine asamblat va fi mult mai stabil si mai sigur.</p>
+      </section>
+
+      <section id="parerea-mea-finala-ce-recomand">
+        <h2>Parerea mea finala: Ce recomand</h2>
+        <p>Dupa atatia ani de testat si recomandat, pot sa spun ca alegerea unui set de masa si scaune pentru gradina tine mult de preferintele personale si de nevoile specifice ale fiecaruia. Totusi, daca ar fi sa dau o recomandare generala, as merge pe <strong>ratan sintetic</strong>. Mi se pare ca ofera cel mai bun echilibru intre aspect, durabilitate, intretinere usoara si pret.</p>
+        <p>Un set din ratan sintetic arata modern, rezista bine in conditii meteo variate si nu necesita mult efort pentru a fi tinut in stare buna. E usor de curatat, nu se decoloreaza rapid si e o investitie care te va bucura ani de zile.</p>
+        <p>Pentru cei cu un buget mai generos si care apreciaza frumusetea naturala, un set din <strong>lemn masiv de tec</strong> este, fara indoiala, o alegere de lux. Cu putina atentie la intretinere, devine o piesa centrala spectaculoasa in orice gradina. Insa, pretul sau poate fi un factor descurajant pentru multi.</p>
+        <p>Ce am invatat e ca cel mai important e sa te gandesti la cum vei folosi spatiul. Daca e vorba de un balcon mic unde bei cafeaua dimineata, un set compact, poate chiar pliabil, e perfect. Daca vrei sa organizezi cine mari cu prietenii, vei avea nevoie de ceva mai generos.</p>
+        <p>Nu te lasa pacalit de cele mai ieftine oferte, pentru ca de cele mai multe ori calitatea lasa de dorit. Cauta un echilibru intre pret, calitate si aspect. Si, cel mai important, alege ceva ce iti place cu adevarat, pentru ca gradina ta este refugiul tau si merita sa fie amenajata cu suflet.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de des trebuie intretinut mobilierul de gradina din lemn?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Mobilierul din lemn masiv, mai ales cel expus la soare si ploaie, ar trebui tratat cel putin o data pe an, de preferat la inceputul si sfarsitul sezonului de utilizare. Acest tratament presupune curatarea lemnului, aplicarea unui strat de ulei specific pentru lemn de exterior si, uneori, a unui lac protector. Acest proces previne uscarea, craparea si decolorarea lemnului, prelungindu-i durata de viata considerabil.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot lasa mobilierul de gradina afara pe timp de iarna?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Depinde foarte mult de material. Mobilierul din ratan sintetic, aluminiu sau plastic de calitate superioara poate fi lasat afara peste iarna, insa este recomandat sa fie acoperit cu huse de protectie. Mobilierul din fier forjat sau lemn, mai ales daca nu a fost tratat corespunzator, nu este recomandat sa fie lasat afara fara o protectie serioasa, deoarece umezeala si inghetul pot deteriora materialul.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce inseamna "ratan sintetic" si de ce e atat de popular?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Ratanul sintetic, cunoscut si sub denumirea de poliratan, este un material plastic (de obicei polietilena) impletit, care imita aspectul ratanului natural. Este foarte popular pentru ca este extrem de rezistent la intemperii (soare, ploaie, umiditate), nu se decoloreaza, nu putrezeste si este foarte usor de curatat. In plus, este mai accesibil decat ratanul natural si are o durata de viata lunga.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce fel de perne sunt cele mai potrivite pentru exterior?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Cele mai potrivite perne pentru exterior sunt cele confectionate din materiale rezistente la apa si la razele UV, cum ar fi poliesterul tratat sau acrilicul. Cauta perne cu umplutura care nu absoarbe apa usor (de exemplu, spuma cu celula inchisa) si care se usuca rapid. De asemenea, este util ca husele sa fie detasabile si lavabile pentru o curatare facila.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum pot curata petele de mucegai de pe mobilierul de gradina?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru petele de mucegai, cel mai bine este sa folosesti o solutie de apa cu otet alb (o parte otet la doua parti apa) sau o solutie delicata de sapun si apa. Freaca usor zona afectata cu o perie moale sau un burete. Dupa ce ai curatat, clateste bine cu apa curata si lasa mobilierul sa se usuce complet la soare. Evita produsele chimice agresive care pot deteriora materialul.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Exista seturi de masa si scaune "all-inclusive" pentru gradina?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Termenul "all-inclusive" se refera mai mult la pachetele turistice, dar in contextul mobilierului de gradina, poti gasi seturi care includ masa, scaune, si uneori chiar si perne, umbrela sau alte accesorii. Acestea sunt gandite sa fie o solutie completa pentru amenajarea unui spatiu exterior. Totusi, chiar si in aceste seturi, calitatea pernelor sau a accesoriilor poate varia, asa ca e bine sa verifici specificatiile.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="set-masa-si-scaune-pentru-gradina"
+      currentCategory="mobilier-gradina"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

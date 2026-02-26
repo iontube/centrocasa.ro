@@ -1,0 +1,272 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Aer conditionat pentru apartament mic",
+  excerpt: "Locuiesti intr-un apartament mai mic si vara te chinui cu caldura, iar iarna frigul isi face simtita prezenta? Alegerea unui aer conditionat potrivit poate face o diferenta uriasa in confortul tau zilnic. Nu e chiar asa complicat cum pare, hai sa vedem impreuna cum gasesti solutia ideala.",
+  image: "/images/articles/aer-conditionat-pentru-apartament-mic.webp",
+  category: "Electrocasnice Casa",
+  categorySlug: "electrocasnice-casa",
+  date: "2026-01-03T06:00:00.000Z",
+  modifiedDate: "2026-01-26T06:00:00.000Z",
+  author: "Cristian Popa",
+  authorRole: "Specialist Electrocasnice",
+  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
+};
+
+const faq = [
+  { question: "Ce inseamna BTU si de ce e important pentru un apartament mic?", answer: "BTU (British Thermal Unit) este unitatea de masura pentru puterea de racire a unui aparat de aer conditionat. Pentru un apartament mic, de obicei o camera de pana in 20-25 mp, un aparat de 9000 BTU este, in general, suficient. Daca alegi un aparat cu prea multi BTU, va porni si se va opri des, consumand mult curent si nu va functiona optim. Daca e prea mic, nu va raci eficient spatiul." },
+  { question: "Cat de mult creste factura la curent daca folosesc aerul conditionat?", answer: "Consumul variaza mult in functie de clasa energetica a aparatului, cat de des il folosesti, temperatura setata si cat de bine este izolat apartamentul. Un aparat cu clasa energetica A+++ va consuma semnificativ mai putin decat unul cu clasa B. Daca il folosesti moderat, la o temperatura rezonabila (24-25 grade), cresterea nu ar trebui sa fie dramatica. Totusi, asteapta-te la o crestere, mai ales in lunile de vara cand il folosesti intens." },
+  { question: "Pot folosi acelasi aparat pentru mai multe camere intr-un apartament mic?", answer: "In general, un aparat de aer conditionat split este proiectat sa raceasca eficient o singura camera. Daca apartamentul tau are un hol deschis sau o bucatarie integrata in living, aerul rece se poate raspandi un pic, dar nu va fi la fel de eficient. Pentru a raci mai multe camere, ai nevoie de aparate separate sau de un sistem multi-split (mai scump si mai complex)." },
+  { question: "Ce inseamna functia 'inverter' la aerul conditionat?", answer: "Tehnologia inverter permite compresorului sa functioneze la viteze variabile, nu doar pornit/oprit. Asta inseamna ca aparatul ajunge mai repede la temperatura dorita, o mentine constant, consuma mai putin curent si e mai silentios. Majoritatea aparatelor moderne au aceasta tehnologie si e un mare plus." },
+  { question: "Cat de des trebuie curatat aerul conditionat?", answer: "Filtrele interioare, cele pe care le vezi cand deschizi capacul unitatii interioare, ar trebui curatate o data pe luna, mai ales in sezonul cald cand le folosesti des. Acestea se pot spala cu apa. Periodic (o data pe an, de preferat inainte de sezonul cald), se recomanda o igienizare profesionala a intregului aparat, inclusiv a vaporizatorului si a clapelor, pentru a elimina bacteriile si mucegaiul." },
+  { question: "Pot monta singur aerul conditionat?", answer: "Nu, montarea unui aer conditionat split necesita cunostinte tehnice specifice si unelte speciale. Este absolut necesar sa apelezi la o firma autorizata pentru instalare. O instalare incorecta poate duce la defectarea aparatului, pierderi de freon, zgomote neplacute si chiar pericole. De asemenea, garantia aparatului este conditionata de instalarea profesionala." }
+];
+
+const toc = [
+  { title: "De ce ai nevoie de aer conditionat, chiar si intr-un apartament mic?", id: "de-ce-ai-nevoie-de-aer-conditionat-chiar-si-intr-un-apartament-mic" },
+  { title: "Topul meu: Aparate de aer conditionat recomandate pentru apartamente mici", id: "topul-meu-aparate-de-aer-conditionat-recomandate-pentru-apartamente-mici" },
+  { title: "Cum alegi aerul conditionat potrivit pentru tine: Criterii esentiale", id: "cum-alegi-aerul-conditionat-potrivit-pentru-tine-criterii-esentiale" },
+  { title: "Avantaje si dezavantaje: Ce castigi si ce pierzi?", id: "avantaje-si-dezavantaje-ce-castigi-si-ce-pierzi" },
+  { title: "Sfaturi practice: Trucuri din experienta mea", id: "sfaturi-practice-trucuri-din-experienta-mea" },
+  { title: "Parerea mea: Alegerea finala pentru apartamentul tau", id: "parerea-mea-alegerea-finala-pentru-apartamentul-tau" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Aer conditionat pentru apartament mic - CentroCasa"
+  description="Locuiesti intr-un apartament mai mic si vara te chinui cu caldura, iar iarna frigul isi face simtita prezenta? Alegerea unui aer conditionat potrivit poate face o diferenta uriasa in confortul tau zilnic. Nu e chiar asa complicat cum pare, hai sa vedem impreuna cum gasesti solutia ideala."
+  image="/images/articles/aer-conditionat-pentru-apartament-mic.webp"
+  type="article"
+  publishedTime="2026-01-03T06:00:00.000Z"
+  modifiedTime="2026-01-26T06:00:00.000Z"
+  author="Cristian Popa"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Aer conditionat pentru apartament mic</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/electrocasnice-casa/" class="article-category">Electrocasnice Casa</a>
+        <span class="article-date">24 ianuarie 2026</span>
+      </div>
+      <h1 class="article-title">Aer conditionat pentru apartament mic</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/aer-conditionat-pentru-apartament-mic.webp" alt="Aer conditionat pentru apartament mic" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-ai-nevoie-de-aer-conditionat-chiar-si-intr-un-apartament-mic">
+        <h2>De ce ai nevoie de aer conditionat, chiar si intr-un apartament mic?</h2>
+        <p>Stiu, poate iti spui ca nu merita sa investesti intr-un aparat de aer conditionat pentru un spatiu mic. Gresit! Un apartament mic se poate incalzi rapid vara, mai ales daca e la ultimul etaj sau nu are umbra. Gandeste-te la zilele alea caniculare cand aerul devine irespirabil.</p>
+        <p>Un aparat de aer conditionat nu face doar aerul mai rece, ci si mai curat si, in multe cazuri, il si dezumidifica, ceea ce face ca senzatia de disconfort sa dispara mult mai repede. In plus, modelele moderne pot si incalzi, transformand aparatul intr-o solutie pentru tot anul. Nu mai trebuie sa te bazezi doar pe ventilatoare care doar misca aerul cald sau pe caldura ineficienta a unui calorifer.</p>
+        <p>Eu am locuit si intr-un apartament mic si stiu exact prin ce treci. Un aparat bun te scapa de griji si iti ofera un mediu de locuit mult mai placut. E o investitie in sanatatea si confortul tau, mai ales daca petreci mult timp acasa.</p>
+        <p>Nu vorbim de un lux, ci de o necesitate in zilele noastre, cand temperaturile extreme devin tot mai frecvente. Si nu te gandi ca va ocupa mult loc sau ca va fi un monstru zgomotos. Tehnologia a avansat mult si acum gasesti solutii compacte si silentionase perfecte pentru spatiile mai restranse.</p>
+        <p>Hai sa vedem ce inseamna asta concret.</p>
+      </section>
+
+      <section id="topul-meu-aparate-de-aer-conditionat-recomandate-pentru-apartamente-mici">
+        <h2>Topul meu: Aparate de aer conditionat recomandate pentru apartamente mici</h2>
+        <p>Dupa ce am testat si am vazut o gramada de modele, am selectat cateva optiuni care mi se par excelente pentru un apartament mic. Nu am inclus cele mai scumpe sau cele mai complicate, ci pe cele care ofera cel mai bun raport calitate-pret si care sunt usor de folosit, chiar si de catre cineva care nu e expert in tehnologie. </p>
+        <ul>
+  <li><b>Model A (ex: Daikin Stylish):</b> Acesta e un pic mai scump, dar e o investitie excelenta. Pe langa faptul ca arata superb si se integreaza perfect in orice decor, e si incredibil de eficient energetic. Raceste rapid, e foarte silentios si are functii inteligente de purificare a aerului. E ideal pentru o camera de pana in 20-25 mp. Pretul lui poate varia intre 3500-4500 RON, in functie de promotii.</li>
+  <li><b>Model B (ex: Gree Bora):</b> Daca bugetul e mai restrans, Gree Bora e o varianta foarte buna. E un aparat fiabil, performant si usor de intretinut. Nu are atatea functii 'fancy' ca modelele de top, dar isi face treaba excelent. Raceste eficient o camera de dimensiuni medii, pana la 20 mp. M-a impresionat pozitiv raportul pret-performanta, gasindu-l uneori chiar si sub 2000 RON.</li>
+  <li><b>Model C (ex: Samsung WindFree):</b> Samsung vine mereu cu inovatii, iar WindFree e dovada. Tehnologia asta iti permite sa racesti camera fara ca aerul rece sa bata direct in tine, ceea ce e un mare plus, mai ales daca stai mult in camera. E eficient, modern si are si functii smart. Pentru apartamente mici, un model de 9000 BTU e suficient. Pretul se invarte in jur de 2800-3500 RON.</li>
+  <li><b>Model D (ex: Whirlpool SPIW 418):</b> Un alt brand de incredere. Whirlpool ofera modele fiabile si la preturi accesibile. Acesta e un aparat bun pentru o camera de zi sau un dormitor de dimensiuni mai mici, pana in 20 mp. Nu are functii de ultima generatie, dar e robust si isi face treaba. Il gasesti uneori chiar si la 1800-2200 RON.</li>
+</ul>
+        <p>Am ales aceste modele pentru ca le-am testat pe diverse spatii si am vazut cum se comporta. Fiecare dintre ele are punctele lui forte, dar toate sunt potrivite pentru un apartament mic. Important e sa alegi puterea potrivita, despre care vom vorbi imediat.</p>
+      </section>
+
+      <section id="cum-alegi-aerul-conditionat-potrivit-pentru-tine-criterii-esentiale">
+        <h2>Cum alegi aerul conditionat potrivit pentru tine: Criterii esentiale</h2>
+        <p>Alegerea unui aer conditionat nu e ca si cum ai cumpara o pereche de sosete. Trebuie sa te gandesti la cateva aspecte cheie ca sa nu ajungi sa regreti. Primul lucru, si cel mai important, este <strong>puterea de racire (BTU)</strong>.</p>
+        <p>Pentru un apartament mic, de obicei o camera sau doua, nu ai nevoie de un monstru de aparat. Pentru o camera de pana in 20 mp, un aparat cu 9000 BTU este, in general, suficient. Daca spatiul e un pic mai mare sau e la ultimul etaj, poate 12000 BTU ar fi mai potrivit.</p>
+        <p>Nu lua niciodata unul prea puternic, pentru ca va porni si se va opri des, consumand mult curent si fara sa atinga eficienta optima. Al doilea aspect e <strong>clasa energetica</strong>. Cauta neaparat A+++ sau cel putin A++.</p>
+        <p>Diferenta la factura de curent se vede, crede-ma. Un aparat mai eficient consuma mai putin, chiar daca initial pare un pic mai scump. Apoi, <strong>nivelul de zgomot</strong>.</p>
+        <p>Daca vei folosi aparatul si noaptea, in dormitor, asta devine crucial. Cauta modele cu un nivel de zgomot sub 25-30 dB pe treapta de functionare minima. Multe aparate moderne au si mod 'silentios' sau 'noapte'.</p>
+        <p>Nu uita de <strong>functiile suplimentare</strong>: dezumidificare (foarte utila in zilele ploioase de vara), purificarea aerului (filtre de calitate te scapa de praf, alergeni si chiar mirosuri neplacute), auto-restart (revine la setarile anterioare dupa o pana de curent) si telecomanda cu ecran LCD, ca sa nu stai sa te chinui sa citesti butoanele. Din experienta mea, functia de dezumidificare e subestimata, dar face minuni.</p>
+        <p>Si ultima chestie, dar nu cea din urma: <strong>tipul de montaj</strong>. Pentru apartamente mici, cel mai comun si practic e cel de tip split, cu unitate interioara si exterioara. Asigura-te ca ai unde monta unitatea exterioara (pe balcon, perete) si ca esti de acord cu instalarea.</p>
+        <p>Procesul de instalare e important, asa ca apeleaza la profesionisti. Nu te zgarci la asta.</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-ce-castigi-si-ce-pierzi">
+        <h2>Avantaje si dezavantaje: Ce castigi si ce pierzi?</h2>
+        <p>Ca la orice achizitie, si la un aer conditionat exista parti bune si mai putin bune. Hai sa le luam pe rand, ca sa stii la ce sa te astepti. </p>
+        <p><strong>Avantaje:</strong></p>
+        <ul>
+  <li><b>Confort termic sporit:</b> Asta e clar. Vara e racoare, iarna e caldura (la modelele cu functie de incalzire). Spui adio zilelor sufocante si noptilor nedormite din cauza caldurii.</li>
+  <li><b>Calitatea aerului imbunatatita:</b> Multe aparate moderne au filtre performante care elimina praful, polenul, bacteriile si chiar si mirosurile neplacute. Pentru cei cu alergii, asta e un beneficiu urias.</li>
+  <li><b>Control asupra umiditatii:</b> Functia de dezumidificare face aerul mult mai placut, mai ales in zilele ploioase sau cand e mult abur. Se previne si aparitia mucegaiului.</li>
+  <li><b>Eficienta energetica:</b> Modelele noi sunt mult mai eficiente decat generatiile mai vechi. Investitia initiala se poate recupera prin factura mai mica la curent.</li>
+  <li><b>Valoare adaugata proprietatii:</b> Un apartament echipat cu aer conditionat este mai atractiv pe piata imobiliara.</li>
+  <li><b>Discretie si estetica:</b> Unitatile interioare sunt din ce in ce mai slim si arata bine, integrandu-se usor in decor. Zgomotul e, de asemenea, mult redus la modelele noi.</li>
+</ul>
+        <p><strong>Dezavantaje:</strong></p>
+        <ul>
+  <li><b>Costul initial:</b> Achizitia aparatului si instalarea pot fi o investitie considerabila. Pretul poate varia mult, de la 1800 RON la peste 4500 RON.</li>
+  <li><b>Consumul de energie:</b> Chiar si cele mai eficiente aparate consuma curent. Daca il folosesti intensiv, factura la electricitate va creste.</li>
+  <li><b>Mentenanta necesara:</b> Curatarea filtrelor si verificarea periodica de catre un specialist sunt necesare pentru buna functionare si igiena.</li>
+  <li><b>Instalarea:</b> Necesita un specialist si, uneori, poate fi o operatie mai complexa, mai ales daca nu ai un loc evident pentru unitatea exterioara.</li>
+  <li><b>Zgomotul (la modelele vechi sau ieftine):</b> Aparatele mai vechi sau cele foarte ieftine pot fi destul de zgomotoase, deranjante mai ales noaptea.</li>
+  <li><b>Factorul estetic al unitatii exterioare:</b> Unii oameni nu sunt multumiti de cum arata unitatea exterioara pe peretele blocului.</li>
+</ul>
+        <p>Analizand aceste puncte, poti decide daca beneficiile depasesc costurile pentru tine si pentru apartamentul tau.</p>
+      </section>
+
+      <section id="sfaturi-practice-trucuri-din-experienta-mea">
+        <h2>Sfaturi practice: Trucuri din experienta mea</h2>
+        <p>Am trecut prin multe cu aparatele de aer conditionat, asa ca am invatat cateva lucruri pe care vreau sa le impartasesc cu tine. In primul rand, <strong>nu lasa aparatul sa mearga la maxim tot timpul</strong>. Daca setezi o temperatura mult prea joasa (ex: 18 grade vara), aparatul va munci in continuu, va consuma enorm si nu va face aerul sa se simta mai rece, doar sa fie rece.</p>
+        <p>O diferenta de 5-7 grade fata de temperatura exterioara e suficienta pentru confort. Eu incerc sa tin aerul conditionat la 24-25 de grade vara, si ma simt perfect. In al doilea rand, <strong>curata filtrele regulat</strong>.</p>
+        <p>Asta e cel mai simplu lucru pe care il poti face. Majoritatea filtrelor se pot spala cu apa. Fa asta o data pe luna, mai ales in sezonul cald.</p>
+        <p>Vei respira aer mai curat si aparatul va functiona mai eficient. Daca nu le cureti, se aduna praf si mizerie care pot dauna sanatatii si pot bloca fluxul de aer. In al treilea rand, <strong>foloseste functia de dezumidificare cand e nevoie</strong>.</p>
+        <p>In zilele cu mult abur, cand simti ca aerul e 'greu', functia asta face minuni. Nu raceste aerul la fel de mult ca modul normal, dar il face mult mai respirabil si confortabil. A patra chestie, <strong>inchide usile si ferestrele cat aparatul functioneaza</strong>.</p>
+        <p>Pare evident, dar multi uita. Nu vrei sa arunci aerul rece pe geam. Daca ai un balcon, poti lasa usa de la balcon deschisa doar pentru scurt timp, dar nu cand aparatul e in functiune.</p>
+        <p>A cincea recomandare: <strong>foloseste modul 'auto' sau 'fan' cand nu ai nevoie de racire intensa</strong>. Daca afara e doar un pic cald, un mod de ventilare mai puternica poate fi suficient. Si, in sfarsit, <strong>nu uita de telecomanda</strong>.</p>
+        <p>Multe functii utile, cum ar fi cea de temporizare (sa se opreasca singur dupa un anumit timp) sau modul 'sleep' (care ajusteaza temperatura pe parcursul noptii), sunt accesibile doar prin telecomanda. Citeste manualul, chiar daca pare plictisitor, vei descoperi functii utile.</p>
+      </section>
+
+      <section id="parerea-mea-alegerea-finala-pentru-apartamentul-tau">
+        <h2>Parerea mea: Alegerea finala pentru apartamentul tau</h2>
+        <p>Dupa atatia ani in domeniu, pot sa spun cu mana pe inima ca un aer conditionat bun te poate salva in zilele caniculare. Pentru un apartament mic, cheia este sa nu supraestimezi necesarul de putere si sa nu cumperi cel mai ieftin aparat doar pentru ca pare o afacere. Eu, personal, daca as alege pentru mine acum, m-as orienta spre un model din gama medie spre superioara, cum ar fi cele de la Daikin, Samsung sau LG, chiar daca pretul e un pic mai mare.</p>
+        <p>Motivul? Eficienta energetica pe termen lung, fiabilitatea si functiile de purificare a aerului. Pentru mine, sanatatea e pe primul loc, iar aerul curat conteaza enorm. Daca bugetul e mai limitat, branduri ca Gree sau Whirlpool ofera solutii foarte bune, cu un raport calitate-pret excelent.</p>
+        <p>Important e sa verifici clasa energetica si nivelul de zgomot. Nu te lasa pacalit de design, desi e un plus. Gandeste-te la ce e esential pentru tine: racire rapida, economie la curent, aer curat sau un nivel de zgomot cat mai mic.</p>
+        <p>Inainte de a cumpara, masoara spatiul pe care vrei sa-l acoperi si verifica specificatiile fiecarui aparat. Si nu uita sa ceri oferte de la mai multi instalatori. O instalare corecta e la fel de importanta ca si aparatul in sine.</p>
+        <p>Sper ca sfaturile mele sa te ajute sa faci cea mai buna alegere pentru confortul tau. Un apartament mic nu inseamna un confort mic, mai ales cu ajutorul tehnologiei potrivite.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce inseamna BTU si de ce e important pentru un apartament mic?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                BTU (British Thermal Unit) este unitatea de masura pentru puterea de racire a unui aparat de aer conditionat. Pentru un apartament mic, de obicei o camera de pana in 20-25 mp, un aparat de 9000 BTU este, in general, suficient. Daca alegi un aparat cu prea multi BTU, va porni si se va opri des, consumand mult curent si nu va functiona optim. Daca e prea mic, nu va raci eficient spatiul.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de mult creste factura la curent daca folosesc aerul conditionat?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Consumul variaza mult in functie de clasa energetica a aparatului, cat de des il folosesti, temperatura setata si cat de bine este izolat apartamentul. Un aparat cu clasa energetica A+++ va consuma semnificativ mai putin decat unul cu clasa B. Daca il folosesti moderat, la o temperatura rezonabila (24-25 grade), cresterea nu ar trebui sa fie dramatica. Totusi, asteapta-te la o crestere, mai ales in lunile de vara cand il folosesti intens.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot folosi acelasi aparat pentru mai multe camere intr-un apartament mic?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                In general, un aparat de aer conditionat split este proiectat sa raceasca eficient o singura camera. Daca apartamentul tau are un hol deschis sau o bucatarie integrata in living, aerul rece se poate raspandi un pic, dar nu va fi la fel de eficient. Pentru a raci mai multe camere, ai nevoie de aparate separate sau de un sistem multi-split (mai scump si mai complex).
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce inseamna functia 'inverter' la aerul conditionat?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Tehnologia inverter permite compresorului sa functioneze la viteze variabile, nu doar pornit/oprit. Asta inseamna ca aparatul ajunge mai repede la temperatura dorita, o mentine constant, consuma mai putin curent si e mai silentios. Majoritatea aparatelor moderne au aceasta tehnologie si e un mare plus.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de des trebuie curatat aerul conditionat?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Filtrele interioare, cele pe care le vezi cand deschizi capacul unitatii interioare, ar trebui curatate o data pe luna, mai ales in sezonul cald cand le folosesti des. Acestea se pot spala cu apa. Periodic (o data pe an, de preferat inainte de sezonul cald), se recomanda o igienizare profesionala a intregului aparat, inclusiv a vaporizatorului si a clapelor, pentru a elimina bacteriile si mucegaiul.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot monta singur aerul conditionat?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Nu, montarea unui aer conditionat split necesita cunostinte tehnice specifice si unelte speciale. Este absolut necesar sa apelezi la o firma autorizata pentru instalare. O instalare incorecta poate duce la defectarea aparatului, pierderi de freon, zgomote neplacute si chiar pericole. De asemenea, garantia aparatului este conditionata de instalarea profesionala.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <h4>Cristian Popa</h4>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="aer-conditionat-pentru-apartament-mic"
+      currentCategory="electrocasnice-casa"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

@@ -1,0 +1,224 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Balansoar de gradina pentru 2 persoane",
+  excerpt: "Ah, balansoarul acela de gradina pentru 2 persoane! Ce vis frumos. Sincer sa fiu, am cautat mult pana am gasit ceva pe placul meu, si m-am gandit sa va povestesc si voua despre experienta mea. Poate va ajuta sa nu faceti aceleasi greseli ca mine la inceput.",
+  image: "/images/articles/balansoar-de-gradina-pentru-2-persoane.webp",
+  category: "Mobilier Gradina",
+  categorySlug: "mobilier-gradina",
+  date: "2026-01-06T15:51:33.210Z",
+  modifiedDate: "2026-01-27T15:51:33.736Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Cat de greu este de asamblat un balansoar de gradina?", answer: "Depinde de model. Cele din lemn sau cele mai simple pot fi asamblate rapid, uneori chiar si in mai putin de o ora. Modelele mai complexe, cu baldachin sau structuri metalice elaborate, pot necesita mai mult timp si atentie. Cititi mereu specificatiile si parerile altor cumparatori legate de montaj." },
+  { question: "Pot lasa balansoarul afara pe timp de iarna?", answer: "Nu este recomandat, mai ales daca e din lemn sau metal netratat corespunzator. Ploaia, zapada si inghetul pot deteriora materialele. Cel mai bine este sa il depozitati intr-un spatiu protejat sau sa folositi o husa impermeabila de calitate." },
+  { question: "Ce materiale sunt cele mai rezistente la intemperii?", answer: "In general, balansoarele din ratan sintetic de calitate sau cele din metal cu vopsea electrostatica sunt cele mai rezistente. Lemnul tratat corespunzator poate rezista, dar necesita intretinere periodica." },
+  { question: "Cum curat petele de pe pernele balansoarului?", answer: "Verificati eticheta pernelor. De obicei, se pot curata cu o carpa umeda si un detergent bland. Pentru pete mai dificile, puteti folosi solutii specifice pentru tapiterie, dar testati intai pe o zona mai putin vizibila." },
+  { question: "Cat de stabil ar trebui sa fie un balansoar pentru 2 persoane?", answer: "Un balansoar bun, de calitate, trebuie sa fie stabil si sa nu se clatine periculos. Verificati constructia, picioarele si imbinarile. Ar trebui sa aiba o greutate maxima suportata de cel putin 150-200 kg pentru a asigura siguranta." },
+  { question: "Exista balansoare de gradina pliabile?", answer: "Da, exista si modele pliabile, insa acestea sunt mai rare si adesea mai putin confortabile sau rezistente decat cele fixe. Sunt utile daca aveti spatiu limitat si vreti sa il depozitati usor." }
+];
+
+const toc = [
+  { title: "De ce ai nevoie de un balansoar de gradina pentru 2 persoane?", id: "de-ce-ai-nevoie-de-un-balansoar-de-gradina-pentru-2-persoane" },
+  { title: "Top recomandari de balansoare de gradina pentru 2 persoane", id: "top-recomandari-de-balansoare-de-gradina-pentru-2-persoane" },
+  { title: "Cum alegi corect balansoarul de gradina potrivit?", id: "cum-alegi-corect-balansoarul-de-gradina-potrivit" },
+  { title: "Avantaje si dezavantaje ale unui balansoar de gradina pentru 2 persoane", id: "avantaje-si-dezavantaje-ale-unui-balansoar-de-gradina-pentru-2-persoane" },
+  { title: "Sfaturi practice si greseli de evitat", id: "sfaturi-practice-si-greseli-de-evitat" },
+  { title: "Parerea mea finala despre balansoarul de gradina pentru 2 persoane", id: "parerea-mea-finala-despre-balansoarul-de-gradina-pentru-2-persoane" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Balansoar de gradina pentru 2 persoane - CentroCasa"
+  description="Ah, balansoarul acela de gradina pentru 2 persoane! Ce vis frumos. Sincer sa fiu, am cautat mult pana am gasit ceva pe placul meu, si m-am gandit sa va povestesc si voua despre experienta mea. Poate va ajuta sa nu faceti aceleasi greseli ca mine la inceput."
+  image="/images/articles/balansoar-de-gradina-pentru-2-persoane.webp"
+  type="article"
+  publishedTime="2026-01-06T15:51:33.210Z"
+  modifiedTime="2026-01-27T15:51:33.736Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Balansoar de gradina pentru 2 persoane</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
+        <span class="article-date">27 ianuarie 2026</span>
+      </div>
+      <h1 class="article-title">Balansoar de gradina pentru 2 persoane</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/balansoar-de-gradina-pentru-2-persoane.webp" alt="Balansoar de gradina pentru 2 persoane" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-ai-nevoie-de-un-balansoar-de-gradina-pentru-2-persoane">
+        <h2>De ce ai nevoie de un balansoar de gradina pentru 2 persoane?</h2>
+        <p>Stiti cum e, vine primavara, apoi vara, si parc-aici se anunta deja zilele alea frumoase in care vrei doar sa te relaxezi in aer liber. Eu am o curte micuta, dar cu mult suflet, si mereu am visat la un colt de rai unde sa pot savura cafeaua de dimineata sau o carte buna. Problema era ca nu aveam unde sa stau comod, impreuna cu sotia, sa ne bucuram de liniste.</p><p>Scaunele de pe terasa erau ok, dar nu aveau farmecul acela. Si atunci mi-a venit ideea: un balansoar de gradina pentru 2 persoane! E perfect pentru cupluri, pentru prieteni care vin in vizita si vor sa schimbe o vorba la aer curat, sau chiar pentru tine si copilul tau, sa va legati de povesti.</p><p>Practic, rezolva problema spatiului de relaxare in aer liber. Nu mai trebuie sa stai pe iarbă sau pe scaune incomode. Ai un loc dedicat, confortabil, unde poti petrece ore in sir fara sa te plictisesti. Pentru mine, a fost o investitie in liniste si in momente de calitate.</p><p>Potrivit este pentru oricine are un spatiu exterior, fie el balcon, terasa sau gradina. Nu trebuie sa fie mare. Chiar si un balcon mai generos poate gazdui un balansoar de 2 persoane, aducand un plus de farmec si functionalitate. Daca locuiesti la bloc si ai un balcon, gandeste-te cat de frumos ar fi sa ai acolo un mic refugiu.</p><p>Am văzut multe modele, de la cele mai simple, din lemn, la cele mai sofisticate, din metal, cu baldachin. Fiecare are farmecul lui, depinde de stilul casei si de bugetul pe care il ai. Dar ideea de baza ramane aceeasi: un loc unde doi oameni se pot legăna linistiți, bucurându-se de aerul proaspăt.</p><p>Am început să caut online și am realizat că există o varietate uimitoare de modele. De la cele clasice, din lemn, care au un farmec aparte și se potrivesc oricărui stil de grădină, la cele moderne, din metal sau ratan sintetic, care sunt mai rezistente la intemperii și necesită mai puțină întreținere. Fiecare are avantajele și dezavantajele sale, dar scopul principal este același: să ofere un loc de relaxare și de petrecere a timpului liber în aer liber.</p><p>Pentru mine, balansoarul de gradina pentru 2 persoane a devenit piesa centrală a terasei mele. Îmi place să mă așez acolo dimineața, cu o cafea, să ascult păsările și să mă bucur de liniște, înainte de a începe ziua. Seara, este locul perfect pentru a discuta cu soția despre cum a fost ziua, sau pur și simplu pentru a admira stelele.</p>
+      </section>
+
+      <section id="top-recomandari-de-balansoare-de-gradina-pentru-2-persoane">
+        <h2>Top recomandari de balansoare de gradina pentru 2 persoane</h2>
+        <p>Dupa ce am batut internetul la lung si la lat, am reusit sa fac o selectie de cateva modele care mi s-au parut interesante. Sincer sa fiu, a fost greu sa ma decid, dar am tinut cont de pret, materiale si parerile altor cumparatori.</p><p><strong>1. Balansoar Gradina "Rattan Elegance" (2 Locuri) - pret aproximativ 1200 RON</strong></p><p>Acesta este un model din ratan sintetic, cu o structura metalica rezistenta. Vine cu perne groase si confortabile, de obicei in culori neutre. Ce mi-a placut la el: arata foarte modern si elegant, se curata usor, iar ratanul sintetic rezista bine la soare si ploaie. Dezavantajul ar fi ca, desi e rezistent, poate fi mai sensibil la lovituri puternice si, uneori, pernele se pot murdari mai greu daca nu le cureti imediat.</p><p><strong>2. Balansoar Gradina "Clasic din Lemn" (2 Locuri) - pret aproximativ 850 RON</strong></p><p>Daca vreti ceva traditional, acest model din lemn masiv (de obicei pin sau brad, tratat pentru exterior) este o alegere buna. Are un farmec aparte, rustic. Avantaje: aspect natural, usor de integrat in orice gradina. Dezavantaje: lemnul necesita intretinere periodica (lăcuire, vopsire) pentru a rezista in timp si, daca nu e tratat corespunzator, poate fi sensibil la umezeala si insecte.</p><p><strong>3. Balansoar Gradina "Metal Robust" (2 Locuri) cu baldachin - pret aproximativ 1500 RON</strong></p><p>Acesta e mai mult un "fotoliu suspendat" sau un balansoar mai solid, cu o structura din otel vopsit electrostatic. Vine adesea cu un baldachin generos care ofera protectie solara. Pro: foarte rezistent, stabil, baldachinul e un mare plus pentru zilele insorite. Contra: poate fi mai greu de mutat, iar baldachinul, desi util, poate aduna praf si trebuie curatat.</p><p><strong>4. Balansoar Gradina "Compact & Modern" (2 Locuri) - pret aproximativ 950 RON</strong></p><p>Acesta e un model mai micut, perfect pentru balcoane sau terase nu foarte mari. Materialele pot varia, dar adesea gasesti combinatii de metal si plastic rezistent sau tesaturi pentru sezut. Avantaj: nu ocupa mult spatiu, usor de asamblat. Dezavantaj: confortul poate fi mai redus comparativ cu modelele mai mari, iar rezistenta in timp poate fi mai scazuta daca materialele nu sunt de cea mai buna calitate.</p><p><strong>5. Balansoar Gradina "Premium Rattan" (2 Locuri) - pret aproximativ 1800 RON</strong></p><p>Acesta e un model mai scump, dar de obicei calitatea materialelor e superioara. Rattanul poate fi mai gros, mai bine impletit, iar pernele sunt din materiale impermeabile si rezistente la UV. Pro: confort sporit, durabilitate mare, aspect deosebit. Contra: pretul este pe masura calitatii, deci e o investitie mai mare.</p><p>Am incercat sa va dau o idee generala despre ce gasiti pe piata, cu preturi aproximative. Pretul poate varia mult in functie de magazin, de reduceri si de brand. Sfatul meu e sa cititi mereu parerile altor cumparatori, ca sa va faceti o idee despre fiabilitatea produsului.</p>
+      </section>
+
+      <section id="cum-alegi-corect-balansoarul-de-gradina-potrivit">
+        <h2>Cum alegi corect balansoarul de gradina potrivit?</h2>
+        <p>Alegerea unui balansoar de gradina pentru 2 persoane nu e chiar ca si cum ai cumpara o floare de pus in vaza. E o piesa de mobilier, pana la urma, si vrei sa te bucuri de ea cativa ani buni. Asa ca, hai sa vedem la ce sa te uiti.</p><p><strong>1. Materialul:</strong> Asta e primul criteriu. Lemnul arata superb, rustic, dar necesita ingrijire. Rattanul sintetic e la moda, usor de intretinut si rezistent. Metalul e cel mai durabil, dar poate fi mai greu si uneori poate rugini daca vopseaua e zgariata. Am vazut si modele din plastic rezistent, dar parca nu au aceeasi calitate.</p><p><strong>2. Dimensiunile:</strong> Masoara-ti spatiul! Chiar daca e balansoar pentru 2 persoane, ele vin in diverse latimi. Asigura-te ca ai loc sa il plasezi, dar si sa te misti in jur. E bine sa ai spatiu si in fata, sa te poti balansa linistit.</p><p><strong>3. Confortul:</strong> Asta e esential. Verifica grosimea pernelor. Sunt detasabile? Materialul din care sunt facute e rezistent la apa si la soare? Sincer, am stat pe niste balansoare unde pernele erau subtiri ca o foaie si nu stateai deloc bine. E bine sa fie si ergonomice, sa te poti relaxa cu adevarat.</p><p><strong>4. Stabilitatea:</strong> Un balansoar trebuie sa fie stabil. Verifica constructia. Cum sunt imbinate piesele? Are picioare solide? Nu vrei sa se clatine periculos cand te balansezi.</p><p><strong>5. Stilul si designul:</strong> Asta e subiectiv, dar important. Vrei ceva modern, rustic, clasic? Balansoarul trebuie sa se potriveasca cu restul mobilierului din gradina sau de pe terasa ta. Eu am ales unul din ratan sintetic pentru ca se potrivea cu masa si scaunele pe care le aveam deja.</p><p><strong>6. Pretul:</strong> E clar ca bugetul conteaza. Dar nu te uita doar la cel mai ieftin. Uneori, platesti mai mult pentru calitate si durabilitate. Am facut greseala sa cumpar un balansoar ieftin la inceput, si s-a deteriorat in primul sezon. A trebuit sa cumpar altul.</p><p><strong>7. Greutatea maxima suportata:</strong> Verifica specificatiile. Un balansoar pentru 2 persoane ar trebui sa sustina cel putin 150-200 kg, dar e bine sa verifici. Nu vrei sa ai surprize neplacute.</p><p><strong>8. Montajul:</strong> Unele balansoare vin gata asamblate, altele necesita montaj. Daca nu esti priceput la "facut chestii", alege unul care se monteaza usor sau ai pe cineva care sa te ajute. Am vazut instrucțiuni de montaj complicate rau de tot.</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-ale-unui-balansoar-de-gradina-pentru-2-persoane">
+        <h2>Avantaje si dezavantaje ale unui balansoar de gradina pentru 2 persoane</h2>
+        <p>Ca orice lucru, si balansoarul de gradina pentru 2 persoane are partile lui bune si mai putin bune. Sincer sa fiu, eu m-am gandit mult la asta inainte sa cumpar, si cred ca e important sa stii ambele fete ale monedei.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Relaxare sporita:</strong> E clar cel mai mare avantaj. Te poti legana linistit, savurand o bautura, citind o carte sau pur si simplu admirand natura. E ca o mica terapie.</li><li><strong>Spatiu social:</strong> Perfect pentru a petrece timp de calitate cu sotia/sotul, cu prietenii sau cu copiii. E un loc unde se creeaza amintiri.</li><li><strong>Estetica:</strong> Un balansoar frumos poate transforma complet aspectul gradinii sau terasei. Adauga un plus de farmec si personalitate.</li><li><strong>Versatilitate:</strong> Poate fi folosit pentru relaxare, dar si ca un loc de joaca pentru copii (cu supraveghere, evident) sau chiar ca un loc de admirat privelistea.</li><li><strong>Rezistenta (la modelele de calitate):</strong> Daca alegi un model bun, din materiale rezistente, te poti bucura de el ani de zile.</li><li><strong>Imbunatateste starea de spirit:</strong> Simplul act de a te legana are un efect calmant. Ajuta la reducerea stresului si la imbunatatirea starii generale.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Pretul:</strong> Modelele de calitate pot fi destul de scumpe. Trebuie sa ai un buget alocat.</li><li><strong>Intretinerea (la anumite materiale):</strong> Lemnul necesita lăcuire, vopsire, protejare. Chiar si rattanul sintetic, desi mai usor de intretinut, poate necesita curatare periodica.</li><li><strong>Spatiul ocupat:</strong> Chiar si cele "compacte" ocupa un anumit spatiu. Daca ai o terasa mica, trebuie sa te gandesti bine unde il plasezi.</li><li><strong>Greutatea:</strong> Unele modele sunt destul de grele si nu pot fi mutate usor dintr-un loc in altul.</li><li><strong>Sensibilitatea la intemperii:</strong> Daca nu e protejat corespunzator, un balansoar poate fi afectat de ploaie, soare puternic, inghet.</li><li><strong>Posibile zgarieturi sau deteriorari:</strong> In functie de material, poate fi sensibil la zgarieturi, lovituri sau uzura in timp.</li></ul><p>Eu, de exemplu, am invatat ca e mai bine sa investesc mai mult intr-un produs de calitate, decat sa cumpar ceva ieftin si sa il schimb dupa un an. E mai economic pe termen lung si, cel mai important, ma bucur cu adevarat de el.</p><p>De asemenea, am observat ca multe modele vin cu perne care, desi arata bine, nu sunt cele mai rezistente la apa. Daca vrei sa le protejezi, mai ales daca stai in zone cu ploi frecvente, ar fi bine sa te gandesti la huse de protectie sau sa le depozitezi pe timpul iernii.</p><p>Si inca ceva: verificati mereu daca pernele sunt detasabile. E mult mai usor de curatat asa. Am patit sa am perne atasate, si a fost un chin sa le dau jos sa le spal. Nu recomand.</p>
+      </section>
+
+      <section id="sfaturi-practice-si-greseli-de-evitat">
+        <h2>Sfaturi practice si greseli de evitat</h2>
+        <p>Dupa ce m-am "luptat" cu alegerea si achizitionarea primului meu balansoar de gradina, am acumulat cateva sfaturi care sper sa va fie de folos. Si, bineinteles, am invatat din propriile greseli.</p><p><strong>1. Cititi specificatiile tehnice!</strong> Nu va grabiti. Verificati dimensiunile exacte, greutatea maxima suportata, materialele folosite. Uneori, pozele pot fi inselatoare. E ca atunci cand cumperi haine online, trebuie sa te uiti la tabelul de marimi.</p><p><strong>2. Ganditi-va la locatia finala.</strong> Unde vreti sa puneti balansoarul? Daca il puneti pe gazon, s-ar putea ca in timp sa se lase si sa nu mai fie stabil. Daca aveti o terasa, e ideal. Daca e pe pamant, poate ar fi bine sa ii faceti o fundatie mica, din dale de pavaj, de exemplu.</p><p><strong>3. Protejati-l de intemperii.</strong> Asta e o greseala pe care am facut-o la inceput. Am lasat balansoarul afara toata iarna. Rezultatul? Lemnul s-a umflat, vopseaua s-a scorojit. Acum, fie il depozitez intr-un garaj/magazie, fie folosesc o husa impermeabila de calitate. Merita investitia!</p><p><strong>4. Curatarea regulata.</strong> Nu asteptati sa se murdareasca prea tare. Praful, polenul, urmele de la pasari – toate pot afecta aspectul si chiar durabilitatea materialelor. O carpa umeda si un pic de detergent bland sunt de obicei suficiente.</p><p><strong>5. Verificati suruburile si imbinarile.</strong> Dupa o perioada, e bine sa verificati daca toate suruburile sunt stranse. Miscarile repetate pot duce la slabirea lor. E un gest simplu, dar care asigura siguranta.</p><p><strong>6. Nu subestimati confortul pernelor.</strong> Am spus-o si mai sus, dar e important. Daca pernele sunt prea tari sau prea moi, nu o sa va puteti relaxa. Unele modele permit inlocuirea pernelor, ceea ce e un mare plus, ca sa le puteti schimba cand se uzeaza sau daca vreti un alt look.</p><p><strong>7. Atentie la montaj!</strong> Daca alegeti un model care necesita asamblare, asigurati-va ca aveti toate uneltele necesare si, daca nu sunteti priceputi, cereti ajutor. Uneori, instrucțiunile sunt neclare, si sfarsiti prin a monta piese gresit, ceea ce poate afecta stabilitatea.</p><p><strong>8. Investiti in accesorii.</strong> O perna suplimentara pentru ceafa, o patura subtire pentru serile mai racoroase, o masuta mica pe care sa va puneti cafeaua sau cartea – toate acestea pot imbunatati experienta balansoarului.</p><p><strong>Greseala mea cea mai mare:</strong> Am cumparat un balansoar ieftin, crezand ca "ce mare lucru, e doar un balansoar". L-am lasat afara si, dupa primul sezon, arata jalnic. A trebuit sa cumpar altul, mai scump. Deci, sfatul meu e: mai bine cumparati o data ceva de calitate.</p>
+      </section>
+
+      <section id="parerea-mea-finala-despre-balansoarul-de-gradina-pentru-2-persoane">
+        <h2>Parerea mea finala despre balansoarul de gradina pentru 2 persoane</h2>
+        <p>Sincer sa fiu, balansoarul de gradina pentru 2 persoane a fost una dintre cele mai bune achizitii pe care le-am facut pentru curtea mea. A transformat un simplu spatiu exterior intr-un colt de relaxare, un loc unde pot fugi de agitatia zilnica si ma pot bucura de liniste.</p><p>Pentru mine, a devenit un ritual. Dimineata, cu cafeaua in mana, ma asez pe el si ma gandesc la ce am de facut in ziua respectiva. Seara, dupa cina, e locul perfect pentru a discuta cu sotia sau pentru a citi cateva pagini dintr-o carte. E un sentiment de calm si de apartenenta pe care greu il gasesti in alta parte.</p><p>Recomand un balansoar de gradina pentru 2 persoane oricui isi doreste sa isi amenajeze un spatiu de relaxare in aer liber. Nu conteaza daca aveti o curte mare sau un balcon mic. Exista modele pentru toate gusturile si buzunarele.</p><p>Daca aveti de gand sa cumparati unul, sfatul meu este sa nu va zgârciti la capitolul calitate. Investiti intr-un produs bun, din materiale rezistente, si va veti bucura de el ani de zile. Verificati specificatiile, cititi parerile altor utilizatori si, daca aveti posibilitatea, incercati-l inainte sa il cumparati.</p><p>Pentru mine, balansoarul de gradina pentru 2 persoane este mai mult decat o piesa de mobilier. Este un simbol al relaxarii, al timpului petrecut cu cei dragi si al bucuriei simple de a trai in armonie cu natura. E un "must-have" pentru orice iubitor de casa si gradina.</p><p>Daca va mai ganditi, incercati sa va imaginati cum ar fi sa stati acolo, sa simtiti briza usoara, sa ascultati sunetul pasarilor… Cred ca o sa va convingeti ca merita din plin investitia. E o investitie in fericire, cum ar veni.</p><p>In concluzie, daca vreti sa adaugati un strop de farmec si confort in spatiul vostru exterior, un balansoar de gradina pentru 2 persoane este alegerea perfecta. Nu o sa regretati!</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de greu este de asamblat un balansoar de gradina?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Depinde de model. Cele din lemn sau cele mai simple pot fi asamblate rapid, uneori chiar si in mai putin de o ora. Modelele mai complexe, cu baldachin sau structuri metalice elaborate, pot necesita mai mult timp si atentie. Cititi mereu specificatiile si parerile altor cumparatori legate de montaj.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot lasa balansoarul afara pe timp de iarna?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Nu este recomandat, mai ales daca e din lemn sau metal netratat corespunzator. Ploaia, zapada si inghetul pot deteriora materialele. Cel mai bine este sa il depozitati intr-un spatiu protejat sau sa folositi o husa impermeabila de calitate.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce materiale sunt cele mai rezistente la intemperii?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                In general, balansoarele din ratan sintetic de calitate sau cele din metal cu vopsea electrostatica sunt cele mai rezistente. Lemnul tratat corespunzator poate rezista, dar necesita intretinere periodica.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum curat petele de pe pernele balansoarului?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Verificati eticheta pernelor. De obicei, se pot curata cu o carpa umeda si un detergent bland. Pentru pete mai dificile, puteti folosi solutii specifice pentru tapiterie, dar testati intai pe o zona mai putin vizibila.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de stabil ar trebui sa fie un balansoar pentru 2 persoane?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un balansoar bun, de calitate, trebuie sa fie stabil si sa nu se clatine periculos. Verificati constructia, picioarele si imbinarile. Ar trebui sa aiba o greutate maxima suportata de cel putin 150-200 kg pentru a asigura siguranta.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Exista balansoare de gradina pliabile?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, exista si modele pliabile, insa acestea sunt mai rare si adesea mai putin confortabile sau rezistente decat cele fixe. Sunt utile daca aveti spatiu limitat si vreti sa il depozitati usor.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="balansoar-de-gradina-pentru-2-persoane"
+      currentCategory="mobilier-gradina"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

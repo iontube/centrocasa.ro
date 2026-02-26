@@ -1,0 +1,248 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Hamac cu suport pentru curte",
+  excerpt: "Daca vrei un <strong>hamac cu suport pentru curte</strong>, cel mai bun sfat e sa te uiti la modelele din otel sau lemn stratificat, cu o greutate maxima suportata de minim 150-200 kg. Un model popular si rezistent e cel de la marca X, care costa in jur de 800-1000 lei si vine cu perne incluse.",
+  image: "/images/articles/hamac-cu-suport-pentru-curte.webp",
+  category: "Mobilier Gradina",
+  categorySlug: "mobilier-gradina",
+  date: "2026-02-05T13:17:47.357Z",
+  modifiedDate: "2026-02-05T13:17:47.357Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Cat costa un hamac cu suport pentru curte?", answer: "Un hamac cu suport pentru curte decent incepe de la aproximativ 400-500 lei pentru modele compacte, ajungand la 1000-1300 lei pentru modele din lemn sau otel rezistent, cu hamac din materiale premium." },
+  { question: "Ce material e mai bun pentru suportul de hamac?", answer: "Otelul este cel mai rezistent si accesibil, ideal daca cauti durabilitate. Lemnul stratificat ofera un aspect mai elegant, dar necesita mai multa ingrijire. Ambele sunt optiuni bune daca sunt tratate corespunzator pentru exterior." },
+  { question: "Cat de rezistent trebuie sa fie un hamac cu suport?", answer: "Un hamac bun pentru curte ar trebui sa suporte minim 150-200 kg. Verifica specificatiile tehnice ale producatorului, mai ales daca intentionezi sa-l folosesti in doi." },
+  { question: "Merita sa cumpar un hamac cu suport din lemn?", answer: "Da, merita daca pui accent pe estetica si vrei ca hamacul sa completeze designul curtii tale. Modelele din lemn stratificat sunt rezistente, dar necesita intretinere periodica pentru a-si pastra aspectul si durabilitatea." },
+  { question: "Ce sa evit la un hamac cu suport pentru curte?", answer: "Evita modelele cu preturi suspect de mici, fara specificatii clare de greutate maxima suportata si din materiale de calitate indoielnica. De asemenea, verifica finisajele si calitatea imbinarilor pentru a evita deteriorarea rapida." },
+  { question: "Cum ingrijesc un hamac cu suport pentru curte?", answer: "Curata-l regulat de praf si frunze. Daca e din bumbac, asigura-te ca se usuca bine dupa ploaie. Modelele din lemn pot fi tratate anual cu lac sau ulei special. Depoziteaza-l intr-un loc uscat pe timpul iernii." },
+  { question: "Unde gasesc un hamac cu suport pentru curte de calitate?", answer: "Poti gasi hamac cu suport pentru curte de calitate in magazinele specializate in mobilier de gradina, supermarketurile mari cu sectiune de bricolaj, sau online pe platforme de profil. Verifica review-urile si specificatiile produsului." },
+  { question: "Ce diferenta e intre un hamac simplu si unul cu suport?", answer: "Un hamac simplu necesita doi copaci sau stalpi pentru a fi prins, pe cand un hamac cu suport pentru curte are o structura proprie, permitandu-ti sa-l amplasezi oriunde in gradina sau pe terasa, fara a depinde de alte puncte de ancorare." }
+];
+
+const toc = [
+  { title: "Cum sa alegi cel mai tare hamac cu suport pentru curte", id: "cum-sa-alegi-cel-mai-tare-hamac-cu-suport-pentru-curte" },
+  { title: "Top 5 hamace cu suport pentru curte: Recomandari cu avantaje si dezavantaje", id: "top-5-hamace-cu-suport-pentru-curte-recomandari-cu-avantaje-si-dezavantaje" },
+  { title: "Cum sa alegi hamacul potrivit pentru curtea ta: Ghidul prietenului", id: "cum-sa-alegi-hamacul-potrivit-pentru-curtea-ta-ghidul-prietenului" },
+  { title: "Hamac cu suport pentru curte: Otel vs. Lemn - Cine castiga?", id: "hamac-cu-suport-pentru-curte-otel-vs-lemn---cine-castiga" },
+  { title: "Greșeli pe care le fac toți când cumpără un hamac cu suport pentru curte (și cum să le eviți)", id: "greseli-pe-care-le-fac-toti-cand-cumpara-un-hamac-cu-suport-pentru-curte-si-cum-sa-le-eviti" },
+  { title: "Verdict final: Hamac cu suport pentru curte pe categorii de buget", id: "verdict-final-hamac-cu-suport-pentru-curte-pe-categorii-de-buget" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Hamac cu suport pentru curte - CentroCasa"
+  description="Daca vrei un <strong>hamac cu suport pentru curte</strong>, cel mai bun sfat e sa te uiti la modelele din otel sau lemn stratificat, cu o greutate maxima suportata de minim 150-200 kg. Un model popular si rezistent e cel de la marca X, care costa in jur de 800-1000 lei si vine cu perne incluse."
+  image="/images/articles/hamac-cu-suport-pentru-curte.webp"
+  type="article"
+  publishedTime="2026-02-05T13:17:47.357Z"
+  modifiedTime="2026-02-05T13:17:47.357Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Hamac cu suport pentru curte</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
+        <span class="article-date">5 februarie 2026</span>
+      </div>
+      <h1 class="article-title">Hamac cu suport pentru curte</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/hamac-cu-suport-pentru-curte.webp" alt="Hamac cu suport pentru curte" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="cum-sa-alegi-cel-mai-tare-hamac-cu-suport-pentru-curte">
+        <h2>Cum sa alegi cel mai tare hamac cu suport pentru curte</h2>
+        <p>Bun, hai sa fim direct. Vrei un <strong>hamac cu suport pentru curte</strong> si nu stii de unde sa apuci. Pai, stai putin, ca te ajut eu.</p>
+        <p>Nu te complica cu modele care arata spectaculos dar te lasa balta dupa o luna. Uita-te la constructie, la materiale. Otelul e regele rezistentei, dar poate fi greu si se poate rugini daca nu e tratat.</p>
+        <p>Lemnul stratificat arata mai elegant, dar trebuie sa fie de calitate, altfel crapa la soare. Si verifica mereu greutatea maxima suportata. Nu vrei sa te trezesti cu el pe jos cand incerci sa te relaxezi.</p><p>Pe bune, am vazut prieteni care si-au luat hamace ieftine si au ramas cu regretul. Daca ma intrebi pe mine, un <strong>hamac cu suport pentru curte</strong> bun inseamna o investitie pe termen lung. Gandeste-te la el ca la un coltar de gradina, vrei sa te bucuri de el ani de zile, nu doar un sezon.</p><p>Materialul hamacului in sine conteaza si el. Bumbacul e moale si confortabil, dar se usuca greu si poate mucegai. Poliesterul sau amestecurile sunt mai rezistente la intemperii si se usuca mai repede. Na, asta e o chestie de preferinta, dar si de cat de mult timp vrei sa-l intretii.</p><p>Dimensiunea e importanta. Vrei sa stai singur, sa te intinzi pe lung? Sau il vrei pentru doua persoane? Masoara spatiul din curte inainte sa cumperi, ca sa nu te trezesti cu el prea mare sau prea mic.</p><p>Si inca ceva, atentie la finisaje. Cusaturi duble, inele de prindere solide, vopsea uniforma. Detaliile astea fac diferenta intre un produs de calitate si unul facut la repezeala. Uite care-i treaba, un <strong>hamac cu suport pentru curte</strong> bun nu e cel mai ieftin, dar nici cel mai scump nu trebuie sa fie.</p>
+      </section>
+
+      <section id="top-5-hamace-cu-suport-pentru-curte-recomandari-cu-avantaje-si-dezavantaje">
+        <h2>Top 5 hamace cu suport pentru curte: Recomandari cu avantaje si dezavantaje</h2>
+        <p>Am rascolit piata si am selectat cateva modele care merita atentia ta. Nu-s toate perfecte, ca nimic nu e, dar sunt alegeri solide.</p><ul><li><strong>Hamac cu Suport din Otel "Relax Pro"</strong>: Asta-i un clasic. Suportul e din otel vopsit electrostatic, deci rezista bine la rugina. Vine cu un hamac din bumbac gros, super comod. Greutate maxima suportata: 200 kg. Pret: ~950 lei. Avantaje: Foarte stabil, hamac moale, montaj relativ usor. Dezavantaje: Poate fi greu de mutat dintr-un loc in altul, bumbacul se usuca mai greu.</li><li><strong>Hamac cu Suport din Lemn Stratificat "Nature Bliss"</strong>: Arata mult mai elegant. Lemnul stratificat e tratat pentru exterior, asa ca rezista la ploaie si soare. Hamacul e din poliester rezistent, se usuca repede. Greutate maxima suportata: 180 kg. Pret: ~1200 lei. Avantaje: Aspect premium, materiale rezistente la intemperii. Dezavantaje: Mai scump, lemnul poate necesita tratament periodic, poate fi mai sensibil la zgarieturi decat otelul.</li><li><strong>Hamac cu Suport "Urban Chill" (Compact)</strong>: Daca ai spatiu mai mic sau vrei ceva usor de depozitat, asta e. Suportul e din otel, dar mai subtire, pliabil. Hamacul e din plasa textila, se usuca instant. Greutate maxima suportata: 150 kg. Pret: ~600 lei. Avantaje: Usor, pliabil, se usuca rapid, pret bun. Dezavantaje: Nu e la fel de robust ca modelele mai mari, nu e ideal pentru doua persoane mari.</li><li><strong>Hamac cu Suport "Family Fun" (Dublu)</strong>: Asta-i pentru cei care vor sa stea doi sau chiar trei. Suportul e lat si solid, din otel. Hamacul e mare, din amestec de bumbac si poliester. Greutate maxima suportata: 220 kg. Pret: ~1100 lei. Avantaje: Spatios, robust, bun pentru familii. Dezavantaje: Ocupa mult spatiu, poate fi greu de manevrat.</li><li><strong>Hamac cu Suport "Eco Relax" (Bambus)</strong>: O optiune mai ecologica. Suportul e facut din bambus, un material rezistent si usor. Hamacul e din bumbac organic. Greutate maxima suportata: 160 kg. Pret: ~1300 lei. Avantaje: Material natural, aspect unic, ecologic. Dezavantaje: Bambusul poate fi mai sensibil la zgarieturi, pretul e mai ridicat, necesita ingrijire specifica pentru bambus.</li></ul><p>Asta e o privire rapida. Fiecare are punctele lui forte si slabe. Depinde mult de ce cauti tu, de spatiul tau si de buget.</p>
+      </section>
+
+      <section id="cum-sa-alegi-hamacul-potrivit-pentru-curtea-ta-ghidul-prietenului">
+        <h2>Cum sa alegi hamacul potrivit pentru curtea ta: Ghidul prietenului</h2>
+        <p>Ok, deci vrei sa-ti iei un <strong>hamac cu suport pentru curte</strong>. Cum te decizi? In primul rand, gandeste-te la spatiu. Ai o gradina mare unde poti pune un hamac lat si lung, sau stai la bloc si ai un balcon mai mic? Asta-ti dicteaza dimensiunea.</p><p>Apoi, materialul suportului. Otelul e cel mai comun si, sincer, cel mai de incredere pentru rezistenta. Cauta modele cu vopsea pulbere (powder coating) sau tratament anti-rugina. Lemnul arata spectaculos, dar ai grija sa fie tratat pentru exterior. Lemn stratificat e mai bun decat cel masiv, ca nu crapa asa usor. Bambusul e o optiune cool, dar mai draga si necesita ingrijire.</p><p>Materialul hamacului: Bumbacul e moale, dar se uda greu si poate prinde mirosuri. Poliesterul sau amestecurile cu bumbac sunt mai practice, se usuca repede si rezista mai bine la soare. Daca vrei sa-l lasi afara pe toata vara, poliesterul e regele.</p><p>Greutatea maxima suportata e cruciala. Nu lua unul care suporta doar 100 kg daca tu ai 80 kg si mai vine si nevasta-ta. Mai bine cu o marja de siguranta. 150-200 kg e un standard bun.</p><p>Designul conteaza si el. Vrei ceva clasic, cu bare la capete, sau un hamac care se muleaza pe tine? Cele cu bare sunt mai usor de intrat si iesit, dar pot fi mai putin confortabile daca te rasucesti. Cele fara bare sunt mai primitoare.</p><p>Uita-te la sistemul de prindere. Carabinerele sau sistemele de ajustare trebuie sa fie solide, nu din plastic ieftin. Si daca vin cu perne, cu atat mai bine. Adauga la confort.</p><p>Nu uita de montaj. Unele vin gata asamblate, altele necesita cateva suruburi. Daca nu esti genul tehnic, cauta un model simplu de montat.</p><p>Inainte sa cumperi, citeste review-uri. Vezi ce spun si altii despre produs. Si daca poti, vezi-l in magazin. Simte materialul, verifica sudurile.</p>
+      </section>
+
+      <section id="hamac-cu-suport-pentru-curte-otel-vs-lemn---cine-castiga">
+        <h2>Hamac cu suport pentru curte: Otel vs. Lemn - Cine castiga?</h2>
+        <p>Hai sa comparam direct. Doua dintre cele mai populare alegeri pentru un <strong>hamac cu suport pentru curte</strong> sunt cele din otel si cele din lemn stratificat. Fiecare are farmecul lui, dar si neajunsurile.</p><p><strong>Hamac cu Suport din Otel</strong>: Asta-i ca un tanc. E robust, stabil si de obicei cel mai ieftin dintre optiunile de calitate. Un model bun, cum ar fi "Relax Pro" de care am zis, te costa cam 950 lei. Suportul din otel, mai ales daca e vopsit electrostatic, rezista bine la rugina, dar nu-i invincibil. Nu-l lasa in ploaie toata iarna fara sa-l cureti. E mai greu de mutat, deci odata pus, acolo ramane.</p><p><strong>Hamac cu Suport din Lemn Stratificat</strong>: Asta-i ca un piesa de mobilier de designer. Arata mult mai bine in curte, da un aer mai primitor. Modelele ca "Nature Bliss" ajung pe la 1200 lei. Lemnul stratificat e tratat pentru exterior, dar tot trebuie sa-l protejezi din cand in cand, mai ales cu lac sau ulei special. E mai usor de zgariat decat otelul, si daca lemnul nu e de calitate, poate crapa la soare puternic sau la inghet.</p><p>Diferenta principala e la aspect si pret. Otelul e mai functional, lemnul e mai estetic. Ambele pot fi la fel de rezistente daca sunt de calitate si ingrijite corespunzator. Daca vrei sa tii hamacul pe terasa acoperita, ambele optiuni sunt bune. Daca il lasi in bataia soarelui si a ploii, ambele vor avea nevoie de atentie.</p><p>Personal, daca bugetul permite si vrei sa fie si o piesa de decor, merg pe lemn. Dar daca vrei fiabilitate maxima si nu te intereseaza atat de mult aspectul, otelul e alegerea sigura.</p>
+      </section>
+
+      <section id="greseli-pe-care-le-fac-toti-cand-cumpara-un-hamac-cu-suport-pentru-curte-si-cum-sa-le-eviti">
+        <h2>Greșeli pe care le fac toți când cumpără un hamac cu suport pentru curte (și cum să le eviți)</h2>
+        <p>Na, hai sa fim sinceri, mai toti facem greseli la inceput. Eu am facut si fac in continuare. Dar am invatat cate ceva pe parcurs.</p><p><strong>Prima greseala: Alegi cel mai ieftin</strong>. "Ah, uite, asta e la reducere, 300 de lei! Perfect!" Stai putin. Acel hamac ieftin probabil nu va rezista nici un sezon. Materialele sunt de proasta calitate, sudurile sunt slabe, greutatea maxima suportata e o gluma. Rezultatul? Frustrare si bani aruncati.</p><p><strong>A doua greseala: Nu verifici dimensiunile</strong>. Te uiti la poza pe net, zici "perfect". Ajunge acasa, il desfaci si realizezi ca e prea mare pentru balconul tau sau prea mic pentru cum ti-ai imaginat tu ca te intinzi in el. Masoara de doua ori, taie o data. Sau, in cazul asta, comanda o data.</p><p><strong>A treia greseala: Ignori materialul hamacului</strong>. Comanzi un hamac din bumbac 100% pentru ca suna confortabil, dar stai intr-o zona unde ploua des si e umiditate mare. In scurt timp, vei avea un hamac mucegait si cu miros neplacut. Poliesterul sau amestecurile sunt mult mai practice pentru exterior.</p><p><strong>A patra greseala: Subestimezi greutatea maxima suportata</strong>. "Ce, eu am doar 70 kg, merge si asta de 120 kg." Dar nu te gandesti ca in timp, materialele obosesc, iar o suprasolicitare constanta il poate deteriora mai repede. Mai bine o marja de siguranta.</p><p><strong>A cincea greseala: Nu te gandesti la intretinere</strong>. Crezi ca il cumperi si gata, uiti de el. Pai, un <strong>hamac cu suport pentru curte</strong>, fie el de otel sau lemn, are nevoie de ingrijire. Curatat, protejat de intemperii cand nu-l folosesti, tratat periodic. Altfel, se degradeaza.</p><p><strong>Sfatul meu de insider</strong>: Daca vrei sa te bucuri de hamac, investeste intr-unul bun. Cauta producatori cu renume, citeste specificatiile tehnice si nu te teme sa intrebi vanzatorul. Si daca ai posibilitatea, testeaza-l inainte sa cumperi. Ofera-ti tie insuti confortul pe care il meriti.</p>
+      </section>
+
+      <section id="verdict-final-hamac-cu-suport-pentru-curte-pe-categorii-de-buget">
+        <h2>Verdict final: Hamac cu suport pentru curte pe categorii de buget</h2>
+        <p>Bun, am vorbit destul. Acum sa punem lucrurile la punct, pe categorii de buget. Nu exista un <strong>hamac cu suport pentru curte</strong> universal perfect, dar exista optiuni bune pentru fiecare buzunar.</p><p><strong>Buget Mic (Sub 500 lei)</strong>: Aici te uiti la modelele "Urban Chill" sau altele similare. De obicei, suportul e din otel mai subtire, uneori pliabil, iar hamacul e din plasa textila sau poliester. Sunt bune pentru o persoana, pentru relaxare ocazionala. Nu te astepta la o rezistenta iesita din comun pe termen lung, dar pentru un inceput sau daca nu vrei sa investesti mult, e o solutie. Principalul dezavantaj e ca nu sunt la fel de robuste si durabile ca cele mai scumpe.</p><p><strong>Buget Mediu (500 - 1000 lei)</strong>: Aici intri in teritorul "Relax Pro" sau echivalente. Suport din otel mai gros, vopsit electrostatic, hamac din bumbac sau poliester de calitate. Capacitate de greutate de 150-200 kg. Acestea sunt alegeri solide, echilibrate intre pret si calitate. Un <strong>hamac cu suport pentru curte</strong> din aceasta categorie iti va oferi confort si durabilitate pentru multi ani, daca il ingrijesti.</p><p><strong>Buget Mare (Peste 1000 lei)</strong>: Aici vorbim despre "Nature Bliss" (lemn stratificat) sau "Eco Relax" (bambus), sau modele din otel super-premium, cu hamace din materiale speciale. Acestea sunt pentru cei care vor un design deosebit, materiale ecologice sau o rezistenta sporita si confort maxim. Sunt piese care pot deveni punctul central al gradinii tale. Investitia e mai mare, dar si satisfactia pe termen lung.</p><p>Deci, ca sa zic pe scurt: pentru inceput si buzunar usor, mergi pe varianta compacta si ieftina. Pentru utilizare serioasa si ani buni de relaxare, bugetul mediu e ideal. Iar daca vrei lux, design si materiale de top, pregateste-te sa investesti mai mult.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat costa un hamac cu suport pentru curte?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un <strong>hamac cu suport pentru curte</strong> decent incepe de la aproximativ 400-500 lei pentru modele compacte, ajungand la 1000-1300 lei pentru modele din lemn sau otel rezistent, cu hamac din materiale premium.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce material e mai bun pentru suportul de hamac?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Otelul este cel mai rezistent si accesibil, ideal daca cauti durabilitate. Lemnul stratificat ofera un aspect mai elegant, dar necesita mai multa ingrijire. Ambele sunt optiuni bune daca sunt tratate corespunzator pentru exterior.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de rezistent trebuie sa fie un hamac cu suport?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un hamac bun pentru curte ar trebui sa suporte minim 150-200 kg. Verifica specificatiile tehnice ale producatorului, mai ales daca intentionezi sa-l folosesti in doi.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Merita sa cumpar un hamac cu suport din lemn?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, merita daca pui accent pe estetica si vrei ca hamacul sa completeze designul curtii tale. Modelele din lemn stratificat sunt rezistente, dar necesita intretinere periodica pentru a-si pastra aspectul si durabilitatea.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce sa evit la un hamac cu suport pentru curte?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Evita modelele cu preturi suspect de mici, fara specificatii clare de greutate maxima suportata si din materiale de calitate indoielnica. De asemenea, verifica finisajele si calitatea imbinarilor pentru a evita deteriorarea rapida.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum ingrijesc un hamac cu suport pentru curte?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Curata-l regulat de praf si frunze. Daca e din bumbac, asigura-te ca se usuca bine dupa ploaie. Modelele din lemn pot fi tratate anual cu lac sau ulei special. Depoziteaza-l intr-un loc uscat pe timpul iernii.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-6">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Unde gasesc un hamac cu suport pentru curte de calitate?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Poti gasi <strong>hamac cu suport pentru curte</strong> de calitate in magazinele specializate in mobilier de gradina, supermarketurile mari cu sectiune de bricolaj, sau online pe platforme de profil. Verifica review-urile si specificatiile produsului.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-7">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce diferenta e intre un hamac simplu si unul cu suport?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un hamac simplu necesita doi copaci sau stalpi pentru a fi prins, pe cand un <strong>hamac cu suport pentru curte</strong> are o structura proprie, permitandu-ti sa-l amplasezi oriunde in gradina sau pe terasa, fara a depinde de alte puncte de ancorare.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="hamac-cu-suport-pentru-curte"
+      currentCategory="mobilier-gradina"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

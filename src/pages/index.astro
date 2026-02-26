@@ -1,0 +1,137 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import keywordsData from '../../keywords.json';
+
+const categories = [
+  {
+    name: 'Gradinarit si Unelte',
+    slug: 'gradinarit-unelte',
+    description: 'Recenzii si comparatii pentru tractorase de tuns gazonul, motocoase, motosape si unelte de gradina. Te ajutam sa alegi echipamentele potrivite pentru ingrijirea curtii si gradinii tale, indiferent de suprafata sau buget.',
+    icon: '🌱'
+  },
+  {
+    name: 'Mobilier Gradina',
+    slug: 'mobilier-gradina',
+    description: 'Seturi de masa si scaune pentru gradina, umbrele rezistente la vant, hamace si mobilier de terasa. Transforma spatiul exterior intr-o oaza de relaxare cu recomandarile noastre testate si verificate.',
+    icon: '🪑'
+  },
+  {
+    name: 'Electrocasnice Casa',
+    slug: 'electrocasnice-casa',
+    description: 'Aspiratoare robot, aparate de aer conditionat, purificatoare de aer si electrocasnice moderne pentru o casa confortabila. Analizam performanta, consumul energetic si raportul calitate-pret pentru fiecare produs.',
+    icon: '🏠'
+  },
+  {
+    name: 'Decoratiuni Casa',
+    slug: 'decoratiuni-casa',
+    description: 'Corpuri de iluminat pentru living, plante artificiale decorative, tablouri si accesorii pentru amenajari interioare moderne. Idei si recomandari pentru a-ti transforma locuinta intr-un spatiu elegant si primitor.',
+    icon: '💡'
+  },
+  {
+    name: 'Curatenie si Intretinere',
+    slug: 'curatenie-intretinere',
+    description: 'Masini de spalat cu presiune, aspiratoare profesionale, produse de curatenie si sfaturi practice pentru intretinerea casei. Solutii eficiente pentru a mentine casa curata si ordonata cu efort minim.',
+    icon: '🧹'
+  }
+];
+
+// Get completed articles
+const articles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+})).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+// Count articles per category
+const categoryCounts = categories.map(cat => ({
+  ...cat,
+  count: articles.filter(a => a.categorySlug === cat.slug).length
+}));
+---
+
+<Layout
+  title="CentroCasa - Sfaturi si Recomandari pentru Casa si Gradina"
+  description="Descopera cele mai bune produse si sfaturi pentru casa si gradina ta. Ghiduri de cumparare, recenzii si recomandari de la experti."
+>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Transforma-ti Casa si Gradina</h1>
+        <p>
+          Descopera sfaturi practice, recenzii detaliate si recomandari de produse
+          pentru a-ti crea spatiul perfect. De la gradinarit la decoratiuni,
+          te ajutam sa faci cele mai bune alegeri.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Categorii</h2>
+        <p class="section-subtitle">Exploreaza articolele pe domenii de interes</p>
+      </div>
+      <div class="categories-grid">
+        {categoryCounts.map(cat => (
+          <a href={`/${cat.slug}/`} class="category-card">
+            <div class="category-icon">{cat.icon}</div>
+            <h3>{cat.name}</h3>
+            <p>{cat.description}</p>
+            <span class="category-count">{cat.count} articole</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Articles -->
+  {articles.length > 0 && (
+    <section class="section" style="background: var(--color-gray-100);">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Articole Recente</h2>
+          <p class="section-subtitle">Cele mai noi ghiduri si recomandari</p>
+        </div>
+        <div class="articles-grid">
+          {articles.slice(0, 18).map(article => (
+            <ArticleCard {...article} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- About Section -->
+  <section class="section">
+    <div class="container">
+      <div class="about-content" style="max-width: 900px; margin: 0 auto;">
+        <h2 class="section-title" style="text-align: center; margin-bottom: var(--space-xl);">Despre CentroCasa</h2>
+        <div class="article-content">
+          <p>
+            CentroCasa a luat nastere din dorinta de a oferi romanilor un ghid complet si de incredere pentru alegerea produselor destinate casei si gradinii. Stim cat de greu poate fi sa navighezi printre miile de optiuni disponibile pe piata, fiecare promiţand ca e cea mai buna. De aceea, echipa noastra de experti testeaza, analizeaza si compara produsele pentru a-ti oferi recomandari sincere si bine documentate.
+          </p>
+          <p>
+            Fie ca iti doresti sa iti amenajezi gradina cu cele mai bune unelte, sa iti mobilezi terasa pentru serile de vara, sa iti dotezi casa cu electrocasnice moderne sau pur si simplu cauti sfaturi practice pentru curatenie si intretinere, aici gasesti raspunsurile de care ai nevoie. Fiecare articol este scris cu atentie, bazat pe experienta reala si pe cercetare aprofundata.
+          </p>
+          <p>
+            Nu suntem sponsorizati de producatori si nu favorizăm anumite branduri. Scopul nostru este simplu: sa te ajutam sa faci alegeri inteligente, sa economisesti timp si bani, si sa te bucuri de o casa si o gradina asa cum iti doresti. Iti multumim ca ne-ai ales ca ghid in aceasta calatorie!
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

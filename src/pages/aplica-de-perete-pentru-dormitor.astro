@@ -1,0 +1,226 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Aplica de perete pentru dormitor",
+  excerpt: "Dormitorul e sanctuarul nostru, locul unde ne retragem dupa o zi lunga. Si cum ar putea fi mai primitor decat cu o lumina calda, plina de personalitate? Astazi vorbim despre aplica de perete pentru dormitor, acele mici bijuterii care fac diferenta.",
+  image: "/images/articles/aplica-de-perete-pentru-dormitor.webp",
+  category: "Decoratiuni Casa",
+  categorySlug: "decoratiuni-casa",
+  date: "2026-01-04T09:17:31.736Z",
+  modifiedDate: "2026-01-26T09:17:31.578Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Ce tip de bec este cel mai potrivit pentru o aplicatie de perete in dormitor?", answer: "Pentru dormitor, cel mai bine se potrivesc becurile LED cu lumina calda (2700K-3000K). Ele consuma putin, tin mult si creeaza o atmosfera relaxanta, ideala pentru odihna si citit. Evitati lumina prea rece sau prea puternica." },
+  { question: "Cat de sus ar trebui montata o aplicatie de perete in dormitor?", answer: "Inaltimea ideala depinde de cum stai in pat. In general, se monteaza la nivelul umerilor sau un pic mai sus, astfel incat lumina sa cada confortabil pe carte sau pe tine, fara sa te orbeasca. Cam 1.5 - 1.7 metri de la podea." },
+  { question: "Pot monta singur o aplicatie de perete sau am nevoie de electrician?", answer: "Daca aplicatia vine cu cablu si stecher, o poti monta singur. Daca necesita conectare directa la retea, este recomandat sa apelezi la un electrician pentru siguranta si corectitudinea instalarii." },
+  { question: "Ce fac daca vreau sa citesc in pat, dar aplicatia nu are lumina suficienta?", answer: "Poti alege o aplicatie cu lumina reglabila sau una cu un brat flexibil, care permite directionarea luminii exact unde ai nevoie. De asemenea, verifica specificatiile legate de Lumeni (lm) – cu cat sunt mai multi, cu atat lumina e mai puternica." },
+  { question: "Exista aplicatii de perete pentru dormitor care sa se potriveasca oricarui stil de amenajare?", answer: "Absolut! Piata ofera o varietate uriasa de stiluri: modern, minimalist, vintage, rustic, industrial, clasic. Poti gasi aplicatii din metal, sticla, lemn, textile, in diverse culori si forme, asa ca vei gasi cu siguranta ceva pe gustul tau." },
+  { question: "Pot folosi o aplicatie de perete ca sursa principala de lumina in dormitor?", answer: "Nu, de obicei aplicile de perete sunt gandite ca lumina auxiliara sau ambientala. Pentru activitatile zilnice sau pentru a ilumina uniform camera, vei avea nevoie si de o sursa de lumina principala, cum ar fi o lustra sau spoturi." }
+];
+
+const toc = [
+  { title: "De ce ai nevoie de o aplica de perete in dormitor? Mai mult decat un simplu corp de iluminat", id: "de-ce-ai-nevoie-de-o-aplica-de-perete-in-dormitor-mai-mult-decat-un-simplu-corp-de-iluminat" },
+  { title: "Top recomandari: Aplicile de perete care mi-au furat inima (si nu numai!)", id: "top-recomandari-aplicile-de-perete-care-mi-au-furat-inima-si-nu-numai" },
+  { title: "Cum sa alegi corect: Ghidul meu personal pentru o alegere inspirata", id: "cum-sa-alegi-corect-ghidul-meu-personal-pentru-o-alegere-inspirata" },
+  { title: "Avantaje si dezavantaje: Sinceritatea mea despre aplicile de perete", id: "avantaje-si-dezavantaje-sinceritatea-mea-despre-aplicile-de-perete" },
+  { title: "Sfaturi practice: Trucuri din experienta si greseli de evitat", id: "sfaturi-practice-trucuri-din-experienta-si-greseli-de-evitat" },
+  { title: "Parerea mea finala: Recomand cu drag aplicile de perete pentru dormitor!", id: "parerea-mea-finala-recomand-cu-drag-aplicile-de-perete-pentru-dormitor" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Aplica de perete pentru dormitor - CentroCasa"
+  description="Dormitorul e sanctuarul nostru, locul unde ne retragem dupa o zi lunga. Si cum ar putea fi mai primitor decat cu o lumina calda, plina de personalitate? Astazi vorbim despre aplica de perete pentru dormitor, acele mici bijuterii care fac diferenta."
+  image="/images/articles/aplica-de-perete-pentru-dormitor.webp"
+  type="article"
+  publishedTime="2026-01-04T09:17:31.736Z"
+  modifiedTime="2026-01-26T09:17:31.578Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Aplica de perete pentru dormitor</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
+        <span class="article-date">25 ianuarie 2026</span>
+      </div>
+      <h1 class="article-title">Aplica de perete pentru dormitor</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/aplica-de-perete-pentru-dormitor.webp" alt="Aplica de perete pentru dormitor" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-ai-nevoie-de-o-aplica-de-perete-in-dormitor-mai-mult-decat-un-simplu-corp-de-iluminat">
+        <h2>De ce ai nevoie de o aplica de perete in dormitor? Mai mult decat un simplu corp de iluminat</h2>
+        <p>Salutare, dragii mei! Astazi vorbim despre un subiect care ma pasioneaza tare mult: cum sa transformam dormitorul intr-un spatiu si mai cozy si functional. Si cand spun functional, ma gandesc in primul rand la lumina. Stiti cum e, seara, cand vrei sa citesti o carte sau doar sa te relaxezi, lumina din tavan e prea puternica, prea rece. Aici intervin aplicile de perete pentru dormitor, niste mici eroi ai confortului.</p><p>Personal, am descoperit cat de mult pot schimba atmosfera dintr-o camera odata ce am inceput sa experimentez cu diverse tipuri de iluminat. Dormitorul nu e doar un loc unde dormim, e un refugiu, un spatiu personal unde ne incarcam bateriile. Si pentru asta, avem nevoie de o lumina care sa ne calmeze, sa ne invite la relaxare, nu sa ne agite.</p><p>O aplica de perete pentru dormitor e perfecta pentru oricine vrea sa adauge un plus de stil si functionalitate. Fie ca locuiesti la bloc sau la casa, fie ca ai un dormitor micut sau unul spatios, o aplica bine aleasa poate face minuni. E ideala pentru cei care citesc in pat, pentru cei care vor sa creeze o atmosfera romantica sau pur si simplu pentru cei care vor sa evite lumina puternica a lustrei principale.</p><p>Am observat ca multi se gandesc la aplicile de perete doar ca la un element decorativ. Si e adevarat, arata grozav! Dar rolul lor depaseste cu mult estetica. Ele sunt practic extensii ale veiozelor de pe noptiera, dar fara sa ocupe spatiu pretios pe aceasta. Ganditi-va, cate dati peste cap lucrurile de pe noptiera incercand sa stingeti veioza? Cu o aplica, totul e la indemana.</p><p>Pentru mine, aplicile de perete in dormitor au devenit indispensabile. Creeaza un joc de lumini si umbre care da profunzime camerei. Si, cel mai important, ma ajuta sa ma deconectez de la ziua agitata. E ca si cum as aprinde o lumanare, dar mult mai practic si sigur.</p><p>Deci, daca va ganditi sa va imbunatatiti dormitorul, sa-l faceti mai primitor si mai personal, o aplica de perete pentru dormitor ar trebui sa fie pe lista voastra. Nu e un moft, e o investitie in confortul si starea voastra de bine. Si, sincer sa fiu, varietatea de modele de pe piata e atat de mare incat veti gasi sigur ceva care sa se potriveasca stilului vostru.</p>
+      </section>
+
+      <section id="top-recomandari-aplicile-de-perete-care-mi-au-furat-inima-si-nu-numai">
+        <h2>Top recomandari: Aplicile de perete care mi-au furat inima (si nu numai!)</h2>
+        <p>Am tot cautat si testat fel de fel de aplicatii de perete pentru dormitor, si am ajuns la cateva favorite pe care vi le recomand cu drag. Fiecare are farmecul ei si rezolva anumite nevoi. Hai sa vedem ce am gasit.</p><p><strong>1. Aplica de perete moderna, reglabila, cu brat flexibil.</strong> Am gasit una super draguta pe un site de specialitate, undeva la <strong>180 RON</strong>. E metalica, neagra mata, cu un design minimalist.</p>
+        <p>Ce-mi place la ea cel mai mult e bratul flexibil. Pot sa o indrept exact unde am nevoie, fie ca citesc, fie ca lucrez la laptop in pat. Lumina e usor directionala, perfecta pentru citit.</p>
+        <p>Dezavantajul? E destul de simpla, poate nu se potriveste in orice decor. Dar functionalitatea e de top.</p><p><strong>2. Aplica de perete vintage, cu abajur textil.</strong> Asta am gasit-o intr-un magazin de decoratiuni, cam la <strong>250 RON</strong>. Are un abajur din material textil, crem, si un piciorus din bronz patinat. Creeaza o lumina foarte difuza, calda, ideala pentru o atmosfera relaxanta. E super potrivita daca aveti un dormitor in stil clasic sau rustic. Contra? Lumina nu e foarte puternica, deci nu e ideala daca vreti sa cititi mult. E mai mult pentru ambiance.</p><p><strong>3. Aplica LED incastrata, cu lumina indirecta.</strong> Asta e o optiune mai moderna, am dat pe ea cam <strong>120 RON</strong>. Arata ca un mic cub sau un dreptunghi mic, se monteaza pe perete si lumina iese pe sus si pe jos, creand un efect de "halo" pe perete. E super eleganta si da un aer sofisticat camerei. Lumina e placuta, nu deranjeaza. Partea mai putin faina e ca lumina e fixa, nu o poti directiona. Si daca becul se arde, de obicei trebuie schimbata toata aplicatia.</p><p><strong>4. Aplica de perete cu priza USB integrata.</strong> Asta e o descoperire geniala! Am gasit una la <strong>220 RON</strong>. E tot moderna, din metal, dar are in plus o mica priza USB unde poti incarca telefonul sau tableta. Cat de util e asta cand stai in pat! Nu mai ai nevoie de prelungitoare sau sa te intinzi dupa priza. Lumina e reglabila, e destul de puternica pentru citit. Un mic minus ar fi ca designul e mai mult modern, s-ar putea sa nu se potriveasca oricui.</p><p><strong>5. Aplica de perete cu intrerupator pe fir.</strong> Asta e o solutie clasica si buna. Am gasit una destul de simpla, alba, undeva la <strong>150 RON</strong>. Avantajul mare e ca ai intrerupatorul la indemana, nu trebuie sa te ridici din pat sa-l cauti pe perete. Lumina e ok pentru citit. Dezavantajul e ca firul de la intrerupator poate fi inestetic daca nu e ascuns cum trebuie. Dar ca functionalitate, e una dintre cele mai practice.</p><p>Fiecare dintre ele are rolul ei. Conteaza mult ce cautati: lumina directionala, atmosfera, design sau functii extra. Eu le-am incercat pe rand si am vazut ce mi se potriveste cel mai bine in diverse zone ale dormitorului.</p>
+      </section>
+
+      <section id="cum-sa-alegi-corect-ghidul-meu-personal-pentru-o-alegere-inspirata">
+        <h2>Cum sa alegi corect: Ghidul meu personal pentru o alegere inspirata</h2>
+        <p>Alegerea unei aplicatii de perete pentru dormitor poate parea simpla, dar sunt cateva aspecte pe care eu le iau in considerare si care fac toata diferenta. Nu vrei sa cumperi ceva ce nu ti se potriveste sau, mai rau, ceva ce nu face ce trebuie.</p><p><strong>1. Tipul de lumina.</strong> Asta e cel mai important pentru mine. Vrei lumina calda, galbuie, care creeaza o atmosfera de relaxare? Sau vrei lumina mai alba, mai rece, buna pentru citit? Majoritatea aplicilor vin cu specificatii despre temperatura de culoare (masurata in Kelvin). Sub 3000K e considerata calda, peste 4000K e rece. Eu prefer undeva intre 2700K si 3000K pentru dormitor.</p><p><strong>2. Intensitatea luminii.</strong> Asta se masoara in Lumeni (lm). Pentru citit, ai nevoie de o intensitate mai mare (peste 300-400 lm). Pentru atmosfera, ceva mai putin (100-200 lm) e suficient. Unele aplicatii permit reglarea intensitatii (dimmer), ceea ce e un mare plus!</p><p><strong>3. Designul si stilul.</strong> Aici tine de gustul personal si de cum e amenajat dormitorul. Ai un stil modern, minimalist? Atunci cauta aplicatii din metal, sticla, cu linii drepte. E mai rustic sau clasic? Atunci mergi pe materiale naturale, textile, finisaje patinate. Eu incerc sa aleg ceva ce se integreaza armonios, nu sa iasa in evidenta in mod fortat.</p><p><strong>4. Materialele.</strong> De la metal, sticla, plastic, la textile. Fiecare confera un aspect diferit. Metalul e durabil, sticla e eleganta, textilele dau caldura. Eu prefer combinatii, de exemplu metal cu un pic de lemn sau sticla mata.</p><p><strong>5. Montajul.</strong> Majoritatea aplicilor se monteaza destul de usor, dar e bine sa te interesezi. Unele necesita conexiune la retea, altele vin cu cablu si stecher. Daca nu te pricepi la electrice, alege o varianta cu stecher sau cheama un electrician.</p><p><strong>6. Functii suplimentare.</strong> Cum ziceam, priza USB, intrerupator pe fir, posibilitatea de reglare a directiei luminii sau a intensitatii. Acestea pot face o mare diferenta in utilizare.</p><p>Eu am invatat ca e mai bine sa investesti un pic mai mult intr-o aplicatie de calitate, decat sa cumperi una ieftina care se strica repede sau nu ofera lumina potrivita. Uita-te la specificatii, citeste parerile altor cumparatori si, daca poti, vezi produsul inainte de a-l cumpara.</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-sinceritatea-mea-despre-aplicile-de-perete">
+        <h2>Avantaje si dezavantaje: Sinceritatea mea despre aplicile de perete</h2>
+        <p>Ca orice produs, si aplicile de perete au plusurile si minusurile lor. Eu am incercat sa fiu mereu obiectiv, asa ca hai sa vedem care sunt, in viziunea mea, cele mai importante.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Economie de spatiu:</strong> Asta e, cred, cel mai mare atu. Nu mai ai nevoie de veioze pe noptiera, eliberand astfel suprafata pentru carti, paharul cu apa sau alte lucruri. E perfect pentru dormitoarele mici.</li><li><strong>Ambianță placuta:</strong> Creeaza o lumina discreta, calda, ideala pentru relaxare. Lumina din tavan e adesea prea puternica si prea directa pentru momentele de odihna.</li><li><strong>Functionalitate sporita:</strong> Multe modele sunt reglabile, permitand directionarea luminii exact unde ai nevoie – perfect pentru citit.</li><li><strong>Design versatil:</strong> Exista o varietate uriasa de stiluri, de la minimalist la vintage, de la modern la industrial. Poti gasi aplicatii care sa completeze perfect decorul camerei.</li><li><strong>Securitate:</strong> Lumina ambientala de la aplicile de perete poate face deplasarea prin camera pe timp de noapte mai sigura, fara a fi nevoie sa aprinzi lumina principala.</li><li><strong>Costuri accesibile:</strong> Desi exista si modele scumpe, poti gasi aplicatii de perete foarte dragute si functionale la preturi rezonabile.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Instalare:</strong> Unele modele necesita conectare la retea electrica, ceea ce poate implica niste lucrari suplimentare sau apelarea la un electrician, mai ales daca nu ai prize in peretele respectiv.</li><li><strong>Luminozitate limitata:</strong> Daca ai nevoie de o lumina foarte puternica pentru activitati precum cusutul sau alte hobby-uri care necesita precizie, o singura aplicatie s-ar putea sa nu fie suficienta.</li><li><strong>Schimbarea becului:</strong> La modelele cu becuri non-LED sau cu becuri integrate, schimbarea acestora poate fi uneori dificila sau chiar imposibila, necesitand inlocuirea intregii aplicatii.</li><li><strong>Designul poate deveni depasit:</strong> Daca alegi un model foarte la moda, exista riscul ca in cativa ani sa nu ti se mai para la fel de atractiv.</li><li><strong>Pozitionarea:</strong> Daca nu esti atent la pozitionarea aplicatiei, o poti monta prea sus, prea jos, sau intr-un loc care nu e practic.</li></ul><p>Parerea mea e ca avantajele depasesc cu mult dezavantajele, mai ales daca faci o alegere informata si iti cunosti bine nevoile. E un element de decor si functionalitate care merita investitia.</p>
+      </section>
+
+      <section id="sfaturi-practice-trucuri-din-experienta-si-greseli-de-evitat">
+        <h2>Sfaturi practice: Trucuri din experienta si greseli de evitat</h2>
+        <p>Am trecut prin multe pana sa ajung sa aleg aplicile de perete potrivite pentru dormitorul meu. Am facut si greseli, am si invatat multe pe parcurs. Iata cateva sfaturi pe care le-as da oricui se gandeste sa faca aceasta achizitie.</p><p><strong>1. Gandeste-te la scopul principal.</strong> Vrei lumina pentru citit? Atunci cauta un model cu brat flexibil sau cu lumina directionala, usor de pozitionat deasupra patului. Vrei doar o lumina ambientala, de "atmosfera"? Atunci un model cu abajur textil sau cu lumina difuza e perfect.</p><p><strong>2. Pozitionarea conteaza enorm.</strong> Eu am pus o aplicatie pe fiecare parte a patului, la nivelul la care imi vine confortabil sa apas pe intrerupator sau sa reglez lumina. Nu le monta prea sus, ca iti cade lumina in cap, si nici prea jos, ca nu lumineaza unde trebuie. In general, cam la nivelul umerilor sau un pic mai sus, cand stai asezat in pat.</p><p><strong>3. Verifica sursa de alimentare.</strong> Daca nu ai prize in peretele unde vrei sa montezi aplicatia, va trebui sa tragi cablu. Unele aplicatii vin cu cablu si stecher, ceea ce e mult mai usor. Altfel, poate fi nevoie de un electrician. Eu am preferat initial modelele cu stecher, ca sa nu ma complic.</p><p><strong>4. Nu te feri de becurile LED.</strong> Consuma putin, tin mult si se incing mai greu. Unele aplicatii vin cu LED integrat, altele permit folosirea becurilor LED. Eu prefer sa pot schimba becul, ca sa am flexibilitate.</p><p><strong>5. Atentie la dimensiuni.</strong> Intr-un dormitor micut, o aplicatie masiva poate parea prea mare si incarca spatiul. Intr-un dormitor mare, o aplicatie prea mica se poate pierde. Masoara peretele si vizualizeaza-ti aplicatia acolo inainte de a cumpara.</p><p><strong>6. Culoarea luminii.</strong> Am mentionat asta si inainte, dar e crucial. Lumina calda (galbuie) e ideala pentru relaxare. Lumina neutra sau rece (alba) e mai buna pentru activitati care necesita concentrare. Eu am ales becuri cu lumina calda pentru dormitorul meu.</p><p><strong>7. Greșeli de evitat:</strong></p><ul><li><strong>Alegerea unui model prea complicat:</strong> Uneori, simplitatea e cheia. Nu te complica cu un design prea incarcat daca nu se potriveste stilului tau.</li><li><strong>Ignorarea specificațiilor tehnice:</strong> Nu cumpara doar pentru ca arata bine. Verifica puterea becului, tipul de soc, temperatura de culoare.</li><li><strong>Montajul prost:</strong> Daca nu esti sigur, cere ajutor. O aplicatie montata stramb sau nesigur poate fi periculoasa.</li><li><strong>Uitatul la pretul total:</strong> Uneori, pretul aplicatiei nu include becul. Asigura-te ca stii costul total.</li></ul><p>Sper ca aceste mici sfaturi sa va fie de ajutor. Eu am invatat ca e mai bine sa investesti timp in cercetare decat sa regretzi o achizitie nepotrivita.</p>
+      </section>
+
+      <section id="parerea-mea-finala-recomand-cu-drag-aplicile-de-perete-pentru-dormitor">
+        <h2>Parerea mea finala: Recomand cu drag aplicile de perete pentru dormitor!</h2>
+        <p>Dupa toata aceasta discutie, pot spune cu mana pe inima ca aplicile de perete pentru dormitor sunt o investitie excelenta in confortul si estetica casei tale. Le-am incercat, le-am testat si le-am adorat.</p><p>Pentru mine, dormitorul e un sanctuar. E locul unde ma deconectez, unde ma relaxez, unde ma pregatesc pentru o noua zi. Si o lumina potrivita face o diferenta uriasa in tot acest proces. Aplicile de perete aduc acea lumina blanda, primitoare, care te imbie la odihna. Nu mai e nevoie sa te chinui cu intrerupatorul lustrei sau sa te impiedici de mobila pe intuneric.</p><p>Daca ma intrebati pe cine recomand aplicile de perete, raspunsul e simplu: tuturor! Fie ca ai un dormitor mic si vrei sa economisesti spatiu, fie ca ai unul mare si vrei sa creezi zone de interes, fie ca esti un cititor pasionat sau pur si simplu apreciezi o atmosfera calduroasa, o aplicatie de perete isi gaseste locul.</p><p>Am vazut cum mici modificari pot aduce transformari mari. Si in cazul aplicilor de perete, vorbim de un impact vizual si functional semnificativ pentru o investitie, de cele mai multe ori, destul de modesta. Un pret de 150-250 RON pentru o aplicatie de calitate, care sa iti aduca bucurie si confort zi de zi, mi se pare absolut justificat.</p><p>Ce sfat final va dau? Nu va fie teama sa experimentati! Alegeti un model care va place, care se potriveste stilului vostru si, cel mai important, care va ajuta sa va simtiti mai bine in propriul dormitor. Sincer sa fiu, de cand am inceput sa folosesc aplicile de perete, noptile mele au devenit mult mai linistite si mai placute.</p><p>Deci, daca va ganditi la o mica renovare sau doar la un upgrade de atmosfera, nu uitati de aplicile de perete pentru dormitor. Sunt un mic detaliu care face o diferenta mare!</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce tip de bec este cel mai potrivit pentru o aplicatie de perete in dormitor?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru dormitor, cel mai bine se potrivesc becurile LED cu lumina calda (2700K-3000K). Ele consuma putin, tin mult si creeaza o atmosfera relaxanta, ideala pentru odihna si citit. Evitati lumina prea rece sau prea puternica.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de sus ar trebui montata o aplicatie de perete in dormitor?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Inaltimea ideala depinde de cum stai in pat. In general, se monteaza la nivelul umerilor sau un pic mai sus, astfel incat lumina sa cada confortabil pe carte sau pe tine, fara sa te orbeasca. Cam 1.5 - 1.7 metri de la podea.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot monta singur o aplicatie de perete sau am nevoie de electrician?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Daca aplicatia vine cu cablu si stecher, o poti monta singur. Daca necesita conectare directa la retea, este recomandat sa apelezi la un electrician pentru siguranta si corectitudinea instalarii.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce fac daca vreau sa citesc in pat, dar aplicatia nu are lumina suficienta?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Poti alege o aplicatie cu lumina reglabila sau una cu un brat flexibil, care permite directionarea luminii exact unde ai nevoie. De asemenea, verifica specificatiile legate de Lumeni (lm) – cu cat sunt mai multi, cu atat lumina e mai puternica.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Exista aplicatii de perete pentru dormitor care sa se potriveasca oricarui stil de amenajare?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Absolut! Piata ofera o varietate uriasa de stiluri: modern, minimalist, vintage, rustic, industrial, clasic. Poti gasi aplicatii din metal, sticla, lemn, textile, in diverse culori si forme, asa ca vei gasi cu siguranta ceva pe gustul tau.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot folosi o aplicatie de perete ca sursa principala de lumina in dormitor?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Nu, de obicei aplicile de perete sunt gandite ca lumina auxiliara sau ambientala. Pentru activitatile zilnice sau pentru a ilumina uniform camera, vei avea nevoie si de o sursa de lumina principala, cum ar fi o lustra sau spoturi.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="aplica-de-perete-pentru-dormitor"
+      currentCategory="decoratiuni-casa"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

@@ -1,0 +1,224 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Veioza pentru noptiera",
+  excerpt: "Am stat si m-am gandit la micile detalii care fac o casa sa fie cu adevarat un camin. Unul dintre ele este lumina potrivita, mai ales in dormitor. M-am tot uitat dupa o veioza pentru noptiera care sa ma ajute sa citesc seara fara sa-mi obosesc ochii si sa creeze o atmosfera calduroasa. Si am gasit cateva modele super faine pe care vreau sa vi le povestesc.",
+  image: "/images/articles/veioza-pentru-noptiera.webp",
+  category: "Decoratiuni Casa",
+  categorySlug: "decoratiuni-casa",
+  date: "2026-01-24T07:23:49.000Z",
+  modifiedDate: "2026-02-02T07:23:49.000Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Ce tip de bec este cel mai potrivit pentru o veioza de noptiera?", answer: "Cel mai potrivit este un bec cu lumina calda (sub 3000K), care creeaza o atmosfera relaxanta. Becurile LED sunt eficiente energetic si au o durata de viata lunga. Evita lumina rece, prea alba, care poate fi obositoare seara." },
+  { question: "Cum aleg dimensiunea corecta a veiozei pentru noptiera?", answer: "Masura noptiera si inaltimea patului. Veioza nu trebuie sa fie nici prea mare, nici prea mica. Baza ei ar trebui sa fie cam la nivelul saltelei, pentru ca lumina sa cada confortabil pe carte sau pe obiectele de pe noptiera." },
+  { question: "Pot folosi o veioza cu functii smart in dormitor?", answer: "Da, daca iti doresti. Veiozele smart iti permit sa controlezi lumina din telefon, sa schimbi intensitatea sau culoarea. Sunt utile, dar asigura-te ca sunt compatibile cu sistemul tau si ca le vei folosi efectiv." },
+  { question: "Cat de important este stilul veiozei?", answer: "Foarte important, deoarece veioza este si un element de decor. Alege un stil care se potriveste cu decorul general al dormitorului tau, fie el modern, clasic, vintage sau industrial." },
+  { question: "Ce fac daca noptiera mea este foarte mica?", answer: "Opteaza pentru o veioza compacta, cu un design minimalist sau o veioza reglabila cu brat flexibil, care poate fi montata pe perete deasupra noptierei pentru a economisi spatiu." },
+  { question: "Cum curat abajurul unei veioze?", answer: "Curata abajurul regulat cu o perie moale sau cu aspiratorul la putere mica. Daca este din material textil si murdar, verifica instructiunile producatorului pentru metoda de curatare potrivita (unele se pot spala, altele nu)." }
+];
+
+const toc = [
+  { title: "De ce ai nevoie de o veioza pentru noptiera? Mai mult decat o sursa de lumina", id: "de-ce-ai-nevoie-de-o-veioza-pentru-noptiera-mai-mult-decat-o-sursa-de-lumina" },
+  { title: "Top 5 Veioze pentru Noptiera: Recomandarile mele cu preturi", id: "top-5-veioze-pentru-noptiera-recomandarile-mele-cu-preturi" },
+  { title: "Cum alegi corect? Ghid pentru o alegere inspirata", id: "cum-alegi-corect-ghid-pentru-o-alegere-inspirata" },
+  { title: "Avantaje si Dezavantaje: O privire sincera asupra veiozelor pentru noptiera", id: "avantaje-si-dezavantaje-o-privire-sincera-asupra-veiozelor-pentru-noptiera" },
+  { title: "Sfaturi practice de la un pasionat: Trucuri si greseli de evitat", id: "sfaturi-practice-de-la-un-pasionat-trucuri-si-greseli-de-evitat" },
+  { title: "Parerea mea finala: Pentru cine recomand o veioza pentru noptiera", id: "parerea-mea-finala-pentru-cine-recomand-o-veioza-pentru-noptiera" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Veioza pentru noptiera - CentroCasa"
+  description="Am stat si m-am gandit la micile detalii care fac o casa sa fie cu adevarat un camin. Unul dintre ele este lumina potrivita, mai ales in dormitor. M-am tot uitat dupa o veioza pentru noptiera care sa ma ajute sa citesc seara fara sa-mi obosesc ochii si sa creeze o atmosfera calduroasa. Si am gasit cateva modele super faine pe care vreau sa vi le povestesc."
+  image="/images/articles/veioza-pentru-noptiera.webp"
+  type="article"
+  publishedTime="2026-01-24T07:23:49.000Z"
+  modifiedTime="2026-02-02T07:23:49.000Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Veioza pentru noptiera</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
+        <span class="article-date">2 februarie 2026</span>
+      </div>
+      <h1 class="article-title">Veioza pentru noptiera</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/veioza-pentru-noptiera.webp" alt="Veioza pentru noptiera" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="de-ce-ai-nevoie-de-o-veioza-pentru-noptiera-mai-mult-decat-o-sursa-de-lumina">
+        <h2>De ce ai nevoie de o veioza pentru noptiera? Mai mult decat o sursa de lumina</h2>
+        <p>Stiti cum e, seara, dupa o zi lunga, vrei sa te trantesti in pat, poate sa mai citesti cateva pagini dintr-o carte sau pur si simplu sa te relaxezi putin. Si aici intervine problema: lumina principala din dormitor e prea puternica, prea rece, sau pur si simplu iti strica atmosfera de liniste. Te uiti la ea si parca te si enerveaza. Ei bine, asta e exact problema pe care o rezolva o veioza pentru noptiera. E mica, e discreta, si iti ofera exact atata lumina cat ai nevoie, unde ai nevoie.</p><p>Pentru mine, a devenit un obiect indispensabil. Nu pot sa ma imaginez citind seara fara ea. Lumina aia blanda, calda, te imbie la relaxare. Si nu e doar pentru citit. E perfecta si pentru momentele cand te trezesti noaptea si nu vrei sa aprinzi lumina mare, sa te trezesti complet. Sau cand vrei sa creezi o atmosfera mai intima, mai romantica. Pur si simplu, schimba total experienta din dormitor.</p><p>Cui i se potriveste? Pai, in primul rand, oricui citeste in pat. Asta e clar. Dar si celor care lucreaza seara pe laptop in dormitor, sau celor care folosesc telefonul mult inainte de culcare si vor o lumina mai blanda pentru ochi. Si, sa fim sinceri, e si un element de decor. O veioza draguta poate completa stilul camerei tale, ii poate da un plus de personalitate.</p><p>Am observat ca multe persoane aleg veioze care nu sunt potrivite. Fie sunt prea mari si ocupa tot spatiul de pe noptiera, fie lumina e prea puternica sau prea galbena, sau prea alba. Si atunci, in loc sa te relaxeze, te irita. Deci, e important sa alegi corect. Nu e doar un obiect, e o componenta importanta a confortului tau.</p><p>Pana la urma, e vorba despre a-ti face spatiul personal cat mai primitor si functional. O simpla veioza pentru noptiera poate face o diferenta enorma. E genul de lucru mic, dar cu impact mare. Si cand spun impact, ma refer la cum te simti in propriul dormitor. E despre starea ta de bine, despre momentele tale de liniste.</p><p>Am avut si momente cand am cumparat la prima vedere, fara sa ma gandesc prea mult, si am realizat ca nu e ce trebuie. De asta ma si apuc sa va povestesc experientele mele, ca sa nu patiti si voi la fel. Alegerea unei veioze nu e chiar atat de simpla pe cat pare. Trebuie sa te gandesti la stil, la lumina, la dimensiune, la material. Toate conteaza.</p>
+      </section>
+
+      <section id="top-5-veioze-pentru-noptiera-recomandarile-mele-cu-preturi">
+        <h2>Top 5 Veioze pentru Noptiera: Recomandarile mele cu preturi</h2>
+        <p>Dupa ce am cercetat destul de mult si am incercat cateva modele, am ajuns la un top al meu. Sunt modele diferite, pentru gusturi si bugete diferite, asa ca sigur gasiti ceva pe plac. Am incercat sa aleg varietate, atat ca stil, cat si ca functionalitate.</p><p><strong>1. Veioza Minimalista cu LED Integrat (Ex: Philips Hue White Ambiance)</strong></p><ul><li><strong>Pret estimat:</strong> 250 - 400 RON</li><li><strong>Descriere:</strong> Acestea sunt de obicei cele mai moderne. Au LED integrat, deci nu trebuie sa schimbi becuri. Multe sunt smart, adica le poti controla din telefon, poti schimba culoarea luminii (de la alb cald la alb rece) si intensitatea.</li><li><strong>Pro:</strong> Foarte versatile, economice pe termen lung (LED-ul tine mult), design modern, lumina reglabila.</li><li><strong>Contra:</strong> Pot fi mai scumpe la achizitia initiala, functionalitatile smart pot fi complicate pentru unii.</li></ul><p><strong>2. Veioza Clasica cu Abajur Textil (Ex: Ikea Lampan sau similare)</strong></p><ul><li><strong>Pret estimat:</strong> 80 - 150 RON</li><li><strong>Descriere:</strong> Asta e varianta clasica, pe care o gasesti peste tot. Baza poate fi din metal, lemn sau ceramica, iar deasupra are un abajur dintr-un material textil (panza, bumbac). Poti folosi orice tip de bec, de preferat unul cu lumina calda.</li><li><strong>Pro:</strong> Accesibile ca pret, ofera o lumina difuza si placuta, usor de gasit, varietate mare de stiluri.</li><li><strong>Contra:</strong> Abajurul se poate murdari in timp, trebuie sa tii cont de tipul de bec pe care il cumperi, designul poate fi mai putin spectaculos.</li></ul><p><strong>3. Veioza Reglabila cu Brat Flexibil (Ex: Veioze de citit de la diverse branduri)</strong></p><ul><li><strong>Pret estimat:</strong> 120 - 200 RON</li><li><strong>Descriere:</strong> Ideale pentru cititori. Au un brat pe care il poti indoi si roti exact unde ai nevoie de lumina. De obicei, au un design mai simplu, functional.</li><li><strong>Pro:</strong> Foarte practice pentru citit, lumina directionata, nu deranjezi persoana de langa tine.</li><li><strong>Contra:</strong> Designul nu e mereu cel mai estetic, pot fi mai mici si mai putin potrivite ca element decorativ principal.</li></ul><p><strong>4. Veioza cu Design Industrial/Vintage (Ex: cu suport din metal negru, bec Edison)</strong></p><ul><li><strong>Pret estimat:</strong> 180 - 300 RON</li><li><strong>Descriere:</strong> Pentru cei care iubesc stilul asta, sunt piese de efect. Baza e adesea din metal negru, cu forme geometrice sau un aspect brut. Becul Edison, vizibil, e un must.</li><li><strong>Pro:</strong> Adauga un accent puternic de stil camerei, sunt piese de designer.</li><li><strong>Contra:</strong> Lumina poate fi mai slaba (depinde mult de bec), stilul nu se potriveste oricui, pot fi mai greu de curatat.</li></ul><p><strong>5. Veioza cu Incarcare Wireless pentru Telefon</strong></p><ul><li><strong>Pret estimat:</strong> 200 - 350 RON</li><li><strong>Descriere:</strong> O combinatie inteligenta. Pe langa faptul ca lumineaza, are si o baza pe care poti pune telefonul sa se incarce wireless. Foarte practic pentru noptiera, unde spatiul e limitat.</li><li><strong>Pro:</strong> Multifunctionala, reduce numarul de cabluri pe noptiera, moderna.</li><li><strong>Contra:</strong> Pretul poate fi un pic mai ridicat, functia de incarcare wireless poate sa nu fie compatibila cu toate telefoanele.</li></ul><p>Am incercat sa acopar o plaja destul de larga de optiuni. Fiecare are farmecul ei si se potriveste unor nevoi specifice. Important e sa va ganditi ce cautati, mai exact, de la ea.</p>
+      </section>
+
+      <section id="cum-alegi-corect-ghid-pentru-o-alegere-inspirata">
+        <h2>Cum alegi corect? Ghid pentru o alegere inspirata</h2>
+        <p>Alegerea unei veioze pentru noptiera nu e chiar o misiune imposibila, dar nici sa iei primul lucru care iti iese in cale. Trebuie sa te gandesti la cateva aspecte ca sa nu ajungi sa regreti. Eu asa am invatat, din greseli.</p><p><strong>1. Dimensiunea conteaza (chiar si la veioze!)</strong></p><ul><li>Inainte de toate, masoara-ti noptiera. Nu vrei sa cumperi o veioza care e prea mare si da impresia ca e inghesuita, sau invers, prea mica si pare pierduta. Gandeste-te si la inaltimea patului. Veioza ar trebui sa aiba o inaltime care sa permita luminii sa cada peste carte sau pe ce citesti, fara sa te orbeasca. O regula generala e ca baza veiozei sa fie cam la acelasi nivel cu salteaua patului sau putin mai sus.</li></ul><p><strong>2. Tipul de lumina: Calda, rece sau reglabila?</strong></p><ul><li>Asta e, parerea mea, cel mai important aspect. Lumina calda (sub 3000K) e cea mai potrivita pentru relaxare, pentru dormitor. Creeaza o atmosfera confortabila, asemanatoare cu lumina lumanarilor. Lumina rece (peste 4000K) e mai buna pentru concentrare, pentru birou. Nu prea o recomand pentru noptiera, decat daca ai o veioza smart si poti regla lumina. Lumina neutra (3000-4000K) e un echilibru. Daca ai posibilitatea, alege o veioza cu lumina reglabila.</li></ul><p><strong>3. Stilul si designul: Sa se potriveasca cu decorul tau</strong></p><ul><li>Veioza e si un obiect de decor. Gandeste-te la stilul general al dormitorului tau. E modern, minimalist, rustic, vintage, industrial? Cauta o veioza care sa completeze sau chiar sa accentueze stilul respectiv. Materialele conteaza si ele: metal, lemn, sticla, ceramica, tesaturi. Fiecare aduce o nota diferita.</li></ul><p><strong>4. Becul: Edison, LED, sau clasic?</strong></p><ul><li>Daca alegi o veioza care permite schimbarea becului, ai optiuni. Becurile LED sunt cele mai eficiente energetic si au o durata de viata lunga. Becurile cu filament stil Edison sunt foarte estetice, dar consuma mai mult si lumina lor e adesea mai slaba, mai mult decorativa. Becurile clasice, incandescente, sunt cele mai ieftine la achizitie, dar consuma mult si se ard repede. Verificati ce tip de dulie are veioza (E14, E27, etc.).</li></ul><p><strong>5. Alimentarea si functionalitati suplimentare</strong></p><ul><li>Majoritatea veiozelor se conecteaza la priza. Dar exista si variante pe baterii, utile daca nu ai o priza aproape sau vrei sa o muti usor. Unele au si functii smart (conectare la Wi-Fi, control prin aplicatie), altele au incarcare wireless pentru telefon, sau porturi USB pentru incarcarea altor dispozitive. Ganditi-va de ce aveti nevoie.</p><p>Eu zic ca e bine sa te gandesti la toate astea inainte. Nu e vorba de a complica lucrurile, ci de a face o alegere informata, care sa te multumeasca pe termen lung.</p>
+      </section>
+
+      <section id="avantaje-si-dezavantaje-o-privire-sincera-asupra-veiozelor-pentru-noptiera">
+        <h2>Avantaje si Dezavantaje: O privire sincera asupra veiozelor pentru noptiera</h2>
+        <p>Ca la orice produs, si la veiozele pentru noptiera exista avantaje si dezavantaje. Eu am incercat sa le identific pe cele mai importante, ca sa va fac o idee mai clara.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Iluminat ambiental placut:</strong> Acesta e, probabil, cel mai mare avantaj. Lumina unei veioze e mult mai blanda si mai difuza decat cea a lustrei. Creeaza o atmosfera calda si relaxanta, perfecta pentru seri de odihna. Nu te orbeste, nu te agaseaza.</li><li><strong>Functionalitate pentru citit:</strong> Daca esti un cititor pasionat, o veioza cu lumina directionata pe noptiera este esentiala. Iti permite sa citesti confortabil fara a deranja persoana de langa tine si fara a-ti forta ochii.</li><li><strong>Economie de energie (cu LED-uri):</strong> Daca alegi o veioza cu becuri LED, vei observa o diferenta la factura de electricitate. LED-urile consuma mult mai putin si au o durata de viata mult mai lunga decat becurile clasice.</li><li><strong>Element decorativ:</strong> O veioza bine aleasa poate adauga un plus de stil si personalitate dormitorului tau. Poate fi piesa centrala a noptierei sau un accent subtil care completeaza decorul.</li><li><strong>Control asupra luminii:</strong> Multe veioze permit reglarea intensitatii luminii sau chiar a culorii, oferindu-ti flexibilitate in functie de momentul zilei sau de starea ta de spirit.</li><li><strong>Solutie pentru treziri nocturne:</strong> Cand te trezesti noaptea si ai nevoie de putina lumina, o veioza e mult mai potrivita decat lumina principala, care te-ar trezi complet.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Spatiu ocupat pe noptiera:</strong> Veioza ocupa un loc pe noptiera, care poate fi deja limitat. Daca ai multe alte lucruri pe noptiera (carte, telefon, pahar cu apa, etc.), o veioza mai mare poate fi o problema.</li><li><strong>Pretul:</strong> Unele veioze, mai ales cele cu design special sau cu functii smart, pot fi destul de scumpe. Trebuie sa iti adaptezi bugetul.</li><li><strong>Mentenanta:</strong> Abajurul de material textil se poate murdari in timp si necesita curatare. Becurile se ard si trebuie inlocuite (mai rar la LED-uri).</li><li><strong>Posibila lumina insuficienta (daca nu alegi corect):</strong> Daca alegi o veioza prea mica sau cu un bec prea slab, s-ar putea sa nu fie suficienta pentru nevoile tale, mai ales pentru citit.</li><li><strong>Dependenta de priza:</strong> Majoritatea veiozelor necesita o priza in apropiere. Daca noptiera e departe de priza, s-ar putea sa ai nevoie de un prelungitor, ceea ce nu e mereu estetic.</li><li><strong>Designul poate fi greu de integrat:</strong> Uneori, gasesti o veioza care iti place mult ca functionalitate, dar care nu se potriveste deloc cu stilul camerei.</li></ul><p>Parerea mea e ca avantajele depasesc, in general, dezavantajele, mai ales daca faci o alegere informata. E un obiect care aduce mult confort si imbunatateste experienta din dormitor.</p>
+      </section>
+
+      <section id="sfaturi-practice-de-la-un-pasionat-trucuri-si-greseli-de-evitat">
+        <h2>Sfaturi practice de la un pasionat: Trucuri si greseli de evitat</h2>
+        <p>Am trecut prin destule cu veiozele mele ca sa pot sa va dau cateva sfaturi utile. Sunt chestii marunte, dar care fac diferenta.</p><p><strong>1. Nu te feri sa experimentezi cu becurile:</strong> Daca veioza ta permite schimbarea becului, joaca-te cu asta. Am avut perioade in care foloseam becuri cu lumina mai galbena, apoi am trecut la unele cu lumina mai alba, dar tot calda. Poti gasi becuri cu lumina dimabila (reglabila) si fara sa fie smart, doar ca trebuie sa ai un intrerupator pe fir care sa permita asta. Verifica specificatiile becului!</p><p><strong>2. Curata abajurul regulat:</strong> Daca ai un abajur din material textil, praful se depune destul de repede. O curatare usoara cu o perie moale sau cu aspiratorul (la putere mica) o data pe luna te scapa de murdaria persistenta. Daca e prea murdar, poti incerca sa-l cureti conform instructiunilor (unele se pot spala, altele nu).</p><p><strong>3. Ai grija la pozitionare:</strong> Nu pune veioza exact in fata ta cand stai in pat, mai ales daca citesti. Lumina ar trebui sa vina din lateral sau din spate, ca sa nu te orbeasca. Incearca sa o pozitionezi astfel incat sa lumineze zona de interes (cartea, telefonul) fara sa creeze umbre deranjante.</p><p><strong>4. Nu ignora cablul:</strong> Un cablu lung si inestetic care atarna pe perete sau pe podea poate strica orice aspect frumos al unei veioze. Daca e posibil, foloseste cleme pentru cabluri ca sa il prinzi de perete sau de piciorul patului. Sau, daca amenajezi, poti chiar ascunde cablul in perete. E un efort in plus, dar merita.</p><p><strong>5. Veiozele smart, dar cu masura:</strong> Daca te tenteaza o veioza smart, verifica compatibilitatea cu sistemul tau de casa inteligenta (daca ai unul) si citeste parerile altor utilizatori. Unele aplicatii sunt mai usor de folosit decat altele. Nu cumpara doar pentru ca e smart, ci pentru ca iti rezolva o nevoie.</p><p><strong>Greseli de evitat:</strong></p><ul><li><strong>Alegerea unei lumini prea puternice sau prea reci:</strong> Asta e cea mai frecventa greseala. Lumina prea intensa sau prea alba te agita, nu te relaxeaza.</li><li><strong>Ignorarea dimensiunii:</strong> Sa cumperi o veioza prea mare pentru o noptiera mica sau invers.</li><li><strong>Alegerea unui stil complet nepotrivit:</strong> O veioza foarte moderna intr-o camera rustica, de exemplu.</li><li><strong>A cumpara doar pe baza aspectului:</strong> Sa te lasi vrajit de design, dar sa ignori calitatea luminii sau functionalitatea.</li><li><strong>A uita de bec:</strong> Sa cumperi o veioza frumoasa, dar sa nu te gandesti la tipul de bec pe care il va folosi si la costurile pe termen lung.</li></ul><p>Eu am invatat ca detaliile conteaza. Si o veioza, oricat de mica, este un detaliu important.</p>
+      </section>
+
+      <section id="parerea-mea-finala-pentru-cine-recomand-o-veioza-pentru-noptiera">
+        <h2>Parerea mea finala: Pentru cine recomand o veioza pentru noptiera</h2>
+        <p>Dupa toata povestea asta, pot sa spun sincer ca o veioza pentru noptiera este, pentru mine, un must-have in orice dormitor. Nu e un lux, e o necesitate pentru confortul tau.</p><p>Recomand cu caldura o veioza pentru noptiera oricui citeste inainte de culcare. E o investitie mica pentru un confort vizual si o relaxare mult sporita. Daca vrei sa te deconectezi de la ecrane si sa te bucuri de o carte, o veioza cu lumina calda si reglabila e partenerul perfect.</p><p>De asemenea, o recomand persoanelor care se trezesc des noaptea sau care au nevoie sa se deplaseze prin camera in timpul noptii. Lumina ei discreta te ajuta sa te orientezi fara sa te trezesti complet, iar apoi sa te intorci la somn mai usor.</p><p>Pentru cupluri, o veioza pe fiecare parte a patului poate fi o solutie excelenta. Fiecare isi poate seta lumina dorita, fara a-l deranja pe celalalt. E o dovada de respect si atentie.</p><p>Si, nu in ultimul rand, recomand o veioza pentru noptiera oricui vrea sa isi personalizeze si sa isi infrumuseteze dormitorul. Cu atatea modele si stiluri disponibile, cu siguranta veti gasi o piesa care sa se potriveasca perfect cu decorul vostru si sa aduca un plus de caldura si personalitate camerei.</p><p>In concluzie, daca ma intrebati pe mine, o veioza pentru noptiera este un accesoriu esential pentru oricine isi doreste un dormitor mai confortabil, mai primitor si mai functional. E genul de investitie care iti aduce bucurie in fiecare seara.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce tip de bec este cel mai potrivit pentru o veioza de noptiera?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Cel mai potrivit este un bec cu lumina calda (sub 3000K), care creeaza o atmosfera relaxanta. Becurile LED sunt eficiente energetic si au o durata de viata lunga. Evita lumina rece, prea alba, care poate fi obositoare seara.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum aleg dimensiunea corecta a veiozei pentru noptiera?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Masura noptiera si inaltimea patului. Veioza nu trebuie sa fie nici prea mare, nici prea mica. Baza ei ar trebui sa fie cam la nivelul saltelei, pentru ca lumina sa cada confortabil pe carte sau pe obiectele de pe noptiera.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot folosi o veioza cu functii smart in dormitor?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, daca iti doresti. Veiozele smart iti permit sa controlezi lumina din telefon, sa schimbi intensitatea sau culoarea. Sunt utile, dar asigura-te ca sunt compatibile cu sistemul tau si ca le vei folosi efectiv.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de important este stilul veiozei?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Foarte important, deoarece veioza este si un element de decor. Alege un stil care se potriveste cu decorul general al dormitorului tau, fie el modern, clasic, vintage sau industrial.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce fac daca noptiera mea este foarte mica?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Opteaza pentru o veioza compacta, cu un design minimalist sau o veioza reglabila cu brat flexibil, care poate fi montata pe perete deasupra noptierei pentru a economisi spatiu.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum curat abajurul unei veioze?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Curata abajurul regulat cu o perie moale sau cu aspiratorul la putere mica. Daca este din material textil si murdar, verifica instructiunile producatorului pentru metoda de curatare potrivita (unele se pot spala, altele nu).
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="veioza-pentru-noptiera"
+      currentCategory="decoratiuni-casa"
+      articles={allArticles}
+    />
+  </article>
+</Layout>

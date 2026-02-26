@@ -1,0 +1,61 @@
+---
+const categories = [
+  { name: 'Gradinarit', slug: 'gradinarit-unelte' },
+  { name: 'Mobilier Gradina', slug: 'mobilier-gradina' },
+  { name: 'Electrocasnice', slug: 'electrocasnice-casa' },
+  { name: 'Decoratiuni', slug: 'decoratiuni-casa' },
+  { name: 'Curatenie', slug: 'curatenie-intretinere' }
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <span>CentroCasa</span>
+      </a>
+
+      <nav class="nav-desktop">
+        <a href="/" class={`nav-link ${currentPath === '/' ? 'active' : ''}`}>Acasa</a>
+        {categories.map(cat => (
+          <a href={`/${cat.slug}/`} class={`nav-link ${currentPath.includes(cat.slug) ? 'active' : ''}`}>
+            {cat.name}
+          </a>
+        ))}
+      </nav>
+
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Meniu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav">
+    <a href="/" class="mobile-nav-link">Acasa</a>
+    {categories.map(cat => (
+      <a href={`/${cat.slug}/`} class="mobile-nav-link">{cat.name}</a>
+    ))}
+    <a href="/contact/" class="mobile-nav-link">Contact</a>
+  </nav>
+</header>
+
+<script>
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  menuBtn?.addEventListener('click', () => {
+    mobileNav?.classList.toggle('open');
+  });
+</script>
