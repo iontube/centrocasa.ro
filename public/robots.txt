@@ -2,4 +2,3 @@ User-agent: *
 Allow: /
 
 Sitemap: https://centrocasa.ro/sitemap-index.xml
-Sitemap: https://centrocasa.ro/sitemap-images.xml
