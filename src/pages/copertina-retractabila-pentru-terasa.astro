@@ -1,0 +1,286 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Copertina retractabila pentru terasa",
+  excerpt: "Daca vrei o copertina retractabila pentru terasa de calitate, care sa te tina ani buni, eu zic sa te uiti la modelele cu brat de otel si tesatura acrilica de peste 300g/m². Nu te zgarci la motorizare, mai ales daca terasa e mare, si verifica atent garantia. O copertina retractabila buna, bine aleasa, iti poate schimba complet experienta de outdoor. Stai sa-ti zic cum sta treaba.",
+  image: "/images/articles/copertina-retractabila-pentru-terasa.webp",
+  category: "Mobilier Gradina",
+  categorySlug: "mobilier-gradina",
+  date: "2026-03-02T07:54:47.410Z",
+  modifiedDate: "2026-03-02T07:54:47.410Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "cat costa o copertina retractabila pentru terasa", answer: "Pretul unei copertine retractabile pentru terasa variaza mult, de la circa 1200 lei pentru modele manuale mici, la peste 9000 lei pentru cele de lux, cu brat dublu si senzori. Modelele medii, motorizate, cu dimensiuni standard, se gasesc in general intre 2000 si 4500 lei." },
+  { question: "care e diferenta intre copertina cu brat simplu si brat dublu", answer: "O copertina retractabila cu brat dublu ofera stabilitate superioara, fiind ideala pentru terase mari sau zone expuse la vant. Bratul dublu adauga un set suplimentar de brate care intind tesatura mai bine si previn vibratiile, in timp ce bratul simplu e suficient pentru terase medii si protejate de vant." },
+  { question: "merita sa cumpar o copertina retractabila cu caseta", answer: "Da, merita daca vrei protectie maxima pentru tesatura si mecanism atunci cand copertina e retractata. Caseta protejeaza impotriva prafului, ploii si razelor UV, prelungind durata de viata a copertinei, dar vine cu un cost suplimentar." },
+  { question: "ce tesatura e mai buna pentru copertina retractabila", answer: "Tesatura acrilica de peste 300g/m², tratata UV, este cea mai recomandata pentru o copertina retractabila. Ea ofera rezistenta buna la decolorare, intemperii si uzura, spre deosebire de poliesterul de densitate mica." },
+  { question: "de ce se strica motorul la copertina retractabila", answer: "Motorul unei copertine retractabile se poate strica din cauza suprasolicitarii (vant puternic, blocaje), a umiditatii excesive, a lipsei de intretinere sau a defectelor de fabricatie. Alegerea unui motor de calitate si respectarea instructiunilor de utilizare sunt esentiale." },
+  { question: "cum sa intretin copertina retractabila pentru terasa", answer: "Pentru a intretine o copertina retractabila, curata periodic tesatura cu apa si sapun neutru, verifica si lubrifiaza bratele si mecanismele, si asigura-te ca este complet uscata inainte de a o retracta. Evita deschiderea fortata in conditii de vant puternic." },
+  { question: "unde gasesc copertina retractabila pentru terasa de calitate", answer: "Poti gasi copertine retractabile pentru terasa de calitate in magazine specializate de mobilier de exterior, showroom-uri de constructii sau online pe site-urile producatorilor sau distribuitorilor autorizati. Verifica recenziile si garantia oferita." },
+  { question: "care e garantia pentru o copertina retractabila buna", answer: "O copertina retractabila de calitate ar trebui sa aiba o garantie de minim 2-3 ani pentru structura si motor. Producatorii de top pot oferi chiar si 5 ani garantie pe anumite componente, ceea ce indica o calitate superioara a produsului." }
+];
+
+const toc = [
+  { title: "Ce copertina retractabila pentru terasa sa alegi ca sa nu regreti?", id: "ce-copertina-retractabila-pentru-terasa-sa-alegi-ca-sa-nu-regreti" },
+  { title: "Top 5 copertine retractabile pentru terasa: avantaje si dezavantaje pe bune", id: "top-5-copertine-retractabile-pentru-terasa-avantaje-si-dezavantaje-pe-bune" },
+  { title: "Cum sa alegi copertina retractabila pentru terasa potrivita: ghidul prietenului tău", id: "cum-sa-alegi-copertina-retractabila-pentru-terasa-potrivita-ghidul-prietenului-tau" },
+  { title: "Copertina retractabila cu brat simplu vs. brat dublu: Care e diferenta?", id: "copertina-retractabila-cu-brat-simplu-vs-brat-dublu-care-e-diferenta" },
+  { title: "Greseli frecvente cand cumperi o copertina retractabila pentru terasa si cum sa le eviti", id: "greseli-frecvente-cand-cumperi-o-copertina-retractabila-pentru-terasa-si-cum-sa-le-eviti" },
+  { title: "Copertina retractabila pentru terasa: Recomandari pe categorii de buget", id: "copertina-retractabila-pentru-terasa-recomandari-pe-categorii-de-buget" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Copertina retractabila pentru terasa - CentroCasa"
+  description="Daca vrei o copertina retractabila pentru terasa de calitate, care sa te tina ani buni, eu zic sa te uiti la modelele cu brat de otel si tesatura acrilica de peste 300g/m². Nu te zgarci la motorizare, mai ales daca terasa e mare, si verifica atent garantia. O copertina retractabila buna, bine aleasa, iti poate schimba complet experienta de outdoor. Stai sa-ti zic cum sta treaba."
+  image="/images/articles/copertina-retractabila-pentru-terasa.webp"
+  type="article"
+  publishedTime="2026-03-02T07:54:47.410Z"
+  modifiedTime="2026-03-02T07:54:47.410Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Copertina retractabila pentru terasa</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
+        <span class="article-date">2 martie 2026</span>
+      </div>
+      <h1 class="article-title">Copertina retractabila pentru terasa</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/copertina-retractabila-pentru-terasa.webp" alt="Copertina retractabila pentru terasa" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="ce-copertina-retractabila-pentru-terasa-sa-alegi-ca-sa-nu-regreti">
+        <h2>Ce copertina retractabila pentru terasa sa alegi ca sa nu regreti?</h2>
+        <p>Bon, sa fim directi. Cauti o <strong>copertina retractabila pentru terasa</strong>, nu un bibelou. Vrei umbra, vrei sa poti inchide terasa cand ploua sau bate soarele prea tare, si vrei sa arate si bine.</p>
+        <p>Daca ma intrebi pe mine, prima chestie la care te uiti e structura. Bratele alea retractabile trebuie sa fie solide. Eu prefer otelul, chiar daca e un pic mai greu sau mai scump decat aluminiul.</p>
+        <p>Am vazut prea multe copertine cu brate indoite de la primul vant mai serios. Deci, <strong>structura din otel</strong>, punct.</p>
+        <p>Apoi, materialul. Tesatura aia e practic fata copertinei tale. Cauta ceva acrilic, tratat UV, sa nu se decoloreze in doi ani. Si sa fie dens. Asta inseamna ca rezista mai bine la soare, la ploaie usoara si nu se rupe usor. Minim 300g/m², zic eu. Daca gasesti peste 350g/m², si mai bine.</p>
+        <p>Motorizarea e si ea importanta. Daca ai o copertina mica, de 2-3 metri, poate merge si cu manivela. Dar la terase mai mari, peste 4 metri, motorul e sfant. Nu te chinui sa o rulezi manual. Si nu uita sa verifici telecomanda, daca vine cu una. Unele sunt mai sensibile, altele mai lente. Am avut o experienta cu una care facea figuri la fiecare al doilea click.</p>
+        <p>Garantia e un alt punct cheie. O <strong>copertina retractabila</strong> de calitate vine cu garantie de minim 2-3 ani pe structura si motor. Daca producatorul iti ofera mai mult, e un semn bun. Inseamna ca are incredere in produsul lui. Si asta e important, ca nu cumperi chestia asta de flori. E o investitie.</p>
+        <p>Deci, pe scurt: <strong>brat de otel</strong>, tesatura acrilica densa (peste 300g/m²), motorizare pe masura terasei si garantie serioasa. Asta e baza. Restul e stil si accesorii.</p>
+      </section>
+
+      <section id="top-5-copertine-retractabile-pentru-terasa-avantaje-si-dezavantaje-pe-bune">
+        <h2>Top 5 copertine retractabile pentru terasa: avantaje si dezavantaje pe bune</h2>
+        <p>Hai sa vedem cateva variante concrete, ca sa ai de unde alege. Nu zic ca sunt singurele bune, dar sunt modele pe care le-am vazut, le-am pipait sau mi-au fost recomandate de prieteni care chiar se pricep.</p>
+        <ul><li><strong>Model 1: Copertina retractabila cu brat telescopic de la BrandX (pret estimat: 2500-4000 lei)</strong><br><em>Avantaje:</em> Bratele astea telescopice sunt super flexibile, iti permit sa ajustezi deschiderea mai fin. Structura e solida, din otel vopsit electrostatic, rezista bine la rugina. Tesatura e acrilica, 320g/m², cu protectie UV destul de buna. Vine cu motorizare inclusa si telecomanda. E o optiune de mijloc, destul de populara.<br><em>Dezavantaje:</em> Bratele telescopice pot fi un pic mai greu de reglat la inceput, trebuie sa prinzi mecanismul. Daca o lasi mereu deschisa la maximum si bate vantul, se simte o usoara vibratie. Motorul, desi bun, nu e cel mai silentios de pe piata.</li><li><strong>Model 2: Copertina retractabila cu brat simplu, motorizata, de la BrandY (pret estimat: 1800-3000 lei)</strong><br><em>Avantaje:</em> E mai accesibila ca pret. Structura e solida, din aluminiu, mai usoara dar tot destul de rezistenta pentru dimensiuni medii. Tesatura e un poliester dens, tratat anti-UV, 280g/m². Motorizarea cu telecomanda e standard. E o alegere buna daca bugetul e mai limitat.<br><em>Dezavantaje:</em> Tesatura de poliester, desi buna, nu e la fel de rezistenta la decolorare pe termen lung ca acrilicul de calitate superioara. Bratele din aluminiu, desi rezistente, nu fac fata la vanturi puternice la fel de bine ca otelul. Nu are protectie suplimentara pentru ploaie, e doar pentru soare si vant usor.</li><li><strong>Model 3: Copertina retractabila de lux cu brat dublu si senzori de vant de la BrandZ (pret estimat: 5000-9000 lei)</strong><br><em>Avantaje:</em> Aici vorbim de alt nivel. Bratele duble din otel masiv ofera o stabilitate IMPECABILA, chiar si la vanturi moderate. Tesatura e acrilica premium, 350g/m², impermeabila pe bune, nu doar rezistenta la stropi. Are senzori de vant si soare care actioneaza automat copertina. Motorul e ultra-silentios si rapid. Arata si fantastic. E o investitie pe termen foarte lung.<br><em>Dezavantaje:</em> Pretul e pe masura. E grea, deci montajul trebuie facut de profesionisti. Senzorii de vant, desi utili, pot fi uneori prea sensibili si inchid copertina cand nu e neaparat nevoie, daca bate un curent de aer mai puternic.</li><li><strong>Model 4: Copertina retractabila manuala, compacta, de la BrandA (pret estimat: 1200-2000 lei)</strong><br><em>Avantaje:</em> Cea mai accesibila varianta. Perfecta pentru balcoane sau terase mici (pana in 3 metri latime). Structura e destul de OK, din otel. Tesatura e un poliester decent, 260g/m². Functioneaza cu manivela, deci nu depinzi de curent.<br><em>Dezavantaje:</em> Manivela poate fi incomoda la utilizare frecventa, mai ales daca ai nevoie sa o strangi si sa o desfaci des. Tesatura nu e de top, se poate decolora mai repede. Nu e recomandata pentru vanturi puternice, se poate deteriora usor.</li><li><strong>Model 5: Copertina retractabila cu caseta de la BrandB (pret estimat: 3500-6000 lei)</strong><br><em>Avantaje:</em> Caseta asta protejeaza complet tesatura si bratele cand copertina e stransa. Ofera o protectie excelenta impotriva prafului, ploii si a factorilor de mediu. Arata foarte elegant pe perete. Structura e de obicei din aluminiu de buna calitate, iar tesatura e acrilica premium. Motorizare inclusa.<br><em>Dezavantaje:</em> E mai scumpa decat modelele fara caseta. Montajul poate fi un pic mai complicat din cauza greutatii si a sistemului de prindere. Daca vrei doar umbra ocazionala, s-ar putea sa fie o investitie prea mare.</li></ul>
+        <p>Cam astea sunt cateva directii. Alege in functie de cat de mare e terasa ta, cat de des o folosesti si, bineinteles, cat vrei sa cheltui.</p>
+      </section>
+
+      <section id="cum-sa-alegi-copertina-retractabila-pentru-terasa-potrivita-ghidul-prietenului-tau">
+        <h2>Cum sa alegi copertina retractabila pentru terasa potrivita: ghidul prietenului tău</h2>
+        <p>Ok, ai vazut cateva modele, dar cum te hotarasti? Stai putin, ca iti zic eu pe ce sa te uiti ca sa nu dai cu piciorul banilor.</p>
+        <p><strong>1. Dimensiunea conteaza, frate.</strong> Masoara terasa aia cum trebuie. Nu doar lungimea, ci si cat vrei sa se extinda copertina. Majoritatea modelelor au specificata latimea maxima si deschiderea maxima. Nu lua una prea mare ca o sa stea mereu prea intinsa si o sa se lase, nici prea mica sa nu-ti acopere zona dorita. Gandeste-te la spatiul pe care vrei sa-l umbresti. E pentru o masa cu scaune? Sau pentru toata zona de relaxare?</p>
+        <p><strong>2. Structura si materialul: Forta si rezistenta.</strong> Am zis de otel vs aluminiu. Otelul e mai greu, dar mai rezistent la indoire. Aluminiul e mai usor, mai rezistent la rugina, dar se poate indoi mai usor la vanturi puternice. Asta depinde si de cat de expusa e terasa ta. Daca stai intr-o zona cu vanturi frecvente, mergi pe otel. Daca e mai ferita, aluminiul e OK.</p>
+        <p>Tesatura: Aici nu te juca. Cauta acrilic, 300g/m² minim. Daca scrie "poliester", verifica densitatea. Unele poliestere sunt bune, altele sunt ca o hartie. Tratamentul UV e esential. Altfel, in doi ani o sa ai o copertina decolorata, ca o batrana obosita.</p>
+        <p><strong>3. Motorizare sau manivela?</strong> Daca terasa are peste 4 metri latime, sau daca nu ai chef sa depui efort, ia una motorizata. E mult mai comod. Verifica ce fel de motor are, cat de silentios e, daca vine cu telecomanda sau buton pe perete. Unele au si senzori de vant, ploaie, soare. Sunt super utile, dar cresc si pretul.</p>
+        <p>Manivela e OK pentru terase mici, sub 3 metri, unde nu o folosesti zilnic. Dar sincer, si acolo, daca bugetul permite, motorizarea face diferenta.</p>
+        <p><strong>4. Montajul: Nu subestima asta!</strong> O <strong>copertina retractabila</strong>, mai ales una mare si grea, trebuie montata corect. Daca peretele nu e solid, daca prinderile nu sunt bine facute, o sa ai probleme. Cel mai bine e sa apelezi la o firma specializata. Da, te costa, dar e mai sigur. Daca o montezi singur, citeste manualul de la A la Z si ai grija la fiecare surub.</p>
+        <p><strong>5. Garantie si service: Ce se intampla daca?</strong> Verifica ce garantie iti ofera producatorul. 2 ani e minimul decent. Daca ofera 5 ani pe structura, e un mare plus. Si intreaba daca au service in Romania, daca poti gasi piese de schimb, daca au pe cine sa sune daca se strica ceva. Nu cumpara de la firme fantoma.</p>
+        <p>Cam asta e. Nu te grabi. Cauta, compara, intreaba. Mai bine dai un ban pe una buna, decat doi pe una ieftina care te lasa balta.</p>
+      </section>
+
+      <section id="copertina-retractabila-cu-brat-simplu-vs-brat-dublu-care-e-diferenta">
+        <h2>Copertina retractabila cu brat simplu vs. brat dublu: Care e diferenta?</h2>
+        <p>Asta e o intrebare pe care o primesc des. Si e importanta. Hai sa vedem care-i faza cu bratele alea.</p>
+        <p><strong>Copertina cu brat simplu:</strong> Asta e varianta standard, cea mai comuna. Are doua brate principale care se extind din perete. Sunt mai usoare, mai simple ca mecanism si, evident, mai ieftine.</p>
+        <p>Sunt perfecte pentru terase medii, pana la vreo 5-6 metri latime, unde vantul nu e o problema majora. Tesatura e prinsa direct de aceste brate. Stabilitatea e buna, dar nu extraordinara la vanturi mai puternice.</p>
+        <p>Daca bate un vanticel, se cam simte vibratia in brate. Am vazut modele unde tesatura incepea sa se rupa in punctele de prindere pe brate, dupa cativa ani de utilizare intensa.</p>
+        <p><strong>Copertina cu brat dublu:</strong> Aici vorbim de alta clasa. Pe langa cele doua brate principale, mai exista un al doilea set de brate, montat intre ele, care ofera un suport suplimentar. Asta inseamna o stabilitate mult mai mare.</p>
+        <p>Tesatura e prinsa de bratele din fata, iar cele din spate ofera tensiune si rigiditate. Rezista mult mai bine la vanturi puternice, chiar si la modele mai mari, de 7-8 metri latime. Sunt ideale pentru terase expuse, unde vrei siguranta maxima.</p>
+        <p>Dezavantajul principal e pretul, sunt semnificativ mai scumpe. Si greutatea lor e mai mare, deci montajul trebuie facut cu multa grija.</p>
+        <p><strong>Ce sa alegi?</strong> Daca ai o terasa mica spre medie (pana in 4 metri) si nu e intr-o zona foarte expusa la vant, un brat simplu de calitate buna e suficient. Daca ai o terasa mare, sau daca vrei liniste sufleteasca pe timp de vant, merita sa investesti intr-una cu brat dublu. E ca diferenta dintre o masina normala si una 4x4: ambele te duc unde vrei, dar una te duce si pe teren accidentat.</p>
+        <p>Nu uita si de caseta. Modelele cu caseta, fie ca au brat simplu sau dublu, ofera protectie suplimentara pentru tesatura si mecanism cand copertina e stransa. Asta prelungeste viata copertinei, dar creste si pretul.</p>
+      </section>
+
+      <section id="greseli-frecvente-cand-cumperi-o-copertina-retractabila-pentru-terasa-si-cum-sa-le-eviti">
+        <h2>Greseli frecvente cand cumperi o copertina retractabila pentru terasa si cum sa le eviti</h2>
+        <p>Stai sa vezi ce prostii fac unii, si ca sa nu ajungi si tu in situatia aia, iti zic direct.</p>
+        <p><strong>1. Alegi cea mai ieftina varianta.</strong> Asta e clasica. Vezi o copertina la 800 de lei si te gandesti 'ce afacere!'.</p>
+        <p>Na, asta e. Si apoi te trezesti ca dupa un an tesatura s-a decolorat, bratele au inceput sa rugineasca si motorul face zgomot ca o moara stricata. O <strong>copertina retractabila</strong> e o investitie.</p>
+        <p>Una ieftina, de obicei, inseamna materiale proaste si manopera indoielnica. Mai bine platesti un pic mai mult pe una de calitate, care te tine 5-10 ani, decat sa cumperi una la doi ani.</p>
+        <p><strong>2. Ignori dimensiunea si deschiderea.</strong> Unii se gandesc doar la latimea terasei si uita sa masoare cat vrei sa se extinda copertina. Sau, invers, iau una care se extinde prea mult si ajunge sa stea intinsa la maximum mereu, ceea ce nu e bine pentru structura. Gandeste-te la spatiul de umbra de care ai nevoie. Si verifica daca nu cumva o sa loveasca in ceva (o usa de balcon, o scara, etc.) cand se deschide.</p>
+        <p><strong>3. Nu verifici rezistenta la vant.</strong> Asta e critica. Multi cumpara copertine fara sa se gandeasca la vant. Daca stai intr-o zona mai batuta de vant, ai nevoie de o structura mai solida (brat dublu, otel) si o tesatura rezistenta. Daca iei una de rezistenta mica si vine o rafala, s-ar putea sa ai surprize neplacute. Si apoi dai vina pe producator, desi tu ai gresit cand ai ales.</p>
+        <p><strong>4. Montaj facut de mantuiala.</strong> Am zis si mai sus, dar repet. O copertina grelita, cu prinderi slabe, poate fi periculoasa. Nu te baza pe dibluri obisnuite daca peretele nu e din beton masiv. Foloseste suruburi si ancore dedicate, potrivite pentru materialul peretelui. Daca nu esti sigur, plateste un profesionist. E mai ieftin decat sa repari o tencuiala cazuta sau o terasa stricata.</p>
+        <p><strong>5. Uiti de intretinere.</strong> Nu te astepta ca o <strong>copertina retractabila</strong> sa functioneze perfect daca o lasi de izbeliste. Curata tesatura periodic, mai ales daca a stat mult timp stransa si a prins mucegai. Verifica bratele, lubrifiaza mecanismele daca e cazul. O intretinere minima ii prelungeste viata considerabil. Nu o lasa deschisa cand pleci in concediu si e anuntat vant puternic, chiar daca are senzori.</p>
+        <p>Deci, fii atent la aceste puncte si o sa te alegi cu o copertina care te va bucura ani buni.</p>
+      </section>
+
+      <section id="copertina-retractabila-pentru-terasa-recomandari-pe-categorii-de-buget">
+        <h2>Copertina retractabila pentru terasa: Recomandari pe categorii de buget</h2>
+        <p>Hai sa simplificam si mai mult treaba. Pentru ca stiu ca bugetul e un factor decisiv, am impartit recomandarile in trei categorii.</p>
+        <p><strong>Buget Mic (sub 2000 lei):</strong><br>Aici vorbim de modele compacte, de obicei cu manivela, pentru terase si balcoane mai mici (pana in 3-4 metri). Cauta modele de la producatori consacrati care ofera totusi preturi accesibile. De exemplu, cauta <strong>copertina retractabila manuala BrandA</strong> sau modele similare de la branduri care au reprezentare in Romania.</p>
+        <p>Avantajul principal e pretul. Dezavantajul e ca tesatura nu va fi de top, rezistenta la vant va fi mica, si mecanismul manual poate fi obositor. E o solutie decenta pentru umbra ocazionala, dar nu te astepta la performante de lux.</p>
+        <p>Verifica neaparat garantia, chiar si la modelele astea.</p>
+        <p><strong>Buget Mediu (2000 - 4500 lei):</strong><br>Aceasta e zona cea mai populara si, daca ma intrebi pe mine, cea mai echilibrata. Aici gasesti modele motorizate, cu structura solida (fie otel, fie aluminiu de calitate), tesatura acrilica decenta (peste 300g/m²) si o deschidere rezonabila (pana la 5-6 metri). Cauta modele precum <strong>copertina retractabila BrandX cu brat telescopic</strong> sau optiuni similare de la BrandY.</p>
+        <p>Avantajele sunt confortul motorizarii, o rezistenta mai buna la conditiile meteo si o durata de viata mai mare. Dezavantajele pot fi legate de zgomotul motorului sau de faptul ca nu fac fata la vanturi foarte puternice, dar pentru majoritatea situatiilor sunt perfecte. Aici incepi sa vezi si optiuni cu caseta, dar de obicei la limita superioara a bugetului.</p>
+        <p><strong>Buget Mare (peste 4500 lei):</strong><br>Daca bugetul nu e o problema si vrei ce e mai bun, aici gasesti varful de gama. Vorbim de modele cu brat dublu, structura din otel masiv, tesaturi acrilice premium impermeabile, casete de protectie complete si motorizari de top, cu senzori de vant si soare. Modelele de la BrandZ sau <strong>copertine retractabile cu caseta de la BrandB</strong> se incadreaza aici.</p>
+        <p>Avantajele sunt stabilitatea exceptionala, durabilitatea pe termen foarte lung, protectia maxima impotriva elementelor si aspectul premium. Dezavantajele sunt, evident, pretul foarte ridicat si greutatea, care impune un montaj profesional. Sunt investitii pe 10-15 ani, daca nu chiar mai mult, daca sunt bine intretinute.</p>
+        <p>Deci, fie ca ai un buget mic si vrei o solutie simpla, fie ca vrei sa investesti intr-un sistem complex si durabil, exista optiuni. Important e sa stii ce cauti si sa nu te lasi pacalit de preturi prea mici.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                cat costa o copertina retractabila pentru terasa
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pretul unei copertine retractabile pentru terasa variaza mult, de la circa 1200 lei pentru modele manuale mici, la peste 9000 lei pentru cele de lux, cu brat dublu si senzori. Modelele medii, motorizate, cu dimensiuni standard, se gasesc in general intre 2000 si 4500 lei.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                care e diferenta intre copertina cu brat simplu si brat dublu
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                O copertina retractabila cu brat dublu ofera stabilitate superioara, fiind ideala pentru terase mari sau zone expuse la vant. Bratul dublu adauga un set suplimentar de brate care intind tesatura mai bine si previn vibratiile, in timp ce bratul simplu e suficient pentru terase medii si protejate de vant.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                merita sa cumpar o copertina retractabila cu caseta
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, merita daca vrei protectie maxima pentru tesatura si mecanism atunci cand copertina e retractata. Caseta protejeaza impotriva prafului, ploii si razelor UV, prelungind durata de viata a copertinei, dar vine cu un cost suplimentar.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                ce tesatura e mai buna pentru copertina retractabila
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Tesatura acrilica de peste 300g/m², tratata UV, este cea mai recomandata pentru o copertina retractabila. Ea ofera rezistenta buna la decolorare, intemperii si uzura, spre deosebire de poliesterul de densitate mica.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                de ce se strica motorul la copertina retractabila
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Motorul unei copertine retractabile se poate strica din cauza suprasolicitarii (vant puternic, blocaje), a umiditatii excesive, a lipsei de intretinere sau a defectelor de fabricatie. Alegerea unui motor de calitate si respectarea instructiunilor de utilizare sunt esentiale.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                cum sa intretin copertina retractabila pentru terasa
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru a intretine o copertina retractabila, curata periodic tesatura cu apa si sapun neutru, verifica si lubrifiaza bratele si mecanismele, si asigura-te ca este complet uscata inainte de a o retracta. Evita deschiderea fortata in conditii de vant puternic.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-6">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                unde gasesc copertina retractabila pentru terasa de calitate
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Poti gasi copertine retractabile pentru terasa de calitate in magazine specializate de mobilier de exterior, showroom-uri de constructii sau online pe site-urile producatorilor sau distribuitorilor autorizati. Verifica recenziile si garantia oferita.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-7">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                care e garantia pentru o copertina retractabila buna
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                O copertina retractabila de calitate ar trebui sa aiba o garantie de minim 2-3 ani pentru structura si motor. Producatorii de top pot oferi chiar si 5 ani garantie pe anumite componente, ceea ce indica o calitate superioara a produsului.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="copertina-retractabila-pentru-terasa"
+      currentCategory="mobilier-gradina"
+      articles={allArticles}
+    />
+  </article>
+</Layout>
