@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import keywordsData from '../../keywords.json';
+import PrevNextNav from '../components/PrevNextNav.astro';
 
 export const frontmatter = {
   title: "Cel mai bun tractoras pentru tuns gazonul",
@@ -112,18 +113,18 @@ const allArticles = keywordsData.completed.map(item => ({
         <h2>De ce ai avea nevoie de un tractoras pentru gazon?</h2>
         <p>In primul rand, sa fim sinceri, tunsul gazonului pe o suprafata generoasa cu o masina de tuns clasica poate fi epuizant. Daca ai peste 500-700 de metri patrati de gazon, sau daca ai multe obstacole, pante sau pur si simplu vrei sa economisesti timp si energie, un tractoras devine o solutie excelenta. Mi se pare ca e ideal pentru proprietarii de case cu curti mai mari, pentru cei care nu vor sa se mai complice cu impingerea unei masini, dar si pentru cei care vor un finisaj impecabil, fara efort.</p>
         <p>Gandeste-te la el ca la un upgrade major in rutina de ingrijire a gradinii. Nu mai alergi dupa o masina, ci te asezi confortabil si 'calaresti' catre rezultatul dorit. Este o investitie, desigur, dar daca timpul si confortul tau conteaza, impactul se vede in timp.</p>
-        <p>Am vazut si oameni care pur si simplu se bucura de experienta condusului, transformand tunsul gazonului intr-o activitate relaxanta, mai ales in zilele insorite de weekend. Pentru mine, principalul argument a fost intotdeauna reducerea efortului fizic si castigul de timp. Daca ai de tuns o suprafata mica, gen 200 de metri patrati, probabil ca nu merita efortul financiar si spatiul de depozitare.</p>
+        <p>Am vazut si oameni care pur si simplu se bucura de experienta condusului, transformand tunsul gazonului intr-o activitate relaxanta, mai ales in zilele insorite de weekend. Pentru mine, principalul argument a fost intotdeauna reducerea efortului fizic si castigul de timp. Daca ai de tuns o suprafata mica, gen 200 de metri patrati, probabil ca nu merita efortul financiar si spatiul <a href="/cutii-de-depozitare-pentru-debara/" class="interlink">de depozitare</a>.</p>
         <p>Dar daca suprafata creste, si mai ales daca e neregulata, cu pomi, straturi de flori sau chiar mici denivelari, tractorasul iti face viata mult mai usoara. Practic, iti preia munca grea si ti-o face intr-un timp mult mai scurt. Si sa nu uitam de aspectul estetic; un gazon tuns uniform si ingrijit transforma complet aspectul curtii tale, facand-o mai primitoare si mai placuta.</p>
       </section>
 
       <section id="top-3-tractorase-de-gazon-pe-care-le-as-recomanda">
         <h2>Top 3 tractorase de gazon pe care le-as recomanda</h2>
         <p>Am testat si am comparat destul de multe modele de-a lungul timpului si pot spune ca exista cateva optiuni care ies in evidenta, mai ales prin fiabilitate si performanta in raport cu pretul.  Mi se pare ca pentru majoritatea gradinilor de dimensiuni medii spre mari, primele trei locuri ar fi ocupate de urmatoarele:</p>
-        <p>1.  <strong>Husqvarna TS242XD:</strong> Acesta este un model robust, cu un motor puternic (de obicei in jur de 20 CP) si o latime de taiere de 42 de inch (aproximativ 107 cm). Ce imi place la el este sistemul de transmisie hidrostatica, care iti permite sa controlezi viteza fluid, fara trepte, la fel ca la o masina automata. E ideal pentru manevre in jurul obstacolelor si pe terenuri cu pante usoare.</p>
+        <p>1.  <strong>Husqvarna TS242XD:</strong> Acesta este un model robust, cu un motor puternic (de obicei in jur de 20 CP) si o latime de taiere de 42 de inch (aproximativ 107 cm). Ce imi place la el este sistemul de transmisie hidrostatica, care iti permite sa controlezi viteza fluid, fara trepte, la fel ca la o masina <a href="/sistem-de-irigare-automata-pentru-gradina/">automata</a>. E ideal pentru manevre in jurul obstacolelor si pe terenuri cu pante usoare.</p>
         <p>Are si o constructie solida, din otel, ceea ce ii confera durabilitate. Pretul poate varia, dar te poti astepta la ceva in jur de 20.000 - 25.000 RON, in functie de promotii.</p>
         <p>2.  <strong>Cub Cadet XT2 Enduro Series:</strong> Cub Cadet e un nume de traditie in domeniu, iar seria XT2 este o alegere excelenta pentru cei care cauta o combinatie buna intre performanta si confort. Modelele din aceasta serie vin cu motoare puternice (adesea peste 22 CP) si latimi de taiere similare, de 42 sau 46 de inch (107-117 cm). Sistemul de directie e foarte precis, iar scaunul e proiectat pentru confort pe perioade mai lungi.</p>
         <p>Mi se pare ca au un sistem de evacuare a ierbii (mulching sau colectare) foarte eficient. Pretul se situeaza undeva intre 18.000 si 22.000 RON.</p>
-        <p>3.  <strong>John Deere X350:</strong> John Deere este sinonim cu calitatea in agricultura si gradinarit, iar tractorasele lor nu fac exceptie. Modelul X350 e un entry-level in gama lor premium, dar ofera o experienta de utilizare deosebita. Motorul e de obicei in jur de 18 CP, iar latimea de taiere e de 42 de inch (107 cm).</p>
+        <p>3.  <strong>John Deere X350:</strong> John Deere este sinonim cu calitatea in agricultura si <a href="/motosapa-electrica-pentru-gradina-mica/">gradina</a>rit, iar tractorasele lor nu fac exceptie. Modelul X350 e un entry-level in gama lor premium, dar ofera o experienta de utilizare deosebita. Motorul e de obicei in jur de 18 CP, iar latimea de taiere e de 42 de inch (107 cm).</p>
         <p>Ceea ce il diferentiaza este calitatea constructiei, sistemul de amortizare a vibratiilor si precizia taieturii. Este construit sa dureze si sa ofere o experienta de condus foarte placuta. Pretul este, in general, mai ridicat, incepand de la aproximativ 23.000 - 28.000 RON.</p>
         <p>Acestea sunt doar cateva exemple, dar mi se pare ca acopera o gama larga de nevoi si bugete, oferind in acelasi timp performante si fiabilitate pe care te poti baza.</p>
       </section>
@@ -148,20 +149,20 @@ const allArticles = keywordsData.completed.map(item => ({
         <p><strong>Performanta pe suprafete mari:</strong> Daca ai o curte generoasa, un tractoras este aproape indispensabil. Acopera rapid suprafete mari si poate face fata si ierbii mai inalte sau mai dese.</p>
         <p><strong>Versatilitate:</strong> Multe tractorase pot fi echipate cu accesorii suplimentare, transformandu-le in adevarate ajutoare in curte. Poti atasa un plug pentru deszapezire, un tavalug pentru aerificare, o remorca mica pentru transportul pamantului sau a frunzelor, sau un imprastietor de ingrasaminte. Astfel, investitia devine si mai rentabila.</p>
         <p><strong>Confort sporit:</strong> Cum spuneam, confortul la bord este mult mai mare decat la o masina de tuns clasica. Scaune confortabile, manevre usoare, control intuitiv – toate contribuie la o experienta placuta.</p>
-        <p><strong>Finisaj profesional:</strong> Tractorasele, mai ales cele de calitate, ofera un tuns uniform si precis, lasand gazonul cu un aspect ingrijit, ca de teren de golf.</p>
+        <p><strong>Finisaj <a href="/blender-profesional-pentru-smoothie/" class="interlink">profesional</a>:</strong> Tractorasele, mai ales cele de calitate, ofera un tuns uniform si precis, lasand gazonul cu un aspect ingrijit, ca de teren de golf.</p>
         <p><strong>Dezavantaje:</strong></p>
         <p><strong>Costul initial:</strong> Acesta este, probabil, principalul obstacol. Un tractoras bun poate costa de la 15.000 RON in sus, iar modelele mai performante pot ajunge si la 30.000 RON sau chiar mai mult. E o investitie considerabila.</p>
         <p><strong>Spatiul de depozitare:</strong> Tractorasele ocupa mult mai mult spatiu decat o masina de tuns clasica. Ai nevoie de un garaj, un sopron sau un spatiu dedicat pentru a-l depozita in siguranta, ferit de intemperii.</p>
         <p><strong>Intretinerea:</strong> Ca orice vehicul, si tractorasul necesita intretinere regulata: schimb de ulei, filtre, verificarea lamelor, ungere etc. Aceste operatiuni pot adauga costuri suplimentare si timp dedicat.</p>
         <p><strong>Manevrabilitate in spatii inguste:</strong> Desi sunt mai agile decat par, tractorasele pot avea dificultati in a naviga prin curti foarte inguste, cu multe obstacole mici, sau cu alei foarte strâmte. Pentru aceste cazuri, o masina de tuns mai mica sau un robot de tuns ar putea fi mai potrivite.</p>
-        <p><strong>Consumul de combustibil:</strong> Daca ai o curte mare si il folosesti des, consumul de benzina poate deveni un factor de luat in calcul in costurile de operare.</p>
+        <p><strong>Consumul de combustibil:</strong> Daca ai o curte mare si il folosesti des, consumul de <a href="/motocoasa-electrica-sau-pe-benzina/">benzina</a> poate deveni un factor de luat in calcul in costurile de operare.</p>
       </section>
 
       <section id="sfaturi-practice-de-la-un-vechi-gradinar">
         <h2>Sfaturi practice de la un 'vechi' gradinar</h2>
-        <p>Dupa ani de zile in care am pus mana pe tot felul de unelte de gradina, am acumulat cateva secrete si sfaturi pe care le impartasesc cu drag. Sper sa iti fie de folos si tie:</p>
+        <p>Dupa ani de zile in care am pus mana pe tot felul de unelte <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">de gradina</a>, am acumulat cateva secrete si sfaturi pe care le impartasesc cu drag. Sper sa iti fie de folos si tie:</p>
         <p><strong>Citeste manualul!</strong> Stiu, pare banal, dar manualul de utilizare contine informatii esentiale despre cum sa folosesti corect tractorasul, cum sa il intretii si ce sa faci in caz de probleme. Nu il arunca pur si simplu.</p>
-        <p><strong>Siguranta pe primul loc:</strong> Poarta intotdeauna incaltaminte rezistenta, pantaloni lungi si, daca e posibil, ochelari de protectie. Tractorasul e o masina puternica si trebuie tratat cu respect. Nu lasa niciodata copiii sa se apropie in timp ce motorul functioneaza.</p>
+        <p><strong>Siguranta pe primul loc:</strong> Poarta intotdeauna incaltaminte rezistenta, pantaloni lungi si, daca e posibil, ochelari de protectie. Tractorasul e o masina <a href="/bormasina-cu-acumulator-puternica/" class="interlink">puternica</a> si trebuie tratat cu respect. Nu lasa niciodata copiii sa se apropie in timp ce motorul functioneaza.</p>
         <p><strong>Verifica gazonul inainte:</strong> Inainte sa pornesti la tuns, da o tura prin curte si aduna crengutele, pietrele sau jucariile care ar putea deteriora lamele sau, si mai rau, ar putea fi proiectate si cauza accidente.</p>
         <p><strong>Regleaza inaltimea de taiere corect:</strong> Nu taia gazonul prea scurt dintr-o data. Regula de aur e sa nu tai mai mult de o treime din lungimea firului de iarba. Ajusteaza inaltimea in functie de sezon si de cum arata gazonul. Vara, o inaltime mai mare ajuta iarba sa retina mai bine apa.</p>
         <p><strong>Manevreaza cu grija pe pante:</strong> Daca ai pante, nu urca sau cobori perpendicular pe ele, ci pe curbe, in zig-zag. Nu face viraje bruste pe panta. La fel, ai grija sa nu calci pe zone unde iarba e foarte umeda, pentru ca tractorasul poate derapa.</p>
@@ -259,6 +260,12 @@ const allArticles = keywordsData.completed.map(item => ({
 
     <!-- Similar Articles -->
     <SimilarArticles
+      currentSlug="cel-mai-bun-tractoras-pentru-tuns-gazonul"
+      currentCategory="gradinarit-unelte"
+      articles={allArticles}
+    />
+
+    <PrevNextNav
       currentSlug="cel-mai-bun-tractoras-pentru-tuns-gazonul"
       currentCategory="gradinarit-unelte"
       articles={allArticles}

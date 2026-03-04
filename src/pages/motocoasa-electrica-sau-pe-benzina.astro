@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import keywordsData from '../../keywords.json';
+import PrevNextNav from '../components/PrevNextNav.astro';
 
 export const frontmatter = {
   title: "Motocoasa electrica sau pe benzina",
@@ -110,11 +111,11 @@ const allArticles = keywordsData.completed.map(item => ({
       
       <section id="motocoasa-ce-inseamna-si-de-ce-ti-ar-trebui-una">
         <h2>Motocoasa: Ce inseamna si de ce ti-ar trebui una?</h2>
-        <p>Stai sa ma gandesc, cand am inceput eu cu gradinaritul, totul era pe  manual. Acum insa, viata e mult mai usoara datorita uneltelor electrice si pe benzina. O motocoasa, pe scurt, e un fel de unealta puternica, folosita pentru a tunde iarba in locuri unde masina de tuns clasica nu ajunge sau e greu de manevrat.</p>
+        <p>Stai sa ma gandesc, cand am inceput eu cu <a href="/sistem-de-irigare-automata-pentru-gradina/">gradina</a>ritul, totul era pe  manual. Acum insa, viata e mult mai usoara datorita uneltelor <a href="/fierastrau-electric-pentru-lemne/">electric</a>e si pe benzina. O motocoasa, pe scurt, e un fel de unealta puternica, folosita pentru a tunde iarba in locuri unde masina de tuns clasica nu ajunge sau e greu de manevrat.</p>
         <p>Ma refer la zonele de langa garduri, copaci, borduri, sau pur si simplu la terenuri cu iarba mai inalta si mai deasa. Daca ai o peluza mica, poate ca o masina de tuns clasica e suficienta. Dar daca ai un teren mai mare, cu denivelari, sau vrei sa intretii o zona mai salbatica, atunci o motocoasa devine aproape indispensabila.</p>
         <p>Si cand spun indispensabila, ma refer la a economisi timp si efort fizic considerabil. Din experienta mea, o motocoasa bine aleasa iti poate transforma munca de intretinere a gradinii dintr-o corvoada intr-o activitate chiar placuta. Asadar, daca te confrunti cu iarba inalta, buruieni rebele sau pur si simplu vrei sa dai un aspect ingrijit si ordonat curtii tale, o motocoasa este solutia.</p>
-        <p>Pentru cine e potrivita?  Practic, pentru oricine isi doreste sa aiba o gradina frumoasa, fara prea mult efort. Fie ca esti un pasionat de gradinarit cu experienta sau abia incepi sa te ocupi de curtea ta, exista o motocoasa potrivita pentru tine. Am vazut prieteni cu terenuri mici, unde o motocoasa electrica cu acumulator a fost exact ce le trebuia.</p>
-        <p>Pe de alta parte, vecinii mei cu terenuri mai mari si mai salbatice au mers pe varianta pe benzina, fara ezitare. Deci, raspunsul e simplu: daca ai nevoie sa tai iarba in locuri dificile sau sa intretii suprafete mari, ai nevoie de o motocoasa.</p>
+        <p>Pentru cine e potrivita?  Practic, pentru oricine isi doreste sa aiba o gradina frumoasa, fara prea mult efort. Fie ca esti un pasionat de gradinarit cu experienta sau abia incepi sa te ocupi de curtea ta, exista o motocoasa potrivita pentru tine. Am vazut prieteni cu terenuri mici, unde o motocoasa electrica <a href="/bormasina-cu-acumulator-puternica/" class="interlink">cu acumulator</a> a fost exact ce le trebuia.</p>
+        <p>Pe de alta parte, vecinii mei cu terenuri mai mari si mai salbatice au mers pe varianta <a href="/drujba-pe-benzina-pentru-lemne/" class="interlink">pe benzina</a>, fara ezitare. Deci, raspunsul e simplu: daca ai nevoie sa tai iarba in locuri dificile sau sa intretii suprafete mari, ai nevoie de o motocoasa.</p>
       </section>
 
       <section id="electric-sau-pe-benzina-cele-mai-bune-optiuni-pe-care-le-am-incercat">
@@ -123,7 +124,7 @@ const allArticles = keywordsData.completed.map(item => ({
         <p><strong>Pentru cei cu gradini mici si medii, fara prea multe batai de cap: Motocoasele Electrice (cu fir si cu acumulator)</strong></p>
         <p><strong>Bosch Art 30 Combitrim:</strong> Mi se pare o optiune excelenta pentru bugete medii. Este usoara, manevrabila si suficient de puternica pentru iarba normala din curte. Vine cu fir, deci trebuie sa ai o priza prin apropiere, dar pentru suprafete mici e perfect. Pretul? Undeva pe la 300-400 RON.</p>
         <p><strong>Einhell GE-CT 18 Li Kit:</strong> Aici vorbim de libertate de miscare! E pe acumulator, deci uiti de fire. Bateria tine suficient pentru o gradina de dimensiuni medii (cam 30-45 minute, depinde de intensitate). E mai scumpa, undeva pe la 500-700 RON cu tot cu acumulator si incarcator, dar merita fiecare banut daca vrei sa scapi de fire.</p>
-        <p><strong>Makita DUR189Z:</strong> Daca vrei ceva mai profesional, dar tot electric, Makita e o alegere sigura. E mai puternica, mai robusta, dar si mai scumpa (cam 800-1000 RON, fara acumulator). Tot pe acumulator, bineinteles.</p>
+        <p><strong>Makita DUR189Z:</strong> Daca vrei ceva mai <a href="/blender-profesional-pentru-smoothie/" class="interlink">profesional</a>, dar tot electric, Makita e o alegere sigura. E mai puternica, mai robusta, dar si mai scumpa (cam 800-1000 RON, fara acumulator). Tot pe acumulator, bineinteles.</p>
         <p><strong>Pentru cei cu terenuri mari, iarba deasa si probleme de genul: Motocoasele pe Benzina</strong></p>
         <p><strong>Stihl FS 40 C-E:</strong> Stihl e un nume de referinta in domeniu, iar acest model e un bun punct de plecare pentru cei ce vor o motocoasa pe benzina. E destul de usoara pentru clasa ei, pornire usoara si suficient de puternica pentru majoritatea treburilor. Pretul e pe la 1200-1500 RON.</p>
         <p><strong>Husqvarna 128R:</strong> Husqvarna e un alt gigant. Acest model e echilibrat, robust si fiabil. Mi-a placut cum manevreaza si cat de eficient taie. E undeva pe la 1400-1600 RON.</p>
@@ -135,7 +136,7 @@ const allArticles = keywordsData.completed.map(item => ({
         <h2>Cum alegi corect? Detaliile conteaza!</h2>
         <p>Alegerea unei motocoase nu e chiar ca si cum ai cumpara o pereche de manusi. Trebuie sa te gandesti la cateva lucruri esentiale ca sa nu dai cu bata-n balta. Din experienta mea, cel mai important e sa iti evaluezi corect nevoile. Nu cumpara cea mai puternica si scumpa motocoasa daca ai doar 50 de metri patrati de gazon. Pe de alta parte, daca ai un teren de 1000 de metri patrati cu buruieni cat palma, o motocoasa electrica mica nu o sa faca fata. </p>
         <p><strong>Iata la ce ma uit eu cand aleg:</strong></p>
-        <p><strong>Suprafata de lucru:</strong> Asta e cel mai clar indicator. Gradina mica (pana la 200 mp) - electrica cu fir sau acumulator. Gradina medie (200-500 mp) - electrica cu acumulator puternic sau benzina usoara. Gradina mare (peste 500 mp) - benzina, cu cat mai mare suprafata, cu atat mai puternica si confortabila (cu ham).</p>
+        <p><strong>Suprafata de lucru:</strong> Asta e cel mai clar indicator. <a href="/motosapa-electrica-pentru-gradina-mica/">Gradina mica</a> (pana la 200 mp) - electrica cu fir sau acumulator. Gradina medie (200-500 mp) - electrica cu acumulator puternic sau benzina usoara. Gradina mare (peste 500 mp) - benzina, cu cat mai mare suprafata, cu atat mai puternica si confortabila (cu ham).</p>
         <p><strong>Tipul de vegetatie:</strong> Ai doar iarba fina sau te confrunti si cu buruieni mai groase, mici tufisuri? Motocoasele electrice sunt bune pentru iarba, dar pentru vegetatie mai densa, cele pe benzina au un cuvant greu de spus. Unele modele pe benzina vin si cu cutit de taiere, nu doar cu fir, ceea ce e ideal pentru vegetatie mai aspra.</p>
         <p><strong>Puterea motorului:</strong> La cele electrice, se masoara in Watti (W). Peste 500W e un semn bun. La cele pe benzina, se masoara in centimetri cubi (cc) sau cai putere (CP). Peste 25 cc sau 1 CP e un motor decent.</p>
         <p><strong>Greutatea si manevrabilitatea:</strong> O motocoasa grea o sa te oboseasca repede, mai ales daca ai de lucru mult. Verifica greutatea si cum se simte in mana. Modelele mai performante vin adesea cu hamuri de purtat pe umeri, care distribuie greutatea si fac munca mult mai usoara. Mi-a placut la modelele mai noi ca sunt tot mai usoare si mai ergonomice.</p>
@@ -174,7 +175,7 @@ const allArticles = keywordsData.completed.map(item => ({
         <p><strong>Intretinere mai complexa:</strong> Necesita amestec de benzina si ulei, curatarea filtrului de aer, verificarea bujiei etc.</p>
         <p><strong>Pornire mai dificila:</strong> Unele modele pot fi mai greu de pornit, mai ales cand motorul e rece.</p>
         <p><strong>Cost de achizitie si de operare mai mare:</strong> Sunt, in general, mai scumpe la achizitie, iar benzina si uleiul adauga la costurile de operare.</p>
-        <p>Asadar, cum vezi, fiecare are punctele ei forte si slabe. Alegerea depinde, in mare masura, de tipul de gradina pe care il ai si de preferintele tale.</p>
+        <p>Asadar, cum vezi, fiecare are punctele ei forte si slabe. Alegerea depinde, in mare masura, de tipul <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">de gradina</a> pe care il ai si de preferintele tale.</p>
       </section>
 
       <section id="sfaturi-practice-direct-din-experienta-mea">
@@ -278,6 +279,12 @@ const allArticles = keywordsData.completed.map(item => ({
 
     <!-- Similar Articles -->
     <SimilarArticles
+      currentSlug="motocoasa-electrica-sau-pe-benzina"
+      currentCategory="gradinarit-unelte"
+      articles={allArticles}
+    />
+
+    <PrevNextNav
       currentSlug="motocoasa-electrica-sau-pe-benzina"
       currentCategory="gradinarit-unelte"
       articles={allArticles}

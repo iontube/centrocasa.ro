@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import keywordsData from '../../keywords.json';
+import PrevNextNav from '../components/PrevNextNav.astro';
 
 export const frontmatter = {
   title: "Cum sa cureti eficient casa",
@@ -110,7 +111,7 @@ const allArticles = keywordsData.completed.map(item => ({
       
       <section id="de-ce-e-curatenia-eficienta-atat-de-importanta-pentru-cine-e-potrivita">
         <h2>De ce e curatenia eficienta atat de importanta? Pentru cine e potrivita?</h2>
-        <p>Salutare! Ca jurnalist cu ceva ani de experienta in spate, am vazut o multime de produse si metode de curatenie. Si stii ce am invatat? Ca o casa curata nu e doar despre estetica, e despre sanatate, despre bunastare si despre un spatiu in care te simti cu adevarat relaxat. Gandeste-te: cat de bine te simti cand intri intr-o camera proaspat curatata, unde totul e la locul lui si aerul e proaspat? Exact.</p>
+        <p>Salutare! Ca jurnalist cu ceva ani de experienta in spate, am vazut o multime de produse si metode de curatenie. Si stii ce am invatat? Ca o casa curata nu e doar despre estetica, e despre sanatate, despre bunastare si despre un spatiu in care te simti cu adevarat relaxat. Gandeste-te: cat de bine te simti cand intri intr-o camera proaspat <a href="/robot-de-curatat-geamuri/">curatat</a>a, unde totul e la locul lui si aerul e proaspat? Exact.</p>
         <p>Curatenia eficienta nu e un lux, e o necesitate. Si nu, nu e doar pentru cei obsedati de ordine. E pentru oricine isi doreste sa traiasca intr-un mediu sanatos, mai ales daca ai copii mici, animale de companie sau daca suferi de alergii. Praful, bacteriile si alergenii se pot acumula rapid, iar o curatenie superficiala nu face decat sa mute problema. Vorbim aici despre a elimina sursele de probleme, nu doar despre a le ascunde.</p>
         <p>Poate ca ti se pare ca nu ai timp, ca e prea complicat sau ca produsele de curatenie sunt prea scumpe. Eu zic ca e o chestiune de prioritati si de a alege solutiile potrivite pentru tine. Nu trebuie sa devii un expert in chimie, dar cateva cunostinte de baza te pot ajuta enorm.</p>
         <p>Si vesti bune: curatenia eficienta poate fi si economica, daca stii ce sa alegi si cum sa folosesti produsele. Vom vorbi despre asta pe parcurs. Deci, daca vrei sa ai o casa mai placuta, mai sanatoasa si sa petreci mai putin timp cu eforturi inutile, esti in locul potrivit.</p>
@@ -120,12 +121,12 @@ const allArticles = keywordsData.completed.map(item => ({
       <section id="top-produse-si-solutii-recomandate-pentru-o-curatenie-eficienta">
         <h2>Top Produse si Solutii Recomandate pentru o Curatenie Eficienta</h2>
         <p>Am testat o gramada de produse de-a lungul timpului, de la cele mai ieftine la cele mai 'de firma', si am ajuns la cateva concluzii. Nu intotdeauna cel mai scump e si cel mai bun, dar nici cel mai ieftin nu e intotdeauna o afacere buna pe termen lung. Iata cateva categorii si produse care mi s-au parut esentiale pentru o curatenie de succes:</p>
-        <p>1.  <strong>Aspiratorul:</strong> Asta e regele curateniei, fara discutie. Am testat aspiratoare cu sac, fara sac, cu filtrare HEPA, cu diverse accesorii. Pentru o curatenie eficienta, mai ales daca ai par de animale sau alergii, un aspirator cu filtrare HEPA e sfant.</p>
+        <p>1.  <strong>Aspiratorul:</strong> Asta e regele curateniei, fara discutie. Am testat aspiratoare cu sac, fara sac, cu filtrare HEPA, cu diverse accesorii. Pentru o curatenie eficienta, mai ales daca ai par de animale sau alergii, un <a href="/aspirator-cu-spalare-pentru-covoare/" class="interlink">aspirator cu</a> filtrare HEPA e sfant.</p>
         <p>Elimina particulele fine de praf si alergenii din aer, ceea ce face o diferenta uriasa. Mi-a placut mult seria <strong>Philips PowerPro Expert</strong> (preturi intre 800-1500 RON, in functie de model) pentru puterea de aspiratie si sistemul de filtrare. Daca bugetul e mai restrans, <strong>Vortex VORTEX-VC1801</strong> (aproximativ 300-400 RON) face o treaba buna pentru apartamente si sarcini uzuale.</p>
         <p>2.  <strong>Solutii de Curatat Multifunctionale:</strong> Nu ai nevoie de un dulap plin de sticle. O solutie buna, ecologica pe cat posibil, poate face minuni.  Am fost impresionat de <strong>Ecover Multi-Surface Cleaner</strong> (in jur de 30-40 RON) – curata bine si lasa un miros placut, natural.  Pentru pete mai dificile, un <strong>degresant pe baza de citrice</strong> (preturi variind intre 20-50 RON) e excelent, mai ales in bucatarie.</p>
-        <p>3.  <strong>Lavete din Microfibra:</strong> Astea sunt 'armele secrete'. Sunt mult mai bune decat cele vechi din bumbac. Absorb mult mai bine, nu lasa scame si pot fi folosite pe aproape orice suprafata. Am recomandat des seturile de la <strong>Vileda</strong> sau <strong>Kaufland (marca proprie)</strong>, care sunt accesibile (15-30 RON pentru un set de 3-5 bucati) si isi fac treaba.  Recomand sa ai lavete separate pentru bucatarie, baie si suprafete generale.</p>
-        <p>4.  <strong>Solutie pentru Geamuri:</strong> Nimic nu strica aspectul unei case curate mai tare ca geamurile murdare. Am incercat diverse solutii, dar clasicul <strong>solutie pe baza de otet si apa</strong> (costuri minime, acasa) sau un <strong>spray dedicat de la W5 (Lidl)</strong> sau <strong>Frosch</strong> (in jur de 15-25 RON) fac minuni.  Important e sa folosesti o <strong>racleta de geamuri</strong> buna (20-50 RON) si sa stergi intr-o directie pentru a evita urmele.</p>
-        <p>5.  <strong>Otet Alb Distilat:</strong> Asta e un produs 'minune' din batrani, si pe buna dreptate. E ieftin, natural si extrem de eficient pentru igienizare, indepartarea calcarului si chiar pentru a elimina mirosurile neplacute. Il poti folosi diluat in apa pentru podele, bai, bucatarie sau chiar in masina de spalat. Un litru de otet costa sub 10 RON.</p>
+        <p>3.  <strong>Lavete din Microfibra:</strong> Astea sunt 'armele secrete'. Sunt mult mai bune decat cele vechi din bumbac. Absorb mult mai bine, nu lasa scame si pot fi folosite pe aproape orice suprafata. Am recomandat des seturile de la <strong>Vileda</strong> sau <strong>Kaufland (marca proprie)</strong>, care sunt accesibile (15-30 RON pentru un set de 3-5 bucati) si isi fac treaba.  Recomand sa ai lavete separate <a href="/plita-cu-inductie-pentru-bucatarie/" class="interlink">pentru bucatarie</a>, baie si suprafete generale.</p>
+        <p>4.  <strong><a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">Solutie pentru</a> Geamuri:</strong> Nimic nu strica aspectul unei case curate mai tare ca geamurile murdare. Am incercat diverse solutii, dar clasicul <strong>solutie pe baza de otet si apa</strong> (costuri minime, acasa) sau un <strong>spray dedicat de la W5 (Lidl)</strong> sau <strong>Frosch</strong> (in jur de 15-25 RON) fac minuni.  Important e sa folosesti o <strong>racleta de geamuri</strong> buna (20-50 RON) si sa stergi intr-o directie pentru a evita urmele.</p>
+        <p>5.  <strong>Otet Alb Distilat:</strong> Asta e un produs 'minune' din batrani, si pe buna dreptate. E ieftin, natural si extrem de eficient pentru igienizare, indepartarea calcarului si chiar pentru a elimina mirosurile neplacute. Il poti folosi diluat in apa <a href="/mop-cu-aburi-pentru-podele/" class="interlink">pentru podele</a>, bai, bucatarie sau chiar in masina de spalat. Un litru de otet costa sub 10 RON.</p>
         <p>Acestea sunt bazele. Bineinteles, in functie de nevoile specifice (parchet, gresie speciala, inox, etc.), vei avea nevoie si de solutii dedicate, dar cu lista asta poti acoperi 80% din nevoile tale de curatenie.</p>
       </section>
 
@@ -183,11 +184,11 @@ const allArticles = keywordsData.completed.map(item => ({
 
       <section id="parerea-mea-sincera-ce-conteaza-cel-mai-mult-la-o-curatenie-eficienta">
         <h2>Parerea Mea Sinceră: Ce Contează Cel Mai Mult la o Curățenie Eficientă?</h2>
-        <p>După atâția ani în care am văzut și am testat tot felul de produse și metode, am ajuns la concluzia că cel mai important aspect al unei curățenii eficiente nu este neapărat cât de scump e aspiratorul sau cât de 'magică' e soluția de curățat. Nu, cel mai mult contează <strong>atitudinea și organizarea</strong>.</p>
+        <p>După atâția ani în care am văzut și am testat tot felul de produse și metode, am ajuns la concluzia că cel mai important aspect al unei curățenii eficiente nu este neapărat cât de scump e <a href="/aspirator-cu-spalare-pentru-covoare/">aspirator</a>ul sau cât de 'magică' e soluția de curățat. Nu, cel mai mult contează <strong>atitudinea și organizarea</strong>.</p>
         <p>Mi se pare că mulți oameni văd curățenia ca pe o obligație grea, o corvoadă de neevitat. Și, evident, cu o astfel de mentalitate, orice ai face, va fi greu. Eu, de când am început să privesc curățenia mai mult ca pe o formă de grijă față de mine și de spațiul în care trăiesc, totul s-a schimbat. E ca un ritual de 'reset' pentru casă și pentru minte.</p>
         <p>Am observat că atunci când ai un <strong>plan</strong>, chiar și unul simplu, totul devine mai ușor. Nu trebuie să fie un orar militar, dar să știi ce ai de făcut te ajută enorm. De exemplu, să dedici 15 minute dimineața pentru a pune lucrurile la loc sau a șterge blatul din bucătărie poate preveni o mare problemă mai târziu. E vorba de <strong>consecvență</strong>.</p>
         <p>Și produsele? Da, contează să alegi ce e bun, ce e eficient și, pe cât posibil, ce e prietenos cu sănătatea și mediul. Dar, din experiența mea, un produs bun folosit corect și la momentul potrivit face mai mult decât zece produse 'miraculoase' aruncate la întâmplare. Am văzut rezultate uimitoare și cu soluții simple, cum ar fi oțetul și bicarbonatul, folosite inteligent.</p>
-        <p>Ce aș recomanda cu tărie? <strong>Investiți în câteva unelte bune:</strong> un aspirator decent, un set de lavete de microfibră de calitate, o mop bun. Acestea vă vor face munca mult mai ușoară și mai eficientă pe termen lung. Nu vă lăsați tentați de soluții rapide și ieftine care promit minuni, dar nu livrează.</p>
+        <p>Ce aș recomanda cu tărie? <strong>Investiți în câteva unelte bune:</strong> un <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspirator</a> decent, un set de lavete de microfibră de calitate, o mop bun. Acestea vă vor face munca mult mai ușoară și mai eficientă pe termen lung. Nu vă lăsați tentați de soluții rapide și ieftine care promit minuni, dar nu livrează.</p>
         <p>În final, curățenia eficientă înseamnă un echilibru între <strong>produsele potrivite, o atitudine pozitivă și o bună organizare</strong>. Nu uitați că o casă curată este un spațiu în care te simți bine, un loc unde poți respira liniștit. Și asta merită efortul, nu-i așa?</p>
       </section>
 
@@ -269,6 +270,12 @@ const allArticles = keywordsData.completed.map(item => ({
 
     <!-- Similar Articles -->
     <SimilarArticles
+      currentSlug="cum-sa-cureti-eficient-casa"
+      currentCategory="curatenie-intretinere"
+      articles={allArticles}
+    />
+
+    <PrevNextNav
       currentSlug="cum-sa-cureti-eficient-casa"
       currentCategory="curatenie-intretinere"
       articles={allArticles}

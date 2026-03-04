@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import keywordsData from '../../keywords.json';
+import PrevNextNav from '../components/PrevNextNav.astro';
 
 export const frontmatter = {
   title: "Masina de spalat cu presiune pentru acasa",
@@ -110,7 +111,7 @@ const allArticles = keywordsData.completed.map(item => ({
       
       <section id="de-ce-ai-avea-nevoie-de-o-masina-de-spalat-cu-presiune-acasa">
         <h2>De ce ai avea nevoie de o masina de spalat cu presiune acasa?</h2>
-        <p>Hai sa fim sinceri, curatenia casei si a curtii poate deveni o corvoada. Dar ce te faci cand mizeria e mai incapatanata? Aici intervine o masina de spalat cu presiune. Nu e doar un jet de apa, e o unealta care te ajuta sa cureti eficient suprafete pe care altfel le-ai freca ore in sir.</p>
+        <p>Hai sa fim sinceri, curatenia casei si a curtii poate deveni o corvoada. Dar ce te faci cand mizeria e mai incapatanata? Aici intervine o masina de spalat cu presiune. Nu e doar un jet de apa, e o unealta care te ajuta sa <a href="/cum-sa-cureti-eficient-casa/">cureti eficient</a> suprafete pe care altfel le-ai freca ore in sir.</p>
         <p>M-am gandit mult la asta si am ajuns la concluzia ca e perfecta pentru oricine are o curte, o terasa, o masina sau pur si simplu vrea sa scape de murdaria persistenta. Gandeste-te la fatada casei, la gard, la mobilierul de exterior, la alei... toate astea prind viata cu o curatare ca la carte. Eu personal am gasit-o indispensabila pentru a reda stralucirea mobilierului de gradina, care dupa un sezon de stat afara, arata de multe ori jalnic.</p>
         <p>Si nu te gandi ca trebuie sa fii un profesionist ca sa o folosesti. Majoritatea modelelor pentru uz casnic sunt gandite sa fie cat mai intuitive.</p>
         <p>Pentru cei care locuiesc la bloc, dar au un balcon generos sau o boxa unde isi tin bicicleta sau alte echipamente, o masina de spalat cu presiune compacta poate fi o solutie buna pentru a le mentine curate. De asemenea, daca esti pasionat de curatat jantele masinii sau vrei sa-i dai un refresh rapid, te va ajuta enorm. Am vazut prieteni care o folosesc si pentru a curata gratarul dupa un barbecue, o treaba care in mod normal ar fi fost mult mai greoaie.</p>
@@ -119,14 +120,14 @@ const allArticles = keywordsData.completed.map(item => ({
 
       <section id="topul-meu-3-masini-de-spalat-cu-presiune-pe-care-le-as-recomanda">
         <h2>Topul meu: 3 masini de spalat cu presiune pe care le-as recomanda</h2>
-        <p>Dupa ce am pus mana pe destule modele, am identificat cateva care mi s-au parut cu adevarat bune pentru uz casnic. Nu vorbim de aparate profesionale, ci de cele care fac fata sarcinilor obisnuite din curte.</p>
+        <p>Dupa ce am pus mana pe destule modele, am identificat cateva care mi s-au parut cu adevarat bune pentru uz casnic. Nu vorbim de aparate <a href="/set-unelte-de-gradinarit-profesionale/" class="interlink">profesionale</a>, ci de cele care fac fata sarcinilor obisnuite din curte.</p>
         <p>1.  <strong>Karcher K4 Full Control</strong>: Asta e un clasic si pe buna dreptate. Mi se pare ca are un echilibru fantastic intre putere si usurinta in utilizare. Presiunea ajunge pana la 130 bar, ceea ce e suficient pentru majoritatea treburilor.</p>
         <p>Ce-mi place mult la ea e sistemul Full Control: are un pistol cu display LED unde vezi exact presiunea pe care o setezi, si poti ajusta jetul din mers. Vine cu diverse accesorii, inclusiv o perie rotativa pentru murdarie mai grea. E robusta, usor de manevrat si destul de silentioasa pentru cat de puternica e.</p>
         <p>Pretul ei e undeva in jur de 1100-1300 RON, in functie de oferta.</p>
         <p>2.  <strong>Bosch Aquatak AQT 37-13+</strong>: Bosch nu dezamageste niciodata. Acest model are 130 bar presiune maxima si un debit de apa de 370 litri pe ora. M-a impresionat cat de usor se monteaza si cat de compacta e, desi are o putere buna.</p>
         <p>Jetul e puternic si eficient, ideal pentru curatat terase, masini, garduri. Vine cu o duza reglabila, o perie de terasa si o duza de spumare pentru sampon. Mi se pare o optiune excelenta pentru cine cauta un brand de incredere si performante solide.</p>
         <p>O gasesti de obicei in jur de 900-1100 RON.</p>
-        <p>3.  <strong>Stihl RE 98</strong>: Pentru cei care au nevoie de ceva mai portabil, dar totusi capabil, Stihl RE 98 e o alegere buna. Are 100 bar presiune, ceea ce e mai putin decat celelalte doua, dar e suficient pentru curatarea rapida a bicicletei, a mobilierului de gradina sau a unei alei. E usoara, compacta si usor de depozitat.</p>
+        <p>3.  <strong>Stihl RE 98</strong>: Pentru cei care au nevoie de ceva mai portabil, dar totusi capabil, Stihl RE 98 e o alegere buna. Are 100 bar presiune, ceea ce e mai putin decat celelalte doua, dar e suficient <a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">pentru curatarea</a> rapida a bicicletei, a mobilierului de gradina sau a unei alei. E usoara, compacta si usor de depozitat.</p>
         <p>Sistemul de conectare a furtunului e simplu. Nu are atatea functii sofisticate ca Karcher, dar face treaba bine si e un brand pe care te poti baza pentru durabilitate. Pretul ei este mai accesibil, in jur de 600-800 RON.</p>
         <p>Acestea sunt modele pe care le-am folosit si mi s-au parut fiabile si eficiente pentru uz casnic. Bineinteles, exista si optiuni mai ieftine, dar adesea vin cu compromisuri la capitolul putere, durabilitate sau accesorii.</p>
       </section>
@@ -135,12 +136,12 @@ const allArticles = keywordsData.completed.map(item => ({
         <h2>Cum alegi masina potrivita pentru nevoile tale?</h2>
         <p>Alegerea unei masini de spalat cu presiune poate parea complicata la prima vedere, dar daca stii la ce sa te uiti, devine mult mai simplu. Eu am invatat din experienta ca nu trebuie sa te lasi intimidat de specificatii, ci sa te gandesti ce vei curata cel mai des. Iata cateva aspecte importante pe care eu le iau in considerare:</p>
         <p><strong>Presiunea (bar)</strong>: Acesta e cel mai important parametru. Pentru uz casnic, o presiune de <strong>100-130 bar</strong> este de obicei suficienta. Daca ai de curatat mizerie persistenta, cum ar fi mucegai pe fatada sau pete vechi pe terasa, mergi spre modele cu presiune mai mare. Daca o vei folosi mai mult pentru a da o clatire rapida masinii sau bicicletei, nici 80-100 bar nu e rau.</p>
-        <p><strong>Debit de apa (litri pe ora)</strong>: Arata cat de multa apa poate pompa masina. Un debit mai mare inseamna o curatare mai rapida, deoarece apa curata mai mult intr-un timp dat. Pentru acasa, un debit de <strong>350-450 litri/ora</strong> e un punct bun de plecare. Daca ai de curatat suprafete mari, cum ar fi o curte intreaga, un debit mai mare te va ajuta.</p>
+        <p><strong>Debit de apa (litri pe ora)</strong>: Arata cat de multa apa poate pompa masina. Un debit mai mare inseamna o curatare mai rapida, deoarece apa curata mai mult intr-un timp dat. <a href="/invertor-de-sudura-pentru-acasa/" class="interlink">Pentru acasa</a>, un debit de <strong>350-450 litri/ora</strong> e un punct bun de plecare. Daca ai de curatat suprafete mari, cum ar fi o curte intreaga, un debit mai mare te va ajuta.</p>
         <p><strong>Puterea motorului (kW)</strong>: De regula, un motor mai puternic inseamna si o presiune si un debit mai mare. Modelele pentru uz casnic au motoare intre <strong>1.4 kW si 2 kW</strong>. Daca vrei o masina care sa faca fata treburilor mai grele, cauta una cu un motor de cel putin 1.7-1.8 kW.</p>
         <p><strong>Tipul pompei</strong>: Pompele din metal sunt mult mai durabile decat cele din plastic. Daca vrei o masina care sa te tina ani buni, verifica din ce material e facuta pompa. Cele de la brandurile mai cunoscute (Karcher, Bosch, Stihl) folosesc de obicei materiale de calitate.</p>
         <p><strong>Accesorii incluse</strong>: Ce vine la pachet conteaza mult. Daca vei curata masina, vei vrea o duza de spumare. Pentru terase, o perie rotativa sau o perie speciala pentru curatat suprafete plane e foarte utila. O lance cu jet reglabil iti ofera flexibilitate. Verifica ce accesorii sunt incluse si daca se pot achizitiona separat si ce pret au.</p>
         <p><strong>Lungimea furtunului si a cablului de alimentare</strong>: Un furtun mai lung (ideal peste 6-7 metri) si un cablu de alimentare generos iti ofera mai multa libertate de miscare. E frustrant sa fii mereu dependent de priza sau sa te chinui sa ajungi in toate colturile.</p>
-        <p><strong>Sistemul de depozitare</strong>: Multe modele vin cu suporturi pentru accesorii si un loc unde sa infasori cablul si furtunul. Asta e un plus mare pentru organizare si pentru a nu le pierde.</p>
+        <p><strong>Sistemul <a href="/cutii-de-depozitare-pentru-debara/" class="interlink">de depozitare</a></strong>: Multe modele vin cu suporturi pentru accesorii si un loc unde sa infasori cablul si furtunul. Asta e un plus mare pentru organizare si pentru a nu le pierde.</p>
         <p><strong>Greutate si mobilitate</strong>: Daca vei muta masina des, cauta un model mai usor si cu roti. Cele mai grele pot fi mai puternice, dar devin incomode daca nu ai o suprafata plana pe care sa le tarasti.</p>
       </section>
 
@@ -265,6 +266,12 @@ const allArticles = keywordsData.completed.map(item => ({
 
     <!-- Similar Articles -->
     <SimilarArticles
+      currentSlug="masina-de-spalat-cu-presiune-pentru-acasa"
+      currentCategory="curatenie-intretinere"
+      articles={allArticles}
+    />
+
+    <PrevNextNav
       currentSlug="masina-de-spalat-cu-presiune-pentru-acasa"
       currentCategory="curatenie-intretinere"
       articles={allArticles}
