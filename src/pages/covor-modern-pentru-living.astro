@@ -1,0 +1,273 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Covor modern pentru living",
+  excerpt: "Cel mai bun covor modern pentru living depinde mult de stilul tau, buget si ce vrei sa obtii vizual. Daca vrei ceva versatil si care sa reziste, un covor din polipropilena cu un design geometric sau abstract, de dimensiuni medii (200x300 cm) ar fi o alegere buna, undeva intre 500 si 1000 de lei. Dar stai, ca am sa intru in detalii mai jos.",
+  image: "/images/articles/covor-modern-pentru-living.webp",
+  category: "Decoratiuni Casa",
+  categorySlug: "decoratiuni-casa",
+  date: "2026-03-04T07:43:10.316Z",
+  modifiedDate: "2026-03-04T07:43:10.316Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Cat costa un covor modern pentru living de dimensiuni medii?", answer: "Un covor modern pentru living de dimensiuni medii, cum ar fi 200x300 cm, din polipropilena sau poliester de calitate, costa in general intre 500 si 1500 de lei. Modelele mai simple sau din colectii de baza pot fi gasite si sub 500 lei, in timp ce cele din materiale premium sau cu designuri deosebite pot depasi 1500 lei." },
+  { question: "Care e diferenta intre un covor din polipropilena si unul din poliester pentru living?", answer: "Polipropilena este foarte rezistenta la trafic si pete, fiind usor de curatat, dar poate fi mai putin moale. Poliesterul este mai moale, are un luciu frumos si o textura mai placuta la atingere, fiind ideal pentru un plus de confort, insa poate fi usor mai sensibil la petele persistente." },
+  { question: "Merita sa cumpar un covor modern pentru living din lana?", answer: "Un covor din lana merita daca iti doresti lux, confort termic si o textura naturala deosebita, fiind si hipoalergenic. Totusi, pretul este ridicat (peste 1500 lei pentru 200x300 cm) si intretinerea este mai pretentioasa, necesitand curatare specializata, deci nu e cea mai practica optiune pentru un living cu copii sau animale de companie." },
+  { question: "Ce dimensiune de covor modern pentru living e cea mai potrivita?", answer: "Dimensiunea ideala depinde de spatiul tau, dar regula generala este ca picioarele din fata canapelei si ale fotoliilor sa stea pe covor. Pentru un living mediu, un covor de 200x300 cm este adesea o alegere sigura. Masoara-ti spatiul pentru a evita sa cumperi un covor prea mic sau prea mare." },
+  { question: "De ce se tureste firul la un covor modern?", answer: "Firul unui covor modern se tureste, in special la modelele cu fir lung (shaggy), din cauza traficului intens si a presiunii constante in anumite zone. De asemenea, calitatea materialului si a constructiei covorului influenteaza rezistenta firului in timp." },
+  { question: "Cum sa curat un covor modern pentru living cu fir lung?", answer: "Pentru un covor cu fir lung, aspira regulat, preferabil cu un aspirator cu perie rotativa. Petele se curata prin tamponare cu o carpa curata si solutie de curatare speciala pentru covoare, evitand frecarea. Curatarea profesionala periodica este recomandata pentru o igiena completa." },
+  { question: "Unde gasesc covor modern pentru living de calitate in Romania?", answer: "Covoare moderne de calitate se gasesc in magazinele mari de bricolaj (Dedeman, Leroy Merlin, Hornbach), in magazinele specializate de covoare (Kika, Mobexpert, Jysk), dar si online pe platforme precum eMAG, Vivre sau direct pe site-urile producatorilor si distribuitorilor de mobilier si decoratiuni." },
+  { question: "Ce design de covor modern pentru living e la moda acum?", answer: "La moda sunt designurile minimaliste, geometrice si abstracte, cu linii curate si culori neutre (gri, bej, alb) sau tonuri de albastru inchis si verde. De asemenea, covoarele cu efect vintage stilizat si cele cu texturi bogate, monocrome, sunt foarte populare pentru a adauga personalitate si caldura spatiului." }
+];
+
+const toc = [
+  { title: "Ce covor modern pentru living sa alegi acum? Recomandarea mea directa", id: "ce-covor-modern-pentru-living-sa-alegi-acum-recomandarea-mea-directa" },
+  { title: "Top 5 optiuni de covor modern pentru living: Ce sa alegi cand ai un buget", id: "top-5-optiuni-de-covor-modern-pentru-living-ce-sa-alegi-cand-ai-un-buget" },
+  { title: "Cum sa alegi covor modern pentru living ca un profesionist (fara sa fii unul)", id: "cum-sa-alegi-covor-modern-pentru-living-ca-un-profesionist-fara-sa-fii-unul" },
+  { title: "Covor versus parchet: Ce covor modern pentru living se potriveste cel mai bine?", id: "covor-versus-parchet-ce-covor-modern-pentru-living-se-potriveste-cel-mai-bine" },
+  { title: "Greseli la alegerea covor modern pentru living: Ce sa NU faci si ce sa faci", id: "greseli-la-alegerea-covor-modern-pentru-living-ce-sa-nu-faci-si-ce-sa-faci" },
+  { title: "Recomandari covor modern pentru living pe categorii de buget", id: "recomandari-covor-modern-pentru-living-pe-categorii-de-buget" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Covor modern pentru living - CentroCasa"
+  description="Cel mai bun covor modern pentru living depinde mult de stilul tau, buget si ce vrei sa obtii vizual. Daca vrei ceva versatil si care sa reziste, un covor din polipropilena cu un design geometric sau abstract, de dimensiuni medii (200x300 cm) ar fi o alegere buna, undeva intre 500 si 1000 de lei. Dar stai, ca am sa intru in detalii mai jos."
+  image="/images/articles/covor-modern-pentru-living.webp"
+  type="article"
+  publishedTime="2026-03-04T07:43:10.316Z"
+  modifiedTime="2026-03-04T07:43:10.316Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Covor modern pentru living</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
+        <span class="article-date">4 martie 2026</span>
+      </div>
+      <h1 class="article-title">Covor modern pentru living</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/covor-modern-pentru-living.webp" alt="Covor modern pentru living" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+        <li><a href="#faq">Intrebari Frecvente</a></li>
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      
+      <section id="ce-covor-modern-pentru-living-sa-alegi-acum-recomandarea-mea-directa">
+        <h2>Ce covor modern pentru living sa alegi acum? Recomandarea mea directa</h2>
+        <p>Bon, hai sa fim directi. Daca ma intrebi pe mine, cel mai bun <strong>covor modern pentru living</strong> la ora asta, ca sa zic asa, e unul care imbina estetica cu functionalitatea. Gandeste-te la un covor din fibre sintetice de calitate, gen polipropilena sau poliester, cu un design minimalist, poate o textura interesanta sau un model abstract discret.</p>
+        <p>Culoarea? Asta depinde mult de cum arata camera ta, dar nu da gres cu tonuri neutre (gri, bej, crem) sau culori mai inchise, gen bleumarin sau verde smarald, daca vrei sa fie piesa de rezistenta. Dimensiunea e cruciala – sa nu fie nici prea mic, sa para pierdut in spatiu, nici prea mare, sa acopere totul. Ideal e sa acopere zona de canapea si masuta de cafea, dar sa ramana cam 30-50 cm liberi pe margini pana la pereti.</p>
+        <p>Pretul? Pentru ceva decent, care sa nu se rupa in 2 ani, te astepti la 500-1500 lei, depinde de firma si de cat de fancy e.</p>
+        <p>Am avut un <strong>covor modern pentru living</strong> din polipropilena de la o firma mai cunoscuta, l-am luat cu vreo 700 de lei, si a rezistat vreo 4 ani fara sa arate rau, chiar si cu cainele prin el. Nu era cel mai moale, dar era usor de curatat si asta a contat enorm. Deci, ca sa rezum, nu te uita doar la cum arata, ci si la ce material e, cum se intretine si cat de mare e pentru spatiul tau. Un <strong>covor modern pentru living</strong> bun e o investitie, nu o cheltuiala.</p>
+        <p>Materialele naturale gen lana sau bumbac arata fabulos, da, dar sunt mai greu de intretinut, mai scumpe si uneori nu sunt cea mai buna optiune daca ai copii mici sau animale de companie. Si pe asta o zic din proprie experienta, ca am patit-o cu un covor de lana, arata ca nou o luna, dupa aia… a inceput nebunia. Deci, pentru un <strong>covor modern pentru living</strong> care sa te tina si sa arate bine, fibrele sintetice de calitate sunt calea cea mai sigura, mai ales daca vrei sa aiba si un pret pe masura.</p>
+      </section>
+
+      <section id="top-5-optiuni-de-covor-modern-pentru-living-ce-sa-alegi-cand-ai-un-buget">
+        <h2>Top 5 optiuni de covor modern pentru living: Ce sa alegi cand ai un buget</h2>
+        <p>Hai sa vedem cateva variante concrete, ca sa nu ramai doar in teorie. Am ales cateva tipuri de <strong>covor modern pentru living</strong> care mi s-au parut bune, ca sa zic asa, si am pus si cateva preturi realiste din piata romaneasca. Nu uita, astea sunt orientative, preturile pot varia.</p>
+        <ul><li><strong>Covor Geometric Abstract (Polipropilena)</strong>: Asta e campionul polivalentei. Se potriveste in aproape orice living modern. Modelele astea cu linii curate, forme geometrice sau abstracte, in nuante de gri, negru, alb sau chiar albastru inchis, sunt super versatile. Avantaje: rezistent la trafic, usor de curatat, nu se decoloreaza repede, pret accesibil (400-900 lei pentru 200x300 cm). Dezavantaje: poate fi mai putin moale decat altele, textura poate fi un pic „plasticoasa” daca e de slaba calitate. Am vazut unul la Dedeman, vreo 500 de lei, arata destul de bine si a rezistat bine la uzura zilnica.</li><li><strong>Covor Texturat Monocrom (Poliester/Acryl)</strong>: Aici vorbim de eleganta prin simplitate. Un covor intr-o singura culoare, dar cu o textura bogata, gen fir lung (shaggy) sau cu un relief subtil. E perfect daca vrei sa adaugi caldura si confort vizual fara sa aglomerezi spatiul. Avantaje: foarte moale si placut la atingere, creeaza o atmosfera primitoare, aspect premium. Pret: 700-1500 lei pentru 200x300 cm. Dezavantaje: curatarea poate fi mai dificila, mai ales la modelele shaggy (se aduna par, firimituri), firul lung se poate turti in timp in zonele cu trafic intens. Un prieten si-a luat unul bej, shaggy, si e super misto, dar recunoaste ca il da cu aspiratorul de 2 ori pe saptamana.</li><li><strong>Covor cu efect Vintage/Persan modernizat</strong>: Asta e pentru cei care vor un pic de personalitate. Nu ma refer la alea vechi, prastie, ci la modele moderne care preiau motive clasice, dar le stilizeaza, le estompeaza, le pun in culori noi (albastru petrol, verde menta, roz pal). Avantaje: adauga un punct focal interesant, poate ascunde mici imperfectiuni, ofera un contrast interesant cu mobilierul minimalist. Pret: 600-1200 lei. Dezavantaje: poate fi prea „ocupat” vizual daca ai deja multe elemente decorative, unele modele pot arata ieftin daca sunt prost imprimate.</li><li><strong>Covor Rotund Modern (diverse materiale)</strong>: Daca vrei sa spargi monotonia liniilor drepte, un covor rotund e solutia. Poate fi pus sub masuta de cafea, sau chiar langa canapea, pentru a delimita o zona. Avantaje: adauga dinamism, poate face spatiul sa para mai mare, e o alternativa la forma clasica. Pret: 300-800 lei (diametru 150-200 cm). Dezavantaje: poate fi greu de integrat daca ai deja multe piese de mobilier rotunde, nu acopera la fel de mult ca unul drept.</li><li><strong>Covor cu Fir Scurt, Dens (Polipropilena de calitate superioara)</strong>: Asta e o varianta de mijloc, un fel de „cel mai bun din ambele lumi”. E suficient de rezistent pentru trafic, dar are o textura placuta, firul e scurt si dens, deci se curata usor si nu se turteste asa repede. Avantaje: echilibru bun intre rezistenta si confort, aspect ingrijit, pret mediu (500-1000 lei). Dezavantaje: poate fi mai scump decat un polipropilena de baza, dar merita investitia.</li></ul>
+        <p>Am testat personal un model de genul asta, din fir scurt, dens, vreo luna. L-am pus in hol, unde se calca cel mai mult, si a facut fata cu brio. Nu l-am stropit, recunosc, dar firimiturile si praful se aspirau usor. Deci, ca un <strong>covor modern pentru living</strong>, asta ar fi o optiune sigura.</p>
+      </section>
+
+      <section id="cum-sa-alegi-covor-modern-pentru-living-ca-un-profesionist-fara-sa-fii-unul">
+        <h2>Cum sa alegi covor modern pentru living ca un profesionist (fara sa fii unul)</h2>
+        <p>Ok, ai vazut cateva tipuri, ai o idee despre preturi. Acum, cum alegi, de fapt? Nu-i chiar asa greu, stai linistit. Uite care-s criteriile principale, pe care le folosesc si eu cand ma uit la un <strong>covor modern pentru living</strong>:</p>
+        <ul><li><strong>Materialul</strong>: Asta e baza. Fibrele sintetice (polipropilena, poliester, acril) sunt cele mai populare pentru ca sunt rezistente, usor de curatat si au un pret bun. Polipropilena e o alegere sigura pentru trafic intens. Poliesterul e mai moale si are un luciu frumos. Acrilul seamana cu lana, dar e mai ieftin. Fibrele naturale (lana, bumbac, iuta) arata spectaculos, sunt hipoalergenice, dar mai scumpe si mult mai greu de intretinut. Daca ai animale sau copii, fugi de lana si bumbac, pe bune.</li><li><strong>Dimensiunea</strong>: Asta e cum sa zic, critica. Un covor prea mic face camera sa para dezordonata. Unul prea mare sufoca. Regula de aur: ideal ar fi ca picioarele din fata canapelei si ale fotoliilor sa stea pe covor. Daca nu se poate, macar masuta de cafea sa fie centrata pe el. Masoara-ti spatiul! Ia o coala de hartie sau chiar banda de mascare si delimiteaza pe podea cum crezi ca ar arata covorul. Vezi cum se simte. O dimensiune comuna e 200x300 cm, dar poti gasi si 160x230 cm, 240x340 cm sau chiar mai mari.</li><li><strong>Designul si Culoarea</strong>: Aici intervine gustul personal, dar si logica. Culoarea covorului ar trebui sa completeze, nu sa se bata cap in cap cu restul decorului. Tonurile neutre (gri, bej, crem, alb) sunt sigure si se potrivesc cu orice. Culorile mai puternice (albastru, verde, rosu) pot fi un punct focal, dar trebuie sa te gandesti bine cum le integrezi. Designul – geometric, abstract, minimalist, floral stilizat – depinde de stilul general al livingului tau. Daca ai deja multe modele pe pereti sau pe perne, mergi pe un covor mai simplu.</li><li><strong>Textura si Inaltimea Firului</strong>: Vrei ceva pufos si moale sub picioare (fir lung, shaggy) sau ceva mai practic, cu fir scurt si dens? Firul lung e luxos, dar greu de curatat si se turteste. Firul scurt e mai rezistent si mai usor de intretinut. Textura poate fi neteda, cu relief, 3D, etc.</li><li><strong>Bugetul</strong>: Cat vrei sa cheltui? Un <strong>covor modern pentru living</strong> bun nu e cel mai ieftin, dar nici cel mai scump. Stabileste-ti un interval realist. Ai grija la reduceri, dar si la ce cumperi. Un covor foarte ieftin, sub 200 de lei pentru o dimensiune decenta, probabil nu o sa te multumeasca prea mult.</li><li><strong>Intretinerea</strong>: Asta e legat de material, dar si de stilul tau de viata. Ai copii? Animale? Fumezi in casa? Ai tendinta sa scapi chestii pe jos? Atunci ai nevoie de ceva usor de curatat, rezistent la pete. Polipropilena e campioana aici.</li></ul>
+        <p>Am avut un prieten care si-a luat un covor alb, din fir lung, pentru living. Arata genial… primele doua saptamani. Dupa a inceput sa arate ca vai de el, ca si-a varsat cafea, copilul a facut o pata cu suc… Deci, gandeste-te la viata reala cand alegi, nu doar la pozele din reviste.</p>
+      </section>
+
+      <section id="covor-versus-parchet-ce-covor-modern-pentru-living-se-potriveste-cel-mai-bine">
+        <h2>Covor versus parchet: Ce covor modern pentru living se potriveste cel mai bine?</h2>
+        <p>Ok, acum ca am lamurit ce sa cauti la un <strong>covor modern pentru living</strong>, hai sa vedem cum se impaca el cu podeaua ta. Cel mai des, un covor modern se pune peste parchet sau peste gresie. Daca ai parchet, covorul adauga un plus de confort termic si fonic, plus ca protejeaza parchetul in zonele cu trafic intens, cum ar fi in fata canapelei sau pe culoarul principal.</p>
+        <p>E ca o perna pentru picioare, zic si eu. Daca ai gresie, rolul covorului e si mai mare. Gresia e rece si tare, iar un covor aduce caldura, moliciune si un aspect mult mai primitor.</p>
+        <p>Plus ca, daca ai un model de gresie mai… interesant, covorul poate masca o parte din el, daca asta iti doresti. Am vazut livinguri cu gresie imitatie de lemn care arata super, dar si altele unde covorul a facut diferenta, transformand totul. Acum, sa comparam cateva optiuni populare de <strong>covor modern pentru living</strong>, ca sa vezi ce si cum:</p>
+        <ul><li><strong>Covor Polipropilena (aprox. 400-900 lei, 200x300 cm)</strong>: Asta e varianta „workhorse”. E rezistent, usor de curatat, pretul e OK. Se potriveste bine peste parchet sau gresie. Nu adauga mult la inaltime, deci nu creeaza probleme cu usile. Un minus e ca nu e cel mai moale, dar asta compensezi prin confortul vizual si prin faptul ca nu-ti ingheata picioarele iarna.</li><li><strong>Covor Poliester/Acryl Texturat (aprox. 700-1500 lei, 200x300 cm)</strong>: Asta e pentru confort si aspect. E mult mai moale, mai placut la atingere. Se potriveste perfect peste parchet, adaugand un strat de izolare fonica si termica. Peste gresie, face o diferenta uriasa in „senzația” camerei. Dezavantajul e ca, fiind mai moale, poate atrage mai mult praf si murdarie, si necesita o curatare mai atenta. Firul poate fi mai inalt, deci trebuie sa te uiti cum se deschid usile.</li><li><strong>Covor Lana (aprox. 1500-3000+ lei, 200x300 cm)</strong>: Asta e varianta de lux. Lana e naturala, hipoalergenica, rezista bine in timp daca e ingrijita. E calduroasa, moale, arata impecabil. Se potriveste de minune peste parchet. Peste gresie, e o transformare totala. Marele, mare minus: pretul e pe masura, si intretinerea e pretentioasa.Petele, mai ales cele de grasime sau lichide colorate, pot fi o problema serioasa. Nu l-as recomanda daca ai un stil de viata agitat.</li></ul>
+        <p>Deci, daca ai parchet, ai mai multa libertate. Daca ai gresie, un covor mai gros si mai moale (poliester, acril) ar face minuni. Daca vrei un <strong>covor modern pentru living</strong> care sa te tina si sa fie practic, polipropilena de calitate e un punct de plecare excelent, indiferent de podea.</p>
+        <p>Am vazut un living cu parchet laminat si un covor geometric, fir scurt, albastru inchis. Arata impecabil, curat, modern. Apoi am vazut un living cu gresie de mari dimensiuni, rece, si un covor pufos, crem, care a incalzit instant totul.</p>
+        <p>Deci, conteaza mult ce ai pe jos, dar si ce vrei sa obtii cu covorul.</p>
+      </section>
+
+      <section id="greseli-la-alegerea-covor-modern-pentru-living-ce-sa-nu-faci-si-ce-sa-faci">
+        <h2>Greseli la alegerea covor modern pentru living: Ce sa NU faci si ce sa faci</h2>
+        <p>Stai putin, ca nu e totul roz. Sunt niste greseli pe care le fac multi cand isi iau un <strong>covor modern pentru living</strong> si care ii costa apoi. Uite cateva din ele, ca sa le eviti:</p>
+        <ul><li><strong>Sa alegi marimea gresita</strong>: Asta am tot zis, dar e cea mai mare greseala. Un covor prea mic pare ca „pluteste” in mijlocul camerei, nu leaga mobila. Unul prea mare sufoca si face spatiul sa para mai mic. Masoara, masoara, masoara! Si gandeste-te cum se va integra cu canapeaua, fotoliile, masuta.</li><li><strong>Sa ignori materialul</strong>: Ce-i frumos, nu-i si practic mereu. Un covor din matase arata divin, dar daca ai copii si caini, o sa fie un coșmar. Alege materialul in functie de stilul tau de viata, nu doar de cum arata in poze. Polipropilena pentru trafic, poliester pentru confort, lana pentru lux si rabdare.</li><li><strong>Sa cumperi online fara sa verifici dimensiunile si culorile</strong>: Poza aia de pe site poate fi inselatoare. Lumina, monitorul – toate pot altera cum vezi culoarea. Incearca sa cauti pe viu sau sa verifici politica de retur. Si verifica dimensiunile din nou si din nou.</li><li><strong>Sa alegi un model care se bate cap in cap cu restul decorului</strong>: Daca ai deja un perete accent cu tapet, o canapea cu model mare si multe perne decorative, un covor cu un model si mai incarcat o sa faca livingul sa para un haos. Alege un covor care sa completeze, nu sa domine excesiv.</li><li><strong>Sa nu te gandesti la intretinere</strong>: Asta e legat de material, dar si de cum curati. Unele covoare se aspira usor, altele necesita curatare profesionala. Daca nu ai timp sau chef sa bati la curatatorie, alege ceva usor de intretinut.</li><li><strong>Sa te lasi orbit de pret</strong>: Cel mai ieftin nu e mereu cel mai bun. Un covor de 200 de lei s-ar putea sa se deterioreze in 6 luni. In schimb, nici nu trebuie sa cheltui o avere. Gaseste un echilibru. Un <strong>covor modern pentru living</strong> bun e o investitie de 500-1500 lei, de obicei.</li></ul>
+        <p>Ce sa faci in schimb? Ia-ti timp. Nu te grabi. Uita-te la cat mai multe modele, cauta pe viu daca poti, citeste pareri. Gandeste-te la spatiul tau, la viata ta. Un <strong>covor modern pentru living</strong> bun trebuie sa fie atat estetic, cat si functional.
+Am avut un prieten care si-a luat un covor cu fir lung, alb, pentru ca a vazut la cineva si i-a placut. Acum plange dupa el, ca nu-l poate curata si arata mereu murdar. Asta e, na, uneori trebuie sa fim mai pragmatici.</p>
+      </section>
+
+      <section id="recomandari-covor-modern-pentru-living-pe-categorii-de-buget">
+        <h2>Recomandari covor modern pentru living pe categorii de buget</h2>
+        <p>Hai sa facem o recapitulare pe categorii de buget, ca sa fie treaba treaba. Nu toata lumea are acelasi buget, si e normal. Important e sa stii ce primesti pentru banii tai.</p>
+        <h3>Buget Mic (sub 500 lei)</h3>
+        <p>Pentru sub 500 de lei, te poti astepta la un <strong>covor modern pentru living</strong> din polipropilena, de dimensiuni mai mici (gen 160x230 cm) sau la unul de 200x300 cm dintr-o colectie mai basic. Designurile vor fi, cel mai probabil, geometrice sau abstracte simple, in culori mai comune (gri, bej). Avantaje: pret foarte accesibil, poti schimba covorul mai des daca te plictisesti.</p>
+        <p>Dezavantaje: materialul poate fi mai putin fin, durabilitatea poate fi mai mica, firul se poate turti mai repede. Sunt ok pentru inceput sau daca vrei sa schimbi des decorul, dar nu te astepta la un produs premium.</p>
+        <h3>Buget Mediu (500 - 1500 lei)</h3>
+        <p>Aici intri pe terenul bunurilor de calitate. Pentru 500-1500 lei, poti gasi un <strong>covor modern pentru living</strong> din polipropilena de calitate superioara, poliester sau acril, cu un fir mai dens, o textura interesanta si un design mai rafinat. Dimensiunile pot fi 200x300 cm sau chiar mai mari.</p>
+        <p>Avantaje: echilibru excelent intre pret, calitate si aspect, durabilitate buna, confort sporit. Dezavantaje: pretul poate fi un pic cam mare pentru unii. Aici gasesti cele mai multe optiuni bune, de la branduri cunoscute, cu o gama variata de modele.</p>
+        <h3>Buget Mare (peste 1500 lei)</h3>
+        <p>Daca bugetul nu e o problema, atunci te poti orienta catre covoare din materiale naturale (lana, bumbac de calitate) sau catre branduri de design cu modele unice. Aici vorbim de o senzatie de lux, o textura deosebita, un fir bogat, culori vibrante sau modele artistice. Avantaje: calitate premium, aspect spectaculos, durabilitate pe termen foarte lung (daca sunt ingrijite), hipoalergenice (in cazul lanii).</p>
+        <p>Dezavantaje: pretul este pe masura, intretinerea poate fi mai pretentioasa, mai ales la materialele naturale. Aici, practic, platesti pentru marca, design, si calitatea superioara a materialelor. Eu, personal, daca ar fi sa aleg un <strong>covor modern pentru living</strong> pentru mine, as merge undeva in zona de buget mediu.</p>
+        <p>Gasesti cele mai bune compromisuri si cele mai multe optiuni care sa arate bine si sa reziste. Dar, na, asta e doar parerea mea.</p>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat costa un covor modern pentru living de dimensiuni medii?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un covor modern pentru living de dimensiuni medii, cum ar fi 200x300 cm, din polipropilena sau poliester de calitate, costa in general intre 500 si 1500 de lei. Modelele mai simple sau din colectii de baza pot fi gasite si sub 500 lei, in timp ce cele din materiale premium sau cu designuri deosebite pot depasi 1500 lei.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Care e diferenta intre un covor din polipropilena si unul din poliester pentru living?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Polipropilena este foarte rezistenta la trafic si pete, fiind usor de curatat, dar poate fi mai putin moale. Poliesterul este mai moale, are un luciu frumos si o textura mai placuta la atingere, fiind ideal pentru un plus de confort, insa poate fi usor mai sensibil la petele persistente.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Merita sa cumpar un covor modern pentru living din lana?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un covor din lana merita daca iti doresti lux, confort termic si o textura naturala deosebita, fiind si hipoalergenic. Totusi, pretul este ridicat (peste 1500 lei pentru 200x300 cm) si intretinerea este mai pretentioasa, necesitand curatare specializata, deci nu e cea mai practica optiune pentru un living cu copii sau animale de companie.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce dimensiune de covor modern pentru living e cea mai potrivita?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Dimensiunea ideala depinde de spatiul tau, dar regula generala este ca picioarele din fata canapelei si ale fotoliilor sa stea pe covor. Pentru un living mediu, un covor de 200x300 cm este adesea o alegere sigura. Masoara-ti spatiul pentru a evita sa cumperi un covor prea mic sau prea mare.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                De ce se tureste firul la un covor modern?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Firul unui covor modern se tureste, in special la modelele cu fir lung (shaggy), din cauza traficului intens si a presiunii constante in anumite zone. De asemenea, calitatea materialului si a constructiei covorului influenteaza rezistenta firului in timp.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-5">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cum sa curat un covor modern pentru living cu fir lung?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru un covor cu fir lung, aspira regulat, preferabil cu un aspirator cu perie rotativa. Petele se curata prin tamponare cu o carpa curata si solutie de curatare speciala pentru covoare, evitand frecarea. Curatarea profesionala periodica este recomandata pentru o igiena completa.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-6">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Unde gasesc covor modern pentru living de calitate in Romania?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Covoare moderne de calitate se gasesc in magazinele mari de bricolaj (Dedeman, Leroy Merlin, Hornbach), in magazinele specializate de covoare (Kika, Mobexpert, Jysk), dar si online pe platforme precum eMAG, Vivre sau direct pe site-urile producatorilor si distribuitorilor de mobilier si decoratiuni.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-7">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce design de covor modern pentru living e la moda acum?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                La moda sunt designurile minimaliste, geometrice si abstracte, cu linii curate si culori neutre (gri, bej, alb) sau tonuri de albastru inchis si verde. De asemenea, covoarele cu efect vintage stilizat si cele cu texturi bogate, monocrome, sunt foarte populare pentru a adauga personalitate si caldura spatiului.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="covor-modern-pentru-living"
+      currentCategory="decoratiuni-casa"
+      articles={allArticles}
+    />
+  </article>
+</Layout>
