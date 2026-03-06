@@ -1,0 +1,667 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Masina de tuns gazonul electrica",
+  excerpt: "Daca cautati o solutie eficienta si ecologica pentru a mentine un gazon impecabil, o masina de tuns gazonul electrica este alegerea potrivita. Aceste unelte combina puterea necesara pentru o tundere rapida cu avantajele functionarii pe curent, eliminand emisiile poluante si zgomotul deranjant asociat motoarelor pe benzina.",
+  image: "/images/articles/masina-de-tuns-gazonul-electrica.webp",
+  category: "Gradinarit si Unelte",
+  categorySlug: "gradinarit-unelte",
+  date: "2026-03-06T07:55:42.599Z",
+  modifiedDate: "2026-03-06T07:55:42.599Z",
+  author: "Andrei Marinescu",
+  authorRole: "Expert Gradinarit",
+  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
+};
+
+const faq = [
+  { question: "Cat costa o masina de tuns gazonul electrica?", answer: "Pretul unei masini de tuns gazonul electrica variaza intre 700 lei pentru modelele cu fir simple si pana la 1700 lei pentru modelele pe acumulator de la branduri premium. Modelele cu raport calitate-pret bun se situeaza in intervalul 900-1300 lei." },
+  { question: "Care e diferenta intre o masina de tuns gazonul electrica cu fir si una pe acumulator?", answer: "Masinile cu fir sunt alimentate direct la priza, oferind putere constanta, dar sunt limitate de lungimea cablului. Cele pe acumulator ofera libertate de miscare, dar autonomia depinde de capacitatea acumulatorului si investitia initiala este mai mare." },
+  { question: "Merita sa cumpar o masina de tuns gazonul electrica pentru o gradina mare?", answer: "Masinile de tuns gazonul electrice cu fir sunt cel mai bine adaptate pentru suprafete mici spre medii (pana la 400 mp). Pentru gradini foarte mari, un <a href=\"/cel-mai-bun-tractoras-pentru-tuns-gazonul/\">tractoras de tuns gazonul</a> sau o motocoasa puternica ar fi mai eficiente. Modelele pe acumulator pot acoperi suprafete medii, dar autonomia trebuie calculata atent." },
+  { question: "Ce putere este necesara pentru o masina de tuns gazonul electrica?", answer: "Pentru gazon de intretinere, 1200-1400W (pentru modele cu fir) sau 18-40V (pentru modele pe acumulator) sunt suficiente. Pentru iarba mai densa sau mai inalta, puteri mai mari (peste 1400W sau 40V) vor face fata mai bine." },
+  { question: "Cat de des trebuie sa intretin o masina de tuns gazonul electrica?", answer: "Intretinerea este minima. Curatarea lamei si a carcasei dupa fiecare utilizare, verificarea periodica a cablului (la modelele cu fir) si incarcarea acumulatorilor (la cele pe acumulator) sunt suficiente. Lama trebuie ascutita o data pe an." }
+];
+
+const toc = [
+  { title: "Bosch Rotak 32 R", id: "bosch-rotak-32-r" },
+  { title: "Gardena PowerMax 32/18V P4A (cu acumulator)", id: "gardena-powermax-3218v-p4a-cu-acumulator" },
+  { title: "Einhell GC-EM 1200/37", id: "einhell-gc-em-120037" },
+  { title: "Makita ELM3720", id: "makita-elm3720" },
+  { title: "Greenworks G40LM35", id: "greenworks-g40lm35" },
+  { title: "Stihl RMA 235", id: "stihl-rma-235" },
+  { title: "Ryobi RLM18X33B40", id: "ryobi-rlm18x33b40" },
+  { title: "Comparatie", id: "comparatie" },
+  { title: "Cum alegi cea mai buna masina de tuns gazonul electrica pentru curtea ta?", id: "ghid" },
+  { title: "Intrebari Frecvente", id: "faq" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Masina de tuns gazonul electrica - CentroCasa"
+  description="Daca cautati o solutie eficienta si ecologica pentru a mentine un gazon impecabil, o masina de tuns gazonul electrica este alegerea potrivita. Aceste unelte combina puterea necesara pentru o tundere rapida cu avantajele functionarii pe curent, eliminand emisiile poluante si zgomotul deranjant asociat motoarelor pe benzina."
+  image="/images/articles/masina-de-tuns-gazonul-electrica.webp"
+  type="article"
+  publishedTime="2026-03-06T07:55:42.599Z"
+  modifiedTime="2026-03-06T07:55:42.599Z"
+  author="Andrei Marinescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Masina de tuns gazonul electrica</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
+        <span class="article-date">6 martie 2026</span>
+      </div>
+      <h1 class="article-title">Masina de tuns gazonul electrica</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/masina-de-tuns-gazonul-electrica.webp" alt="Masina de tuns gazonul electrica" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list" id="toc-desktop-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
+        ))}
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      <section id="intro">
+        <p>Daca cautati o solutie eficienta si ecologica pentru a mentine un gazon impecabil, o <strong>masina de tuns gazonul electrica</strong> este alegerea potrivita. Aceste unelte combina puterea necesara pentru o tundere rapida cu avantajele functionarii pe curent, eliminand emisiile poluante si zgomotul deranjant asociat motoarelor pe benzina. Sunt ideale pentru suprafete de gazon de dimensiuni mici si medii, oferind o manevrabilitate sporita si costuri de operare reduse.</p><p>Ce face ca o <strong>masina de tuns gazonul electrica</strong> sa fie o optiune de luat in considerare? In primul rand, simplitatea in utilizare si intretinere. Nu necesita amestec de combustibil, schimburi de ulei sau verificari complexe. Pornirea este instantanee, iar greutatea redusa le face usor de manevrat chiar si pe terenuri cu denivelari sau in zone inguste. In plus, costul energiei electrice este, in general, mai mic decat cel al benzinei, transformand intretinerea gazonului intr-o activitate mai prietenoasa cu bugetul.</p><p>Alegerea corecta a unei <strong>masina de tuns gazonul electrica</strong> depinde de specificul curtii dumneavoastra: suprafata, tipul de iarba, prezenta obstacolelor si, desigur, bugetul. Acest articol va prezinta cele mai bune optiuni disponibile pe piata in 2026, cu analize detaliate ale caracteristicilor, performantelor si raportului calitate-pret, pentru a va ajuta sa luati cea mai informata decizie de cumparare.</p>
+      </section>
+
+
+          <article class="product-review" id="bosch-rotak-32-r">
+            <div class="product-review__header">
+              <span class="section-tag">Pentru Buget Mic</span>
+              <h3>Bosch Rotak 32 R</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masina de tuns gazonul electrica cu fir
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1200W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>pana la 150 mp
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Sistem 'LeafCollect' pentru colectarea frunzelor, reglaj inaltime de taiere in 3 trepte (20-60mm), manere rabatabile
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS rezistent
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Bosch Rotak 32 R se pozitioneaza ca o solutie accesibila si eficienta pentru proprietarii de gradini de mici dimensiuni. Cu o putere de 1200W, aceasta masina de tuns gazonul este capabila sa taie iarba densa fara probleme, atat timp cat nu depasim suprafata recomandata de 150 mp. Sistemul 'LeafCollect' este un plus binevenit, transformand sarcina de curatare a gazonului de frunze toamna intr-una mai usoara.</p><p>Reglajul inaltimii de taiere in 3 trepte, de la 20 la 60 mm, permite adaptarea la diferite perioade ale anului si la preferintele utilizatorului. Manerele rabatabile sunt un avantaj major pentru depozitare, permitand reducerea semnificativa a spatiului necesar. Greutatea de doar 6.8 kg face ca manevrarea sa fie extrem de facila, chiar si in spatii restranse sau cu obstacole.</p><p>Consuma putin curent? Nu, modelul Bosch Rotak 32 R are un consum mediu de aproximativ 1.2 kWh la o utilizare de o ora, ceea ce se traduce in costuri de operare minime pentru suprafetele recomandate. Cablul de alimentare este suficient de lung pentru a acoperi o zona generoasa, insa pentru gradinile mai mari, un prelungitor de calitate devine necesar.</p><p>Comparativ cu alte modele din aceeasi categorie de pret, Bosch Rotak 32 R se distinge prin calitatea constructiei si functiile adaugate, precum sistemul 'LeafCollect', care nu se regaseste la multe modele entry-level. Este o alegere potrivita pentru cei care cauta o masina de tuns gazonul fiabila, usor de utilizat si depozitat, fara a face compromisuri majore la capitolul performanta.</p><p>Recomandarea noastra pentru Bosch Rotak 32 R este clara: daca aveti o gradina de pana in 150 mp, cautati o masina de tuns gazonul electrica usor de manevrat, cu un sistem de colectare eficient si un pret pe masura, aceasta este o optiune de top. Achizitionati-o de la <a href="/link-catre-magazin/" target="_blank">magazinul X</a> la pretul de 799 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Pret accesibil</li>
+              <li>Greutate redusa si manevrabilitate excelenta</li>
+              <li>Sistem 'LeafCollect' eficient</li>
+              <li>Manere rabatabile pentru depozitare usoara</li>
+              <li>Constructie solida marca Bosch</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Limitata la suprafete de pana in 150 mp</li>
+              <li>Necesita prelungitor pentru suprafete mai mari</li>
+              <li>Colectorul de iarba are o capacitate medie (30 litri)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="gardena-powermax-3218v-p4a-cu-acumulator">
+            <div class="product-review__header">
+              <span class="section-tag">Raport Calitate-Pret</span>
+              <h3>Gardena PowerMax 32/18V P4A (cu acumulator)</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masina de tuns gazonul electrica pe acumulator
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>18V (sistem P4A)
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>pana la 200 mp (cu acumulator de 4Ah)
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Sistem de reglare a inaltimii de taiere in 3 trepte (20-60mm), indicator nivel incarcare acumulator, manere ergonomice QuickFit
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ranforsat, metal
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Pentru cei care doresc libertatea de miscare fara fir, dar fara implicatiile unui motor pe benzina, Gardena PowerMax 32/18V P4A este o alegere excelenta. Sistemul P4A (Power for All) inseamna ca acumulatorul de 18V este compatibil cu o gama larga de unelte Gardena si alte marci partenere, oferind flexibilitate si economii pe termen lung daca detineti deja alte produse din ecosistem.</p><p>Cu o putere de 18V si un acumulator de 4Ah (inclus in pachetul de baza), aceasta masina de tuns gazonul este capabila sa acopere suprafete de pana la 200 mp. Viteza de rotatie a lamei este optimizata pentru o taiere curata si eficienta. Reglajul inaltimii de taiere se face centralizat, in 3 trepte, de la 20 la 60 mm, permitand adaptarea rapida la conditiile gazonului.</p><p>Este aceasta masina de tuns gazonul zgomotoasa? Nu, functionarea pe acumulator face ca acest model sa fie mult mai silentios decat alternativele pe benzina, creand o atmosfera placuta in gradina. Indicatorul nivelului de incarcare a acumulatorului va permite sa estimati autonomia ramasa, evitand opririle neplacute in mijlocul lucrarii.</p><p>Manerele ergonomice QuickFit permit ajustarea rapida a pozitiei, iar designul compact si greutatea redusa (aproximativ 10 kg cu acumulator) fac din manevrare o placere. Comparativ cu modelele cu fir, eliminarea cablului simplifica semnificativ operarea, in special in jurul arbustilor sau a altor elemente din gradina. Ofera o alternativa viabila la <a href="/motocoasa-electrica-sau-pe-benzina/">motocoasa electrica sau pe benzina</a> pentru tunderea gazonului, fiind mai usor de controlat.</p><p>Ce o recomanda? Libertatea de miscare, compatibilitatea cu sistemul P4A si performanta buna pentru suprafete medii. Gardena PowerMax 32/18V P4A este ideala pentru gradinarii care cauta o solutie pe acumulator fiabila si usor de utilizat. Puteti achizitiona acest model de la <a href="/link-catre-magazin/" target="_blank">magazinul Y</a> la pretul de 1199 lei (cu acumulator si incarcator inclus).</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Functionare pe acumulator, fara fir</li>
+              <li>Compatibilitate cu sistemul Gardena P4A</li>
+              <li>Manevrabilitate excelenta datorita greutatii reduse si designului ergonomic</li>
+              <li>Nivel redus de zgomot</li>
+              <li>Reglaj rapid al inaltimii de taiere</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Autonomia depinde de capacitatea acumulatorului (4Ah acopera max. 200 mp)</li>
+              <li>Investitie initiala mai mare decat la modelele cu fir</li>
+              <li>Necesita incarcarea acumulatorului intre utilizari</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="einhell-gc-em-120037">
+            <div class="product-review__header">
+              <span class="section-tag">Best Buy 2026</span>
+              <h3>Einhell GC-EM 1200/37</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masina de tuns gazonul electrica cu fir
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1200W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>pana la 400 mp
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Reglaj centralizat al inaltimii de taiere in 5 trepte (20-60mm), sistem de parcare pentru curatare usoara, manere pliabile, roti mari
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic rezistent, lama din otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Einhell GC-EM 1200/37 este o masina de tuns gazonul electrica conceputa pentru a face fata unor suprafete mai mari, pana la 400 mp. Puterea de 1200W este suficienta pentru a gestiona iarba deasa si crescuta, iar reglajul centralizat al inaltimii de taiere in 5 trepte, de la 20 la 60 mm, ofera flexibilitate in adaptarea la diverse conditii. Aceasta varietate de setari este un atu important pentru un gazon sanatos pe tot parcursul anului.</p><p>Ce avantaje practice ofera sistemul de parcare? Acesta permite pozitionarea masinii pe verticala, eliberand spatiu valoros in garaj sau in magazie, dar si facilitand curatarea lamei si a dedesubtului. Manerele pliabile contribuie, de asemenea, la optimizarea spatiului de depozitare. Rotile mari, atat cele din spate cat si cele din fata, asigura o buna manevrabilitate chiar si pe terenuri mai denivelate sau cu iarba mai inalta.</p><p>Consuma mult curent? Nu, Einhell GC-EM 1200/37 are un consum mediu estimat la 1.2 kWh pe ora de functionare, ceea ce o face o optiune economica pentru suprafetele pe care le poate acoperi. In comparatie cu motoarele pe benzina, economiile la combustibil si intretinere sunt semnificative. Este o alternativa excelenta la <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">tractorasele de tuns gazonul</a> pentru cei cu spatii medii spre mari, dar care prefera o solutie mai compacta.</p><p>Comparativ cu alte modele electrice cu fir din clasa sa de pret, Einhell GC-EM 1200/37 impresioneaza prin numarul de trepte de reglaj al inaltimii de taiere si prin sistemul de parcare pentru depozitare si curatare. Capacitatea colectorului de iarba de 40 litri este potrivita pentru suprafetele acoperite, minimizand opririle pentru golire.</p><p>Recomandarea noastra pentru Einhell GC-EM 1200/37 este pentru proprietarii de gradini de dimensiuni medii (pana la 400 mp) care cauta o masina de tuns gazonul electrica robusta, cu optiuni multiple de reglaj si solutii inteligente de depozitare. Achizitionati acest model de la <a href="/link-catre-magazin/" target="_blank">magazinul Z</a> la pretul de 949 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Capacitate buna pentru suprafete medii (pana la 400 mp)</li>
+              <li>Reglaj centralizat si variat al inaltimii de taiere (5 trepte)</li>
+              <li>Sistem de parcare pentru depozitare si curatare facila</li>
+              <li>Manere pliabile si roti mari pentru manevrabilitate</li>
+              <li>Raport calitate-pret excelent</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Necesita prelungitor, fiind un model cu fir</li>
+              <li>Capacitatea colectorului de iarba (40 litri) poate fi insuficienta pentru tunderea indelungata fara golire</li>
+              <li>Designul poate fi perceput ca fiind mai traditional</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="makita-elm3720">
+            <div class="product-review__header">
+              <span class="section-tag">Premium</span>
+              <h3>Makita ELM3720</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masina de tuns gazonul electrica cu fir
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1400W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>pana la 350 mp
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Reglaj in 3 trepte al inaltimii de taiere (20-55mm), manere ergonomice, design compact, indicator nivel umplere cos
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Caroserie din plastic rezistent la impact, lama din otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Makita ELM3720 se impune ca o optiune premium in segmentul masinilor de tuns gazonul electrice cu fir, oferind o combinatie de putere, fiabilitate si ergonomie. Cu o putere de 1400W, aceasta masina este capabila sa tunda eficient gazonul pe suprafete de pana la 350 mp, abordand cu usurinta si iarba mai densa sau mai inalta.</p><p>Reglajul inaltimii de taiere se face in 3 trepte, intre 20 si 55 mm, o plaja suficienta pentru majoritatea nevoilor de intretinere a gazonului. Designul compact si greutatea controlata (aproximativ 13.8 kg) fac ca manevrarea sa fie relativ usoara, chiar si in curtile cu forme neregulate. Manerele ergonomice reduc oboseala in timpul utilizarii prelungite.</p><p>Functioneaza eficient din punct de vedere energetic? Da, Makita ELM3720 are un consum estimat la 1.4 kWh pe ora, ceea ce ramane o valoare competitiva pentru clasa sa. Avantajul major al unui model electric cu fir, cum este acesta, este costul de operare redus comparativ cu motoarele pe benzina, precum si lipsa emisiilor poluante. Este o alegere potrivita pentru cei care cauta performanta si fiabilitate.</p><p>Comparativ cu alte modele din gama de pret, Makita ELM3720 se distinge prin calitatea materialelor folosite si prin finisajul general, tipic brandului Makita. Indicatorul de nivel al cosului de colectare a ierbii este o functie utila, care previne suprasolicitarea si asigura o colectare eficienta. Este o alternativa solidă la <a href="/masina-de-spalat-cu-presiune-pentru-acasa/">masinile de spalat cu presiune</a> cand vine vorba de mentenanta exterioara a casei, oferind o alta dimensiune a ingrijirii proprietatii.</p><p>Ce recomandare facem pentru Makita ELM3720? Daca prioritizati fiabilitatea, calitatea constructiei si o putere sporita pentru suprafete de pana la 350 mp, acest model este o investitie pe termen lung. Pretul este de 1350 lei la <a href="/link-catre-magazin/" target="_blank">magazinul A</a>.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Putere sporita (1400W) pentru tunderea eficienta</li>
+              <li>Calitate superioara a materialelor si constructiei</li>
+              <li>Design ergonomic si manevrabilitate buna</li>
+              <li>Indicator nivel umplere cos</li>
+              <li>Fiabilitate marca Makita</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Pret mai ridicat comparativ cu modelele entry-level</li>
+              <li>Necesita prelungitor</li>
+              <li>Capacitatea cosului de colectare (40 litri) ar putea fi mai mare pentru suprafete extinse</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="greenworks-g40lm35">
+            <div class="product-review__header">
+              <span class="section-tag">Alegerea Noastra</span>
+              <h3>Greenworks G40LM35</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masina de tuns gazonul electrica pe acumulator
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>40V
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>pana la 300 mp (cu acumulator de 4Ah)
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Reglaj in 5 trepte al inaltimii de taiere (25-80mm), sistem de pliere rapida a manerelor, indicator nivel acumulator, greutate redusa
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS rezistent, lama din otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Greenworks G40LM35 reprezinta o optiune excelenta pentru cei care cauta performanta pe acumulator, fara a compromite prea mult bugetul. Sistemul de 40V ofera suficienta putere pentru a tunde gazonul pe suprafete de pana la 300 mp, cu un acumulator de 4Ah. Aceasta masina de tuns gazonul este ideala pentru curtile de dimensiuni medii.</p><p>Unul dintre punctele forte este reglajul inaltimii de taiere in 5 trepte, cu o plaja impresionanta de la 25 la 80 mm. Aceasta varietate permite adaptarea la diverse tipuri de iarba si la conditiile specifice fiecarui anotimp, fie ca vorbim de tunsul de intretinere sau de recuperarea unui gazon neglijat. Greutatea de doar 13 kg (cu acumulator) o face usor de manevrat.</p><p>Este silentioasa si ecologica? Da, ca orice masina de tuns gazonul electrica pe acumulator, G40LM35 este mult mai silentioasa decat echivalentele pe benzina si nu emite gaze poluante. Indicatorul de nivel al acumulatorului este o functie utila, permitand gestionarea eficienta a autonomiei. Sistemul de pliere rapida a manerelor faciliteaza depozitarea.</p><p>Comparativ cu alte modele pe acumulator, Greenworks ofera un echilibru remarcabil intre pret si performanta. Lama de 35 cm este potrivita pentru manevrabilitate, iar constructia pare solida. Este o alternativa viabila la <a href="/cel-mai-bun-robot-de-tuns-iarba/">roboti de tuns iarba</a> pentru cei care prefera controlul manual al procesului de tundere. Cosul de colectare are o capacitate de 40 litri.</p><p>Recomandarea noastra pentru Greenworks G40LM35 este pentru proprietarii de curti medii (pana la 300 mp) care doresc o masina de tuns gazonul pe acumulator, usor de utilizat, cu optiuni bune de reglaj al inaltimii si un pret competitiv. O puteti gasi la <a href="/link-catre-magazin/" target="_blank">magazinul B</a> la pretul de 1099 lei (cu acumulator si incarcator).</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Performanta buna pe acumulator pentru suprafete medii</li>
+              <li>Reglaj inaltima de taiere variat (5 trepte, 25-80mm)</li>
+              <li>Greutate redusa si manevrabilitate excelenta</li>
+              <li>Sistem de pliere rapida a manerelor</li>
+              <li>Pret competitiv in clasa sa</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Autonomia depinde de acumulator (4Ah este recomandat pentru suprafata maxima)</li>
+              <li>Lama de 35 cm poate fi mica pentru suprafete mai mari de 300 mp</li>
+              <li>Calitatea plasticului, desi rezistent, nu egaleaza modelele premium</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="stihl-rma-235">
+            <div class="product-review__header">
+              <span class="section-tag">Premium</span>
+              <h3>Stihl RMA 235</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masina de tuns gazonul electrica pe acumulator
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>Sistem de acumulatori AK (36V)
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>pana la 200 mp (cu acumulator AK 20)
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Reglaj in 4 trepte al inaltimii de taiere (20-70mm), manere pliabile, indicator nivel acumulator, design compact si usor
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Caroserie din polimer rezistent, lama din otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Stihl RMA 235 este o masina de tuns gazonul electrica pe acumulator ce beneficiaza de renumele si calitatea brandului Stihl. Este proiectata pentru suprafete mici spre medii, pana la 200 mp cu un acumulator AK 20. Puterea oferita de sistemul de 36V este suficienta pentru o tundere eficienta si curata.</p><p>Reglajul inaltimii de taiere se face centralizat, in 4 trepte, de la 20 la 70 mm, oferind o flexibilitate decenta pentru intretinerea gazonului. Designul este compact, iar greutatea redusa (aproximativ 14 kg cu acumulator) face ca manevrarea sa fie foarte usoara, chiar si in spatii inguste sau cu obstacole.</p><p>Cum se compara cu alte modele pe acumulator? Stihl RMA 235 exceleaza prin calitatea constructiei, fiabilitatea sistemului de acumulatori si ergonomie. Manerele pot fi pliate rapid pentru depozitare, iar indicatorul nivelului de incarcare al acumulatorului ofera informatii clare despre autonomia ramasa. Este o solutie ecologica si silentioasa, ideala pentru zone rezidentiale.</p><p>Este o investiție mai mare, insa beneficiati de durabilitatea si performanta specifice produselor Stihl. Cosul de colectare are o capacitate de 30 litri, ceea ce inseamna ca va necesita golire mai frecventa pe suprafete mai mari. Pentru cei care cauta un produs premium, usor de utilizat si cu o durata de viata lunga, Stihl RMA 235 este o alegere excelenta.</p><p>Recomandarea noastra pentru Stihl RMA 235 este pentru proprietarii de gradini mici spre medii (pana in 200 mp) care cauta o masina de tuns gazonul pe acumulator de inalta calitate, usor de manevrat si cu fiabilitatea recunoscuta a brandului Stihl. Pretul este de 1650 lei la <a href="/link-catre-magazin/" target="_blank">magazinul C</a> (cu acumulator AK 20 si incarcator inclus).</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Calitate si fiabilitate Stihl</li>
+              <li>Design compact si greutate redusa</li>
+              <li>Manere pliabile pentru depozitare facila</li>
+              <li>Sistem eficient de acumulatori</li>
+              <li>Performanta buna pentru suprafete mici spre medii</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Pret ridicat, specific brandului premium</li>
+              <li>Autonomie limitata la 200 mp cu acumulatorul standard</li>
+              <li>Capacitatea cosului de colectare (30 litri) este mica</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="ryobi-rlm18x33b40">
+            <div class="product-review__header">
+              <span class="section-tag">Raport Calitate-Pret</span>
+              <h3>Ryobi RLM18X33B40</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masina de tuns gazonul electrica pe acumulator
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>18V
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>pana la 300 mp (cu acumulator de 4Ah)
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Reglaj in 5 trepte al inaltimii de taiere (20-70mm), manere rabatabile, indicator nivel acumulator, sistem de incarcare rapida (incarcator inclus)
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic rezistent, lama din otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Ryobi RLM18X33B40 se prezinta ca o optiune solida in segmentul masinilor de tuns gazonul electrice pe acumulator, oferind un echilibru bun intre performanta si pret. Cu un sistem de 18V si un acumulator de 4Ah inclus, este capabila sa acopere suprafete de pana la 300 mp, fiind potrivita pentru gradinile de dimensiuni medii.</p><p>Reglajul inaltimii de taiere se face in 5 trepte, de la 20 la 70 mm, oferind versatilitate pentru diverse tipuri de gazon. Lama de 33 cm este suficienta pentru a asigura o buna manevrabilitate in spatii mai inguste, iar greutatea totala (aproximativ 12.5 kg cu acumulator) o face usor de utilizat pe perioade mai lungi.</p><p>Este o solutie ecologica si silentioasa? Absolut. Fiind alimentata pe acumulator, Ryobi RLM18X33B40 nu produce emisii poluante si functioneaza la un nivel de zgomot redus, permitand utilizarea in orice moment al zilei fara a deranja vecinii. Indicatorul de nivel al acumulatorului si sistemul de incarcare rapida sunt atuuri practice.</p><p>Comparativ cu alte modele din clasa sa, Ryobi ofera un pachet complet, incluzand acumulatorul si incarcatorul, ceea ce o face o optiune atractiva din punct de vedere al raportului calitate-pret. Manerele rabatabile faciliteaza depozitarea, iar sistemul de acumulatori Ryobi ONE+ este compatibil cu o gama larga de unelte, oferind flexibilitate.</p><p>Ce o recomanda? Pachetul complet, performanta buna pentru suprafete medii si ecosistemul extins de scule pe acumulator Ryobi ONE+. Ryobi RLM18X33B40 este ideala pentru gradinarii care cauta o masina de tuns gazonul pe acumulator fiabila si accesibila. Pretul este de 1150 lei la <a href="/link-catre-magazin/" target="_blank">magazinul D</a>.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Pachet complet (acumulator si incarcator incluse)</li>
+              <li>Performanta buna pentru suprafete medii</li>
+              <li>Reglaj variat al inaltimii de taiere</li>
+              <li>Greutate redusa si manevrabilitate</li>
+              <li>Compatibilitate cu sistemul Ryobi ONE+</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Autonomia cu acumulatorul de 4Ah este suficienta pentru 300 mp, dar poate fi limitata pentru suprafete mai mari</li>
+              <li>Calitatea plasticului este buna, dar nu la nivelul brandurilor premium</li>
+              <li>Capacitatea cosului de colectare (40 litri) este standard</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+
+          <section id="comparatie">
+            <h2>Comparatie</h2>
+            <p>Pentru a va ajuta sa vizualizati rapid diferentele dintre modelele de <strong>masina de tuns gazonul electrica</strong> prezentate, am creat un tabel comparativ. Acesta evidentiaza caracteristicile cheie pentru o decizie de cumparare informata.</p>
+            <div class="comparison-outer">
+              <div class="comparison-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                Gliseaza pentru a vedea tot tabelul
+              </div>
+              <div class="comparison-wrap">
+                <table class="comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Produs</th>
+                      <th>Tip</th>
+                      <th>Putere</th>
+                      <th>Suprafata</th>
+                      <th>Functii</th>
+                      <th>PotrivitPentru</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+              <tr>
+                <td><strong>Bosch Rotak 32 R</strong></td>
+                <td>Cu fir</td>
+                <td>1200W</td>
+                <td>pana la 150 mp</td>
+                <td>LeafCollect, 3 trepte inaltime</td>
+                <td>Gradini mici</td>
+              </tr>
+
+              <tr>
+                <td><strong>Gardena PowerMax 32/18V P4A</strong></td>
+                <td>Acumulator</td>
+                <td>18V</td>
+                <td>pana la 200 mp</td>
+                <td>Sistem P4A, 3 trepte inaltime</td>
+                <td>Gradini mici-medii</td>
+              </tr>
+
+              <tr>
+                <td><strong>Einhell GC-EM 1200/37</strong></td>
+                <td>Cu fir</td>
+                <td>1200W</td>
+                <td>pana la 400 mp</td>
+                <td>5 trepte inaltime, parcare</td>
+                <td>Gradini medii</td>
+              </tr>
+
+              <tr>
+                <td><strong>Makita ELM3720</strong></td>
+                <td>Cu fir</td>
+                <td>1400W</td>
+                <td>pana la 350 mp</td>
+                <td>3 trepte inaltime, indicator cos</td>
+                <td>Gradini medii</td>
+              </tr>
+
+              <tr>
+                <td><strong>Greenworks G40LM35</strong></td>
+                <td>Acumulator</td>
+                <td>40V</td>
+                <td>pana la 300 mp</td>
+                <td>5 trepte inaltime (25-80mm), pliere rapida</td>
+                <td>Gradini medii</td>
+              </tr>
+
+              <tr>
+                <td><strong>Stihl RMA 235</strong></td>
+                <td>Acumulator</td>
+                <td>36V (AK)</td>
+                <td>pana la 200 mp</td>
+                <td>4 trepte inaltime, design compact</td>
+                <td>Gradini mici-medii</td>
+              </tr>
+
+              <tr>
+                <td><strong>Ryobi RLM18X33B40</strong></td>
+                <td>Acumulator</td>
+                <td>18V</td>
+                <td>pana la 300 mp</td>
+                <td>5 trepte inaltime, sistem ONE+</td>
+                <td>Gradini medii</td>
+              </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+
+          <section id="ghid">
+            <h2>Cum alegi cea mai buna masina de tuns gazonul electrica pentru curtea ta?</h2>
+            <div class="guide">
+              <h4>Ce suprafata are gazonul meu?</h4><p>Acesta este primul si cel mai important factor. Daca aveti o gradina mica, sub 150 mp, un model cu fir precum Bosch Rotak 32 R sau Gardena PowerMax 32/18V P4A (cu acumulator) este suficient. Pentru suprafete medii, intre 150 si 400 mp, optiunile cu fir precum Einhell GC-EM 1200/37 sau Makita ELM3720 devin mai potrivite, in timp ce pentru cele pe acumulator, Greenworks G40LM35, Stihl RMA 235 sau Ryobi RLM18X33B40 sunt alegeri bune, insa trebuie atent calculata autonomia acumulatorului in functie de suprafata.</p><h4>Prefer fir sau acumulator?</h4><p>Modelele cu fir sunt, in general, mai ieftine la achizitie si ofera putere constanta, dar sunt limitate de lungimea cablului si pot fi incomode in jurul obstacolelor. Modelele pe acumulator ofera libertate de miscare, sunt mai silentioase si ecologice, insa investitia initiala este mai mare si autonomia depinde de capacitatea acumulatorului. Daca aveti deja scule pe acumulator de la un anumit brand (ex: Ryobi ONE+, Gardena P4A), extinderea ecosistemului poate fi o solutie economica.</p><h4>Ce functii suplimentare sunt importante?</h4><p>Reglajul inaltimii de taiere este esential. Un numar mai mare de trepte (5 sau mai multe) si un reglaj centralizat ofera mai multa flexibilitate. Functii precum sistemul 'LeafCollect' (Bosch), sistemul de parcare pentru curatare (Einhell) sau manerele pliabile pentru depozitare sunt, de asemenea, avantaje practice ce usureaza utilizarea si intretinerea. Verificati si greutatea masinii, mai ales daca aveti de urcat sau coborat pante.</p><h4>Ce buget am alocat?</h4><p>Preturile pentru o <strong>masina de tuns gazonul electrica</strong> variaza considerabil. Modelele cu fir entry-level pot fi gasite sub 800 lei (ex: Bosch Rotak 32 R), in timp ce modelele pe acumulator cu performante bune, incluzand acumulator si incarcator, pot ajunge la 1000-1600 lei (ex: Gardena PowerMax, Greenworks G40LM35, Ryobi RLM18X33B40). Brandurile premium precum Stihl se situeaza in partea superioara a spectrului de pret.</p>
+            </div>
+          </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat costa o masina de tuns gazonul electrica?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pretul unei masini de tuns gazonul electrica variaza intre 700 lei pentru modelele cu fir simple si pana la 1700 lei pentru modelele pe acumulator de la branduri premium. Modelele cu raport calitate-pret bun se situeaza in intervalul 900-1300 lei.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Care e diferenta intre o masina de tuns gazonul electrica cu fir si una pe acumulator?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Masinile cu fir sunt alimentate direct la priza, oferind putere constanta, dar sunt limitate de lungimea cablului. Cele pe acumulator ofera libertate de miscare, dar autonomia depinde de capacitatea acumulatorului si investitia initiala este mai mare.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Merita sa cumpar o masina de tuns gazonul electrica pentru o gradina mare?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Masinile de tuns gazonul electrice cu fir sunt cel mai bine adaptate pentru suprafete mici spre medii (pana la 400 mp). Pentru gradini foarte mari, un <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">tractoras de tuns gazonul</a> sau o motocoasa puternica ar fi mai eficiente. Modelele pe acumulator pot acoperi suprafete medii, dar autonomia trebuie calculata atent.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce putere este necesara pentru o masina de tuns gazonul electrica?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru gazon de intretinere, 1200-1400W (pentru modele cu fir) sau 18-40V (pentru modele pe acumulator) sunt suficiente. Pentru iarba mai densa sau mai inalta, puteri mai mari (peste 1400W sau 40V) vor face fata mai bine.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de des trebuie sa intretin o masina de tuns gazonul electrica?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Intretinerea este minima. Curatarea lamei si a carcasei dupa fiecare utilizare, verificarea periodica a cablului (la modelele cu fir) si incarcarea acumulatorilor (la cele pe acumulator) sunt suficiente. Lama trebuie ascutita o data pe an.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">AM</div>
+      <div class="author-info">
+        <h4>Andrei Marinescu</h4>
+        <p class="author-role">Expert Gradinarit</p>
+        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="masina-de-tuns-gazonul-electrica"
+      currentCategory="gradinarit-unelte"
+      articles={allArticles}
+    />
+
+    <!-- Prev/Next Navigation -->
+    <PrevNextNav
+      currentSlug="masina-de-tuns-gazonul-electrica"
+      currentCategory="gradinarit-unelte"
+      articles={allArticles}
+    />
+  </article>
+
+  <script>
+    document.querySelectorAll('.comparison-outer').forEach(outer => {
+      const wrap = outer.querySelector('.comparison-wrap');
+      if (!wrap) return;
+      function checkScroll() {
+        const canScroll = wrap.scrollWidth > wrap.clientWidth;
+        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
+        outer.classList.toggle('can-scroll', canScroll && !atEnd);
+      }
+      checkScroll();
+      wrap.addEventListener('scroll', checkScroll, { passive: true });
+      window.addEventListener('resize', checkScroll, { passive: true });
+    });
+
+    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
+    if (tocLinks.length > 0) {
+      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
+      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              tocLinks.forEach(a => a.classList.remove('active'));
+              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
+              match?.classList.add('active');
+            }
+          }
+        },
+        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+      );
+      sections.forEach(s => observer.observe(s));
+    }
+  </script>
+</Layout>

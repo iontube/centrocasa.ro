@@ -1,11 +1,6 @@
 {
   "pending": [
     {
-      "keyword": "masina de tuns gazonul electrica",
-      "category": "Gradinarit si Unelte",
-      "categorySlug": "gradinarit-unelte"
-    },
-    {
       "keyword": "foarfeca electrica pentru gard viu",
       "category": "Gradinarit si Unelte",
       "categorySlug": "gradinarit-unelte"
@@ -649,6 +644,13 @@
       "categorySlug": "curatenie-intretinere",
       "excerpt": "Daca cauti o solutie eficienta si ecologica pentru igienizarea locuintei, fara a folosi substante chimice agresive, un aparat de curatat cu aburi este exact ceea ce ai nevoie. Aceste dispozitive transforma apa in vapori la temperaturi inalte, capabili sa dizolve grasimea, sa elimine bacteriile, virusurile si acarienii, lasand suprafetele curate si sterilizate.",
       "date": "2026-03-05T07:58:33.848Z"
+    },
+    {
+      "keyword": "masina de tuns gazonul electrica",
+      "category": "Gradinarit si Unelte",
+      "categorySlug": "gradinarit-unelte",
+      "excerpt": "Daca cautati o solutie eficienta si ecologica pentru a mentine un gazon impecabil, o masina de tuns gazonul electrica este alegerea potrivita. Aceste unelte combina puterea necesara pentru o tundere rapida cu avantajele functionarii pe curent, eliminand emisiile poluante si zgomotul deranjant asociat motoarelor pe benzina.",
+      "date": "2026-03-06T07:55:42.599Z"
     }
   ],
   "authors": [
