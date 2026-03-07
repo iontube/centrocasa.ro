@@ -66,11 +66,6 @@
       "categorySlug": "gradinarit-unelte"
     },
     {
-      "keyword": "fotoliu suspendat pentru gradina",
-      "category": "Mobilier Gradina",
-      "categorySlug": "mobilier-gradina"
-    },
-    {
       "keyword": "banca de gradina din lemn masiv",
       "category": "Mobilier Gradina",
       "categorySlug": "mobilier-gradina"
@@ -349,6 +344,11 @@
       "keyword": "fier de calcat cu aburi puternic",
       "category": "Curatenie si Intretinere",
       "categorySlug": "curatenie-intretinere"
+    },
+    {
+      "keyword": "fotoliu suspendat pentru gradina",
+      "category": "Mobilier Gradina",
+      "categorySlug": "mobilier-gradina"
     }
   ],
   "completed": [
