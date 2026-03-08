@@ -1,0 +1,656 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Espressor automat pentru acasa",
+  excerpt: "Cautati un espressor automat pentru acasa care sa va transforme rutina zilnica intr-o experienta placuta, oferindu-va cafea de specialitate cu o simpla apasare de buton? Alegerea unui espressor automat potrivit poate fi dificila, avand in vedere multitudinea de optiuni de pe piata, fiecare cu specificatii si preturi diferite.",
+  image: "/images/articles/espressor-automat-pentru-acasa.webp",
+  category: "Electrocasnice Casa",
+  categorySlug: "electrocasnice-casa",
+  date: "2026-03-08T07:37:12.218Z",
+  modifiedDate: "2026-03-08T07:37:12.218Z",
+  author: "Cristian Popa",
+  authorRole: "Specialist Electrocasnice",
+  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
+};
+
+const faq = [
+  { question: "Cat costa un espressor automat bun pentru acasa?", answer: "Un espressor automat bun pentru acasa poate varia ca pret. Modelele entry-level, cu functii de baza, incep de la aproximativ 1500 lei. Pentru aparate cu mai multe functii, sisteme de lapte automate si o calitate superioara a cafelei, preturile pot ajunge la 3000-5000 lei sau chiar mai mult pentru modelele premium." },
+  { question: "Care e diferenta intre un espressor automat si unul manual?", answer: "Un espressor automat macina boabele, preseaza cafeaua si prepara espresso printr-o singura apasare de buton. Un espressor manual necesita macinarea separata a cafelei, presarea manuala a acesteia in portafiltru si controlul manual al timpului de extractie, oferind mai mult control dar necesitand mai multa pricepere." },
+  { question: "Merita sa cumpar un espressor automat cu sistem de lapte integrat?", answer: "Da, merita daca preferati frecvent bauturi cu lapte precum cappuccino sau latte macchiato. Aceste sisteme simplifica procesul, preparand spuma de lapte automat. Modelele cu sisteme usor de curatat, precum LatteGo, sunt o optiune excelenta pentru confort si igiena." },
+  { question: "Cat de des trebuie curatat un espressor automat?", answer: "Curatarea zilnica a grupului de cafea si a sistemului de lapte (daca exista) este recomandata. Decalcifierea si igienizarea completa a aparatului trebuie realizate conform indicatiilor producatorului, de obicei o data pe luna sau la fiecare cateva sute de cesti, in functie de duritatea apei si modelul espressorului." },
+  { question: "Ce espressor automat e cel mai bun pentru un apartament mic?", answer: "Pentru un apartament mic, un espressor automat compact, cum ar fi DeLonghi Magnifica S sau Jura ENA 8, este ideal. Aceste modele ocupa mai putin spatiu pe blatul din bucatarie, dar ofera in continuare performante ridicate si o experienta de cafea de calitate." }
+];
+
+const toc = [
+  { title: "DeLonghi Magnifica S ECAM 22.110.B", id: "delonghi-magnifica-s-ecam-22110b" },
+  { title: "Jura ENA 8 Brilliant Silver", id: "jura-ena-8-brilliant-silver" },
+  { title: "Siemens EQ.6 Plus s500 TE655203RW", id: "siemens-eq6-plus-s500-te655203rw" },
+  { title: "Philips Series 5400 EP5447/90", id: "philips-series-5400-ep544790" },
+  { title: "Krups Arabica Latte EA8298", id: "krups-arabica-latte-ea8298" },
+  { title: "Saeco GranAroma SM7485/10", id: "saeco-granaroma-sm748510" },
+  { title: "Comparatie", id: "comparatie" },
+  { title: "Cum alegi cel mai bun espressor automat pentru acasa?", id: "ghid" },
+  { title: "Intrebari Frecvente", id: "faq" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Espressor automat pentru acasa - CentroCasa"
+  description="Cautati un espressor automat pentru acasa care sa va transforme rutina zilnica intr-o experienta placuta, oferindu-va cafea de specialitate cu o simpla apasare de buton? Alegerea unui espressor automat potrivit poate fi dificila, avand in vedere multitudinea de optiuni de pe piata, fiecare cu specificatii si preturi diferite."
+  image="/images/articles/espressor-automat-pentru-acasa.webp"
+  type="article"
+  publishedTime="2026-03-08T07:37:12.218Z"
+  modifiedTime="2026-03-08T07:37:12.218Z"
+  author="Cristian Popa"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      Electrocasnice Casa
+      <span class="breadcrumb-separator">/</span>
+      <span>Espressor automat pentru acasa</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        Electrocasnice Casa
+        <span class="article-date">8 martie 2026</span>
+      </div>
+      <h1 class="article-title">Espressor automat pentru acasa</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/espressor-automat-pentru-acasa.webp" alt="Espressor automat pentru acasa" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list" id="toc-desktop-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
+        ))}
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      <section id="intro">
+        <p>Cautati un <strong>espressor automat pentru acasa</strong> care sa va transforme rutina zilnica intr-o experienta placuta, oferindu-va cafea de specialitate cu o simpla apasare de buton? Alegerea unui espressor automat potrivit poate fi dificila, avand in vedere multitudinea de optiuni de pe piata, fiecare cu specificatii si preturi diferite. Acest ghid va prezinta cele mai bune modele disponibile in 2026, analizand performanta, functiile si raportul calitate-pret, pentru a va ajuta sa faceti cea mai buna investitie in confortul si placerea dumneavoastra zilnica.</p><p>Un <strong>espressor automat pentru acasa</strong> este mai mult decat un simplu aparat electrocasnic; este partenerul dumneavoastra pentru dimineti energizante si pauze relaxante. Elibereaza de sarcinile complexe ale prepararii cafelei, transformand boabele de cafea proaspete intr-o bautura aromata, exact asa cum v-o doriti. Fie ca preferati un espresso scurt si intens, un cappuccino cremos sau un latte macchiato fin, tehnologia moderna a espressoarelor automate face totul posibil, rapid si eficient.</p><p>Ce caracteristici definitoriu diferentiaza un <strong>espressor automat pentru acasa</strong> de top de un model mediu? Raspunsul sta in calitatea constructiei, usurinta in utilizare, varietatea bauturilor oferite, sistemul de rasnire integrat si, bineinteles, rezultatul final in ceasca. Vom analiza modele care exceleaza in aceste domenii, oferind o experienta comparabila cu cea dintr-o cafenea, direct in bucataria dumneavoastra.</p>
+      </section>
+
+
+          <article class="product-review" id="delonghi-magnifica-s-ecam-22110b">
+            <div class="product-review__header">
+              <span class="section-tag">Raport Calitate-Pret</span>
+              <h3>DeLonghi Magnifica S ECAM 22.110.B</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Espressor automat cu rasnita integrata
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1450W
+              </div>
+              <div class="product-review__spec">
+                <strong>Presiune</strong>15 bari
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate rezervor apa</strong>1.8 litri
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate recipient boabe</strong>250g
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Rasnite reglabila (13 setari), reglare aroma, temperatura, dispensere cafea reglabile pe inaltime, abur pentru spumare lapte (panarello), functie apa fierbinte, program decalcifiere, program igienizare, functie economisire energie.
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS, elemente metalice pentru sistemul de incalzire.
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Modelul DeLonghi Magnifica S ECAM 22.110.B ramane o referinta in categoria <strong>espressor automat pentru acasa</strong>, datorita echilibrului sau excelent intre performanta si pret. Acesta dispune de o rasnita conica din otel inoxidabil, cu 13 setari de macinare, permitandu-va sa ajustati finetea macinarii pentru a obtine gustul perfect al cafelei. Presiunea de 15 bari asigura o extractie optima a aromei si o crema bogata pe fiecare espresso.</p><p>Unul dintre punctele forte ale acestui aparat este sistemul sau de preparare rapida a apei fierbinti, util pentru ceaiuri sau bauturi instant. Duza de abur tip 'panarello' este ideala pentru a crea spuma de lapte catifelata pentru cappuccino si latte. Desi nu este complet automatizata ca sistemele cu recipient dedicat pentru lapte, ofera suficient control pentru a obtine rezultate satisfacatoare, daca aveti putina practica.</p><p>Cum se compara cu alternativele? Spre deosebire de masinile cu capsule, Magnifica S va ofera libertatea de a alege orice tip de boabe de cafea, reducand costurile pe termen lung si minimizand impactul asupra mediului. In comparatie cu espressoarele manuale, automatizarea procesului de macinare si presare face prepararea cafelei mult mai simpla si consistenta.</p><p>Ce dezavantaje are? Rezervorul de apa si recipientul pentru boabe, desi de dimensiuni decente, pot necesita reumpleri frecvente in gospodariile cu consum mare de cafea. De asemenea, curatarea periodica, in special a grupului de preparare, necesita atentie pentru a mentine aparatul in stare optima de functionare. Sistemul de spumare a laptelui, desi functional, nu produce aceeasi micro-spuma ca sistemele automate.</p><p>Pentru cine este potrivit acest <strong>espressor automat pentru acasa</strong>? Este ideal pentru cupluri sau familii mici care doresc sa experimenteze cu diverse tipuri de cafea boabe si sa prepare bauturi pe baza de espresso, fara complicate. Pentru cei care cauta simplitate in utilizare si o calitate constanta a cafelei, la un pret accesibil, acesta este o alegere solidă.</p><p><strong>Recomandare:</strong> Daca bugetul este o prioritate, dar nu vreti sa faceti compromisuri majore la calitatea cafelei, DeLonghi Magnifica S ECAM 22.110.B ofera cel mai bun raport calitate-pret. Il puteti gasi la preturi incepand de la aproximativ 1700 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Pret accesibil pentru un espressor automat</li>
+              <li>Rasnita integrata cu 13 setari de macinare</li>
+              <li>Preparare rapida a cafelei si apei fierbinti</li>
+              <li>Design compact si elegant</li>
+              <li>Durabilitate dovedita in timp</li>
+              <li>Consum energetic redus datorita functiei de economisire.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Recipientul pentru lapte nu este automatizat</li>
+              <li>Rezervorul de apa si cel pentru boabe ar putea fi mai mari</li>
+              <li>Curatarea grupului de preparare necesita o atentie sporita</li>
+              <li>Nivelul de zgomot al rasnitei poate fi ridicat pentru unii utilizatori.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="jura-ena-8-brilliant-silver">
+            <div class="product-review__header">
+              <span class="section-tag">Premium</span>
+              <h3>Jura ENA 8 Brilliant Silver</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Espressor automat cu tehnologie P.E.P.
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1450W
+              </div>
+              <div class="product-review__spec">
+                <strong>Presiune</strong>15 bari
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate rezervor apa</strong>1.1 litri
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate recipient boabe</strong>125g
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Display color tactil, 10 specialitati de cafea programabile (inclusiv Flat White, Latte Macchiato), Rasnita Aroma G3, Tehnologie P.E.P. (Pulse Extraction Process), Sistem de apa P.F.A. (Permanent Freshness Adapter), Filtru de apa CLARIS Smart, Mod economisire energie, Setari individuale de cafea, Program igienizare, decalcifiere si curatare.
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS de inalta calitate, elemente metalice frontale.
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Jura ENA 8 Brilliant Silver reprezinta varful de gama in ceea ce priveste <strong>espressor automat pentru acasa</strong>, combinand un design minimalist si elegant cu tehnologie de ultima generatie. Display-ul sau tactil, intuitiv si usor de utilizat, va permite sa selectati dintr-o gama variata de 10 specialitati de cafea, de la espresso clasic la bauturi complexe cu lapte. Tehnologia P.E.P. (Pulse Extraction Process) optimizeaza timpul de extractie, asigurand ca si pentru bauturile scurte se obtine o aroma exceptionala.</p><p>Ce face acest espressor unic? Sistemul de preparare a cafelei cu lapte este integrat inteligent, oferind bauturi pe baza de lapte cu o textura fina si cremoasa, direct in ceasca. Rasnita Aroma G3, cu lame optimizate, macina boabele rapid si uniform, pastrand intacte aromele. Capacitatea rezervorului de apa de 1.1 litri si cel de boabe de 125g sunt dimensionate pentru un consum moderat, subliniind natura sa premium, compacta.</p><p>Cum se pozitioneaza fata de alte modele de lux? Jura ENA 8 se distinge prin simplitatea utilizarii si calitatea bauturilor, in special a celor cu lapte, comparabile cu cele de la cafenelele specializate. Sistemul automat de curatare si intretinere reduce la minim efortul dumneavoastra, un avantaj major fata de aparatele care necesita interventie manuala frecventa.</p><p>Care sunt punctele slabe? Capacitatea limitata a recipientelor pentru apa si boabe poate fi un inconvenient pentru familiile numeroase sau pentru birourile cu multi consumatori. De asemenea, pretul de achizitie este semnificativ mai ridicat decat al altor espressoare automate, plasandu-l intr-o categorie de lux. Curatarea componentelor sistemului de lapte, chiar daca este automatizata, necesita totusi o atentie sporita si utilizarea solutiilor de curatare specifice.</p><p>Pentru cine este destinat acest <strong>espressor automat pentru acasa</strong>? Este ideal pentru persoanele care apreciaza calitatea exceptionala a cafelei, complexitatea aromelor si bauturilor cu lapte, si care sunt dispuse sa investeasca intr-un aparat premium, usor de utilizat si cu un design deosebit. Pentru cunoscatorii de cafea care cauta experienta unei cafenele de specialitate acasa, fara efort.</p><p><strong>Recomandare:</strong> Daca doriti cea mai inalta calitate a cafelei si a bauturilor cu lapte, un design de exceptie si sunteti pregatiti pentru o investitie mai mare, Jura ENA 8 Brilliant Silver este alegerea perfecta. Pretul sau se situeaza in jurul valorii de 5500 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Calitate exceptionala a cafelei si a spumei de lapte</li>
+              <li>Tehnologie P.E.P. pentru o aroma intensa</li>
+              <li>Display tactil intuitiv si usor de utilizat</li>
+              <li>Design compact si elegant, potrivit oricarei bucatarii</li>
+              <li>Sistem automat de curatare si intretinere</li>
+              <li>Recunoastere automata a filtrelor de apa.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Pretul de achizitie ridicat</li>
+              <li>Capacitate mica a rezervoarelor de apa si boabe</li>
+              <li>Necesita solutii de curatare specifice brandului</li>
+              <li>Nu permite personalizarea foarte avansata a parametrilor de extractie.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="siemens-eq6-plus-s500-te655203rw">
+            <div class="product-review__header">
+              <span class="section-tag">Alegerea Noastra</span>
+              <h3>Siemens EQ.6 Plus s500 TE655203RW</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Espressor automat cu sistem dual-bean
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1700W
+              </div>
+              <div class="product-review__spec">
+                <strong>Presiune</strong>15 bari
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate rezervor apa</strong>1.7 litri
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate recipient boabe</strong>270g (plus compartiment pentru cafea macinata)
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Display tactil color "Siemens iSelect Display", 4 profiluri de utilizator, 2 sisteme de rasnire (dual-bean), 6 bauturi pre-programate (inclusiv Cappuccino, Latte Macchiato), sistem de lapte integrat (carafa detasabila), ceramica silentioasa (superSilent), functia "oneTouch DoubleCup", functie apa fierbinte, program igienizare, decalcifiere, curatare.
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS, elemente din otel inoxidabil.
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Siemens EQ.6 Plus s500 TE655203RW este un <strong>espressor automat pentru acasa</strong> ce redefinește experiența cafelei prin tehnologia sa avansată și versatilitatea. Display-ul tactil "iSelect" oferă o navigare fluidă prin meniurile aparatului, permițându-vă să selectați și să personalizați cu ușurință cele 6 băuturi pre-programate, inclusiv cele cu lapte. Sistemul dual-bean, cu două compartimente separate pentru boabe de cafea, vă permite să alternați între diferite tipuri de cafea fără a goli recipientul.</p><p>Ce îl face special? Carafa de lapte integrată, detașabilă și ușor de curățat, prepară automat spuma de lapte perfectă pentru cappuccino și latte macchiato, prin funcția "oneTouch". Rasnita "superSilent" din ceramică asigură o măcinare fină și silențioasă, păstrând intacte aromele boabelor de cafea. Posibilitatea de a crea și salva 4 profiluri de utilizator face ca acest aparat să fie ideal pentru familiile cu preferințe diverse.</p><p>Cum se compară cu alte modele premium? Siemens EQ.6 Plus s500 excelează prin combinația de funcționalități avansate (dual-bean, profiluri utilizator) și ușurința în utilizare. Sistemul automat de curățare al circuitului de lapte este un avantaj major, reducând efortul de întreținere. Spre deosebire de modelele mai simple, acesta oferă o personalizare mai profundă a băuturilor.</p><p>Ce dezavantaje prezintă? Consumul de energie, deși optimizat, este mai ridicat (1700W) comparativ cu alte modele din clasa sa, reflectând puterea necesară funcțiilor sale complexe. Dimensiunile aparatului sunt, de asemenea, mai generoase, necesitând un spațiu adecvat în bucătărie. Deși sistemul de curățare a laptelui este automat, igienizarea periodică completă a carafei și a componentelor sistemului rămâne esențială.</p><p>Pentru cine este acest <strong>espressor automat pentru acasa</strong>? Este perfect pentru familiile sau grupurile de prieteni care au gusturi variate în materie de cafea și doresc să prepare rapid și ușor o gamă largă de băuturi, de la espresso simplu la cele mai complexe latte-uri. Utilizatorii care apreciază tehnologia inteligentă și personalizarea fină a experienței de cafea vor găsi în acest model un aliat de nădejde.</p><p><strong>Recomandare:</strong> Pentru o experiență completă de cafenea acasă, cu flexibilitate în alegerea boabelor și pregătirea automată a băuturilor cu lapte, Siemens EQ.6 Plus s500 este o alegere excelentă. Prețul acestui model se situează în jurul valorii de 3500 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Sistem dual-bean pentru varietate maximă</li>
+              <li>Carafa de lapte integrată cu funcție "oneTouch"</li>
+              <li>Display tactil intuitiv "iSelect"</li>
+              <li>Profiluri de utilizator personalizabile</li>
+              <li>Râșniță ceramică silențioasă și eficientă</li>
+              <li>Curățare automată a circuitului de lapte.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Consum energetic mai ridicat (1700W)</li>
+              <li>Dimensiuni mai mari, necesită spațiu</li>
+              <li>Prețul este peste medie</li>
+              <li>Necesită igienizare completă periodică a sistemului de lapte.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="philips-series-5400-ep544790">
+            <div class="product-review__header">
+              <span class="section-tag">Best Buy 2026</span>
+              <h3>Philips Series 5400 EP5447/90</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Espressor automat cu 12 băuturi pre-programate
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1500W
+              </div>
+              <div class="product-review__spec">
+                <strong>Presiune</strong>15 bari
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate rezervor apa</strong>1.8 litri
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate recipient boabe</strong>275g
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Display "Intuitive Touchscreen", 12 băuturi (inclusiv Latte Macchiato, Cappuccino, Flat White, Americano), Sistem LatteGo (carafa de lapte cu 2 componente, fără tuburi), Rasnita ceramică durabilă (12 setări), AquaClean Filter (până la 5000 cești fără decalcifiere), Funcție "My Coffee Choice" (reglare intensitate, volum, temperatură), Funcție 2 cești, Mod economisire energie, Program igienizare, decalcifiere.
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS de înaltă calitate, elemente frontale din inox.
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Philips Series 5400 EP5447/90 se impune ca un <strong>espressor automat pentru acasa</strong> extrem de versatil, oferind o gamă impresionantă de 12 băuturi pre-programate, de la espresso intens la băuturi cremoase cu lapte. Display-ul "Intuitive Touchscreen" face selecția și personalizarea extrem de simple, permițând utilizatorilor să ajusteze intensitatea, volumul și temperatura cafelei prin funcția "My Coffee Choice".</p><p>Unul dintre cele mai mari avantaje ale acestui model este sistemul inovator LatteGo. Această carafă de lapte, compusă din doar două piese, fără tuburi sau furtunuri, face prepararea spumei de lapte extrem de igienică și ușor de curățat – pur și simplu clătiți-o sub jet de apă. Rasnițele ceramice, cu 12 setări de măcinare, sunt concepute pentru durabilitate și pentru a păstra aromele complexe ale boabelor de cafea.</p><p>Cum se diferențiază de competitori? Philips Series 5400 iese în evidență prin numărul mare de băuturi oferite și, mai ales, prin sistemul extrem de simplu de curățat al carafei de lapte. Spre deosebire de alte aparate cu sisteme automate de lapte, LatteGo minimizează efortul de întreținere, un aspect crucial pentru mulți utilizatori. Filtrele AquaClean, ce permit prepararea a până la 5000 de cești fără decalcifiere, reduc și mai mult necesitatea intervenției manuale.</p><p>Ce minusuri are acest aparat? Deși sistemul LatteGo este revoluționar, unii utilizatori ar putea prefera controlul manual asupra cantității de lapte. De asemenea, deși capacitatea rezervorului de apă este bună (1.8 litri), recipientul pentru boabe (275g) ar putea fi insuficient pentru familiile foarte mari sau birourile cu consum ridicat. Prețul, deși competitiv pentru funcționalitățile oferite, îl plasează în segmentul mediu-superior.</p><p>Pentru cine este ideal acest <strong>espressor automat pentru acasa</strong>? Este perfect pentru cei care doresc o varietate maximă de băuturi din cafea, inclusiv cele cu lapte, și pun un accent deosebit pe ușurința în curățare și întreținere. Este o soluție excelentă pentru familii cu gusturi diverse sau pentru oricine dorește să experimenteze acasă o gamă largă de specialități de cafea, fără bătăi de cap.</p><p><strong>Recomandare:</strong> Dacă vreți un espressor automat cu un număr mare de băuturi, sistem de lapte extrem de ușor de curățat și o funcționalitate intuitivă, Philips Series 5400 EP5447/90 este o alegere inteligentă. Îl puteți găsi la prețuri începând cu aproximativ 3200 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>12 băuturi pre-programate, inclusiv Flat White</li>
+              <li>Sistemul de lapte LatteGo este extrem de ușor de curățat</li>
+              <li>Display tactil intuitiv "Intuitive Touchscreen"</li>
+              <li>Filtru AquaClean pentru până la 5000 de cești fără decalcifiere</li>
+              <li>Râșniță ceramică cu 12 setări de măcinare</li>
+              <li>Funcția "My Coffee Choice" pentru personalizare.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Recipientul pentru boabe de cafea ar putea fi mai mare</li>
+              <li>Prețul este în segmentul mediu-superior</li>
+              <li>Nu oferă personalizare la fel de avansată ca modelele de top</li>
+              <li>Sistemul LatteGo, deși simplu, necesită igienizare zilnică.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="krups-arabica-latte-ea8298">
+            <div class="product-review__header">
+              <span class="section-tag">Pentru Buget Mic</span>
+              <h3>Krups Arabica Latte EA8298</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Espressor automat cu sistem de lapte integrat
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>1450W
+              </div>
+              <div class="product-review__spec">
+                <strong>Presiune</strong>15 bari
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate rezervor apa</strong>1.7 litri
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate recipient boabe</strong>275g
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Sistem One-Touch Cappuccino/Latte Macchiato, Rasnita metalica KRUPS (3 setari macinare), Display LCD, 4 programe (Espresso, Lungo, Cappuccino, Latte Macchiato), Reglare temperatura si volum cafea, Sistem de curatare pentru circuitul de lapte, Program decalcifiere, Igienizare automata a sistemului de lapte.
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS, elemente metalice.
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Krups Arabica Latte EA8298 este o opțiune excelentă pentru cei care caută un <strong>espressor automat pentru acasa</strong> capabil să prepare băuturi cu lapte, la un preț mai accesibil. Sistemul "One-Touch" permite prepararea automată a cappuccino-ului și latte-ului macchiato, cu o simplă apăsare de buton. Aparatul dispune de o rasnita metalica KRUPS cu 3 setări de măcinare, suficient pentru a obține o cafea de calitate decentă.</p><p>Display-ul LCD, deși nu la fel de avansat ca ecranele tactile, este funcțional și ușor de navigat, permițând selectarea programelor și ajustarea parametrilor de bază. Un avantaj major este sistemul automat de igienizare a circuitului de lapte, care curăță automat tubulatura după fiecare utilizare, reducând semnificativ efortul de întreținere și riscul de acumulare a bacteriilor.</p><p>Cum se compară cu alternativele din aceeași gamă de preț? Krups Arabica Latte EA8298 oferă funcționalitatea de preparare automată a băuturilor cu lapte la un preț mai mic decât multe alte modele similare. Spre deosebire de aparatele care necesită spumarea manuală a laptelui, acesta simplifică considerabil procesul. Totuși, calitatea spumei obținute nu se compară cu cea a aparatelor premium.</p><p>Ce dezavantaje prezintă acest model? Rasnita metalică, deși durabilă, poate fi mai zgomotoasă decât cele ceramice și nu oferă același nivel de finețe în măcinare. Numărul limitat de setări de măcinare (3) și programe predefinite (4) înseamnă o personalizare mai redusă comparativ cu modelele superioare. De asemenea, durata de viață a sistemului de lapte poate fi mai scurtă dacă nu este curățat corespunzător, în ciuda programului automat.</p><p>Pentru cine este potrivit acest <strong>espressor automat pentru acasa</strong>? Este ideal pentru utilizatorii cu un buget limitat, care doresc să se bucure de băuturi cu lapte (cappuccino, latte macchiato) preparate automat, fără a investi sume mari. Este o soluție bună pentru persoanele singure sau cupluri care consumă cafea ocazional și apreciază simplitatea.</p><p><strong>Recomandare:</strong> Dacă bugetul este principalul factor și doriți un aparat care să prepare automat băuturi cu lapte, Krups Arabica Latte EA8298 este o alegere rentabilă. Prețurile pentru acest model încep de la aproximativ 1500 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Sistem "One-Touch" pentru cappuccino și latte macchiato</li>
+              <li>Preț accesibil pentru un espressor automat cu sistem de lapte</li>
+              <li>Sistem automat de igienizare a circuitului de lapte</li>
+              <li>Compact și ușor de utilizat</li>
+              <li>Rezervor de apă generos (1.7 litri).</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Râșniță metalică mai zgomotoasă și mai puțin fină</li>
+              <li>Număr limitat de programe și setări de măcinare</li>
+              <li>Calitatea spumei de lapte este medie</li>
+              <li>Fiabilitatea pe termen lung a sistemului de lapte poate fi o problemă.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="saeco-granaroma-sm748510">
+            <div class="product-review__header">
+              <span class="section-tag">Premium</span>
+              <h3>Saeco GranAroma SM7485/10</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Espressor automat cu ecran tactil color și 16 băuturi
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>2000W
+              </div>
+              <div class="product-review__spec">
+                <strong>Presiune</strong>20 bari
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate rezervor apa</strong>1.8 litri
+              </div>
+              <div class="product-review__spec">
+                <strong>Capacitate recipient boabe</strong>275g
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Ecran tactil "CoffeeMaestro" cu 16 băuturi, Sistem "LatteDuo" (preparare 2 băuturi cu lapte simultan), Rasnita ceramica "BeanMaestro" (12 setari macinare), Tehnologie "HygieneClean" (autocuratare circuit lapte, decalcifiere, igienizare grup), Filtru "AquaClean", 4 profiluri utilizator, Funcție "Quick Milk Clean", Mod economisire energie.
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS de înaltă calitate, elemente frontale din inox.
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Saeco GranAroma SM7485/10 este un <strong>espressor automat pentru acasa</strong> proiectat pentru a oferi o experiență completă și personalizată. Cu un ecran tactil "CoffeeMaestro" impresionant și 16 băuturi pre-programate, acest aparat satisface chiar și cele mai pretențioase gusturi. Tehnologia "LatteDuo" permite prepararea a două băuturi cu lapte în același timp, un avantaj major pentru cupluri sau atunci când aveți oaspeți. Presiunea de 20 bari asigură o extracție puternică și o cremă bogată.</p><p>Ce îl face remarcabil? Sistemul "BeanMaestro" cu rasnita ceramică și 12 setări de măcinare oferă flexibilitate maximă în alegerea și prepararea cafelei. Tehnologia "HygieneClean" include funcții avansate de autocurățare pentru circuitul de lapte și igienizare a grupului de preparare, minimizând necesitatea intervenției manuale. Cele 4 profiluri de utilizator permit memorarea setărilor preferate pentru fiecare membru al familiei.</p><p>Cum se compară cu alte modele de top? Saeco GranAroma se distinge prin numărul mare de băuturi, presiunea superioară (20 bari) și funcția unică "LatteDuo". În timp ce alte aparate oferă băuturi cu lapte secvențial, Saeco permite prepararea simultană, economisind timp. Sistemul "HygieneClean" este, de asemenea, unul dintre cele mai complete de pe piață pentru automatizarea igienizării.</p><p>Ce dezavantaje are? Puterea de 2000W, deși contribuie la performanță, implică un consum energetic mai ridicat. Dimensiunile aparatului sunt destul de generoase, necesitând spațiu dedicat în bucătărie. Prețul de achiziție, deși justificat de funcționalități, îl plasează în segmentul premium, făcându-l mai puțin accesibil pentru un public larg. Curățarea completă, deși automatizată în mare parte, necesită totuși o intervenție manuală periodică pentru a asigura longevitatea aparatului.</p><p>Pentru cine este potrivit acest <strong>espressor automat pentru acasa</strong>? Este ideal pentru pasionații de cafea care doresc cea mai largă varietate de băuturi, inclusiv cele complexe cu lapte, preparate rapid și simultan. Familiile numeroase sau cei care primesc frecvent oaspeți vor aprecia funcția "LatteDuo" și posibilitatea de a salva preferințe multiple. Cei care pun preț pe igienă și pe o întreținere cât mai automatizată vor găsi în acest model un partener de nădejde.</p><p><strong>Recomandare:</strong> Pentru o experiență de cafenea de top acasă, cu flexibilitate maximă, funcții avansate de igienizare și capacitatea de a prepara simultan băuturi cu lapte, Saeco GranAroma SM7485/10 este o investiție excelentă. Prețul acestui model se situează în jurul valorii de 4500 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>16 băuturi pre-programate, inclusiv funcția "LatteDuo"</li>
+              <li>Presiune de 20 bari pentru extracție optimă</li>
+              <li>Ecran tactil "CoffeeMaestro" intuitiv</li>
+              <li>Sistem "HygieneClean" avansat pentru igienizare</li>
+              <li>4 profiluri de utilizator personalizabile</li>
+              <li>Râșniță ceramică "BeanMaestro" cu 12 setări.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Consum energetic ridicat (2000W)</li>
+              <li>Dimensiuni generoase</li>
+              <li>Preț ridicat</li>
+              <li>Necesită curățare manuală periodică a anumitor componente.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+
+          <section id="comparatie">
+            <h2>Comparatie</h2>
+            <p>Tabelul comparativ vă oferă o imagine de ansamblu rapidă asupra principalelor caracteristici ale espressoarelor automate analizate, ajutându-vă să identificați modelul cel mai potrivit nevoilor dumneavoastră.</p>
+            <div class="comparison-outer">
+              <div class="comparison-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                Gliseaza pentru a vedea tot tabelul
+              </div>
+              <div class="comparison-wrap">
+                <table class="comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Produs</th>
+                      <th>Tip</th>
+                      <th>Putere</th>
+                      <th>Suprafata</th>
+                      <th>Functii</th>
+                      <th>PotrivitPentru</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+              <tr>
+                <td><strong>DeLonghi Magnifica S ECAM 22.110.B</strong></td>
+                <td>Espressor automat cu rasnita</td>
+                <td>1450W</td>
+                <td>N/A (pentru cafea)</td>
+                <td>Rasnita reglabila (13 setari), abur, apa fierbinte</td>
+                <td>Buget redus, utilizare simpla</td>
+              </tr>
+
+              <tr>
+                <td><strong>Jura ENA 8 Brilliant Silver</strong></td>
+                <td>Espressor automat premium</td>
+                <td>1450W</td>
+                <td>N/A (pentru cafea)</td>
+                <td>Display tactil, P.E.P., 10 bauturi, sistem lapte automat</td>
+                <td>Calitate superioara, design</td>
+              </tr>
+
+              <tr>
+                <td><strong>Siemens EQ.6 Plus s500 TE655203RW</strong></td>
+                <td>Espressor automat cu dual-bean</td>
+                <td>1700W</td>
+                <td>N/A (pentru cafea)</td>
+                <td>Dual-bean, display tactil, 6 bauturi, sistem lapte automat, 4 profiluri</td>
+                <td>Familii, preferinte variate</td>
+              </tr>
+
+              <tr>
+                <td><strong>Philips Series 5400 EP5447/90</strong></td>
+                <td>Espressor automat cu 12 bauturi</td>
+                <td>1500W</td>
+                <td>N/A (pentru cafea)</td>
+                <td>12 bauturi, LatteGo (curatare usoara), display tactil, AquaClean</td>
+                <td>Varietate, intretinere usoara</td>
+              </tr>
+
+              <tr>
+                <td><strong>Krups Arabica Latte EA8298</strong></td>
+                <td>Espressor automat cu sistem lapte</td>
+                <td>1450W</td>
+                <td>N/A (pentru cafea)</td>
+                <td>One-Touch Cappuccino/Latte, LCD, igienizare automata lapte</td>
+                <td>Buget mic, bauturi cu lapte</td>
+              </tr>
+
+              <tr>
+                <td><strong>Saeco GranAroma SM7485/10</strong></td>
+                <td>Espressor automat cu 20 bari</td>
+                <td>2000W</td>
+                <td>N/A (pentru cafea)</td>
+                <td>16 bauturi, LatteDuo, ecran tactil, HygieneClean, 4 profiluri</td>
+                <td>Pasionati, performanta, igiena</td>
+              </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+
+          <section id="ghid">
+            <h2>Cum alegi cel mai bun espressor automat pentru acasa?</h2>
+            <div class="guide">
+              <p>Alegerea unui <strong>espressor automat pentru acasa</strong> poate fi o decizie importantă, influențată de mai mulți factori cheie. Este esențial să înțelegeți ce anume căutați pentru a face cea mai bună investiție.</p><h4>Ce tipuri de băuturi preferi cel mai des?</h4><p>Dacă sunteți un fan al cafelelor cu lapte, precum cappuccino sau latte macchiato, căutați un model cu un sistem de lapte integrat sau automatizat. Modelele precum Philips Series 5400 cu LatteGo sau Saeco GranAroma cu LatteDuo sunt concepute special pentru a simplifica prepararea acestor băuturi. Dacă, în schimb, preferați espresso simplu sau lungo, un aparat cu o rasniță bună și control asupra presiunii de extracție va fi suficient.</p><h4>Cât de importantă este ușurința în întreținere?</h4><p>Curățarea este un aspect vital pentru longevitatea oricărui aparat de cafea. Unele espressoare automate, precum Philips Series 5400 sau Krups Arabica Latte, dispun de sisteme automate de igienizare pentru circuitul de lapte. Altele, cum ar fi Jura ENA 8, au programe de autocurățare integrate. Evaluați cât timp și efort sunteți dispuși să alocați întreținerii.</p><h4>Care este bugetul dumneavoastră?</h4><p>Prețurile pentru un <strong>espressor automat pentru acasa</strong> variază considerabil, de la modele accesibile de sub 2000 lei, cum ar fi Krups Arabica Latte, până la aparate premium ce depășesc 5000 lei, precum Jura ENA 8. Stabiliți un buget clar înainte de a începe căutarea. Modelele mai ieftine pot fi excelente pentru nevoi de bază, în timp ce cele scumpe oferă funcționalități avansate, materiale premium și o calitate superioară a cafelei. Nu uitați să luați în calcul și costul boabelor de cafea pe termen lung.</p><h4>Ce funcții suplimentare sunt importante pentru dumneavoastră?</h4><p>Pe lângă funcțiile de bază, mulți producători oferă opțiuni suplimentare: display-uri tactile, profiluri de utilizator personalizabile (precum la Siemens EQ.6 Plus s500 sau Saeco GranAroma), posibilitatea de a folosi cafea măcinată, reglaje fine ale temperaturii și aromei, sau conectivitate prin aplicație mobilă. Gândiți-vă la ce funcții vă vor îmbunătăți cu adevărat experiența zilnică de preparare a cafelei.</p>
+            </div>
+          </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat costa un espressor automat bun pentru acasa?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un espressor automat bun pentru acasa poate varia ca pret. Modelele entry-level, cu functii de baza, incep de la aproximativ 1500 lei. Pentru aparate cu mai multe functii, sisteme de lapte automate si o calitate superioara a cafelei, preturile pot ajunge la 3000-5000 lei sau chiar mai mult pentru modelele premium.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Care e diferenta intre un espressor automat si unul manual?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Un espressor automat macina boabele, preseaza cafeaua si prepara espresso printr-o singura apasare de buton. Un espressor manual necesita macinarea separata a cafelei, presarea manuala a acesteia in portafiltru si controlul manual al timpului de extractie, oferind mai mult control dar necesitand mai multa pricepere.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Merita sa cumpar un espressor automat cu sistem de lapte integrat?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, merita daca preferati frecvent bauturi cu lapte precum cappuccino sau latte macchiato. Aceste sisteme simplifica procesul, preparand spuma de lapte automat. Modelele cu sisteme usor de curatat, precum LatteGo, sunt o optiune excelenta pentru confort si igiena.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat de des trebuie curatat un espressor automat?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Curatarea zilnica a grupului de cafea si a sistemului de lapte (daca exista) este recomandata. Decalcifierea si igienizarea completa a aparatului trebuie realizate conform indicatiilor producatorului, de obicei o data pe luna sau la fiecare cateva sute de cesti, in functie de duritatea apei si modelul espressorului.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce espressor automat e cel mai bun pentru un apartament mic?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Pentru un apartament mic, un espressor automat compact, cum ar fi DeLonghi Magnifica S sau Jura ENA 8, este ideal. Aceste modele ocupa mai putin spatiu pe blatul din bucatarie, dar ofera in continuare performante ridicate si o experienta de cafea de calitate.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <h4>Cristian Popa</h4>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="espressor-automat-pentru-acasa"
+      currentCategory="electrocasnice-casa"
+      articles={allArticles}
+    />
+
+    <!-- Prev/Next Navigation -->
+    <PrevNextNav
+      currentSlug="espressor-automat-pentru-acasa"
+      currentCategory="electrocasnice-casa"
+      articles={allArticles}
+    />
+  </article>
+
+  <script>
+    document.querySelectorAll('.comparison-outer').forEach(outer => {
+      const wrap = outer.querySelector('.comparison-wrap');
+      if (!wrap) return;
+      function checkScroll() {
+        const canScroll = wrap.scrollWidth > wrap.clientWidth;
+        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
+        outer.classList.toggle('can-scroll', canScroll && !atEnd);
+      }
+      checkScroll();
+      wrap.addEventListener('scroll', checkScroll, { passive: true });
+      window.addEventListener('resize', checkScroll, { passive: true });
+    });
+
+    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
+    if (tocLinks.length > 0) {
+      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
+      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              tocLinks.forEach(a => a.classList.remove('active'));
+              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
+              match?.classList.add('active');
+            }
+          }
+        },
+        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+      );
+      sections.forEach(s => observer.observe(s));
+    }
+  </script>
+</Layout>
