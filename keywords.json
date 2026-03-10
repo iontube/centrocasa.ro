@@ -241,11 +241,6 @@
       "categorySlug": "decoratiuni-casa"
     },
     {
-      "keyword": "detergent ecologic pentru casa",
-      "category": "Curatenie si Intretinere",
-      "categorySlug": "curatenie-intretinere"
-    },
-    {
       "keyword": "solutie pentru curatarea geamurilor",
       "category": "Curatenie si Intretinere",
       "categorySlug": "curatenie-intretinere"
@@ -657,6 +652,13 @@
       "categorySlug": "decoratiuni-casa",
       "excerpt": "Daca cauti solutii pentru a bloca lumina exterioara si a-ti transforma dormitorul intr-o oaza de liniste si confort, atunci perdele blackout pentru dormitor sunt raspunsul. Aceste perdele speciale sunt concepute pentru a impiedica patrunderea luminii solare sau a celei artificiale, asigurand un somn neintrerupt si un ambient mai placut.",
       "date": "2026-03-09T08:04:48.634Z"
+    },
+    {
+      "keyword": "detergent ecologic pentru casa",
+      "category": "Curatenie si Intretinere",
+      "categorySlug": "curatenie-intretinere",
+      "excerpt": "Cautati un detergent ecologic pentru casa care sa curete eficient fara a afecta mediul sau sanatatea familiei? Alegerea unui produs de curatenie ecologic inseamna optarea pentru ingrediente derivate din surse naturale, biodegradabile si fara substante chimice agresive precum fosfatii, clorul sau amoniacul.",
+      "date": "2026-03-10T07:57:20.138Z"
     }
   ],
   "authors": [
