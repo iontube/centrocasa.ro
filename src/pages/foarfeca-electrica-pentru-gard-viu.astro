@@ -1,0 +1,620 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Foarfeca electrica pentru gard viu",
+  excerpt: "Daca ai un gard viu sau arbusti ornamentali, o foarfeca electrica pentru gard viu este unealta de care ai nevoie pentru a mentine forma si sanatatea acestora cu efort minim. Aceste unelte elimina munca fizica greoaie asociata cu foarfecele manuale, permitandu-ti sa finalizezi treaba rapid si eficient, indiferent de lungimea sau grosimea crengilor.",
+  image: "/images/articles/foarfeca-electrica-pentru-gard-viu.webp",
+  category: "Gradinarit si Unelte",
+  categorySlug: "gradinarit-unelte",
+  date: "2026-03-11T07:52:54.983Z",
+  modifiedDate: "2026-03-11T07:52:54.983Z",
+  author: "Andrei Marinescu",
+  authorRole: "Expert Gradinarit",
+  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
+};
+
+const faq = [
+  { question: "Cat costa o foarfeca electrica pentru gard viu?", answer: "Preturile variaza intre 150 lei pentru modelele entry-level cu fir si peste 700 lei pentru cele pe acumulator, cu baterii incluse si performante ridicate. Modelele de mijloc, cu un bun raport calitate-pret, se incadreaza in intervalul 300-500 lei." },
+  { question: "Care este diferenta dintre o foarfeca electrica si una pe acumulator?", answer: "Foarfecele electrice cu fir ofera putere constanta si sunt, de obicei, mai ieftine, dar necesita acces la priza. Cele pe acumulator ofera libertate de miscare totala, fiind ideale pentru gradini mari, dar au o autonomie limitata de bateria reincarcabila." },
+  { question: "Ce diametru maxim de creanga poate taia o foarfeca electrica?", answer: "Majoritatea modelelor electrice cu fir pot taia crengi de pana la 18-24mm. Unele modele, precum Black+Decker GT5500 cu functia 'Saw Blade', pot aborda crengi usor mai groase. Modelele cu acumulator au, de obicei, o capacitate de taiere similara sau usor inferioara." },
+  { question: "Merita sa cumpar o foarfeca electrica cu lama lunga?", answer: "O lama lunga (50-55cm) este eficienta pentru garduri vii mari, permitand acoperirea rapida a suprafetelor. Totusi, poate fi mai greu de manevrat in spatii inguste sau pentru detalii fine. Pentru garduri mici, o lama mai scurta poate fi mai potrivita." },
+  { question: "Ce inseamna puterea motorului (W) pentru o foarfeca electrica?", answer: "Puterea motorului indica forta unealtei. Un motor mai puternic (ex: 600W) va face fata mai usor crengilor groase si dense, asigurand o taiere mai rapida si fara efort. Modelele cu putere mai mica (ex: 450W) sunt potrivite pentru crengi subtiri si intretinere usoara." }
+];
+
+const toc = [
+  { title: "Bosch UniversalHedgeCut 55", id: "bosch-universalhedgecut-55" },
+  { title: "Makita UH5570", id: "makita-uh5570" },
+  { title: "Einhell GC-EH 5550", id: "einhell-gc-eh-5550" },
+  { title: "Black+Decker GT5500", id: "blackdecker-gt5500" },
+  { title: "Worx WG204E", id: "worx-wg204e" },
+  { title: "Gardena EasyCut 450/50", id: "gardena-easycut-45050" },
+  { title: "Comparatie", id: "comparatie" },
+  { title: "Cum alegi cea mai buna foarfeca electrica pentru gard viu?", id: "ghid" },
+  { title: "Intrebari Frecvente", id: "faq" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Foarfeca electrica pentru gard viu - CentroCasa"
+  description="Daca ai un gard viu sau arbusti ornamentali, o foarfeca electrica pentru gard viu este unealta de care ai nevoie pentru a mentine forma si sanatatea acestora cu efort minim. Aceste unelte elimina munca fizica greoaie asociata cu foarfecele manuale, permitandu-ti sa finalizezi treaba rapid si eficient, indiferent de lungimea sau grosimea crengilor."
+  image="/images/articles/foarfeca-electrica-pentru-gard-viu.webp"
+  type="article"
+  publishedTime="2026-03-11T07:52:54.983Z"
+  modifiedTime="2026-03-11T07:52:54.983Z"
+  author="Andrei Marinescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      Gradinarit si Unelte
+      <span class="breadcrumb-separator">/</span>
+      <span>Foarfeca electrica pentru gard viu</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        Gradinarit si Unelte
+        <span class="article-date">11 martie 2026</span>
+      </div>
+      <h1 class="article-title">Foarfeca electrica pentru gard viu</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/foarfeca-electrica-pentru-gard-viu.webp" alt="Foarfeca electrica pentru gard viu" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list" id="toc-desktop-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
+        ))}
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      <section id="intro">
+        <p>Daca ai un gard viu sau arbusti ornamentali, o <strong>foarfeca electrica pentru gard viu</strong> este unealta de care ai nevoie pentru a mentine forma si sanatatea acestora cu efort minim. Aceste unelte elimina munca fizica greoaie asociata cu foarfecele manuale, permitandu-ti sa finalizezi treaba rapid si eficient, indiferent de lungimea sau grosimea crengilor. Alegerea corecta depinde de suprafata gradinii tale, tipul de vegetatie si bugetul disponibil, dar raspunsul direct este ca o <strong>foarfeca electrica pentru gard viu</strong> de calitate va transforma o sarcina anevoioasa intr-una placuta.</p><p>Ce face o <strong>foarfeca electrica pentru gard viu</strong> potrivita pentru tine? Raspunsul se gaseste in combinatia dintre puterea motorului, lungimea lamei, greutatea uneltei si autonomia bateriei (daca este cazul). Modelele mai puternice pot taia crengi mai groase, lamele mai lungi acopera suprafete mai mari rapid, iar o greutate redusa inseamna mai putin oboseala pe durata utilizarii. Pentru a te ajuta sa navighezi prin optiunile disponibile, am analizat cele mai populare modele de pe piata, luand in considerare performanta, fiabilitatea si raportul calitate-pret, pentru a-ti oferi un ghid complet inainte de a face achizitia.</p>
+      </section>
+
+
+          <article class="product-review" id="bosch-universalhedgecut-55">
+            <div class="product-review__header">
+              <span class="section-tag">Alegerea Noastra</span>
+              <h3>Bosch UniversalHedgeCut 55</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Foarfeca electrica pentru gard viu
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>600 W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>Lama de 55 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Sistem 'Quick-Cut', maner ergonomic, protectie lama
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS, otel securizat
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Cand vine vorba de ingrijirea gradinii, unealta potrivita face toata diferenta, iar modelul Bosch UniversalHedgeCut 55 se pozitioneaza ca un aliat de nadejde pentru oricine cauta eficienta si precizie. Cu o putere de 600W, aceasta <strong>foarfeca electrica pentru gard viu</strong> este capabila sa taie crengi cu un diametru de pana la 20mm, fara efort vizibil. Lungimea lamei de 55cm este ideala pentru majoritatea gardurilor vii de dimensiuni medii spre mari, permitand acoperirea rapida a suprafetelor extinse. Sistemul 'Quick-Cut' integrat asigura o taiere continua, prevenind blocarea lamei in crengile mai groase, o caracteristica ce economiseste timp si frustrare. Greutatea de 3.6 kg este bine echilibrata, iar manerul ergonomic, cu functia 'Multi-Grip', permite o manevrare confortabila din diverse pozitii, reducand oboseala chiar si in sesiuni prelungite de lucru. Constructia robusta, specifica brandului Bosch, promite o durabilitate pe masura performantei.</p><p>Ce diferentiaza acest model de altele similare? Sistemul de siguranta integrat, care impiedica pornirea accidentala, si protectia lamei, esentiala pentru depozitare si transport in siguranta, sunt standarde inalte. De asemenea, nivelul de zgomot este relativ redus pentru o unealta electrica de aceasta putere, un plus pentru confortul utilizatorului si al vecinilor. Comparativ cu modelele pe acumulator, UniversalHedgeCut 55 ofera putere constanta, fara grija autonomiei bateriei, fiind perfect pentru cei care au acces facil la o sursa de curent in gradina. Daca gradina ta include garduri vii mai dense sau arbusti care necesita tundere regulata, aceasta unealta se va dovedi un investitie inteligenta.</p><p>Pentru cine este potrivita aceasta <strong>foarfeca electrica pentru gard viu</strong>? Este ideala pentru proprietarii de case cu gradini de dimensiuni medii si mari, care apreciaza fiabilitatea si performanta constanta. Utilizatorii care au avut experiente frustrante cu unelte mai slabe sau cu cele pe acumulator cu autonomie limitata vor gasi in acest model o solutie eficienta. Pretul sau, situat in segmentul mediu spre superior, reflecta calitatea germana si durabilitatea pe termen lung. Recomandarea noastra este clara: daca cauti o unealta puternica, fiabila si confortabila pentru intretinerea gardului viu, Bosch UniversalHedgeCut 55 este o alegere pe care nu o vei regreta.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Putere mare (600W) pentru taiere eficienta</li>
+              <li>Lama lunga (55cm) acopera suprafete mari rapid</li>
+              <li>Sistem 'Quick-Cut' previne blocarea lamei</li>
+              <li>Maner ergonomic si functii multiple de prindere pentru confort</li>
+              <li>Constructie robusta si durabila specifica Bosch</li>
+              <li>Functionare constanta, fara grija bateriei</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Necesita sursa de curent (cablu)</li>
+              <li>Poate fi mai grea decat modelele pe acumulator pentru utilizatori mai slabi</li>
+              <li>Diametrul maxim de taiere (20mm) poate fi insuficient pentru crengi foarte groase</li>
+              <li>Pretul poate fi un factor pentru unii cumparatori</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="makita-uh5570">
+            <div class="product-review__header">
+              <span class="section-tag">Raport Calitate-Pret</span>
+              <h3>Makita UH5570</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Foarfeca electrica pentru gard viu
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>550 W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>Lama de 55 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Maner rotativ, sistem anti-vibratii, frana electrica
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Aluminiu, otel inoxidabil
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Ingrijirea unui gard viu poate fi o provocare, dar cu Makita UH5570, sarcina devine mult mai gestionabila. Acest model se distinge prin puterea sa de 550W, suficienta pentru a face fata crengilor de pana la 18mm grosime, un standard bun pentru majoritatea utilizatorilor casnici. Lama de 55cm este, de asemenea, potrivita pentru suprafete medii, permitand o finisare rapida si uniforma. Unul dintre punctele forte ale acestei <strong>foarfeca electrica pentru gard viu</strong> este sistemul anti-vibratii, care reduce semnificativ socurile transmise utilizatorului, permitand sesiuni de lucru mai lungi si mai confortabile. Manerul rotativ, o caracteristica practică, permite ajustarea unghiului de taiere in functie de pozitia gardului viu, oferind o flexibilitate sporita in utilizare.</p><p>Cum se compara cu alte optiuni din aceeasi categorie? Makita UH5570 impresioneaza prin atentia la detalii. Frana electrica integrata asigura oprirea lamei in fractiuni de secunda dupa eliberarea butonului de pornire, sporind siguranta. Greutatea de 2.9 kg este, de asemenea, un avantaj, facand-o mai usor de manevrat decat alte modele mai puternice. Pentru cine cauta o unealta fiabila, cu un brand recunoscut pentru calitate in scule electrice, acest model ofera un echilibru excelent intre performanta, confort si pret. Este o alegere solida pentru cei care doresc o unealta electrica cu fir, dar cu caracteristici premium.</p><p>Este Makita UH5570 potrivita pentru gradina ta? Daca ai un gard viu de dimensiuni medii, cu crengi nu foarte groase, si apreciezi confortul in utilizare datorita sistemului anti-vibratii si manerului rotativ, atunci da. Este o optiune excelenta pentru proprietarii de case care doresc o unealta performanta, dar nu neaparat cea mai puternica de pe piata. Raportul calitate-pret este unul dintre cele mai bune, plasandu-l ca o optiune de top pentru bugetul mediu. Recomandarea noastra este sa alegi acest model daca prioritizezi confortul si manevrabilitatea, fara a compromite calitatea taierii.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Sistem anti-vibratii pentru confort sporit</li>
+              <li>Maner rotativ pentru flexibilitate in utilizare</li>
+              <li>Frana electrica pentru siguranta suplimentara</li>
+              <li>Greutate redusa (2.9 kg) comparativ cu alte modele</li>
+              <li>Brand recunoscut pentru fiabilitate</li>
+              <li>Constructie solida</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Puterea (550W) este mai mica decat la modelele de top</li>
+              <li>Diametrul maxim de taiere (18mm) este limitat</li>
+              <li>Necesita alimentare la priza</li>
+              <li>Pretul, desi bun, este peste optiunile entry-level</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="einhell-gc-eh-5550">
+            <div class="product-review__header">
+              <span class="section-tag">Pentru Buget Mic</span>
+              <h3>Einhell GC-EH 5550</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Foarfeca electrica pentru gard viu
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>550 W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>Lama de 50 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Maner auxiliar, comutator de siguranta, protectie la suprasarcina
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic, otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Pentru cei care cauta o solutie eficienta si accesibila pentru ingrijirea gardului viu, Einhell GC-EH 5550 se prezinta ca o optiune demna de luat in considerare. Cu o putere de 550W si o lama de 50cm, aceasta <strong>foarfeca electrica pentru gard viu</strong> este potrivita pentru sarcini moderate, cum ar fi tunderea gardurilor vii mici si medii sau a arbustilor decorativi. Diametrul maxim de taiere admis este de 24mm, un avantaj notabil pentru aceasta categorie de pret, permitand abordarea unor crengi usor mai groase decat la alte modele similare. Sistemul de comutare in doi pasi, ce include un maner auxiliar, ofera un control bun asupra uneltei, iar greutatea de aproximativ 3 kg permite o utilizare fara eforturi exagerate.</p><p>Ce face ca acest model sa fie o alegere buna pentru un buget restrans? Einhell este cunoscut pentru oferirea de unelte functionale la preturi competitive. GC-EH 5550 nu face exceptie, oferind caracteristici esentiale pentru o utilizare sigura si eficienta. Protectia la suprasarcina este un element important, prevenind deteriorarea motorului in cazul blocarii lamei. Comparativ cu modelele mult mai scumpe, poate nu ofera finisajele premium sau tehnologiile avansate de reducere a vibratiilor, insa isi face treaba cu brio pentru nevoile de baza ale unui gradinar amator. Este o unealta electrica cu fir, deci autonomia nu este o problema, atata timp cat gradina are acces la electricitate.</p><p>Merita sa investesti in Einhell GC-EH 5550? Daca ai un buget limitat si ai nevoie de o <strong>foarfeca electrica pentru gard viu</strong> pentru a mentine ordinea in gradina, fara a tunde crengi foarte groase sau a lucra pe suprafete extrem de mari, raspunsul este da. Este o optiune excelenta pentru incepatori sau pentru cei care folosesc unealta ocazional. Recomandarea noastra este sa alegi acest model daca prioritizezi costul redus si functionalitatea de baza, fiind o introducere buna in lumea uneltelor electrice pentru gradina.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Pret foarte accesibil</li>
+              <li>Diametru de taiere bun (24mm) pentru clasa sa</li>
+              <li>Usoara si manevrabila</li>
+              <li>Comutator de siguranta si protectie la suprasarcina</li>
+              <li>Brand cu reputatie pentru raportul calitate-pret</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Puterea motorului (550W) este standard, nu impresionanta</li>
+              <li>Poate fi mai putin rezistenta la utilizare intensiva pe termen lung</li>
+              <li>Fara functii suplimentare de confort (ex: anti-vibratii)</li>
+              <li>Necesita conectare la priza</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="blackdecker-gt5500">
+            <div class="product-review__header">
+              <span class="section-tag">Best Buy 2026</span>
+              <h3>Black+Decker GT5500</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Foarfeca electrica pentru gard viu
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>550 W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>Lama de 50 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Sistem 'Saw Blade' pentru crengi groase, maner ergonomic, protectie lama
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ranforsat, otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Cand vine vorba de mentenanta gradinii, versatilitatea este cheia, iar Black+Decker GT5500 integreaza aceasta calitate prin sistemul sau 'Saw Blade'. Aceasta <strong>foarfeca electrica pentru gard viu</strong>, cu o putere de 550W si o lama de 50cm, este proiectata pentru a face fata nu doar tunderilor uzuale, ci si crengilor mai groase, datorita functiei suplimentare de taiere. Diametrul maxim de taiere este de 22mm, dar functia 'Saw Blade' permite abordarea unor diametre usor mai mari, oferind un plus de flexibilitate. Greutatea de 2.7 kg o face una dintre cele mai usoare optiuni, ceea ce contribuie la reducerea oboselii in timpul utilizarii.</p><p>Ce o recomanda in mod special? Sistemul 'Saw Blade' este un diferentiator important, permitand utilizatorului sa taie crengi care ar fi, in mod normal, prea groase pentru o foarfeca electrica standard. Aceasta caracteristica o face potrivita pentru o gama mai larga de sarcini in gradina, de la finisarea gardului viu la eliminarea unor ramuri mai lemnoase. Manerul ergonomic si designul echilibrat asigura o priza buna si o manevrabilitate sporita. Pentru cei care cauta o unealta electrica cu fir, GT5500 ofera un echilibru bun intre putere, versatilitate si greutate, la un pret competitiv. Este o alegere practica pentru proprietarii de case care doresc o unealta capabila sa gestioneze diverse tipuri de tunderi.</p><p>Este Black+Decker GT5500 o investitie buna pentru gradina ta? Daca gradina ta are atat garduri vii ce necesita tundere regulata, cat si arbusti cu crengi mai groase ocazional, atunci acest model este o optiune excelenta. Versatilitatea oferita de sistemul 'Saw Blade' este un avantaj major. Recomandarea noastra este clara: daca cauti o <strong>foarfeca electrica pentru gard viu</strong> usoara, cu o functie utila pentru crengi mai groase si un pret corect, Black+Decker GT5500 se impune ca o alegere inspirata.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Sistem 'Saw Blade' pentru crengi mai groase</li>
+              <li>Foarte usoara (2.7 kg)</li>
+              <li>Maner ergonomic pentru confort</li>
+              <li>Pret competitiv pentru versatilitatea oferita</li>
+              <li>Brand cu experienta in unelte de gradina</li>
+              <li>Lama de 50cm eficienta pentru majoritatea lucrarilor</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Diametrul maxim de taiere standard (22mm) este mediu</li>
+              <li>Necesita alimentare electrica prin cablu</li>
+              <li>Durabilitatea pe termen lung in conditii de utilizare intensiva poate fi o intrebare</li>
+              <li>Nu are functii avansate precum controlul vibratiilor</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="worx-wg204e">
+            <div class="product-review__header">
+              <span class="section-tag">Premium</span>
+              <h3>Worx WG204E</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Foarfeca electrica pentru gard viu (pe acumulator)
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>Baterie 20V (inclusa)
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>Lama de 55 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Acumulator compatibil cu alte unelte Worx, lama cu dubla actiune, maner soft grip
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic, otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Libertatea de miscare este esentiala in gradina, iar Worx WG204E o ofera prin functionarea pe acumulator. Aceasta <strong>foarfeca electrica pentru gard viu</strong> vine cu o baterie de 20V si o lama de 55cm, ideala pentru a lucra fara constrangerile unui cablu. Lama cu dubla actiune asigura o taiere curata si eficienta, reducand vibratiile si efortul necesar. Capacitatea bateriei (de obicei 2.0Ah sau 4.0Ah, in functie de pachet) permite o autonomie de pana la 45-60 minute de lucru continuu, suficienta pentru majoritatea gradinilor de dimensiuni medii. Greutatea de 2.5 kg (fara acumulator) este un avantaj major, facand-o extrem de manevrabila si confortabila pentru utilizare prelungita.</p><p>Cum se diferentiaza acest model? Principalul avantaj este sistemul de acumulatori. Bateria de 20V este compatibila cu o gama larga de alte unelte Worx, ceea ce inseamna ca, daca detii deja alte produse din aceasta platforma, costul initial poate fi redus. Aceasta mobilitate este un beneficiu imens fata de uneltele cu fir, eliminand riscul de a taia accidental cablul sau de a fi limitat de lungimea acestuia. Comparativ cu foarfecele electrice cu fir, WG204E ofera o libertate de operare superioara, fara a sacrifica prea mult din puterea necesara unei taieri eficiente (diametrul maxim de taiere este de 18mm). Finisajul si calitatea materialelor sugereaza o durabilitate buna.</p><p>Merita sa investesti intr-o foarfeca pe acumulator ca Worx WG204E? Daca gradina ta nu dispune de prize electrice accesibile usor sau pur si simplu preferi flexibilitatea oferita de uneltele fara fir, atunci raspunsul este un mare da. Este potrivita pentru cei care doresc o unealta performanta, usoara si convenabila. Recomandarea noastra se indreapta catre acest model pentru utilizatorii care cauta libertatea de miscare si integrarea intr-un ecosistem de unelte pe acumulator, fiind o optiune premium in segmentul sau.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Functionare pe acumulator pentru libertate maxima de miscare</li>
+              <li>Foarte usoara si manevrabila</li>
+              <li>Lama cu dubla actiune pentru taiere curata</li>
+              <li>Acumulator compatibil cu alte unelte Worx</li>
+              <li>Autonomie decenta pentru sarcini medii</li>
+              <li>Ideal pentru gradini fara acces facil la prize</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Autonomia limitata de capacitatea bateriei (necesita incarcare)</li>
+              <li>Puterea poate fi insuficienta pentru crengi foarte groase</li>
+              <li>Pretul initial poate fi mai mare, incluzand acumulator si incarcator</li>
+              <li>Necesitatea de a incarca bateria</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="gardena-easycut-45050">
+            <div class="product-review__header">
+              <span class="section-tag">Alegerea Noastra</span>
+              <h3>Gardena EasyCut 450/50</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Foarfeca electrica pentru gard viu
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>450 W
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>Lama de 50 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Maner ergonomic, protectie impotriva blocarii, sistem de taiere curat
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic, otel
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Pentru utilizatorii care cauta o unealta fiabila si usor de folosit pentru ingrijirea gardului viu, modelul Gardena EasyCut 450/50 reprezinta o optiune excelenta. Cu o putere de 450W, aceasta <strong>foarfeca electrica pentru gard viu</strong> este proiectata pentru sarcini de intretinere, taiind fara probleme crengi cu un diametru de pana la 18mm. Lama de 50cm este dimensionata optim pentru garduri vii de dimensiuni mici si medii, permitand o manevrare agila si precisa. Designul ergonomic al manerului si greutatea redusa (aproximativ 2.4 kg) fac din aceasta unealta una dintre cele mai confortabile de utilizat, chiar si pentru perioade mai lungi.</p><p>Ce o recomanda in mod special? Brandul Gardena este sinonim cu calitatea si durabilitatea in domeniul uneltelor de gradina. EasyCut 450/50 beneficiaza de acest renume, oferind o constructie solida si o performanta constanta. Sistemul de protectie impotriva blocarii lamei este o caracteristica utila, prevenind deteriorarea uneltei in cazul intalnirii unor crengi prea groase. Spre deosebire de modelele mai puternice, acest model este mai silentios si consuma mai putina energie, fiind o optiune prietenoasa atat cu utilizatorul, cat si cu mediul. Pentru cei care nu au nevoie de o putere excesiva, ci cauta o unealta fiabila pentru sarcini de baza, Gardena EasyCut 450/50 este o alegere potrivita.</p><p>Este Gardena EasyCut 450/50 potrivita pentru nevoile tale? Daca ai un gard viu de dimensiuni mici spre medii, care necesita tundere regulata pentru mentinerea formei, si preferi o unealta usoara, fiabila si usor de manevrat, atunci acest model este ideal. Este o optiune excelenta pentru gradinarii amatori care pun pret pe confort si pe o marca de incredere. Recomandarea noastra este sa alegi acest model daca prioritizezi greutatea redusa, usurinta in utilizare si fiabilitatea unui brand consacrat, pentru sarcini de intretinere.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Foarte usoara (2.4 kg) si manevrabila</li>
+              <li>Maner ergonomic pentru confort sporit</li>
+              <li>Brand de incredere (Gardena) cu reputatie pentru calitate</li>
+              <li>Sistem de protectie impotriva blocarii lamei</li>
+              <li>Consum redus de energie si nivel de zgomot scazut</li>
+              <li>Ideala pentru sarcini de intretinere uzuale</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Puterea (450W) este limitata, potrivita doar pentru crengi subtiri</li>
+              <li>Diametrul maxim de taiere (18mm) este printre cele mai mici</li>
+              <li>Necesita alimentare la priza</li>
+              <li>Poate fi considerata prea putin performanta pentru garduri vii dense sau lemnoase</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+
+          <section id="comparatie">
+            <h2>Comparatie</h2>
+            <p>Pentru a te ajuta sa vizualizezi rapid diferentele dintre modelele prezentate, am creat un tabel comparativ. Acesta evidentiaza caracteristicile cheie ale fiecarei foarfece electrice pentru gard viu, facilitand alegerea celei mai potrivite pentru nevoile tale specifice.</p>
+            <div class="comparison-outer">
+              <div class="comparison-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                Gliseaza pentru a vedea tot tabelul
+              </div>
+              <div class="comparison-wrap">
+                <table class="comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Produs</th>
+                      <th>Tip</th>
+                      <th>Putere</th>
+                      <th>Suprafata</th>
+                      <th>Functii</th>
+                      <th>PotrivitPentru</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+              <tr>
+                <td><strong>Bosch UniversalHedgeCut 55</strong></td>
+                <td>Electrica cu fir</td>
+                <td>600W</td>
+                <td>55cm</td>
+                <td>Quick-Cut, Maner Multi-Grip</td>
+                <td>Utilizatori exigenti</td>
+              </tr>
+
+              <tr>
+                <td><strong>Makita UH5570</strong></td>
+                <td>Electrica cu fir</td>
+                <td>550W</td>
+                <td>55cm</td>
+                <td>Anti-vibratii, Maner rotativ</td>
+                <td>Confort sporit</td>
+              </tr>
+
+              <tr>
+                <td><strong>Einhell GC-EH 5550</strong></td>
+                <td>Electrica cu fir</td>
+                <td>550W</td>
+                <td>50cm</td>
+                <td>Protectie suprasarcina</td>
+                <td>Buget mic</td>
+              </tr>
+
+              <tr>
+                <td><strong>Black+Decker GT5500</strong></td>
+                <td>Electrica cu fir</td>
+                <td>550W</td>
+                <td>50cm</td>
+                <td>Sistem 'Saw Blade'</td>
+                <td>Versatilitate</td>
+              </tr>
+
+              <tr>
+                <td><strong>Worx WG204E</strong></td>
+                <td>Pe acumulator (20V)</td>
+                <td>Baterie 20V</td>
+                <td>55cm</td>
+                <td>Acumulator 20V, Lama dubla</td>
+                <td>Libertate miscare</td>
+              </tr>
+
+              <tr>
+                <td><strong>Gardena EasyCut 450/50</strong></td>
+                <td>Electrica cu fir</td>
+                <td>450W</td>
+                <td>50cm</td>
+                <td>Protectie blocare, Usoara</td>
+                <td>Intretinere usoara</td>
+              </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+
+          <section id="ghid">
+            <h2>Cum alegi cea mai buna foarfeca electrica pentru gard viu?</h2>
+            <div class="guide">
+              <p>Cum alegi cea mai buna <strong>foarfeca electrica pentru gard viu</strong>?</p><p>Primul criteriu de luat in calcul este tipul de alimentare. Ai nevoie de o unealta cu fir sau preferi libertatea oferita de acumulator? Modelele cu fir, precum Bosch UniversalHedgeCut 55 sau Makita UH5570, ofera putere constanta si sunt, de obicei, mai accesibile ca pret, dar te limiteaza la distantele fata de priza. Cele pe acumulator, cum ar fi Worx WG204E, ofera mobilitate totala, fiind ideale pentru gradini mari sau zone fara acces facil la electricitate, insa autonomia bateriei si costul initial pot fi factori de decizie.</p><h4>Cat de puternica trebuie sa fie?</h4><p>Puterea motorului (masurata in W) si lungimea lamei (in cm) determina capacitatea foarfecei de a taia crengi mai groase si de a acoperi suprafete mari. Pentru garduri vii dese sau cu crengi lemnoase, cauta modele de peste 550W si cu lame de 50-55cm, cum ar fi Bosch UniversalHedgeCut 55 sau Makita UH5570. Pentru intretinere usoara sau garduri mai subtiri, modele precum Gardena EasyCut 450/50 (450W, 50cm) sunt suficiente.</p><h4>Ce functii suplimentare sunt utile?</h4><p>Pe langa puterea si lungimea lamei, ia in considerare functii care imbunatatesc confortul si siguranta. Sistemele anti-vibratii (Makita UH5570), manerele ergonomice (toate modelele) si manerele rotative (Makita UH5570) reduc oboseala. Functiile de siguranta, precum protectia la suprasarcina (Einhell GC-EH 5550) sau protectia impotriva blocarii lamei (Gardena EasyCut 450/50), sunt esentiale. Pentru versatilitate, sistemul 'Saw Blade' de la Black+Decker GT5500 este un plus.</p><h4>Care este bugetul tau?</h4><p>Preturile pentru o <strong>foarfeca electrica pentru gard viu</strong> variaza considerabil. Modelele entry-level, cum ar fi Einhell GC-EH 5550, pot fi gasite pentru sub 200 lei, fiind potrivite pentru utilizare ocazionala. Modelele de mijloc, cu un echilibru bun intre performanta si pret (Makita UH5570, Black+Decker GT5500, Gardena EasyCut 450/50), se situeaza intre 300 si 500 lei. Modelele premium, cu functii avansate sau pe acumulator (Bosch UniversalHedgeCut 55, Worx WG204E), pot depasi 600-800 lei, dar ofera o experienta de utilizare superioara si o durabilitate crescuta. Daca ai nevoie de unelte pentru diverse activitati in gradina, investitia intr-un sistem pe acumulator (precum Worx) poate fi mai avantajoasa pe termen lung.</p>
+            </div>
+          </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat costa o foarfeca electrica pentru gard viu?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Preturile variaza intre 150 lei pentru modelele entry-level cu fir si peste 700 lei pentru cele pe acumulator, cu baterii incluse si performante ridicate. Modelele de mijloc, cu un bun raport calitate-pret, se incadreaza in intervalul 300-500 lei.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Care este diferenta dintre o foarfeca electrica si una pe acumulator?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Foarfecele electrice cu fir ofera putere constanta si sunt, de obicei, mai ieftine, dar necesita acces la priza. Cele pe acumulator ofera libertate de miscare totala, fiind ideale pentru gradini mari, dar au o autonomie limitata de bateria reincarcabila.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce diametru maxim de creanga poate taia o foarfeca electrica?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Majoritatea modelelor electrice cu fir pot taia crengi de pana la 18-24mm. Unele modele, precum Black+Decker GT5500 cu functia 'Saw Blade', pot aborda crengi usor mai groase. Modelele cu acumulator au, de obicei, o capacitate de taiere similara sau usor inferioara.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Merita sa cumpar o foarfeca electrica cu lama lunga?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                O lama lunga (50-55cm) este eficienta pentru garduri vii mari, permitand acoperirea rapida a suprafetelor. Totusi, poate fi mai greu de manevrat in spatii inguste sau pentru detalii fine. Pentru garduri mici, o lama mai scurta poate fi mai potrivita.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce inseamna puterea motorului (W) pentru o foarfeca electrica?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Puterea motorului indica forta unealtei. Un motor mai puternic (ex: 600W) va face fata mai usor crengilor groase si dense, asigurand o taiere mai rapida si fara efort. Modelele cu putere mai mica (ex: 450W) sunt potrivite pentru crengi subtiri si intretinere usoara.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">AM</div>
+      <div class="author-info">
+        <h4>Andrei Marinescu</h4>
+        <p class="author-role">Expert Gradinarit</p>
+        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="foarfeca-electrica-pentru-gard-viu"
+      currentCategory="gradinarit-unelte"
+      articles={allArticles}
+    />
+
+    <!-- Prev/Next Navigation -->
+    <PrevNextNav
+      currentSlug="foarfeca-electrica-pentru-gard-viu"
+      currentCategory="gradinarit-unelte"
+      articles={allArticles}
+    />
+  </article>
+
+  <script>
+    document.querySelectorAll('.comparison-outer').forEach(outer => {
+      const wrap = outer.querySelector('.comparison-wrap');
+      if (!wrap) return;
+      function checkScroll() {
+        const canScroll = wrap.scrollWidth > wrap.clientWidth;
+        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
+        outer.classList.toggle('can-scroll', canScroll && !atEnd);
+      }
+      checkScroll();
+      wrap.addEventListener('scroll', checkScroll, { passive: true });
+      window.addEventListener('resize', checkScroll, { passive: true });
+    });
+
+    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
+    if (tocLinks.length > 0) {
+      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
+      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              tocLinks.forEach(a => a.classList.remove('active'));
+              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
+              match?.classList.add('active');
+            }
+          }
+        },
+        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+      );
+      sections.forEach(s => observer.observe(s));
+    }
+  </script>
+</Layout>
