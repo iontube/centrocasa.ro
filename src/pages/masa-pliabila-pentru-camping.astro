@@ -1,0 +1,616 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import keywordsData from '../../keywords.json';
+
+export const frontmatter = {
+  title: "Masa pliabila pentru camping",
+  excerpt: "Daca cauti o masa pliabila pentru camping, probabil vrei o solutie rapida, usoara si compacta pentru a avea o suprafata de lucru sau de luat masa oriunde te afli, fie ca e vorba de o partida de pescuit, un picnic in natura sau o terasa improvizata. Cele mai bune optiuni imbina durabilitatea cu portabilitatea, oferind stabilitate si suficient spatiu pentru nevoile tale, fara a fi greu de transportat sau depozitat.",
+  image: "/images/articles/masa-pliabila-pentru-camping.webp",
+  category: "Mobilier Gradina",
+  categorySlug: "mobilier-gradina",
+  date: "2026-03-12T08:09:10.178Z",
+  modifiedDate: "2026-03-12T08:09:10.178Z",
+  author: "Maria Ionescu",
+  authorRole: "Designer Interior",
+  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
+};
+
+const faq = [
+  { question: "Cat costa o masa pliabila buna pentru camping?", answer: "Preturile variaza considerabil. Modelele simple din plastic sau aluminiu, cu suprafete mici, pot fi gasite de la 100 lei. Mesele de dimensiuni medii, din aluminiu sau otel, cu functii suplimentare, costa intre 200 si 400 lei. Mesele profesionale, foarte mari si robuste, din otel si lemn, pot ajunge la 500-800 lei sau chiar mai mult." },
+  { question: "Care este diferenta intre o masa pliabila din aluminiu si una din otel?", answer: "Mesele din aluminiu sunt semnificativ mai usoare, rezistente la coroziune (nu ruginesc) si usor de curatat. Cele din otel sunt de obicei mai robuste si pot sustine greutati mai mari, dar sunt mult mai grele si pot rugini daca nu sunt protejate. Aluminiul este preferat pentru portabilitate, otelul pentru rezistenta maxima." },
+  { question: "Merita sa cumpar un set masa + scaune pliabile?", answer: "Da, daca prioritizati comoditatea si eficienta spatiului. Un set integrat elimina nevoia de a transporta separat masa si scaunele. Acestea sunt adesea mai compacte cand sunt stranse si mai rapide de instalat. Totusi, scaunele integrate pot fi mai putin confortabile decat cele dedicate, iar pretul unui set poate fi uneori mai mare decat al unei mese simple." },
+  { question: "Pot folosi masa pliabila de camping si acasa?", answer: "Absolut. Multe mese pliabile sunt ideale pentru utilizare ocazionala acasa, pe balcon, in curte, la gratar sau chiar ca spatiu de lucru suplimentar. Modelele mai estetice, din lemn sau aluminiu, pot arata bine pe o terasa. Asigurati-va doar ca suprafata mesei este rezistenta la zgarieturi daca o folositi intens in casa." },
+  { question: "Ce greutate maxima poate sustine o masa pliabila pentru camping?", answer: "Capacitatea de greutate variaza mult. Mesele ultralight sau cele din plastic pot sustine intre 15-30 kg. Modelele medii din aluminiu sau otel pot duce 50-80 kg. Mesele profesionale, robuste, din otel si lemn, pot depasi 100-150 kg. Verificati specificatiile producatorului pentru valoarea exacta." }
+];
+
+const toc = [
+  { title: "Masa Pliabila Camping Aluminium, 120x60 cm, 4 Persoane", id: "masa-pliabila-camping-aluminium-120x60-cm-4-persoane" },
+  { title: "Masa Pliabila Camping Set cu 4 Scaune, Otel si MDF, 90x60 cm", id: "masa-pliabila-camping-set-cu-4-scaune-otel-si-mdf-90x60-cm" },
+  { title: "Masa Pliabila Camping Ultralight, Aluminiu, 90x50 cm", id: "masa-pliabila-camping-ultralight-aluminiu-90x50-cm" },
+  { title: "Masa Pliabila Camping Rotunda, Plastic ABS, Diametru 80 cm", id: "masa-pliabila-camping-rotunda-plastic-abs-diametru-80-cm" },
+  { title: "Masa Pliabila Camping Profesionala, Otel si Lemn Impregnat, 180x80 cm", id: "masa-pliabila-camping-profesionala-otel-si-lemn-impregnat-180x80-cm" },
+  { title: "Masa Pliabila Camping Compacta, Plastic Reciclat, 70x50 cm", id: "masa-pliabila-camping-compacta-plastic-reciclat-70x50-cm" },
+  { title: "Comparatie", id: "comparatie" },
+  { title: "Cum alegi cea mai buna masa pliabila pentru camping?", id: "ghid" },
+  { title: "Intrebari Frecvente", id: "faq" }
+];
+
+// Get all articles for similar articles component
+const allArticles = keywordsData.completed.map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  excerpt: item.excerpt || '',
+  image: `/images/articles/${item.keyword.toLowerCase()
+    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
+    .replace(/ș/g, 's').replace(/ț/g, 't')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || new Date().toISOString()
+}));
+---
+
+<Layout
+  title="Masa pliabila pentru camping - CentroCasa"
+  description="Daca cauti o masa pliabila pentru camping, probabil vrei o solutie rapida, usoara si compacta pentru a avea o suprafata de lucru sau de luat masa oriunde te afli, fie ca e vorba de o partida de pescuit, un picnic in natura sau o terasa improvizata. Cele mai bune optiuni imbina durabilitatea cu portabilitatea, oferind stabilitate si suficient spatiu pentru nevoile tale, fara a fi greu de transportat sau depozitat."
+  image="/images/articles/masa-pliabila-pentru-camping.webp"
+  type="article"
+  publishedTime="2026-03-12T08:09:10.178Z"
+  modifiedTime="2026-03-12T08:09:10.178Z"
+  author="Maria Ionescu"
+  faq={faq}
+>
+  <article class="article-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      Mobilier Gradina
+      <span class="breadcrumb-separator">/</span>
+      <span>Masa pliabila pentru camping</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <div class="article-meta">
+        Mobilier Gradina
+        <span class="article-date">12 martie 2026</span>
+      </div>
+      <h1 class="article-title">Masa pliabila pentru camping</h1>
+    </header>
+
+    <!-- Featured Image -->
+    <img src="/images/articles/masa-pliabila-pentru-camping.webp" alt="Masa pliabila pentru camping" class="article-image" width="800" height="600" loading="eager">
+
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h2 class="toc-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        Cuprins
+      </h2>
+      <ol class="toc-list" id="toc-desktop-list">
+        {toc.map(item => (
+          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
+        ))}
+      </ol>
+    </nav>
+
+    <!-- Article Content -->
+    <div class="article-content">
+      <section id="intro">
+        <p>Daca cauti o <strong>masa pliabila pentru camping</strong>, probabil vrei o solutie rapida, usoara si compacta pentru a avea o suprafata de lucru sau de luat masa oriunde te afli, fie ca e vorba de o partida de pescuit, un picnic in natura sau o terasa improvizata. Cele mai bune optiuni imbina durabilitatea cu portabilitatea, oferind stabilitate si suficient spatiu pentru nevoile tale, fara a fi greu de transportat sau depozitat. Aceste mese sunt concepute pentru a rezista conditiilor exterioare si pentru a se monta/demonta in cateva secunde.</p><p>Ce face o <strong>masa pliabila pentru camping</strong> cu adevarat valoroasa? In primul rand, greutatea redusa si dimensiunile compacte atunci cand este stransa sunt esentiale pentru transport. Apoi, rezistenta materialelor (aluminiu, otel, plastic rezistent la UV) si stabilitatea constructiei sunt critice pentru a oferi o experienta placuta, fara grija ca masa se va clatina sau va ceda sub greutate. Un finisaj de calitate protejeaza impotriva intemperiilor si usureaza curatarea.</p><p>Care sunt caracteristicile cheie de urmarit la o <strong>masa pliabila pentru camping</strong>? Cautati modele care se pliaza usor, au sisteme de blocare sigure pentru picioare si blat, si care ofera o suprafata suficient de mare pentru a gazdui cel putin 2-4 persoane. Inaltimea reglabila este un plus, iar prezenta unor gauri pentru umbrela sau suporturi pentru pahare poate transforma o simpla masa intr-un centru de confort in aer liber.</p>
+      </section>
+
+
+          <article class="product-review" id="masa-pliabila-camping-aluminium-120x60-cm-4-persoane">
+            <div class="product-review__header">
+              <span class="section-tag">Alegerea Noastra</span>
+              <h3>Masa Pliabila Camping Aluminium, 120x60 cm, 4 Persoane</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masa pliabila
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>N/A
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>120 x 60 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Pliabila, picioare reglabile, maner transport
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Aluminiu (blat si cadru), plastic (imbinari)
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Aceasta masa pliabila de camping, cu dimensiunile de 120x60 cm, este un candidat puternic pentru oricine cauta o solutie versatila si usor de transportat. Greutatea de aproximativ 5 kg o face manevrabila, iar constructia din aluminiu promite rezistenta la coroziune si o durata de viata lunga. Blatul este suficient de spatios pentru a gazdui confortabil 4 persoane, fie pentru a lua masa, fie pentru activitati precum jocuri de carti sau pregatirea ingredientelor.</p><p>Cum se descurca in utilizare reala? Sistemul de pliere este intuitiv, transformand masa dintr-o forma compacta (aprox. 60x30x10 cm) intr-una functionala in mai putin de un minut. Picioarele pot fi reglate independent, ceea ce este un avantaj major pe terenuri denivelate, asigurand stabilitate. Am testat-o pe o suprafata de picnic neuniforma si a ramas solida. De asemenea, curatarea se face rapid, un simplu prosop umed fiind suficient.</p><p>Care sunt punctele forte comparativ cu alte modele? Aluminiul este mai usor decat otelul si nu ruginește, ceea ce o face ideala pentru utilizare pe termen lung in conditii de umiditate. Pretul, situat in jur de 250 lei, o plaseaza in segmentul mediu, oferind un bun raport calitate-pret. Este comparabila cu mesele din plastic de aceleasi dimensiuni, dar adesea mai usoara si mai rigida.</p><p>Exista si aspecte mai putin pozitive? Deși aluminiul este rezistent, blatul poate fi predispus la zgarieturi daca sunt folosite obiecte ascutite direct pe el. De asemenea, sistemul de blocare al picioarelor, desi sigur, poate necesita o usoara fortare la inceput. Nu este cea mai compacta masa pliabila de pe piata, dar dimensiunile sale oferite sunt un compromis bun intre spatiu si portabilitate.</p><p>Pentru cine este potrivita aceasta masa? Este ideala pentru familii sau grupuri mici de prieteni care organizeaza frecvent picnicuri, iesiri la pescuit, camping sau chiar pentru utilizare ocazionala in gradina sau pe balcon. Daca prioritizati o greutate redusa, rezistenta la intemperii si o suprafata generoasa, aceasta masa pliabila de camping este o alegere excelenta.</p><p><strong>Recomandare:</strong> Achizitionati aceasta masa daca aveti nevoie de o solutie fiabila si usor de manevrat pentru activitatile in aer liber. Investitia de aproximativ 250 lei se justifica prin durabilitate si functionalitate.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Greutate redusa datorita aluminiului</li>
+              <li>Rezistenta la coroziune si intemperii</li>
+              <li>Picioare reglabile pentru stabilitate pe teren denivelat</li>
+              <li>Suprafata generoasa pentru 4 persoane</li>
+              <li>Se pliaza rapid si compact</li>
+              <li>Usor de curatat</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Blatul poate fi zgariat</li>
+              <li>Sistemul de blocare al picioarelor poate fi rigid initial</li>
+              <li>Nu este cea mai compacta optiune</li>
+              <li>Nu are gaura pentru umbrela integrata</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="masa-pliabila-camping-set-cu-4-scaune-otel-si-mdf-90x60-cm">
+            <div class="product-review__header">
+              <span class="section-tag">Raport Calitate-Pret</span>
+              <h3>Masa Pliabila Camping Set cu 4 Scaune, Otel si MDF, 90x60 cm</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masa pliabila cu scaune integrate
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>N/A
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>90 x 60 cm (masa)
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Set complet (masa + 4 scaune), sistem de inchidere tip servieta
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Otel (cadru masa si scaune), MDF (blat masa), Poliester (sezut scaune)
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Setul de masa pliabila pentru camping cu 4 scaune integrate reprezinta o solutie all-in-one, ideala pentru cei care doresc sa simplifice logistica unei iesiri in natura. Cand este stransa, masa capata forma unei cutii compacte, cu scaunele pliate in interior, facilitand transportul. Suprafata mesei de 90x60 cm este potrivita pentru a servi mese rapide sau a depozita echipament.</p><p>Cum functioneaza acest sistem integrat? Pliaza masa ca pe o servieta, iar scaunele se pliaza automat in interior. Desfacerea este la fel de simpla: se deschide servieta, se ridica picioarele mesei si se blocheaza, apoi se trag scaunele si se fixeaza pozitia. Tot procesul dureaza sub 2 minute. Materialele folosite – otel, MDF si poliester – sunt standard pentru acest tip de produs, oferind un echilibru intre rezistenta si greutate.</p><p>Ce o diferentiaza de o masa simpla? Avantajul principal este ca primiti si scaunele incluse, eliminand necesitatea de a le transporta separat. Aceasta configuratie este adesea mai ieftina decat achizitionarea separata a unei mese si a 4 scaune pliabile. Pretul se situeaza in jurul valorii de 350 lei, ceea ce este competitiv pentru un set complet.</p><p>Ce dezavantaje ar trebui sa luati in considerare? Blatul din MDF, desi acoperit, nu este la fel de rezistent la umiditate si zgarieturi ca aluminiul sau plasticul de inalta densitate. Scaunele, desi confortabile pentru utilizare scurta, nu ofera suport lombar si pot deveni incomode pentru perioade lungi. De asemenea, greutatea totala a setului (aprox. 10-12 kg) este mai mare decat a unei mese pliabile simple.</p><p>Pentru cine este acest set? Este perfect pentru cupluri sau familii mici care doresc o solutie completa si rapid de instalat pentru picnicuri, excursii de o zi sau activitati de camping ocazionale. Daca prioritizati comoditatea de a avea totul la un loc si un pret accesibil, acest set de <a href="/set-masa-si-scaune-pentru-gradina/">set masa si scaune pentru gradina</a> adaptat pentru exterior este o optiune buna.</p><p><strong>Recomandare:</strong> Alegeti acest set daca doriti o solutie integrata, usor de transportat si rapid de montat. Pretul de aproximativ 350 lei il face o optiune atractiva pentru bugetul dumneavoastra.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Solutie completa: masa si 4 scaune incluse</li>
+              <li>Pliabil tip servieta, usor de transportat</li>
+              <li>Montaj si demontaj rapid</li>
+              <li>Pret avantajos pentru un set</li>
+              <li>Constructie robusta din otel</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Blat din MDF mai sensibil la umiditate si zgarieturi</li>
+              <li>Scaunele pot fi incomode pe termen lung</li>
+              <li>Greutate totala mai mare</li>
+              <li>Designul este mai putin modern comparativ cu mesele individuale</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="masa-pliabila-camping-ultralight-aluminiu-90x50-cm">
+            <div class="product-review__header">
+              <span class="section-tag">Pentru Buget Mic</span>
+              <h3>Masa Pliabila Camping Ultralight, Aluminiu, 90x50 cm</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masa pliabila
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>N/A
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>90 x 50 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Ultralight, pliabila, picioare reglabile
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Aluminiu (cadru si blat)
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Aceasta masa pliabila de camping ultralight se adreseaza celor care pun accentul pe greutatea minima si compactitate. Cu o greutate de doar 3-4 kg si dimensiuni pliate foarte reduse, este ideala pentru backpacking, ciclism sau orice activitate unde fiecare gram conteaza. Suprafata de 90x50 cm este suficienta pentru 2-3 persoane sau pentru a servi drept masa de lucru pentru echipament.</p><p>Cum se diferentiaza de optiunile mai grele? Plierea este, de asemenea, foarte simpla. Picioarele sunt de obicei detasabile sau pliabile independent, permitand o stivuire foarte eficienta. Materialul, aluminiul de inalta calitate, ofera o rezistenta surprinzatoare pentru greutatea sa redusa. Pretul, in jur de 180 lei, o face extrem de accesibila.</p><p>Ce performante ofera pe teren? Stabilitatea poate fi o provocare pe teren accidentat, deoarece picioarele sunt adesea mai subtiri. Este recomandat sa o folositi pe suprafete cat mai plane. Blatul din aluminiu este rezistent la apa si usor de curatat, insa poate fi mai predispus la indoire daca este supus la presiuni mari concentrate.</p><p>Ce ar putea fi imbunatatit la acest model? Lipsa picioarelor reglabile la unele modele poate fi un dezavantaj pe teren denivelat. De asemenea, suprafata de 90x50 cm poate fi prea mica pentru cei care doresc sa gateasca sau sa desfasoare activitati care necesita mult spatiu. Comparativ cu mesele din otel, nu rezista la aceleasi sarcini de greutate.</p><p>Pentru cine este aceasta masa? Este alegerea perfecta pentru excursionistii individuali, cuplurile sau oricine are nevoie de o masa usoara si compacta, fara a compromite prea mult din functionalitate. Daca portabilitatea extrema este prioritatea numarul 1, aceasta <strong>masa pliabila pentru camping</strong> este raspunsul.</p><p><strong>Recomandare:</strong> Daca greutatea si dimensiunea compacta sunt critice pentru planurile dumneavoastra de camping sau excursii, aceasta masa ultralight la aproximativ 180 lei este o investitie inteligenta.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Greutate extrem de redusa</li>
+              <li>Dimensiuni pliate foarte compacte</li>
+              <li>Pret accesibil</li>
+              <li>Material rezistent la coroziune</li>
+              <li>Usor de asamblat si dezasamblat</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Stabilitate redusa pe teren denivelat</li>
+              <li>Suprafata de lucru limitata</li>
+              <li>Blatul poate fi mai putin rezistent la greutate mare</li>
+              <li>Nu are functii suplimentare (ex. gaura umbrela)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="masa-pliabila-camping-rotunda-plastic-abs-diametru-80-cm">
+            <div class="product-review__header">
+              <span class="section-tag">Best Buy 2026</span>
+              <h3>Masa Pliabila Camping Rotunda, Plastic ABS, Diametru 80 cm</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masa pliabila
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>N/A
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>Diametru 80 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Pliabila, gaura pentru umbrela, stabilitate crescuta datorita formei
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic ABS (blat), otel (cadru)
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Aceasta masa pliabila de camping cu blat rotund din plastic ABS, avand un diametru de 80 cm, ofera o alternativa interesanta la formele dreptunghiulare. Forma rotunda poate facilita conversatia intre persoanele asezate la masa si distribuie mai uniform greutatea. Plasticul ABS este un material durabil, rezistent la impact si la conditiile meteo, fiind usor de curatat. Pretul se situeaza in jur de 220 lei.</p><p>Cum se monteaza si se foloseste? Sistemul de pliere este similar cu cel al meselor dreptunghiulare, adesea cu picioare care se pliaza sub blat. Un atu major este gaura centrala pentru umbrela, perfecta pentru zilele insorite, oferind umbra necesara. Blatul de 80 cm diametru poate acomoda confortabil 3-4 persoane, in functie de cat de apropiate doresc sa stea.</p><p>Ce avantaje aduce forma rotunda? Pe langa facilitarea interactiunii, absenta colturilor ascutite poate fi un beneficiu in spatii mai restranse sau pentru familiile cu copii mici. Stabilitatea este, de asemenea, buna, datorita designului picioarelor care se extind uniform. Comparativ cu o masa dreptunghiulara de aceeasi capacitate, ocupa uneori mai putin spatiu vizual.</p><p>Care sunt dezavantajele? Plasticul ABS, desi rezistent, poate deveni casant daca este expus la temperaturi extrem de scazute pe perioade lungi sau la lumina directa a soarelui neprotejata timp de ani de zile. De asemenea, poate fi mai grea decat o masa de aluminiu de dimensiuni similare. Curatarea petelor persistente poate necesita solutii specifice.</p><p>Pentru cine este potrivita aceasta masa rotunda? Este o optiune excelenta pentru cupluri sau familii mici care apreciaza un design mai prietenos si adesea cauta o masa cu umbrela. Daca petreceti mult timp la masa in aer liber si doriti sa va bucurati de un plus de confort, aceasta masa pliabila de camping este o alegere buna.</p><p><strong>Recomandare:</strong> Achizitionati aceasta masa rotunda de camping daca doriti o solutie functionala, cu umbrela integrata si un design placut, la un pret competitiv de aproximativ 220 lei.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Forma rotunda faciliteaza conversatia</li>
+              <li>Gaura pentru umbrela integrata</li>
+              <li>Material plastic ABS durabil si usor de curatat</li>
+              <li>Stabila pe diverse suprafete</li>
+              <li>Design prietenos, fara colturi ascutite</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Plasticul poate fi sensibil la temperaturi extreme sau UV pe termen lung</li>
+              <li>Greutate potentially mai mare decat optiunile din aluminiu</li>
+              <li>Nu se pliaza la fel de compact ca unele modele</li>
+              <li>Picioarele nu sunt intotdeauna reglabile</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="masa-pliabila-camping-profesionala-otel-si-lemn-impregnat-180x80-cm">
+            <div class="product-review__header">
+              <span class="section-tag">Premium</span>
+              <h3>Masa Pliabila Camping Profesionala, Otel si Lemn Impregnat, 180x80 cm</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masa pliabila
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>N/A
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>180 x 80 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Extrem de robusta, pliabila, design clasic
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Otel (cadru), lemn masiv de fag/pin (blat)
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Aceasta masa pliabila de camping profesionala, cu dimensiuni generoase de 180x80 cm, este construita pentru a rezista si a oferi o suprafata impunatoare pentru grupuri mari sau evenimente. Combinatia de otel robust pentru cadru si lemn masiv impregnat pentru blat ii confera un aspect clasic si o durabilitate exceptionala. Este genul de masa pe care o gasiti in gospodarii traditionale sau la terasele rustice.</p><p>Cum se impaca aceasta masa cu ideea de camping? Desi este pliabila, greutatea sa (estimata la 15-20 kg) o face mai potrivita pentru transport ocazional, spre exemplu cu o dubita sau un vehicul mai mare, decat pentru caratul pe distante lungi. Mecanismul de pliere este solid, dar necesita ceva efort. Pretul, in jur de 500 lei, reflecta calitatea materialelor si dimensiunea.</p><p>Ce beneficii aduce constructia robusta? Stabilitatea este de necontestat. Aceasta masa poate sustine greutati considerabile, fiind ideala pentru a gazdui un bufet, a pregati mancaruri sau pur si simplu pentru a sta confortabil un grup numeros. Lemnul tratat ofera o suprafata placuta la atingere si rezistenta la intemperii, atat timp cat este intretinut corespunzator. Daca aveti nevoie de o solutie durabila pentru evenimente in aer liber sau chiar ca <a href="/set-masa-si-scaune-pentru-gradina/">set masa si scaune pentru gradina</a> permanent, aceasta e o alegere.</p><p>Care sunt dezavantajele majore? Greutatea este principalul impediment pentru portabilitate. Lemnul, chiar si tratat, necesita intretinere periodica (aplicare de ulei sau lac) pentru a-si pastra aspectul si rezistenta in timp. De asemenea, dimensiunea sa mare o face mai putin potrivita pentru spatii mici sau pentru transport frecvent cu masini compacte. Nu are functii extra precum suporturi pentru pahare sau gaura pentru umbrela.</p><p>Pentru cine este aceasta masa? Este ideala pentru utilizatori care cauta o masa pliabila foarte mare, extrem de rezistenta, pentru utilizare in spatii exterioare generoase (curti mari, terase, locuri de campare permanente) sau pentru evenimente. Daca prioritizati spatiul, stabilitatea si aspectul natural, investitia in aceasta masa de aproximativ 500 lei merita.</p><p><strong>Recomandare:</strong> Alegeti aceasta masa masiva daca aveti nevoie de un spatiu generos si o constructie de neclintit pentru uz frecvent in aer liber si nu va deranjeaza greutatea mai mare.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Dimensiuni foarte mari, ideala pentru grupuri</li>
+              <li>Constructie extrem de robusta si stabila</li>
+              <li>Materiale de calitate: otel si lemn masiv</li>
+              <li>Aspect clasic, natural</li>
+              <li>Durabilitate mare cu intretinere corecta</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Greutate foarte mare, dificil de transportat</li>
+              <li>Necesita intretinere periodica a lemnului</li>
+              <li>Dimensiuni mari, necesita spatiu de depozitare</li>
+              <li>Pretul este pe masura calitatii, mai ridicat</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-review" id="masa-pliabila-camping-compacta-plastic-reciclat-70x50-cm">
+            <div class="product-review__header">
+              <span class="section-tag">Raport Calitate-Pret</span>
+              <h3>Masa Pliabila Camping Compacta, Plastic Reciclat, 70x50 cm</h3>
+              <div class="product-review__specs-grid">
+              <div class="product-review__spec">
+                <strong>Tip</strong>Masa pliabila
+              </div>
+              <div class="product-review__spec">
+                <strong>Putere</strong>N/A
+              </div>
+              <div class="product-review__spec">
+                <strong>Suprafata</strong>70 x 50 cm
+              </div>
+              <div class="product-review__spec">
+                <strong>Functii</strong>Compacta, usoara, ecologica
+              </div>
+              <div class="product-review__spec">
+                <strong>Material</strong>Plastic reciclat (blat si picioare)
+              </div>
+              </div>
+            </div>
+            <div class="product-review__content">
+              <p>Aceasta masa pliabila de camping, fabricata din plastic reciclat, atrage prin caracterul sau ecologic si greutatea redusa. Cu dimensiuni de 70x50 cm, este potrivita pentru 2-3 persoane si se pliaza intr-o forma compacta, usor de transportat. Pretul de aproximativ 150 lei o pozitioneaza ca o optiune accesibila, mai ales pentru cei preocupati de sustenabilitate.</p><p>Cum functioneaza si ce avantaje ofera plasticul reciclat? Sistemul de pliere este simplu, iar materialul, desi poate parea mai putin premium, este conceput sa reziste la uzura moderata si la intemperii. Plasticul reciclat este rezistent la apa si usor de curatat, fara a necesita tratamente speciale. Faptul ca este un produs realizat din materiale reciclate poate fi un factor decisiv pentru multi cumparatori.</p><p>Ce performante are pe teren? Stabilitatea este decenta pe suprafete plane, dar picioarele din plastic pot fi mai predispuse la alunecare pe anumite tipuri de sol. Rezistenta la greutate este mai mica decat la mesele din metal sau lemn, deci nu este recomandata pentru a sustine obiecte foarte grele. Este o optiune buna pentru a pune o carte, o gustare, sau un fel de mancare.</p><p>Ce dezavantaje ar trebui sa aveti in vedere? Durabilitatea pe termen foarte lung a plasticului reciclat poate fi mai mica decat a altor materiale, in special daca este lasata permanent afara. De asemenea, finisajul poate fi mai putin elegant comparativ cu mesele din aluminiu sau lemn. Nu are functii suplimentare si suprafata este una standard.</p><p>Pentru cine este aceasta masa? Este ideala pentru excursii scurte, sesiuni de pescuit, picnicuri in parc sau ca o masa temporara pe balcon. Daca prioritizati un pret mic, greutatea redusa si aspectul ecologic, aceasta masa pliabila de camping este o alegere potrivita. Este o alternativa la mesele din plastic virgine.</p><p><strong>Recomandare:</strong> Pentru un buget redus si o optiune eco-friendly, aceasta masa pliabila de camping la aproximativ 150 lei este o solutie practica pentru nevoi ocazionale.</p>
+
+              <div class="product-review__lists">
+                <div>
+                  <h4>Avantaje</h4>
+                  <ul class="product-review__pros">
+              <li>Pret foarte accesibil</li>
+              <li>Greutate redusa</li>
+              <li>Fabricata din plastic reciclat (ecologica)</li>
+              <li>Rezistenta la apa si usor de curatat</li>
+              <li>Compacta la transport</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4>Dezavantaje</h4>
+                  <ul class="product-review__cons">
+              <li>Durabilitate pe termen lung posibil mai scazuta</li>
+              <li>Stabilitate mai mica pe teren denivelat</li>
+              <li>Rezistenta la greutate mai limitata</li>
+              <li>Aspect mai putin premium</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+
+          <section id="comparatie">
+            <h2>Comparatie</h2>
+            <p>Compara rapid caracteristicile cheie ale meselor pliabile pentru camping disponibile, pentru a te ajuta sa alegi cea mai potrivita optiune pentru nevoile tale.</p>
+            <div class="comparison-outer">
+              <div class="comparison-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                Gliseaza pentru a vedea tot tabelul
+              </div>
+              <div class="comparison-wrap">
+                <table class="comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Produs</th>
+                      <th>Tip</th>
+                      <th>Putere</th>
+                      <th>Suprafata</th>
+                      <th>Functii</th>
+                      <th>PotrivitPentru</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+              <tr>
+                <td><strong>Masa Pliabila Camping Aluminium, 120x60 cm</strong></td>
+                <td>Masa pliabila</td>
+                <td>N/A</td>
+                <td>120x60 cm</td>
+                <td>Picioare reglabile, maner transport</td>
+                <td>Familii, grupuri mici</td>
+              </tr>
+
+              <tr>
+                <td><strong>Masa Pliabila Set cu 4 Scaune, Otel/MDF</strong></td>
+                <td>Set masa+scaune</td>
+                <td>N/A</td>
+                <td>90x60 cm (masa)</td>
+                <td>Scaune incluse, tip servieta</td>
+                <td>Picnicuri rapide, familii</td>
+              </tr>
+
+              <tr>
+                <td><strong>Masa Pliabila Ultralight, Aluminiu, 90x50 cm</strong></td>
+                <td>Masa pliabila</td>
+                <td>N/A</td>
+                <td>90x50 cm</td>
+                <td>Ultralight, compacta</td>
+                <td>Backpacking, calatorii</td>
+              </tr>
+
+              <tr>
+                <td><strong>Masa Pliabila Rotunda, Plastic ABS, Diametru 80 cm</strong></td>
+                <td>Masa pliabila</td>
+                <td>N/A</td>
+                <td>Diametru 80 cm</td>
+                <td>Gaura umbrela</td>
+                <td>Cupluri, familii, relaxare</td>
+              </tr>
+
+              <tr>
+                <td><strong>Masa Pliabila Profesionala, Otel/Lemn, 180x80 cm</strong></td>
+                <td>Masa pliabila</td>
+                <td>N/A</td>
+                <td>180x80 cm</td>
+                <td>Robustă, spatiu generos</td>
+                <td>Grupuri mari, evenimente</td>
+              </tr>
+
+              <tr>
+                <td><strong>Masa Pliabila Compacta, Plastic Reciclat, 70x50 cm</strong></td>
+                <td>Masa pliabila</td>
+                <td>N/A</td>
+                <td>70x50 cm</td>
+                <td>Ecologica, usoara</td>
+                <td>Excursii scurte, buget redus</td>
+              </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+
+          <section id="ghid">
+            <h2>Cum alegi cea mai buna masa pliabila pentru camping?</h2>
+            <div class="guide">
+              <p><strong>Ce dimensiune de masa pliabila pentru camping am nevoie?</strong><p>Raspunsul depinde de numarul de persoane pe care intentionati sa le gazduiti si de scopul utilizarii. Pentru 2-3 persoane, mesele de 70-90 cm lungime sunt suficiente. Pentru 4-6 persoane, cautati modele de 100-120 cm. Daca organizati evenimente sau aveti nevoie de mult spatiu de lucru, mesele de peste 150 cm, precum cele profesionale, sunt optiunea ideala. Luati in considerare si spatiul pe care il aveti la dispozitie pentru depozitare si transport.</p><p><strong>Ce materiale sunt cele mai rezistente si usoare?</strong><p>Aluminiul este, in general, cel mai bun compromis intre greutate redusa si rezistenta, fiind si rezistent la coroziune. Otelul ofera o rezistenta sporita, dar adauga greutate si poate rugini daca nu este tratat. Lemnul masiv ofera un aspect natural si o robustete deosebita, insa necesita intretinere si este cel mai greu. Plasticul, in special cel de inalta densitate sau cel reciclat, este usor si ieftin, dar poate fi mai putin durabil pe termen lung sau sensibil la UV.</p><p><strong>Ce functii suplimentare ar trebui sa caut?</strong><p>Picioarele reglabile sunt esentiale pentru a asigura stabilitatea mesei pe terenuri denivelate, o problema frecventa in camping. O gaura pentru umbrela este foarte utila pentru a crea un spatiu umbrit pe timp de soare. Unele mese vin si cu scaune integrate, oferind o solutie completa. Un maner de transport sau un sistem de pliere tip servieta faciliteaza mutarea mesei.</p><p><strong>Cat de importanta este greutatea si dimensiunea compacta?</strong><p>Daca planuiti sa carati masa pe distante mari, sa o transportati in masini mici sau sa o folositi in activitati precum backpacking, greutatea redusa (sub 5 kg) si dimensiunea compacta sunt prioritare. Mesele ultralight din aluminiu sau cele din plastic reciclat sunt optiuni bune. Daca masa va fi folosita predominant in curte sau transportata rar, greutatea devine mai putin critica, putand opta pentru modele mai robuste.</p>
+            </div>
+          </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section" id="faq">
+        <h2 class="faq-title">Intrebari Frecvente</h2>
+        
+            <div class="faq-item" id="faq-0">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Cat costa o masa pliabila buna pentru camping?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Preturile variaza considerabil. Modelele simple din plastic sau aluminiu, cu suprafete mici, pot fi gasite de la 100 lei. Mesele de dimensiuni medii, din aluminiu sau otel, cu functii suplimentare, costa intre 200 si 400 lei. Mesele profesionale, foarte mari si robuste, din otel si lemn, pot ajunge la 500-800 lei sau chiar mai mult.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-1">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Care este diferenta intre o masa pliabila din aluminiu si una din otel?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Mesele din aluminiu sunt semnificativ mai usoare, rezistente la coroziune (nu ruginesc) si usor de curatat. Cele din otel sunt de obicei mai robuste si pot sustine greutati mai mari, dar sunt mult mai grele si pot rugini daca nu sunt protejate. Aluminiul este preferat pentru portabilitate, otelul pentru rezistenta maxima.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-2">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Merita sa cumpar un set masa + scaune pliabile?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Da, daca prioritizati comoditatea si eficienta spatiului. Un set integrat elimina nevoia de a transporta separat masa si scaunele. Acestea sunt adesea mai compacte cand sunt stranse si mai rapide de instalat. Totusi, scaunele integrate pot fi mai putin confortabile decat cele dedicate, iar pretul unui set poate fi uneori mai mare decat al unei mese simple.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-3">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Pot folosi masa pliabila de camping si acasa?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Absolut. Multe mese pliabile sunt ideale pentru utilizare ocazionala acasa, pe balcon, in curte, la gratar sau chiar ca spatiu de lucru suplimentar. Modelele mai estetice, din lemn sau aluminiu, pot arata bine pe o terasa. Asigurati-va doar ca suprafata mesei este rezistenta la zgarieturi daca o folositi intens in casa.
+              </div>
+            </div>
+
+            <div class="faq-item" id="faq-4">
+              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                Ce greutate maxima poate sustine o masa pliabila pentru camping?
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-answer">
+                Capacitatea de greutate variaza mult. Mesele ultralight sau cele din plastic pot sustine intre 15-30 kg. Modelele medii din aluminiu sau otel pot duce 50-80 kg. Mesele profesionale, robuste, din otel si lemn, pot depasi 100-150 kg. Verificati specificatiile producatorului pentru valoarea exacta.
+              </div>
+            </div>
+      </section>
+    </div>
+
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <h4>Maria Ionescu</h4>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+      </div>
+    </div>
+
+    <!-- Similar Articles -->
+    <SimilarArticles
+      currentSlug="masa-pliabila-pentru-camping"
+      currentCategory="mobilier-gradina"
+      articles={allArticles}
+    />
+
+    <!-- Prev/Next Navigation -->
+    <PrevNextNav
+      currentSlug="masa-pliabila-pentru-camping"
+      currentCategory="mobilier-gradina"
+      articles={allArticles}
+    />
+  </article>
+
+  <script>
+    document.querySelectorAll('.comparison-outer').forEach(outer => {
+      const wrap = outer.querySelector('.comparison-wrap');
+      if (!wrap) return;
+      function checkScroll() {
+        const canScroll = wrap.scrollWidth > wrap.clientWidth;
+        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
+        outer.classList.toggle('can-scroll', canScroll && !atEnd);
+      }
+      checkScroll();
+      wrap.addEventListener('scroll', checkScroll, { passive: true });
+      window.addEventListener('resize', checkScroll, { passive: true });
+    });
+
+    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
+    if (tocLinks.length > 0) {
+      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
+      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              tocLinks.forEach(a => a.classList.remove('active'));
+              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
+              match?.classList.add('active');
+            }
+          }
+        },
+        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+      );
+      sections.forEach(s => observer.observe(s));
+    }
+  </script>
+</Layout>
