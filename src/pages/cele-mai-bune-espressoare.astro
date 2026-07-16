@@ -1,7 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
 import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
 
 const pool = emag.espressor || [];
 const byId = Object.fromEntries(pool.map(p => [p.id, p]));
@@ -242,6 +256,9 @@ const b64 = (s) => Buffer.from(s).toString('base64');
     </div>
 
     <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-espressoare" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-espressoare" currentCategory="electrocasnice-casa" articles={relatedArticles} />
   </article>
 </Layout>
 

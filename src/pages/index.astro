@@ -59,19 +59,16 @@ const sections = categories
   {sections.map((section, i) => (
     <section class="section" style={i % 2 === 0 ? 'background: var(--color-gray-100);' : ''}>
       <div class="container">
-        <div class="section-header section-header--row">
-          <div>
-            <h2 class="section-title">{section.name}</h2>
-          </div>
-          <a href={`/${section.slug}/`} class="section-see-all">
-            Vezi toate ({section.count})
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+        <div class="section-header">
+          <h2 class="section-title">{section.name}</h2>
         </div>
         <div class="articles-grid">
           {section.items.map(article => (
             <ArticleCard {...article} />
           ))}
+        </div>
+        <div class="section-footer">
+          <a href={`/${section.slug}/`} class="section-see-all-btn">Vezi toate articolele</a>
         </div>
       </div>
     </section>
