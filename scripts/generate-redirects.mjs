@@ -8,6 +8,13 @@ let groups = {};
 try { groups = JSON.parse(readFileSync(IN, 'utf8')); } catch {}
 const map = {};
 for (const list of Object.values(groups)) for (const p of list) { if (p.id && p.deeplink) map['p-' + p.id] = p.deeplink; }
+// linkuri curate (ex. 'vezi mai multe oferte' pe categorie eMAG)
+try {
+  const DEEPLINK = (u) => 'https://l.profitshare.ro/lps/9/ZmA/?redirect=' + encodeURIComponent(u);
+  const curated = JSON.parse(readFileSync(fileURLToPath(new URL('../src/data/curated-out.json', import.meta.url)), 'utf8'));
+  for (const [k, u] of Object.entries(curated)) map[k] = DEEPLINK(u);
+} catch {}
+
 const js = `// AUTO-GENERAT de scripts/generate-redirects.mjs — NU edita manual.
 const MAP = ${JSON.stringify(map)};
 export async function onRequest({ params }) {
