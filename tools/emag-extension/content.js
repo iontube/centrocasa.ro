@@ -92,10 +92,16 @@
     // Descopera SABLONUL de paginare din link-urile REALE ale paginii (nu ghicim).
     // Merge pe categorie (/slug/pN/c) SI pe cautare (/search/q/pN[?...]).
     let tmpl = null;
+    const abs = (u) => (u.startsWith('http') ? u : location.origin + u);
+    // 1) paginare pe PATH: /slug/pN/c  sau  /search/q/pN
     const mm = page1html.match(/href="([^"]*\/p)\d+((?:\/c)?[^"?]*)(\?[^"]*)?"/i);
     if (mm) {
       const pre = mm[1], suf = (mm[2] || ''), qs = (mm[3] || '').replace(/&amp;/g, '&');
-      tmpl = (n) => (pre.startsWith('http') ? '' : location.origin) + pre + n + suf + qs;
+      tmpl = (n) => abs(pre + n + suf + qs);
+    } else {
+      // 2) fallback paginare pe QUERY: ?page=N sau &page=N (unele liste eMAG)
+      const qm = page1html.match(/href="([^"]*[?&]page=)\d+([^"]*)"/i);
+      if (qm) { const pre = qm[1].replace(/&amp;/g, '&'), suf = (qm[2] || '').replace(/&amp;/g, '&'); tmpl = (n) => abs(pre + n + suf); }
     }
     const pages = [location.href];
     if (tmpl) { for (let p = 2; p <= cfg.maxPages; p++) pages.push(tmpl(p)); }
