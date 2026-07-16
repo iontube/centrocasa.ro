@@ -896,8 +896,11 @@ p {
 
 .similar-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-lg);
+}
+@media (min-width: 640px) {
+  .similar-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* ===== FOOTER ===== */
