@@ -61,6 +61,7 @@ const allArticles = keywordsData.completed.map(item => ({
   publishedTime="2026-01-03T06:00:00.000Z"
   modifiedTime="2026-01-26T06:00:00.000Z"
   author="Cristian Popa"
+  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
   faq={faq}
 >
   <article class="article-container">

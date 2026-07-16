@@ -14,6 +14,7 @@ interface Props {
   modifiedTime?: string;
   author?: string;
   faq?: Array<{ question: string; answer: string }>;
+  breadcrumb?: Array<{ name: string; url?: string }>;
 }
 
 const {
@@ -25,26 +26,54 @@ const {
   publishedTime,
   modifiedTime,
   author,
-  faq
+  faq,
+  breadcrumb
 } = Astro.props;
 
 const siteUrl = 'https://centrocasa.ro';
 const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).href;
 const ogImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 
-// Schema markup
+// WebSite (fara SearchAction fals — nu exista cautare pe site)
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "CentroCasa",
   "url": siteUrl,
   "description": "Sfaturi si recomandari pentru casa si gradina ta",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": `${siteUrl}/?s={search_term_string}`,
-    "query-input": "required name=search_term_string"
-  }
+  "publisher": { "@type": "Organization", "name": "CentroCasa", "url": siteUrl }
 };
+
+// Article schema — doar pe pagini article, din propsurile deja transmise de pagini
+const articleSchema = type === 'article' ? {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "image": ogImage,
+  "url": canonicalUrl,
+  "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
+  ...(publishedTime ? { "datePublished": publishedTime } : {}),
+  ...(modifiedTime ? { "dateModified": modifiedTime } : {}),
+  ...(author ? { "author": { "@type": "Person", "name": author } } : {}),
+  "publisher": {
+    "@type": "Organization",
+    "name": "CentroCasa",
+    "logo": { "@type": "ImageObject", "url": `${siteUrl}/favicon.svg` }
+  }
+} : null;
+
+// BreadcrumbList — cand pagina transmite breadcrumb
+const breadcrumbSchema = breadcrumb && breadcrumb.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumb.map((b, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": b.name,
+    ...(b.url ? { "item": b.url.startsWith('http') ? b.url : `${siteUrl}${b.url}` } : {})
+  }))
+} : null;
 
 const faqSchema = faq && faq.length > 0 ? {
   "@context": "https://schema.org",
@@ -65,7 +94,8 @@ const faqSchema = faq && faq.length > 0 ? {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="theme-color" content="#16a34a">
 
   <title>{title}</title>
   <meta name="description" content={description}>
@@ -99,6 +129,8 @@ const faqSchema = faq && faq.length > 0 ? {
 
   <!-- Schema.org -->
   <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)}></script>
+  {articleSchema && <script type="application/ld+json" set:html={JSON.stringify(articleSchema)}></script>}
+  {breadcrumbSchema && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)}></script>}
   {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>}
 </head>
 <body>

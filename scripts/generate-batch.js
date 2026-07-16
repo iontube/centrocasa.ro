@@ -691,6 +691,7 @@ const allArticles = keywordsData.completed.map(item => ({
   publishedTime="${date}"
   modifiedTime="${date}"
   author="${escapeForHtml(author.name)}"
+  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
   faq={faq}
 >
   <article class="article-container">
