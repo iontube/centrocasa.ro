@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "CentroCasa — eMAG collector",
+  "version": "1.0.0",
+  "description": "Extrage produse pentru casa & gradina de pe eMAG (rating, pret, imagini, specs) si le trimite la colectorul CentroCasa. Filtru pe nr. recenzii.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "*://www.emag.ro/*",
+    "https://centrocasa-emag-collector.noisy-star-b5e3.workers.dev/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    { "matches": ["*://www.emag.ro/*"], "js": ["content.js"], "run_at": "document_idle" }
+  ],
+  "action": { "default_popup": "popup.html", "default_title": "CentroCasa eMAG collector" }
+}

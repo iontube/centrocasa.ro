@@ -1,0 +1,7 @@
+name = "centrocasa-emag-collector"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[[kv_namespaces]]
+binding = "EMAG"
+id = "1d148851aa3b4c38a8b1b7e99b8e057b"
