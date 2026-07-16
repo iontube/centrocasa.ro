@@ -73,9 +73,6 @@ const sections = categories
             <ArticleCard {...article} />
           ))}
         </div>
-        <div class="section-footer">
-          <a href={`/${section.slug}/`} class="section-see-all-btn">Vezi toate articolele din {section.name}</a>
-        </div>
       </div>
     </section>
   ))}
@@ -126,13 +123,13 @@ const sections = categories
     .section-header--row { flex-direction: column; align-items: flex-start; }
   }
 
-  .about { background: var(--color-earth-50, #faf8f5); }
+  .about { background: linear-gradient(135deg, var(--color-primary-800, #166534) 0%, var(--color-primary-900, #14532d) 100%); }
   .about-head { text-align: center; max-width: 680px; margin: 0 auto 2.5rem; }
-  .about-head .section-title { margin-bottom: .5rem; }
-  .about-lead { color: var(--color-gray-600, #57534e); font-size: 1.05rem; line-height: 1.7; margin: 0; }
+  .about-head .section-title { color: #fff; margin-bottom: .5rem; }
+  .about-lead { color: rgba(255,255,255,.85); font-size: 1.05rem; line-height: 1.7; margin: 0; }
   .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; max-width: 960px; margin: 0 auto; }
-  .about-card { background: #fff; border: 1px solid var(--color-earth-200, #e8dfd0); border-radius: 14px; padding: 1.9rem 1.6rem; text-align: center; }
-  .about-icon { width: 54px; height: 54px; margin: 0 auto 1.1rem; border-radius: 13px; background: var(--color-primary-50, #f0fdf4); color: var(--color-primary-600, #16a34a); display: flex; align-items: center; justify-content: center; }
-  .about-card h3 { font-size: 1.12rem; margin: 0 0 .45rem; }
-  .about-card p { color: var(--color-gray-600, #57534e); font-size: .93rem; line-height: 1.6; margin: 0; }
+  .about-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 14px; padding: 1.9rem 1.6rem; text-align: center; }
+  .about-icon { width: 54px; height: 54px; margin: 0 auto 1.1rem; border-radius: 13px; background: rgba(255,255,255,.12); color: var(--color-primary-300, #86efac); display: flex; align-items: center; justify-content: center; }
+  .about-card h3 { color: #fff; font-size: 1.12rem; margin: 0 0 .45rem; }
+  .about-card p { color: rgba(255,255,255,.78); font-size: .93rem; line-height: 1.6; margin: 0; }
 </style>
