@@ -313,6 +313,28 @@
   ],
   "completed": [
     {
+      "keyword": "Cele mai bune espressoare",
+      "category": "Electrocasnice Casa",
+      "categorySlug": "electrocasnice-casa",
+      "excerpt": "6 espressoare automate comparate pe pret, rasnita si sistem de lapte, cu pareri reale de la cumparatori.",
+      "date": "2026-07-16T20:10:00+03:00",
+      "modifiedDate": "2026-07-16T20:10:00+03:00",
+      "author": "Cristian Popa",
+      "slug": "cele-mai-bune-espressoare",
+      "image": "/imagini/articole/espressoare.webp",
+      "images": [
+        "/imagini/articole/espressoare.webp",
+        "/imagini/articole/espressoare-buget.webp",
+        "/imagini/articole/espressoare-premium.webp",
+        "/imagini/produse/espressor-automat-de-longhi-magnifica-s-ecam22-112-b-4-bauturi-sistem-dzbl1hmbm.webp",
+        "/imagini/produse/espressor-automat-krups-espresseria-automatic-ea810b70-1400w-15-bar-1-dz7q2ybbm.webp",
+        "/imagini/produse/espressor-automat-philips-ep2220-10-sistem-de-spumare-a-laptelui-2-bau-d3yf31bbm.webp",
+        "/imagini/produse/espressor-automat-de-longhi-magnifica-evo-milk-ecam290-51-b-5-bauturi-dy9fc8mbm.webp",
+        "/imagini/produse/espressor-automat-philips-ep2235-40-15-bar-12-setari-de-macinare-3-set-ddn2cmmbm.webp",
+        "/imagini/produse/espressor-cu-capsule-krups-nescafe-dolce-gusto-piccolo-xs-kp1a0810-160-dw0wn8bbm.webp"
+      ]
+    },
+    {
       "keyword": "cel mai bun tractoras pentru tuns gazonul",
       "category": "Gradinarit si Unelte",
       "categorySlug": "gradinarit-unelte",

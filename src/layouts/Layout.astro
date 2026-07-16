@@ -141,5 +141,12 @@ const faqSchema = faq && faq.length > 0 ? {
   </main>
   <Footer />
   <CookieBanner />
+  <script>
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-o]');
+      if (!el) return;
+      try { window.open('/out/' + atob(el.getAttribute('data-o')), '_blank', 'noopener'); } catch {}
+    });
+  </script>
 </body>
 </html>

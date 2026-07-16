@@ -9,3 +9,5 @@ cron.log
 generation.log
 .claude/
 .DS_Store
+src/data/emag-raw.json
+functions/out/[slug].js

@@ -65,10 +65,10 @@ function getDateFromAstro(slug) {
 
 // Get completed articles sorted by date descending (newest first)
 function getArticles() {
-  // Exclude articolele legacy din sitemap DOAR daca exista articole noi (non-legacy)
+  // Exclude articolele legacy din sitemap doar cand avem destule articole noi (prag = 6, ca la afisare)
   const _all = keywordsData.completed || [];
   const _fresh = _all.filter(a => !a.legacy);
-  const articles = _fresh.length ? _fresh : _all;
+  const articles = _fresh.length >= 6 ? _fresh : _all;
   // Fill in missing dates from .astro frontmatter
   for (const article of articles) {
     if (!article.date && !article.modifiedDate) {
@@ -112,16 +112,22 @@ function generatePostSitemaps() {
     let urlEntries = '';
     for (const article of chunk) {
       const slug = article.slug || slugify(article.keyword);
-      const imageFile = path.join(DIST_DIR, 'images', 'articles', `${slug}.webp`);
-      const hasImage = fs.existsSync(imageFile);
+      // TOATE imaginile articolului: hero + figuri + poze produse (din keywords.json `images`),
+      // fallback la imaginea unica /images/articles/<slug>.webp (articolele vechi).
+      let imgs = Array.isArray(article.images) ? article.images.filter(Boolean) : [];
+      if (imgs.length === 0) {
+        const imageFile = path.join(DIST_DIR, 'images', 'articles', `${slug}.webp`);
+        if (fs.existsSync(imageFile)) imgs = [`/images/articles/${slug}.webp`];
+      }
+      const imageTags = imgs.map((i) => `
+		<image:image>
+			<image:loc>${i.startsWith('http') ? i : SITE_URL + i}</image:loc>
+		</image:image>`).join('');
 
       urlEntries += `
 	<url>
 		<loc>${SITE_URL}/${slug}/</loc>
-		<lastmod>${formatDate(article.modifiedDate || article.date)}</lastmod>${hasImage ? `
-		<image:image>
-			<image:loc>${SITE_URL}/images/articles/${slug}.webp</image:loc>
-		</image:image>` : ''}
+		<lastmod>${formatDate(article.modifiedDate || article.date)}</lastmod>${imageTags}
 	</url>`;
     }
 
