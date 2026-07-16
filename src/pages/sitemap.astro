@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import keywordsData from '../../keywords.json';
+import { visibleArticles } from '../lib/articles.mjs';
 
 const categories = [
   { name: 'Gradinarit si Unelte', slug: 'gradinarit-unelte' },
@@ -10,7 +11,7 @@ const categories = [
   { name: 'Curatenie si Intretinere', slug: 'curatenie-intretinere' }
 ];
 
-const articles = keywordsData.completed.map(item => ({
+const articles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
   slug: item.keyword.toLowerCase()
     .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')

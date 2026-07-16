@@ -65,7 +65,10 @@ function getDateFromAstro(slug) {
 
 // Get completed articles sorted by date descending (newest first)
 function getArticles() {
-  const articles = keywordsData.completed || [];
+  // Exclude articolele legacy din sitemap DOAR daca exista articole noi (non-legacy)
+  const _all = keywordsData.completed || [];
+  const _fresh = _all.filter(a => !a.legacy);
+  const articles = _fresh.length ? _fresh : _all;
   // Fill in missing dates from .astro frontmatter
   for (const article of articles) {
     if (!article.date && !article.modifiedDate) {

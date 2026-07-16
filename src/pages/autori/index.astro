@@ -1,0 +1,57 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import keywordsData from '../../../keywords.json';
+import { slugify } from '../../lib/articles.mjs';
+
+const authors = (keywordsData.authors || []).map(a => ({
+  ...a,
+  slug: slugify(a.name),
+  initials: a.name.split(' ').map(n => n[0]).join('')
+}));
+---
+
+<Layout
+  title="Autorii CentroCasa - echipa de specialisti"
+  description="Echipa CentroCasa: specialisti in gradinarit, electrocasnice, mobilier si amenajari care testeaza si recomanda produse pentru casa si gradina."
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Autori' }]}
+>
+  <div class="authors-page">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>Autori</span>
+    </nav>
+
+    <header class="authors-header">
+      <h1>Echipa CentroCasa</h1>
+      <p>Specialistii care testeaza produsele si scriu recomandarile de pe site.</p>
+    </header>
+
+    <div class="authors-grid">
+      {authors.map(a => (
+        <a href={`/autori/${a.slug}/`} class="author-card">
+          <div class="author-card-avatar">{a.initials}</div>
+          <div>
+            <h2>{a.name}</h2>
+            <p class="author-card-role">{a.role}</p>
+            <p class="author-card-bio">{a.bio}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .authors-page { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+  .authors-header { margin: 1rem 0 2rem; }
+  .authors-header h1 { margin: 0 0 .4rem; font-size: 1.8rem; }
+  .authors-header p { margin: 0; color: #6b7280; }
+  .authors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+  .author-card { display: flex; gap: 1rem; align-items: flex-start; text-decoration: none; color: inherit; background: #fff; border: 1px solid var(--color-earth-200, #e8dfd0); border-radius: 14px; padding: 1.25rem; transition: box-shadow .15s, transform .15s; }
+  .author-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.08); transform: translateY(-2px); }
+  .author-card-avatar { flex: 0 0 auto; width: 60px; height: 60px; border-radius: 50%; background: var(--color-primary-600, #16a34a); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; }
+  .author-card h2 { margin: 0 0 .2rem; font-size: 1.15rem; }
+  .author-card-role { margin: 0 0 .5rem; color: var(--color-primary-700, #15803d); font-weight: 600; font-size: .9rem; }
+  .author-card-bio { margin: 0; color: #4b5563; font-size: .9rem; line-height: 1.5; }
+</style>

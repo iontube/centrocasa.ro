@@ -1,0 +1,92 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import keywordsData from '../../../keywords.json';
+import { visibleArticles, slugify } from '../../lib/articles.mjs';
+
+export async function getStaticPaths() {
+  const authors = keywordsData.authors || [];
+  return authors.map(a => ({ params: { slug: slugify(a.name) }, props: { author: a } }));
+}
+
+const { author } = Astro.props;
+const slug = slugify(author.name);
+const siteUrl = 'https://centrocasa.ro';
+const cats = author.categories || [];
+const initials = author.name.split(' ').map(n => n[0]).join('');
+
+const articles = visibleArticles(keywordsData.completed)
+  .filter(item => cats.includes(item.categorySlug))
+  .map(item => {
+    const s = slugify(item.keyword);
+    return {
+      title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+      slug: s,
+      excerpt: item.excerpt || '',
+      image: `/images/articles/${s}.webp`,
+      category: item.category,
+      categorySlug: item.categorySlug,
+      date: item.date || new Date().toISOString()
+    };
+  })
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": author.name,
+  "jobTitle": author.role,
+  "description": author.bio,
+  "url": `${siteUrl}/autori/${slug}/`,
+  "worksFor": { "@type": "Organization", "name": "CentroCasa", "url": siteUrl }
+};
+---
+
+<Layout
+  title={`${author.name} - ${author.role} | CentroCasa`}
+  description={author.bio}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Autori', url: '/autori/' }, { name: author.name }]}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(personSchema)}></script>
+
+  <div class="author-page">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="/autori/">Autori</a>
+      <span class="breadcrumb-separator">/</span>
+      <span>{author.name}</span>
+    </nav>
+
+    <header class="author-profile">
+      <div class="author-profile-avatar">{initials}</div>
+      <div class="author-profile-info">
+        <h1>{author.name}</h1>
+        <p class="author-profile-role">{author.role}</p>
+        <p class="author-profile-bio">{author.bio}</p>
+      </div>
+    </header>
+
+    <h2 class="author-articles-title">Articole de {author.name}</h2>
+    {articles.length > 0 ? (
+      <div class="articles-grid">
+        {articles.map(a => <ArticleCard {...a} />)}
+      </div>
+    ) : (
+      <p class="author-no-articles">In curand, articole noi de la acest autor.</p>
+    )}
+  </div>
+</Layout>
+
+<style>
+  .author-page { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+  .author-profile { display: flex; gap: 1.5rem; align-items: center; background: var(--color-earth-50, #faf8f5); border: 1px solid var(--color-earth-200, #e8dfd0); border-radius: 16px; padding: 1.75rem; margin: 1rem 0 2.5rem; }
+  .author-profile-avatar { flex: 0 0 auto; width: 84px; height: 84px; border-radius: 50%; background: var(--color-primary-600, #16a34a); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.9rem; font-weight: 800; }
+  .author-profile-info h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+  .author-profile-role { margin: 0 0 .6rem; color: var(--color-primary-700, #15803d); font-weight: 600; }
+  .author-profile-bio { margin: 0; color: #4b5563; line-height: 1.6; }
+  .author-articles-title { font-size: 1.3rem; margin: 0 0 1.25rem; }
+  .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+  .author-no-articles { color: #6b7280; }
+  @media (max-width: 560px) { .author-profile { flex-direction: column; text-align: center; } }
+</style>

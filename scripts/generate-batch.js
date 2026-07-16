@@ -759,7 +759,7 @@ ${guideHtml}
     <div class="author-box">
       <div class="author-avatar">${author.name.split(' ').map(n => n[0]).join('')}</div>
       <div class="author-info">
-        <h4>${author.name}</h4>
+        <h4><a href="/autori/${author.name.toLowerCase().replace(/ă/g,'a').replace(/â/g,'a').replace(/î/g,'i').replace(/ș/g,'s').replace(/ț/g,'t').replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'')}/" class="author-name-link">${author.name}</a></h4>
         <p class="author-role">${author.role}</p>
         <p class="author-bio">${author.bio}</p>
       </div>

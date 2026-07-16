@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import keywordsData from '../../../keywords.json';
+import { visibleArticles } from '../../lib/articles.mjs';
 
 export async function getStaticPaths() {
   const categories = [
@@ -12,11 +13,11 @@ export async function getStaticPaths() {
     { name: 'Curatenie si Intretinere', slug: 'curatenie-intretinere' }
   ];
 
-  const ARTICLES_PER_PAGE = 12;
+  const ARTICLES_PER_PAGE = 30;
   const paths = [];
 
   for (const category of categories) {
-    const categoryArticles = keywordsData.completed
+    const categoryArticles = visibleArticles(keywordsData.completed)
       .filter(item => item.categorySlug === category.slug)
       .map(item => ({
         title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),

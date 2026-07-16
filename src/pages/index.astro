@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import keywordsData from '../../keywords.json';
+import { visibleArticles } from '../lib/articles.mjs';
 
 const categories = [
   {
@@ -36,8 +37,8 @@ const categories = [
   }
 ];
 
-// Get completed articles
-const articles = keywordsData.completed.map(item => ({
+// Get completed articles (fara cele legacy, cand exista articole noi)
+const articles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
   slug: item.keyword.toLowerCase()
     .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
@@ -58,6 +59,15 @@ const categoryCounts = categories.map(cat => ({
   ...cat,
   count: articles.filter(a => a.categorySlug === cat.slug).length
 }));
+
+// Sectiuni pe categorie: cele mai noi 9 articole per categorie (newest first) + link catre toata categoria
+const sections = categories
+  .map(cat => ({
+    ...cat,
+    count: articles.filter(a => a.categorySlug === cat.slug).length,
+    items: articles.filter(a => a.categorySlug === cat.slug).slice(0, 9)
+  }))
+  .filter(s => s.items.length > 0);
 ---
 
 <Layout
@@ -98,22 +108,31 @@ const categoryCounts = categories.map(cat => ({
     </div>
   </section>
 
-  <!-- Recent Articles -->
-  {articles.length > 0 && (
-    <section class="section" style="background: var(--color-gray-100);">
+  <!-- Sectiuni pe categorie: 9 articole per categorie + link catre toata categoria -->
+  {sections.map((section, i) => (
+    <section class="section" style={i % 2 === 0 ? 'background: var(--color-gray-100);' : ''}>
       <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Articole Recente</h2>
-          <p class="section-subtitle">Cele mai noi ghiduri si recomandari</p>
+        <div class="section-header section-header--row">
+          <div>
+            <h2 class="section-title">{section.icon} {section.name}</h2>
+            <p class="section-subtitle">{section.description}</p>
+          </div>
+          <a href={`/${section.slug}/`} class="section-see-all">
+            Vezi toate ({section.count})
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </div>
         <div class="articles-grid">
-          {articles.slice(0, 18).map(article => (
+          {section.items.map(article => (
             <ArticleCard {...article} />
           ))}
         </div>
+        <div class="section-footer">
+          <a href={`/${section.slug}/`} class="section-see-all-btn">Vezi toate articolele din {section.name}</a>
+        </div>
       </div>
     </section>
-  )}
+  ))}
 
   <!-- About Section -->
   <section class="section">
@@ -135,3 +154,16 @@ const categoryCounts = categories.map(cat => ({
     </div>
   </section>
 </Layout>
+
+<style>
+  .section-header--row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; text-align: left; }
+  .section-header--row .section-subtitle { max-width: 640px; }
+  .section-see-all { flex: 0 0 auto; display: inline-flex; align-items: center; gap: .35rem; color: var(--color-primary-700, #15803d); font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .section-see-all:hover { text-decoration: underline; }
+  .section-footer { text-align: center; margin-top: 2rem; }
+  .section-see-all-btn { display: inline-block; padding: .7rem 1.6rem; border: 1px solid var(--color-primary-600, #16a34a); color: var(--color-primary-700, #15803d); border-radius: 10px; font-weight: 600; text-decoration: none; transition: background .15s, color .15s; }
+  .section-see-all-btn:hover { background: var(--color-primary-600, #16a34a); color: #fff; }
+  @media (max-width: 640px) {
+    .section-header--row { flex-direction: column; align-items: flex-start; }
+  }
+</style>
