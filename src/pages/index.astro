@@ -88,26 +88,6 @@ const sections = categories
     </div>
   </section>
 
-  <!-- Categories Section -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Categorii</h2>
-        <p class="section-subtitle">Exploreaza articolele pe domenii de interes</p>
-      </div>
-      <div class="categories-grid">
-        {categoryCounts.map(cat => (
-          <a href={`/${cat.slug}/`} class="category-card">
-            <div class="category-icon">{cat.icon}</div>
-            <h3>{cat.name}</h3>
-            <p>{cat.description}</p>
-            <span class="category-count">{cat.count} articole</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
   <!-- Sectiuni pe categorie: 9 articole per categorie + link catre toata categoria -->
   {sections.map((section, i) => (
     <section class="section" style={i % 2 === 0 ? 'background: var(--color-gray-100);' : ''}>

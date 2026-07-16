@@ -11,7 +11,10 @@ interface Props {
 }
 
 const { title, slug, excerpt, image, category, categorySlug, date, showExcerpt = true } = Astro.props;
-const cleanExcerpt = excerpt?.replace(/<[^>]*>/g, '') || '';
+const rawExcerpt = (excerpt || '').replace(/<[^>]*>/g, '').trim();
+const cleanExcerpt = rawExcerpt.length > 120
+  ? rawExcerpt.slice(0, 120).replace(/\s+\S*$/, '') + '…'
+  : rawExcerpt;
 
 const formattedDate = new Date(date).toLocaleDateString('ro-RO', {
   year: 'numeric',
