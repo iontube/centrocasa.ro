@@ -51,7 +51,9 @@ const faq = [
   { question: 'Cat costa un espressor automat bun?', answer: 'Un espressor automat cu rasnita, bun, incepe pe la 950-1000 de lei (Krups Espresseria) si merge pana la 3000 de lei pentru modele cu ecran, sistem de lapte si multe retete. Zona cu cel mai bun raport e 1200-1800 de lei. Sub 500 de lei gasesti doar aparate cu capsule, nu cu boabe.' },
   { question: 'Care e diferenta dintre espressor automat si unul cu capsule?', answer: 'Un espressor automat macina boabele proaspat, preseaza cafeaua si prepara espresso la apasarea unui buton, deci cafeaua e mai buna si mai ieftina pe termen lung. Unul cu capsule, ca Dolce Gusto, e mai ieftin la cumparare si foarte simplu, dar cafeaua vine din capsule cumparate mereu, deci costa mai mult in timp.' },
   { question: 'Ce inseamna sistemul LatteGo de la Philips?', answer: 'LatteGo e sistemul de spumare a laptelui de la Philips, format din doar doua piese, fara tuburi. Se spala in cateva secunde sub jet de apa, spre deosebire de sistemele clasice cu tuburi care se infunda. E cel mai comod de intretinut daca bei des bauturi cu lapte.' },
-  { question: 'Cat de des trebuie curatat un espressor automat?', answer: 'Grupul de infuzare si sistemul de lapte se clatesc zilnic sau dupa fiecare folosire cu lapte. Decalcifierea completa se face lunar sau la cateva sute de cafele, in functie de duritatea apei. Modelele cu AquaClean sau cu sisteme usor de scos, ca LatteGo, cer mai putin efort.' },
+  { question: 'Cat de des trebuie curatat un espressor automat?', answer: 'Grupul de infuzare si sistemul de lapte se clatesc zilnic sau dupa fiecare folosire cu lapte. Decalcifierea completa se face de obicei la 2-3 luni sau la cateva sute de cafele, in functie de duritatea apei. Modelele cu AquaClean sau cu sisteme usor de scos, ca LatteGo, cer mai putin efort.' },
+  { question: 'Cat de des trebuie sa decalcifiez espressorul?', answer: 'In general la 2-3 luni, sau atunci cand aparatul iti cere singur, in functie de cat de dura e apa si de cat de des il folosesti. Un espressor folosit de mai multe ori pe zi cu apa dura are nevoie de decalcifiere mai des. Modelele cu filtru AquaClean amana decalcifierea pana la 5000 de cafele, iar apa filtrata reduce depunerile de calcar.' },
+  { question: 'Merita un espressor cu ecran si multe retete?', answer: 'Doar daca in casa fiecare bea altceva sau vrei des bauturi cu lapte diferite, ca latte macchiato sau cappuccino. Daca bei aceeasi cafea in fiecare zi, un model cu doua butoane face aceeasi treaba la un pret mai mic. Ecranul si retetele presetate sunt confort, nu o conditie pentru o cafea buna.' },
 ];
 
 const images = [hero, figBuget, figPremium, ...PICKS.map(x => x.p.image)];
@@ -84,6 +86,7 @@ const money = (n) => n.toLocaleString('ro-RO');
     <div class="rd-intro">
       <p>Cel mai bun espressor automat pentru majoritatea oamenilor este <strong>De Longhi Magnifica S</strong>: are rasnita reglabila pe 13 trepte, e simplu de folosit si are cel mai bun istoric de pareri. Daca vrei acelasi lucru mai ieftin, ia <strong>Krups Espresseria</strong>, iar daca bei des cappuccino, un model cu sistem de lapte automat ca <strong>Philips cu LatteGo</strong> sau <strong>De Longhi Evo Milk</strong> iti scuteste timpul de curatare.</p>
       <p>Mai jos ai 6 espressoare comparate pe pret, rasnita, sistemul de lapte si parerile reale ale cumparatorilor, pentru bugete de la 300 la 3000 de lei. Alege in functie de cat de des bei bauturi cu lapte si de cat vrei sa te implici in preparare.</p>
+      <p>Am pornit de la cele mai vandute espressoare de pe eMAG, am verificat specificatiile reale ale fiecarui model, de la numarul de trepte al rasnitei la sistemul de lapte si modul de intretinere, si le-am comparat cu parerile a mii de cumparatori. Nu insiram doar cifre de pe cutie, ci explicam ce inseamna fiecare in folosirea de zi cu zi.</p>
     </div>
 
     <details class="rd-toc">
@@ -91,13 +94,17 @@ const money = (n) => n.toLocaleString('ro-RO');
       <ol>
         <li><a href="#pe-scurt">Care espressor pentru cine</a></li>
         <li><a href="#produse">Cele 6 espressoare pe larg</a></li>
+        <li><a href="#boabe-capsule">Espressor cu boabe sau cu capsule</a></li>
         <li><a href="#cum-alegi">Cum alegi cel mai bun espressor</a></li>
-        <li><a href="#cat-costa">Cat costa un espressor automat</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cat-costa">Cat costa un espressor</a></li>
+        <li><a href="#intretinere">Cum ai grija de espressor</a></li>
         <li><a href="#faq">Intrebari frecvente</a></li>
       </ol>
     </details>
 
     <h2 id="pe-scurt">Pe scurt: care espressor pentru cine</h2>
+    <p>Daca esti grabit, tabelul de mai jos rezuma pentru cine e potrivit fiecare model si cat costa. Preturile si numarul de recenzii sunt luate direct de pe eMAG.</p>
     <div class="table-wrap">
       <table class="rd-table">
         <thead><tr><th>Model</th><th>Cel mai bun la</th><th>Pret</th><th>Pareri</th></tr></thead>
@@ -115,6 +122,7 @@ const money = (n) => n.toLocaleString('ro-RO');
     </div>
 
     <h2 id="produse">Cele 6 espressoare pe larg</h2>
+    <p>Le-am aranjat de la cea mai echilibrata alegere la cea mai ieftina. Fiecare card are pretul, ratingul si numarul de recenzii direct de pe eMAG, plus avantajele si dezavantajele pe scurt.</p>
     <div class="rd-grid">
       {PICKS.map(x => (
         <ProductCard
@@ -134,6 +142,22 @@ const money = (n) => n.toLocaleString('ro-RO');
     </div>
 
     <img class="rd-fig" src={figBuget} alt="Espressoare bune sub 1500 de lei: Krups, Dolce Gusto, Philips" width="1200" height="675" loading="lazy" />
+
+    <h2 id="boabe-capsule">Espressor cu boabe sau cu capsule?</h2>
+    <p>E prima intrebare de pus inainte sa te uiti la modele, pentru ca sunt doua tipuri complet diferite de aparate, cu costuri si rezultate diferite.</p>
+    <p><strong>Espressorul cu boabe</strong> macina cafeaua proaspat la fiecare ceasca. Costa mai mult la cumparare, dar cafeaua iese mai buna si mai ieftina pe termen lung. Il alegi daca:</p>
+    <ul>
+      <li>Bei cafea in fiecare zi si vrei cel mai bun gust</li>
+      <li>Vrei sa reglezi taria, cantitatea si finetea macinarii</li>
+      <li>Nu te deranjeaza sa cureti si sa decalcifiezi aparatul periodic</li>
+    </ul>
+    <p><strong>Espressorul cu capsule</strong>, ca Dolce Gusto, e ieftin si simplu: pui capsula, apesi, gata. Compromisul e costul pe termen lung, o capsula costa in jur de 1 pana la 2 lei, si nu ai control asupra cafelei. Il alegi daca:</p>
+    <ul>
+      <li>Vrei cel mai mic pret de pornire si zero bataie de cap</li>
+      <li>Bei ocazional si nu te deranjeaza costul per capsula</li>
+      <li>Iti place varietatea de bauturi gata dozate, inclusiv ciocolata calda sau ceai</li>
+    </ul>
+    <p>Pe scurt: pe boabe daca bei zilnic si vrei cafea buna, ieftina in timp; pe capsule daca vrei simplitate si pret mic la cumparare. Restul articolului se concentreaza pe espressoarele cu boabe, acolo unde alegerea conteaza cel mai mult.</p>
 
     <h2 id="cum-alegi">Cum alegi cel mai bun espressor</h2>
     <p>Pretul conteaza, dar cateva lucruri fac ca un espressor sa fie placut sau enervant in fiecare zi. Uite pe ce sa te uiti inainte sa cumperi.</p>
@@ -159,13 +183,33 @@ const money = (n) => n.toLocaleString('ro-RO');
     <p>Aproape toate espressoarele bune au 15 bar, presiunea standard pentru un espresso cu crema densa, asa ca nu e un criteriu care sa te ajute sa alegi intre ele. Nu te lasa impresionat de cifra, o au toate.</p>
     <p>Uita-te mai degraba la rezervorul de apa, in jur de 1.6 - 1.8 litri la modelele din acest top, si la containerul de boabe. Cu cat sunt mai mari, cu atat reumpli mai rar, ceea ce conteaza daca sunteti mai multi bautori de cafea in casa.</p>
 
+    <h2 id="greseli">Greseli frecvente cand cumperi un espressor</h2>
+    <p>Cateva capcane in care cad multi cumparatori si cum le eviti:</p>
+    <ul>
+      <li><strong>Te iei dupa numarul de bari.</strong> Toate espressoarele bune au 15 bar, il au si aparatele slabe, deci nu e un semn de calitate care sa te ajute sa alegi.</li>
+      <li><strong>Cumperi cu capsule crezand ca e cu boabe.</strong> Verifica sa scrie rasnita sau boabe in descriere, altfel vei plati capsule la nesfarsit.</li>
+      <li><strong>Ignori sistemul de lapte.</strong> Daca bei cappuccino zilnic si iei un model cu spumare manuala, te va enerva in fiecare dimineata.</li>
+      <li><strong>Uiti de intretinere.</strong> Un espressor fara decalcifiere se infunda si se strica; alege unul cu grup detasabil sau cu AquaClean daca vrei efort minim.</li>
+      <li><strong>Platesti pentru retete de care nu ai nevoie.</strong> Daca bei mereu aceeasi cafea, un model cu doua bauturi e suficient si mai ieftin decat unul cu ecran si zece retete.</li>
+    </ul>
+
     <h2 id="cat-costa">Cat costa un espressor automat</h2>
     <p>Pragurile arata cam asa in 2026:</p>
     <p><strong>Pana in 500 de lei</strong> gasesti doar aparate cu capsule, ca Dolce Gusto. Simple si ieftine, dar cu cost recurent la capsule si fara cafea din rasnita.</p>
     <p><strong>950 - 1500 de lei</strong> e zona cu cel mai bun raport: espressoare automate cu rasnita, ca Krups Espresseria sau De Longhi Magnifica S. De aici incepe cafeaua adevarata din boabe.</p>
     <p><strong>1600 - 3000 de lei</strong> aduce sisteme de lapte automate, ecran si mai multe retete, ca la Philips seria 2200 sau De Longhi Evo Milk. Platesti pentru confort si bauturi cu lapte la un buton.</p>
+    <p>Dincolo de pretul aparatului, conteaza si costul cafelei in sine. O capsula Dolce Gusto costa in jur de 1 pana la 2 lei bautura, in timp ce un espresso din boabe iese de obicei sub 1 leu. Peste cateva sute de cafele, diferenta acopera o buna parte din pretul unui espressor cu rasnita, motiv pentru care pe termen lung boabele ies mai ieftine.</p>
 
     <img class="rd-fig" src={figPremium} alt="Espressoare premium cu sistem de lapte: De Longhi si Philips" width="1200" height="675" loading="lazy" />
+
+    <h2 id="intretinere">Cum ai grija de espressor ca sa dureze</h2>
+    <p>Un espressor bine intretinut merge ani buni, unul neglijat se infunda si face cafea proasta. Rutina e simpla si merita respectata.</p>
+    <ul>
+      <li><strong>Zilnic:</strong> clateste sistemul de lapte si duza dupa fiecare bautura cu lapte, si goleste tava de scurgere.</li>
+      <li><strong>Saptamanal:</strong> scoate si spala grupul de infuzare, acolo unde e detasabil, si sterge rezervorul de apa.</li>
+      <li><strong>La 2-3 luni:</strong> decalcifiaza aparatul, sau atunci cand ti-o cere singur, in functie de cat de dura e apa si de cat de des il folosesti.</li>
+    </ul>
+    <p>Doua lucruri usureaza mult treaba: un grup de infuzare detasabil, care se spala sub apa, si un filtru ca AquaClean, care amana decalcifierea pana la 5000 de cafele. Daca folosesti apa filtrata sau plata in loc de apa de la robinet, calcarul se depune mai greu si decalcifiezi mai rar.</p>
 
     <h2 id="faq">Intrebari frecvente</h2>
     <div class="rd-faq">
@@ -206,10 +250,14 @@ const money = (n) => n.toLocaleString('ro-RO');
   .rd-toc summary::-webkit-details-marker { display: none; }
   .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
   .rd-toc[open] summary::before { transform: rotate(90deg); }
-  .rd-toc ol { margin: 0 0 .85rem; padding: 0 0 0 1.25rem; }
-  .rd-toc li { margin: .32rem 0; }
-  .rd-toc a { color: var(--color-gray-700); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
   .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
   @media (max-width: 640px) {
     .rd { padding-left: .55rem; padding-right: .55rem; }
     .rd h1 { font-size: 1.6rem; }
