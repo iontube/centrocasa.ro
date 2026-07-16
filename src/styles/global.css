@@ -95,6 +95,7 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
 }
 
 body {
@@ -105,6 +106,11 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Nimic nu depaseste latimea ecranului (fix scroll orizontal pe mobil) */
+img, svg, video, canvas, iframe { max-width: 100%; }
+img, video { height: auto; }
+table { max-width: 100%; }
 
 /* ===== TYPOGRAPHY ===== */
 h1, h2, h3, h4, h5, h6 {
@@ -444,9 +450,11 @@ p {
 
 .article-card-image {
   width: 100%;
-  height: 190px;
+  aspect-ratio: 16 / 9;
+  height: auto;
   object-fit: cover;
   background: var(--color-gray-100);
+  display: block;
 }
 
 .article-card-content {
@@ -1330,6 +1338,7 @@ p {
 
 /* ===== COMPARISON TABLE ===== */
 .comparison-outer {
+  max-width: 100%;
   position: relative;
   margin: var(--space-lg) 0;
 }
@@ -1360,6 +1369,7 @@ p {
 }
 
 .comparison-wrap {
+  max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
