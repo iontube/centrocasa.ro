@@ -1437,3 +1437,6 @@ p {
 .logo-img { height: 42px; width: auto; display: block; }
 .footer-logo-img { height: 40px; width: auto; display: block; margin-bottom: var(--space-md); }
 @media (max-width: 480px) { .logo-img { height: 34px; } }
+
+/* Intro pagina de categorie (descriere mutata din homepage) */
+.category-intro { color: var(--color-gray-600); font-size: 1.02rem; line-height: 1.65; max-width: 760px; margin-top: var(--space-sm); }

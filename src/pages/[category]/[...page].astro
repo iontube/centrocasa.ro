@@ -3,16 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import keywordsData from '../../../keywords.json';
 import { visibleArticles } from '../../lib/articles.mjs';
+import { categories } from '../../lib/categories.mjs';
 
 export async function getStaticPaths() {
-  const categories = [
-    { name: 'Gradinarit si Unelte', slug: 'gradinarit-unelte' },
-    { name: 'Mobilier Gradina', slug: 'mobilier-gradina' },
-    { name: 'Electrocasnice Casa', slug: 'electrocasnice-casa' },
-    { name: 'Decoratiuni Casa', slug: 'decoratiuni-casa' },
-    { name: 'Curatenie si Intretinere', slug: 'curatenie-intretinere' }
-  ];
-
   const ARTICLES_PER_PAGE = 30;
   const paths = [];
 
@@ -51,6 +44,7 @@ export async function getStaticPaths() {
         props: {
           categoryName: category.name,
           categorySlug: category.slug,
+          categoryDescription: category.description || '',
           articles: pageArticles,
           currentPage: i,
           totalPages: totalPages
@@ -62,12 +56,13 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { categoryName, categorySlug, articles, currentPage, totalPages } = Astro.props;
+const { categoryName, categorySlug, categoryDescription, articles, currentPage, totalPages } = Astro.props;
 ---
 
 <Layout
   title={`${categoryName} - CentroCasa`}
-  description={`Descopera cele mai bune produse si sfaturi pentru ${categoryName.toLowerCase()}. Recenzii detaliate si ghiduri de cumparare.`}
+  description={categoryDescription || `Descopera cele mai bune produse si sfaturi pentru ${categoryName.toLowerCase()}. Recenzii detaliate si ghiduri de cumparare.`}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: categoryName }]}
 >
   <div class="container" style="padding-top: var(--space-xl); padding-bottom: var(--space-3xl);">
     <!-- Breadcrumb -->
@@ -79,11 +74,12 @@ const { categoryName, categorySlug, articles, currentPage, totalPages } = Astro.
 
     <div class="section-header" style="text-align: left; margin-bottom: var(--space-xl);">
       <h1 class="section-title">{categoryName}</h1>
-      <p class="section-subtitle">
-        {articles.length > 0
-          ? `${articles.length} articole in aceasta categorie`
-          : 'Nu exista inca articole in aceasta categorie'}
-      </p>
+      {currentPage === 1 && categoryDescription && (
+        <p class="category-intro">{categoryDescription}</p>
+      )}
+      {currentPage > 1 && (
+        <p class="section-subtitle">Pagina {currentPage} din {totalPages}</p>
+      )}
     </div>
 
     {articles.length > 0 ? (
