@@ -86,7 +86,18 @@ const money = (n) => n.toLocaleString('ro-RO');
       <p>Mai jos ai 6 espressoare comparate pe pret, rasnita, sistemul de lapte si parerile reale ale cumparatorilor, pentru bugete de la 300 la 3000 de lei. Alege in functie de cat de des bei bauturi cu lapte si de cat vrei sa te implici in preparare.</p>
     </div>
 
-    <h2>Pe scurt: care espressor pentru cine</h2>
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#pe-scurt">Care espressor pentru cine</a></li>
+        <li><a href="#produse">Cele 6 espressoare pe larg</a></li>
+        <li><a href="#cum-alegi">Cum alegi cel mai bun espressor</a></li>
+        <li><a href="#cat-costa">Cat costa un espressor automat</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="pe-scurt">Pe scurt: care espressor pentru cine</h2>
     <div class="table-wrap">
       <table class="rd-table">
         <thead><tr><th>Model</th><th>Cel mai bun la</th><th>Pret</th><th>Pareri</th></tr></thead>
@@ -103,7 +114,7 @@ const money = (n) => n.toLocaleString('ro-RO');
       </table>
     </div>
 
-    <h2>Cele 6 espressoare pe larg</h2>
+    <h2 id="produse">Cele 6 espressoare pe larg</h2>
     <div class="rd-grid">
       {PICKS.map(x => (
         <ProductCard
@@ -124,7 +135,7 @@ const money = (n) => n.toLocaleString('ro-RO');
 
     <img class="rd-fig" src={figBuget} alt="Espressoare bune sub 1500 de lei: Krups, Dolce Gusto, Philips" width="1200" height="675" loading="lazy" />
 
-    <h2>Cum alegi cel mai bun espressor</h2>
+    <h2 id="cum-alegi">Cum alegi cel mai bun espressor</h2>
     <p>Pretul conteaza, dar cateva lucruri fac ca un espressor sa fie placut sau enervant in fiecare zi. Uite pe ce sa te uiti inainte sa cumperi.</p>
 
     <h3>Rasnita: cu boabe, nu cu capsule</h3>
@@ -148,7 +159,7 @@ const money = (n) => n.toLocaleString('ro-RO');
     <p>Aproape toate espressoarele bune au 15 bar, presiunea standard pentru un espresso cu crema densa, asa ca nu e un criteriu care sa te ajute sa alegi intre ele. Nu te lasa impresionat de cifra, o au toate.</p>
     <p>Uita-te mai degraba la rezervorul de apa, in jur de 1.6 - 1.8 litri la modelele din acest top, si la containerul de boabe. Cu cat sunt mai mari, cu atat reumpli mai rar, ceea ce conteaza daca sunteti mai multi bautori de cafea in casa.</p>
 
-    <h2>Cat costa un espressor automat</h2>
+    <h2 id="cat-costa">Cat costa un espressor automat</h2>
     <p>Pragurile arata cam asa in 2026:</p>
     <p><strong>Pana in 500 de lei</strong> gasesti doar aparate cu capsule, ca Dolce Gusto. Simple si ieftine, dar cu cost recurent la capsule si fara cafea din rasnita.</p>
     <p><strong>950 - 1500 de lei</strong> e zona cu cel mai bun raport: espressoare automate cu rasnita, ca Krups Espresseria sau De Longhi Magnifica S. De aici incepe cafeaua adevarata din boabe.</p>
@@ -156,7 +167,7 @@ const money = (n) => n.toLocaleString('ro-RO');
 
     <img class="rd-fig" src={figPremium} alt="Espressoare premium cu sistem de lapte: De Longhi si Philips" width="1200" height="675" loading="lazy" />
 
-    <h2>Intrebari frecvente</h2>
+    <h2 id="faq">Intrebari frecvente</h2>
     <div class="rd-faq">
       {faq.map(f => (
         <details class="rd-faq-item">
@@ -169,7 +180,7 @@ const money = (n) => n.toLocaleString('ro-RO');
     <div class="author-box">
       <div class="author-avatar">CP</div>
       <div class="author-info">
-        <h4><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></h4>
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
         <p class="author-role">Specialist Electrocasnice</p>
         <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret.</p>
       </div>
@@ -188,7 +199,21 @@ const money = (n) => n.toLocaleString('ro-RO');
   .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
   .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
   .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
   .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 0 .85rem; padding: 0 0 0 1.25rem; }
+  .rd-toc li { margin: .32rem 0; }
+  .rd-toc a { color: var(--color-gray-700); }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+  }
   .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
   .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
   .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
@@ -198,5 +223,7 @@ const money = (n) => n.toLocaleString('ro-RO');
   .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
   .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
   .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
   .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
 </style>

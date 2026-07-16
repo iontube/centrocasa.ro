@@ -158,6 +158,12 @@ p {
   }
 }
 
+@media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+}
+
 /* ===== HEADER ===== */
 .header {
   background: rgba(255, 255, 255, 0.95);
