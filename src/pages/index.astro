@@ -80,21 +80,34 @@ const sections = categories
     </section>
   ))}
 
-  <!-- About Section -->
-  <section class="section">
+  <!-- Despre CentroCasa -->
+  <section class="section about">
     <div class="container">
-      <div class="about-content" style="max-width: 900px; margin: 0 auto;">
-        <h2 class="section-title" style="text-align: center; margin-bottom: var(--space-xl);">Despre CentroCasa</h2>
-        <div class="article-content">
-          <p>
-            CentroCasa a luat nastere din dorinta de a oferi romanilor un ghid complet si de incredere pentru alegerea produselor destinate casei si gradinii. Stim cat de greu poate fi sa navighezi printre miile de optiuni disponibile pe piata, fiecare promiţand ca e cea mai buna. De aceea, echipa noastra de experti testeaza, analizeaza si compara produsele pentru a-ti oferi recomandari sincere si bine documentate.
-          </p>
-          <p>
-            Fie ca iti doresti sa iti amenajezi gradina cu cele mai bune unelte, sa iti mobilezi terasa pentru serile de vara, sa iti dotezi casa cu electrocasnice moderne sau pur si simplu cauti sfaturi practice pentru curatenie si intretinere, aici gasesti raspunsurile de care ai nevoie. Fiecare articol este scris cu atentie, bazat pe experienta reala si pe cercetare aprofundata.
-          </p>
-          <p>
-            Nu suntem sponsorizati de producatori si nu favorizăm anumite branduri. Scopul nostru este simplu: sa te ajutam sa faci alegeri inteligente, sa economisesti timp si bani, si sa te bucuri de o casa si o gradina asa cum iti doresti. Iti multumim ca ne-ai ales ca ghid in aceasta calatorie!
-          </p>
+      <div class="about-head">
+        <h2 class="section-title">Despre CentroCasa</h2>
+        <p class="about-lead">Te ajutam sa alegi cele mai bune produse pentru casa si gradina, cu recomandari sincere bazate pe specificatii reale si pe parerile a mii de cumparatori. Comparam, verificam si explicam pe intelesul tuturor, ca tu sa economisesti timp si bani.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="about-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <h3>Analiza pe date reale</h3>
+          <p>Comparam specificatiile reale ale fiecarui produs, nu doar cifrele de pe cutie.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.8 20.9l1.6-6.8L2.2 8.9l6.9-.6z"/></svg>
+          </div>
+          <h3>Pareri reale</h3>
+          <p>Ne uitam la parerile a mii de cumparatori, nu doar la descrierea producatorului.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h3>Recomandari sincere</h3>
+          <p>Nu suntem sponsorizati de producatori si nu favorizam anumite branduri.</p>
         </div>
       </div>
     </div>
@@ -112,4 +125,14 @@ const sections = categories
   @media (max-width: 640px) {
     .section-header--row { flex-direction: column; align-items: flex-start; }
   }
+
+  .about { background: var(--color-earth-50, #faf8f5); }
+  .about-head { text-align: center; max-width: 680px; margin: 0 auto 2.5rem; }
+  .about-head .section-title { margin-bottom: .5rem; }
+  .about-lead { color: var(--color-gray-600, #57534e); font-size: 1.05rem; line-height: 1.7; margin: 0; }
+  .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; max-width: 960px; margin: 0 auto; }
+  .about-card { background: #fff; border: 1px solid var(--color-earth-200, #e8dfd0); border-radius: 14px; padding: 1.9rem 1.6rem; text-align: center; }
+  .about-icon { width: 54px; height: 54px; margin: 0 auto 1.1rem; border-radius: 13px; background: var(--color-primary-50, #f0fdf4); color: var(--color-primary-600, #16a34a); display: flex; align-items: center; justify-content: center; }
+  .about-card h3 { font-size: 1.12rem; margin: 0 0 .45rem; }
+  .about-card p { color: var(--color-gray-600, #57534e); font-size: .93rem; line-height: 1.6; margin: 0; }
 </style>
