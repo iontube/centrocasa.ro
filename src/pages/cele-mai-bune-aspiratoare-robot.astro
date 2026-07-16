@@ -1,0 +1,293 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import emag from '../data/emag-products.json';
+
+const pool = emag['aspiratoare-robot'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { id: 'D888WWBBM', badge: 'Alegerea noastra',
+    specs: ['navigatie LiDAR laser', 'aspirare 2000 Pa', 'mop cu dozare electronica', 'autonomie 190 min'],
+    pros: ['Cel mai apreciat, peste 1400 de recenzii', 'Navigatie LiDAR precisa, harta reala a casei', 'Bariere virtuale si zone fara mop din aplicatie', 'Mop bun, cu dozare electronica a apei'],
+    cons: ['Aspirare de 2000 Pa, mica pe hartie fata de modelele noi', 'Fara statie de auto-golire'],
+    verdict: 'Cel mai echilibrat si mai de incredere aspirator robot din selectie. Navigatia LiDAR e punctul lui forte: scaneaza casa cu laser, isi face harta precisa si nu se rataceste, iar din aplicatie pui bariere virtuale si zone unde sa nu mopeze. Aspirarea de 2000 Pa pare mica langa cifrele noi de 6000-7000, dar impreuna cu periile si navigatia buna curata excelent in practica, ceea ce confirma si cele peste 1400 de recenzii. Nu are statie de auto-golire, deci golesti recipientul manual. Daca vrei un robot care doar merge si isi face treaba fara batai de cap, aici te opresti.' },
+  { id: 'DJBX5RYBM', badge: 'Cel mai ieftin',
+    specs: ['aspirare 2200 Pa', 'navigatie de baza, fara laser', 'mop simplu', 'autonomie 120 min'],
+    pros: ['Cel mai mic pret din top', 'Compact, intra usor sub mobila', 'Control din aplicatie si comenzi vocale'],
+    cons: ['Navigatie de baza, fara LiDAR, nu retine harta', 'Curata in tipare mai aleatorii, nu sistematic', 'Mopul e simplu, doar de intretinere'],
+    verdict: 'Cel mai ieftin mod de a avea un robot care aspira singur, cu compromisul asteptat la acest pret: navigatia. Nu are LiDAR, se orienteaza prin senzori si merge mai degraba in tipare aleatorii, deci nu isi retine harta si nu curata la fel de sistematic ca modelele cu laser. Aspirarea de 2200 Pa e onesta pentru un apartament mic, cu pardoseli dure. Il controlezi din aplicatie sau cu vocea. Il iei daca vrei sa incerci un robot fara sa investesti mult, pentru spatii mici, nu pentru case mari cu multe camere.' },
+  { id: 'D86RLFYBM', badge: 'Compact pentru spatii mici',
+    specs: ['aspirare 2000 Pa', 'navigatie giroscopica', 'mop cu rezervor 90 ml', 'corp de 30 cm'],
+    pros: ['Compact, doar 30 cm, intra sub mobila joasa', 'Simplu de folosit, cu aplicatie', 'Pret mic pentru un Xiaomi'],
+    cons: ['Navigatie giroscopica, fara laser', 'Autonomie mai mica, 110 min', 'Mop de intretinere, rezervor mic'],
+    verdict: 'Un Xiaomi de intrare, gandit pentru spatii mici si mobila joasa, unde corpul de doar 30 cm ajunge usor. Navigheaza cu giroscop, nu cu laser, deci nu are harta la fel de precisa ca S20, dar planifica traseul in zig-zag mai ordonat decat un robot pur aleatoriu. Aspirarea de 2000 Pa si mopul cu rezervor mic sunt bune pentru intretinere zilnica, nu pentru curatenie grea. Autonomia de 110 minute ajunge pentru un apartament. Il alegi pentru un apartament mic, cu buget strans, unde vrei un Xiaomi simplu si fiabil.' },
+  { id: 'D99WJ4YBM', badge: 'Cel mai bun raport',
+    specs: ['aspirare 5000 Pa', 'navigatie laser LDS', 'mop cu rezervor 270 ml', 'autonomie 130 min'],
+    pros: ['5000 Pa si navigatie laser sub 1000 de lei', 'Harta casei in aplicatie, curata sistematic', 'Recipient generos de praf, 400 ml'],
+    cons: ['Fara statie de auto-golire', 'Mopul e cu tavita, nu rotativ'],
+    verdict: 'Cel mai bun raport din top si saltul logic peste modelele de intrare. Aduce navigatie laser LDS, adica isi face harta casei si curata sistematic, camera cu camera, plus 5000 Pa de aspirare, toate sub 1000 de lei. Are recipient de praf de 400 ml si rezervor de apa de 270 ml pentru mop. Mopul e clasic, cu tavita si laveta, nu rotativ, si nu are statie de auto-golire, deci golesti manual. Pentru cei mai multi oameni care vor un robot serios fara sa dea mult, S20 e alegerea corecta.' },
+  { id: 'DH3WBWYBM', badge: 'Statie all-in-one',
+    specs: ['statie: spala si usuca mopul + auto-golire', 'aspirare 7000 Pa', 'mop dublu rotativ', 'evitare obstacole'],
+    pros: ['Statia spala mopul, il usuca cu aer cald si goleste praful', 'Mop dublu rotativ, freaca podeaua', 'Evitare obstacole cu lumina structurata', 'Aspirare mare, 7000 Pa'],
+    cons: ['Statia ocupa loc si urca pretul', 'Mai zgomotos in modul puternic'],
+    verdict: 'Aici intri in liga aspiratoarelor cu statie completa. Statia all-in-one face totul singura: goleste praful robotului, spala lavetele de mop si le usuca cu aer cald, ca sa nu miroasa. Mopul e dublu rotativ, care freaca podeaua, nu doar o sterge, iar aspirarea urca la 7000 Pa. Se orienteaza cu laser si evita obstacolele cu lumina structurata, deci ocoleste cabluri si obiecte de pe jos. Statia ocupa loc si urca pretul, dar reduce la minim ce trebuie sa faci tu. Il iei daca vrei sa te atingi de robot cat mai rar.' },
+  { id: 'DP9WJ4YBM', badge: 'Auto-golire, putere mare',
+    specs: ['statie de auto-golire praf', 'aspirare 6000 Pa', 'mop dublu rotativ, se ridica pe covor', 'navigatie LiDAR'],
+    pros: ['Statia goleste singura praful intr-un sac mai mare', 'Mopul se ridica automat pe covoare', 'Navigatie LiDAR cu evitare obstacole', '6000 Pa de aspirare'],
+    cons: ['Statia goleste praful, dar nu spala mopul', 'Sacul de praf se schimba periodic'],
+    verdict: 'Un pas sub X20 Pro ca statie, dar mai accesibil. Statia lui goleste automat praful robotului intr-un sac mai mare, deci nu te atingi de recipient cateva saptamani, insa nu spala si nu usuca mopul, ca la X20 Pro. Are 6000 Pa, navigatie LiDAR si mop dublu rotativ care se ridica singur cand da de covor, ca sa nu il ude. Autonomia e de 170 de minute. E alegerea daca vrei confortul auto-golirii prafului si putere mare, fara sa platesti pentru statia care spala mopul.' },
+  { id: 'DR04HTMBM', badge: 'Premium pentru animale',
+    specs: ['aspirare pana la 12000 Pa', 'autonomie 225 min', 'navigatie laser, harta permanenta', 'mop detasabil, lavabil'],
+    pros: ['Cea mai mare aspirare din top, 12000 Pa', 'Cea mai lunga autonomie, 225 min', 'Bun pentru par de animale', 'Laveta de mop se spala la masina'],
+    cons: ['Cel mai scump din selectie', 'Fara statie de auto-golire', 'Rezervor de apa mic, 220 ml'],
+    verdict: 'Varful selectiei, gandit mai ales pentru case cu animale. Are cea mai mare aspirare, pana la 12000 Pa, care ridica parul de animale de pe covoare si din colturi, si cea mai lunga autonomie, 225 de minute, deci acopera si o casa mare dintr-o singura incarcare. Se orienteaza cu laser si isi pastreaza harta permanent in aplicatie. Mopul e detasabil, cu laveta din microfibra care se spala la masina. Nu are statie de auto-golire si rezervorul de apa e mic, deci mopul e mai mult de intretinere. Il iei daca ai animale, casa mare si vrei cea mai mare putere de aspirare.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/aspiratoare-robot.webp';
+const figBuget = '/imagini/articole/aspiratoare-robot-buget.webp';
+const figStatie = '/imagini/articole/aspiratoare-robot-statie.webp';
+const figTop = '/imagini/articole/aspiratoare-robot-top.webp';
+const published = '2026-07-16T21:30:00+03:00';
+
+const faq = [
+  { question: 'Ce aspirator robot sa aleg?', answer: 'Pentru cei mai multi oameni, Roborock S5 Max e alegerea sigura, cu navigatie LiDAR precisa si cel mai bun istoric de pareri. Daca vrei acelasi lucru mai ieftin, Xiaomi S20 iti da 5000 Pa si navigatie laser sub 1000 de lei. Daca vrei sa te atingi de robot cat mai rar, ia un model cu statie, ca Xiaomi X20 Pro, iar daca ai animale, Rowenta Serie 95 are cea mai mare aspirare.' },
+  { question: 'Merita un aspirator robot cu statie?', answer: 'Da, daca vrei confort maxim. O statie de auto-golire strange praful robotului intr-un sac mai mare, deci nu te atingi de recipient cateva saptamani. Statiile all-in-one, ca la X20 Pro, spala si usuca si lavetele de mop. Compromisul e ca ocupa loc si costa mai mult. Daca golesti fara probleme recipientul manual, poti economisi luand un model fara statie.' },
+  { question: 'De cati Pa are nevoie un aspirator robot?', answer: 'Pentru pardoseli dure si praf de zi cu zi, 2000-2500 Pa sunt suficienti. Pentru covoare groase si par de animale, cauta 4000 Pa sau mai mult. Dar puterea in Pa nu spune totul: navigatia buna, periile si trecerea sistematica prin camera conteaza la fel de mult. Roborock S5 Max are doar 2000 Pa si curata mai bine decat multe modele cu cifre duble, tocmai datorita navigatiei.' },
+  { question: 'Ce este navigatia LiDAR si de ce conteaza?', answer: 'LiDAR e un senzor laser care se roteste si masoara distantele, ca robotul sa isi faca o harta precisa a casei si sa curete sistematic, camera cu camera. Modelele fara LiDAR, mai ieftine, se orienteaza prin senzori de ciocnire si merg in tipare mai aleatorii, deci rateaza zone si dureaza mai mult. Pentru case mari, cu mai multe camere, LiDAR face o diferenta reala.' },
+  { question: 'Aspiratorul robot inlocuieste aspiratorul normal?', answer: 'Pentru intretinerea zilnica, da: trece singur in fiecare zi si tine praful sub control fara sa faci nimic. Dar pentru curatenia grea, pentru scari, tapiterie, colturi inalte sau cand muti mobila, tot ai nevoie de un aspirator vertical sau cu sac. Cele doua se completeaza, robotul nu il scoate complet din uz pe cel clasic.' },
+  { question: 'Cat de des se curata un aspirator robot?', answer: 'Goleste recipientul de praf dupa fiecare folosire sau la cateva zile, daca nu are statie de auto-golire. Curata saptamanal peria principala si periile laterale de par si fire, spala filtrul si sterge senzorii si contactele de incarcare. Lavetele de mop se spala dupa fiecare folosire, iar filtrul se inlocuieste la cateva luni.' },
+];
+
+const images = [hero, figBuget, figStatie, figTop, ...PICKS.map(x => x.p.image)];
+const money = (n) => n.toLocaleString('ro-RO');
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune aspiratoare robot in 2026: 7 modele testate (Roborock, Xiaomi, Rowenta)"
+  description="Ce aspirator robot sa iti iei in 2026: 7 modele comparate pe navigatie, putere de aspirare, mop, statie si pareri reale, de la Lefant ieftin la Rowenta premium. Plus cum alegi si cat costa."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune aspiratoare robot' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune aspiratoare robot</span>
+    </nav>
+
+    <h1>Cele mai bune aspiratoare robot in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune aspiratoare robot: Roborock, Xiaomi si Rowenta" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Cel mai bun aspirator robot pentru majoritatea oamenilor este <strong>Roborock S5 Max</strong>: are navigatie LiDAR precisa, curata sistematic si are cel mai bun istoric de pareri. Daca vrei acelasi tip de robot mai ieftin, <strong>Xiaomi S20</strong> iti da 5000 Pa si navigatie laser sub 1000 de lei. Daca vrei sa te atingi de robot cat mai rar, un model cu statie ca <strong>Xiaomi X20 Pro</strong> se goleste singur si isi spala mopul.</p>
+      <p>Mai jos ai 7 aspiratoare robot comparate pe navigatie, putere de aspirare, mop, statie si parerile reale ale cumparatorilor, pentru bugete de la 400 la aproape 5000 de lei. Cel mai important criteriu nu e puterea, ci navigatia, si iti explicam de ce.</p>
+      <p>Am pornit de la cele mai vandute aspiratoare robot de pe eMAG, am verificat specificatiile reale ale fiecarui model, de la tipul de navigatie la statie si autonomie, si le-am comparat cu parerile a mii de cumparatori.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#pe-scurt">Care aspirator robot pentru cine</a></li>
+        <li><a href="#produse">Cele 7 aspiratoare pe larg</a></li>
+        <li><a href="#cum-alegi">Cum alegi un aspirator robot</a></li>
+        <li><a href="#putere">De ce puterea in Pa nu spune totul</a></li>
+        <li><a href="#statie">Cu statie sau fara</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cat-costa">Cat costa un aspirator robot</a></li>
+        <li><a href="#intretinere">Cum ai grija de aspiratorul robot</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="pe-scurt">Pe scurt: care aspirator robot pentru cine</h2>
+    <p>Daca esti grabit, tabelul de mai jos rezuma pentru cine e potrivit fiecare model si cat costa. Preturile si numarul de recenzii sunt luate direct de pe eMAG.</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Cel mai bun la</th><th>Pret</th><th>Pareri</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td>{x.p.name.replace(/’/g, "'").replace(/^Robot de aspirare /i, '').split(',')[0]}</td>
+              <td>{x.badge}</td>
+              <td>{money(x.p.price)} lei</td>
+              <td>{x.p.rating ? `${x.p.rating.toFixed(2)} (${x.p.reviews})` : '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="produse">Cele 7 aspiratoare robot pe larg</h2>
+    <p>Le-am aranjat de la cea mai echilibrata alegere la varful de gama. Fiecare card are pretul, ratingul si numarul de recenzii direct de pe eMAG, plus avantajele si dezavantajele pe scurt.</p>
+    <div class="rd-grid">
+      {PICKS.map(x => (
+        <ProductCard
+          name={x.p.name.replace(/’/g, "'")}
+          image={x.p.image}
+          price={x.p.price}
+          rating={x.p.rating}
+          reviews={x.p.reviews}
+          badge={x.badge}
+          specs={x.specs}
+          pros={x.pros}
+          cons={x.cons}
+          verdict={x.verdict}
+          outKey={'p-' + x.id}
+        />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Aspiratoare robot bune sub 1000 de lei: Lefant, Xiaomi E5 si S20" width="1200" height="675" loading="lazy" />
+
+    <h2 id="cum-alegi">Cum alegi un aspirator robot</h2>
+    <p>Preturile merg de la 400 la 5000 de lei, dar diferenta nu e doar la putere. Uite ce conteaza cu adevarat cand alegi.</p>
+
+    <h3>Navigatia: laser sau senzori</h3>
+    <p>E cel mai important criteriu. Modelele cu navigatie LiDAR, adica un laser rotativ, isi fac o harta precisa a casei si curata sistematic, camera cu camera, fara sa rateze zone.</p>
+    <p>Modelele mai ieftine, fara laser, se orienteaza prin senzori de ciocnire si giroscop si merg in tipare mai aleatorii. Merg pentru un apartament mic, dar pe o casa mare rateaza zone si dureaza mult mai mult.</p>
+
+    <h3>Puterea de aspirare</h3>
+    <p>Se masoara in Pa. Pentru pardoseli dure si praf zilnic, 2000-2500 Pa ajung. Pentru covoare groase si par de animale, cauta 4000 Pa sau mai mult, ca la Xiaomi S20+ sau Rowenta.</p>
+
+    <h3>Mopul: cu tavita sau rotativ</h3>
+    <p>Aproape toate modelele au si functie de mop, dar difera mult. Mopul clasic, cu o laveta si o tavita cu apa, doar sterge usor podeaua, bun pentru praf si urme fine.</p>
+    <p>Mopul dublu rotativ, ca la X20 Pro si S20+, freaca podeaua prin rotatie si scoate petele mai bine. Unele se si ridica automat cand robotul da de covor, ca sa nu il ude.</p>
+
+    <h3>Statia si autonomia</h3>
+    <p>Statia de auto-golire strange singura praful, iar cele all-in-one spala si usuca lavetele de mop. E confort in plus, dar ocupa loc si costa. Autonomia conteaza pe suprafete mari: 120 de minute ajung pentru un apartament, iar pentru o casa mare vrei 180 de minute sau mai mult.</p>
+
+    <h2 id="putere">De ce puterea in Pa nu spune totul</h2>
+    <p>E cea mai frecventa capcana la aspiratoarele robot. Producatorii pun cifre mari, 8000, 10000, 12000 Pa, si pare ca cel cu numarul mai mare curata cel mai bine. In practica nu e asa.</p>
+    <p>Cel mai bun exemplu e chiar din acest top. Roborock S5 Max are doar <strong>2000 Pa</strong>, iar multe modele noi au 6000 sau 7000. Cu toate astea, S5 Max ramane cel mai apreciat, cu peste 1400 de recenzii bune, pentru ca aduna praful in mod constant, prin navigatie precisa si perii bine facute.</p>
+    <p>Un robot cu 8000 Pa dar cu navigatie proasta rateaza zone si trece de doua ori pe unde a fost deja, in timp ce unul cu 2000 Pa si LiDAR curata tot, o singura data, sistematic. Puterea conteaza mai ales pe covoare si la par de animale; pe pardoseli, navigatia si periile fac diferenta reala.</p>
+
+    <img class="rd-fig" src={figTop} alt="Cele mai apreciate aspiratoare robot: Roborock S5 Max si Rowenta Serie 95" width="1200" height="675" loading="lazy" />
+
+    <h2 id="statie">Cu statie sau fara?</h2>
+    <p>E a doua decizie mare, dupa navigatie. O statie schimba mult cat de des te atingi de robot.</p>
+    <ul>
+      <li><strong>Fara statie</strong> (Roborock S5 Max, Xiaomi S20, Rowenta): golesti recipientul de praf manual, la cateva zile. Mai ieftin si ocupa mai putin loc.</li>
+      <li><strong>Statie de auto-golire</strong> (Xiaomi S20+): robotul isi goleste singur praful intr-un sac din statie, deci nu te atingi de recipient saptamani intregi. Schimbi sacul din cand in cand.</li>
+      <li><strong>Statie all-in-one</strong> (Xiaomi X20 Pro): pe langa auto-golire, statia si spala lavetele de mop si le usuca cu aer cald, ca sa nu miroasa. Cel mai putin efort, dar cea mai scumpa si mai mare.</li>
+    </ul>
+    <p>Daca folosesti robotul mai ales ca aspirator si golesti fara probleme recipientul, un model fara statie e cea mai buna afacere. Daca vrei sa uiti complet de el si folosesti des mopul, o statie all-in-one merita banii.</p>
+
+    <img class="rd-fig" src={figStatie} alt="Aspiratoare robot cu statie: Xiaomi X20 Pro si S20+" width="1200" height="675" loading="lazy" />
+
+    <h2 id="greseli">Greseli frecvente cand cumperi un aspirator robot</h2>
+    <p>Cateva capcane in care cad multi cumparatori:</p>
+    <ul>
+      <li><strong>Te iei doar dupa numarul de Pa.</strong> Un robot cu 10000 Pa dar cu navigatie proasta curata mai rau decat unul cu 2000 Pa si LiDAR.</li>
+      <li><strong>Iei un model fara LiDAR pentru o casa mare.</strong> Navigatia aleatorie rateaza zone si dureaza enorm pe mai multe camere.</li>
+      <li><strong>Crezi ca mopul spala ca la mana.</strong> Mopul clasic doar sterge; pentru pete ai nevoie de unul rotativ, si tot nu inlocuieste spalatul serios.</li>
+      <li><strong>Uiti de intretinere.</strong> Periile se infasoara cu par si fire; daca nu le cureti, robotul aspira tot mai slab.</li>
+      <li><strong>Platesti pentru o statie de care nu ai nevoie.</strong> Daca golesti fara probleme recipientul, banii de statie sunt mai bine dati pe navigatie mai buna.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa un aspirator robot</h2>
+    <p>Pragurile arata cam asa in 2026:</p>
+    <p><strong>400 - 800 de lei</strong> sunt modelele de intrare, cu navigatie de baza, fara laser, ca Lefant M210P sau Xiaomi E5. Bune pentru un apartament mic si intretinere zilnica.</p>
+    <p><strong>800 - 1500 de lei</strong> aduc navigatie laser si aspirare mai mare, ca Xiaomi S20. Aici e cel mai bun raport: robotul isi face harta si curata sistematic.</p>
+    <p><strong>1500 - 2500 de lei</strong> adauga statie de auto-golire si mop dublu rotativ, ca Xiaomi X20 Pro sau S20+. Platesti pentru confort si pentru mop mai bun.</p>
+    <p><strong>Peste 2500 de lei</strong> sunt modelele premium, cu putere foarte mare si autonomie lunga, ca Rowenta Serie 95, potrivite pentru case mari sau cu animale.</p>
+
+    <h2 id="intretinere">Cum ai grija de aspiratorul robot</h2>
+    <p>Un aspirator robot curat aspira bine ani buni; unul neglijat pierde din putere si lasa dungi. Rutina e simpla.</p>
+    <ul>
+      <li><strong>Dupa fiecare folosire:</strong> goleste recipientul de praf, daca nu are statie, si clateste laveta de mop.</li>
+      <li><strong>Saptamanal:</strong> scoate peria principala si periile laterale si curata parul si firele infasurate, spala filtrul si sterge senzorii si contactele de incarcare.</li>
+      <li><strong>La cateva luni:</strong> inlocuieste filtrul si periile uzate, iar la modelele cu statie, schimba sacul de praf cand se umple.</li>
+    </ul>
+    <p>Senzorii murdari sunt cea mai frecventa cauza pentru care un robot incepe sa se rataceasca sau sa cada de pe trepte. O stergere cu o laveta uscata rezolva de obicei problema.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-aspiratoare-robot')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate aspiratoarele robot la oferta</strong>
+        <span>Reducerile din acest moment la aspiratoare robot, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>
