@@ -5,7 +5,7 @@
 (() => {
   if (window.__ccEmag) return; window.__ccEmag = true;
 
-  const DEF = { minReviews: 5, maxPages: 5, pacingMs: 2500, tag: '' };
+  const DEF = { minReviews: 5, maxPages: 15, pacingMs: 2200, tag: '' };
   let cfg = { ...DEF };
   let running = false, scanned = 0, sent = 0, queue = [];
   const seen = new Set();
@@ -34,8 +34,8 @@
   function readCfg() {
     cfg.tag = ($('#cc-tag').value || '').trim();
     cfg.minReviews = +$('#cc-min').value || 0;
-    cfg.maxPages = Math.min(40, +$('#cc-pg').value || 5);
-    cfg.pacingMs = Math.max(800, +$('#cc-pace').value || 2500);
+    cfg.maxPages = Math.min(60, +$('#cc-pg').value || 15);
+    cfg.pacingMs = Math.max(800, +$('#cc-pace').value || 2200);
     chrome.storage.local.set(cfg);
   }
   $('#cc-go').addEventListener('click', () => {
@@ -88,17 +88,29 @@
 
   async function run() {
     running = true; scanned = 0; status('pornit…');
-    const base = location.origin + location.pathname.replace(/\/p\d+\/?$/, '').replace(/\/$/, '');
+    const page1html = document.documentElement.outerHTML;
+    // Descopera SABLONUL de paginare din link-urile REALE ale paginii (nu ghicim).
+    // Merge pe categorie (/slug/pN/c) SI pe cautare (/search/q/pN[?...]).
+    let tmpl = null;
+    const mm = page1html.match(/href="([^"]*\/p)\d+((?:\/c)?[^"?]*)(\?[^"]*)?"/i);
+    if (mm) {
+      const pre = mm[1], suf = (mm[2] || ''), qs = (mm[3] || '').replace(/&amp;/g, '&');
+      tmpl = (n) => (pre.startsWith('http') ? '' : location.origin) + pre + n + suf + qs;
+    }
     const pages = [location.href];
-    for (let p = 2; p <= cfg.maxPages; p++) pages.push(base + '/p' + p);
+    if (tmpl) { for (let p = 2; p <= cfg.maxPages; p++) pages.push(tmpl(p)); }
+    else { status('o singura pagina (fara paginare detectata)'); }
 
     const pdUrls = new Set();
     for (const pu of pages) {
       if (!running) break;
-      const html = (pu === location.href) ? document.documentElement.outerHTML : await getHtml(pu);
+      const html = (pu === location.href) ? page1html : await getHtml(pu);
       if (html) {
+        const before = pdUrls.size;
         for (const m of html.matchAll(/\/[a-z0-9\-]+\/pd\/[A-Z0-9]+/gi)) pdUrls.add(location.origin + m[0]);
-        status(`paginare ${pu.split('/').pop()} • ${pdUrls.size} produse gasite`);
+        status(`paginare ${pu.split('/').pop().split('?')[0]} • ${pdUrls.size} produse gasite`);
+        // daca o pagina noua nu aduce nimic nou, am depasit ultima pagina -> oprim paginarea
+        if (pu !== location.href && pdUrls.size === before) break;
       }
       if (pu !== location.href) await sleep(cfg.pacingMs);
     }
