@@ -487,15 +487,6 @@
       "order": 70
     },
     {
-      "keyword": "Cele mai bune canapele extensibile",
-      "category": "Mobila si Dormitor",
-      "categorySlug": "mobila-dormitor",
-      "slug": "cele-mai-bune-canapele-extensibile",
-      "cluster": "CANAPELE",
-      "competitorConsensus": 2,
-      "order": 71
-    },
-    {
       "keyword": "Cele mai bune scaune de birou",
       "category": "Mobila si Dormitor",
       "categorySlug": "mobila-dormitor",
@@ -660,22 +651,28 @@
       "keyword": "Cele mai bune espressoare",
       "category": "Electrocasnice Casa",
       "categorySlug": "electrocasnice-casa",
-      "excerpt": "6 espressoare automate comparate pe pret, rasnita si sistem de lapte, cu pareri reale de la cumparatori.",
+      "excerpt": "Douasprezece espressoare comparate pe costul cafelei pe an si pe note reale: automat, cu capsule sau manual, de la 153 la 2.500 de lei.",
       "date": "2026-07-16T20:10:00+03:00",
-      "modifiedDate": "2026-07-16T20:10:00+03:00",
-      "author": "Cristian Popa",
+      "modifiedDate": "2026-09-17T22:45:00+03:00",
+      "author": "Redactia CentroCasa",
       "slug": "cele-mai-bune-espressoare",
-      "image": "/imagini/articole/espressoare.webp",
+      "image": "/imagini/articole/cele-mai-bune-espressoare/espressoare.webp",
       "images": [
-        "/imagini/articole/espressoare.webp",
-        "/imagini/articole/espressoare-buget.webp",
-        "/imagini/articole/espressoare-premium.webp",
-        "/imagini/produse/espressor-automat-de-longhi-magnifica-s-ecam22-112-b-4-bauturi-sistem-dzbl1hmbm.webp",
-        "/imagini/produse/espressor-automat-krups-espresseria-automatic-ea810b70-1400w-15-bar-1-dz7q2ybbm.webp",
-        "/imagini/produse/espressor-automat-philips-ep2220-10-sistem-de-spumare-a-laptelui-2-bau-d3yf31bbm.webp",
-        "/imagini/produse/espressor-automat-de-longhi-magnifica-evo-milk-ecam290-51-b-5-bauturi-dy9fc8mbm.webp",
-        "/imagini/produse/espressor-automat-philips-ep2235-40-15-bar-12-setari-de-macinare-3-set-ddn2cmmbm.webp",
-        "/imagini/produse/espressor-cu-capsule-krups-nescafe-dolce-gusto-piccolo-xs-kp1a0810-160-dw0wn8bbm.webp"
+        "/imagini/articole/cele-mai-bune-espressoare/espressoare.webp",
+        "/imagini/articole/cele-mai-bune-espressoare/cost-anual.webp",
+        "/imagini/articole/cele-mai-bune-espressoare/note-slabe.webp",
+        "/imagini/produse/espressor-automat-de-longhi-magnifica-s-ecam22-112-b-dzbl1hmbm.webp",
+        "/imagini/produse/espressor-nespresso-by-de-longhi-essenza-mini-ruby-red-dn8c9nbbm.webp",
+        "/imagini/produse/espressor-cu-capsule-krups-nescafe-dolce-gusto-mini-me-kp120-dpx4h2bbm.webp",
+        "/imagini/produse/espressor-manual-de-longhi-ec221-b-dstf6bbbm.webp",
+        "/imagini/produse/espressor-manual-breville-prima-latte-vcf045x-01-dyw0rmbbm.webp",
+        "/imagini/produse/espressor-manual-de-longhi-dedica-style-ec-685-bk-dxgzctmbm.webp",
+        "/imagini/produse/espressor-nespresso-by-krups-inissia-xn100110-dd8c9nbbm.webp",
+        "/imagini/produse/espressor-bosch-tassimo-style-tas1103-d1tp4xmbm.webp",
+        "/imagini/produse/espressor-automat-philips-ep5543-90-seria-5500-dmpw7hybm.webp",
+        "/imagini/produse/espressor-automat-philips-seria-3300-ep3341-50-ddpxsmybm.webp",
+        "/imagini/produse/espressor-automat-de-longhi-magnifica-evo-milk-ecam290-51-b-dy9fc8mbm.webp",
+        "/imagini/produse/espressor-manual-heinner-charm-hem-200bg-d9tgf2bbm.webp"
       ]
     },
     {
@@ -3100,6 +3097,34 @@
         "/imagini/produse/perna-cu-suport-cervical-din-spuma-cu-memorie-suporto-aura-dgl1g8bbm.webp",
         "/imagini/produse/perna-ted-memory-dmmn0gbbm.webp",
         "/imagini/produse/set-de-2-perne-pernador-cu-puf-si-pana-de-gasca-d6cxhhbbm.webp"
+      ]
+    },
+    {
+      "keyword": "Cele mai bune canapele extensibile",
+      "category": "Mobila si Dormitor",
+      "categorySlug": "mobila-dormitor",
+      "excerpt": "Douasprezece canapele extensibile comparate pe suprafata de dormit, mecanismul de extensie si note reale, de la 1.100 la 4.356 de lei.",
+      "date": "2026-09-17T22:40:00+03:00",
+      "modifiedDate": "2026-09-17T22:40:00+03:00",
+      "slug": "cele-mai-bune-canapele-extensibile",
+      "author": "Redactia CentroCasa",
+      "image": "/imagini/articole/cele-mai-bune-canapele-extensibile/canapele-extensibile.webp",
+      "images": [
+        "/imagini/articole/cele-mai-bune-canapele-extensibile/canapele-extensibile.webp",
+        "/imagini/articole/cele-mai-bune-canapele-extensibile/note-slabe.webp",
+        "/imagini/articole/cele-mai-bune-canapele-extensibile/suprafata-de-dormit.webp",
+        "/imagini/produse/canapea-morelia-db0mlqmbm.webp",
+        "/imagini/produse/canapea-sensi-d4q16xybm.webp",
+        "/imagini/produse/canapea-extensibila-nefmob-amias-230x70x90-cm-d9pw9ymbm.webp",
+        "/imagini/produse/coltar-morelia-d6zwc1mbm.webp",
+        "/imagini/produse/coltar-rita-dsm2dh3bm.webp",
+        "/imagini/produse/canapea-extensibila-lincoln-cu-lada-de-depozitare-d9mk0mybm.webp",
+        "/imagini/produse/canapea-extensibila-3-locuri-diego-d15bd8mbm.webp",
+        "/imagini/produse/canapea-extensibila-imperial-225x110cm-dyct8jmbm.webp",
+        "/imagini/produse/canapea-extensibila-modella-jade-235x80x85-cm-dt49kymbm.webp",
+        "/imagini/produse/canapea-extensibila-cu-lada-depozitare-modella-paris-215x80x-df3x19mbm.webp",
+        "/imagini/produse/canapea-studio-d6fljjbbm.webp",
+        "/imagini/produse/canapea-extensibila-olivia-dspnp1bbm.webp"
       ]
     }
   ],
