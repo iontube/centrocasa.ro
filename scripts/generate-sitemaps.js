@@ -169,7 +169,7 @@ function generateCategorySitemap() {
 
 // Pagini statice institutionale
 function generatePageSitemap() {
-  const pages = ['', 'despre', 'cum-testam', 'autori', 'contact', 'privacy-policy', 'terms', 'cookies'];
+  const pages = ['', 'despre', 'cum-testam', 'contact', 'privacy-policy', 'terms', 'cookies'];
   let urlEntries = '';
   for (const slug of pages) {
     urlEntries += `

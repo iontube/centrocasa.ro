@@ -77,7 +77,7 @@ const articleSchema = type === 'article' ? {
   "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
   ...(publishedTime ? { "datePublished": publishedTime } : {}),
   ...(modifiedTime ? { "dateModified": modifiedTime } : {}),
-  ...(author ? { "author": { "@type": "Person", "name": author } } : {}),
+  ...(author ? { "author": author.startsWith("Redactia") ? { "@type": "Organization", "name": author, "url": "https://centrocasa.ro/despre/" } : { "@type": "Person", "name": author } } : {}),
   "publisher": {
     "@type": "Organization",
     "name": "CentroCasa",
