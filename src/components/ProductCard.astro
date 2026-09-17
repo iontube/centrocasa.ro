@@ -43,7 +43,7 @@ const verdictParas = (() => {
           {reviews > 0 && <span class="pcard-reviews">({reviews} recenzii)</span>}
         </span>
       )}
-      <span class="pcard-price">{price.toLocaleString('ro-RO')} {currency === 'RON' ? 'lei' : currency}</span>
+      {/* pretul nu se afiseaza pe card: se schimba des, iar cititorul il vede pe eMAG (userul, 2026-09-17) */}
     </div>
 
     {specs.length > 0 && (
