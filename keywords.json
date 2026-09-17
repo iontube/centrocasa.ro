@@ -154,15 +154,6 @@
       "order": 33
     },
     {
-      "keyword": "Cele mai bune aspiratoare verticale",
-      "category": "Curatenie si Intretinere",
-      "categorySlug": "curatenie-intretinere",
-      "slug": "cele-mai-bune-aspiratoare-verticale",
-      "cluster": "ASPIRATOARE",
-      "competitorConsensus": 5,
-      "order": 34
-    },
-    {
       "keyword": "Cele mai bune aspiratoare cu sac",
       "category": "Curatenie si Intretinere",
       "categorySlug": "curatenie-intretinere",
@@ -3162,6 +3153,34 @@
         "/imagini/produse/masina-de-spalat-vase-compacta-beko-dtc36610w-d84xz7bbm.webp",
         "/imagini/produse/masina-de-spalat-vase-compacta-candy-rapido-cp-6e51lw-dqly1dybm.webp",
         "/imagini/produse/masina-de-spalat-vase-compacta-ihunt-bro-dishwasher-dwr7dyybm.webp"
+      ]
+    },
+    {
+      "keyword": "Cele mai bune aspiratoare verticale",
+      "category": "Curatenie si Intretinere",
+      "categorySlug": "curatenie-intretinere",
+      "excerpt": "Douasprezece aspiratoare verticale fara fir comparate pe autonomie declarata, greutate si note reale, de la 130 la 4.100 de lei.",
+      "date": "2026-09-18T00:25:00+03:00",
+      "modifiedDate": "2026-09-18T00:25:00+03:00",
+      "slug": "cele-mai-bune-aspiratoare-verticale",
+      "author": "Redactia CentroCasa",
+      "image": "/imagini/articole/cele-mai-bune-aspiratoare-verticale/aspiratoare-verticale.webp",
+      "images": [
+        "/imagini/articole/cele-mai-bune-aspiratoare-verticale/aspiratoare-verticale.webp",
+        "/imagini/articole/cele-mai-bune-aspiratoare-verticale/autonomie.webp",
+        "/imagini/articole/cele-mai-bune-aspiratoare-verticale/note-slabe.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-seveshop-v20-dl63lw3bm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-zenkabeat-xc400-d9017h3bm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-seveshop-v08-d8rl903bm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-proscenic-p15-dmlxcx3bm.webp",
+        "/imagini/produse/aspirator-vertical-xiaomi-g20-lite-eu-bhr8195eu-db8rlfybm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-rowenta-rh6545wh-afe-light-dg30yqbbm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-rowenta-x-force-flex-9-60-allerg-d39y45mbm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-rowenta-x-force-flex-12-60-neo-r-d00wbfybm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-rowenta-x-force-flex-14-60-aqua--dtdqbwmbm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-dyson-v10-cyclone-submarine-5944-dbrpk83bm.webp",
+        "/imagini/produse/aspirator-vertical-fara-fir-dyson-v15-detect-absolute-2026-dgmxgv2bm.webp",
+        "/imagini/produse/aspirator-mana-portabil-ds4pzjybm.webp"
       ]
     }
   ],
