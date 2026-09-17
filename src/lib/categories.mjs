@@ -19,6 +19,12 @@ export const categories = [
     description: 'Aspiratoare robot, aparate de aer conditionat, purificatoare de aer si electrocasnice moderne pentru o casa confortabila. Analizam performanta, consumul energetic si raportul calitate-pret pentru fiecare produs.'
   },
   {
+    name: 'Bucatarie si Gatit',
+    short: 'Bucatarie',
+    slug: 'bucatarie-gatit',
+    description: 'Oale, cratite, tigai si vase de gatit comparate pe material, compatibilitate cu plita, capacitate reala si ce spun cumparatorii dupa luni de folosire.'
+  },
+  {
     name: 'Decoratiuni Casa',
     short: 'Decoratiuni',
     slug: 'decoratiuni-casa',
