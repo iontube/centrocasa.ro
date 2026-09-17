@@ -1,0 +1,11 @@
+---
+// Card de produs pentru articolele .mdx: datele live (pret, nota, recenzii, poza) vin din emag-products.json dupa id.
+import ProductCard from './ProductCard.astro';
+import emag from '../data/emag-products.json';
+const { id, eticheta, specs = [], pros = [], cons = [], recenzie = [], nume } = Astro.props;
+const slug = Astro.url.pathname.replace(/^\/|\/$/g, '');
+// grupul articolului are prioritate (date si poza pregatite pentru el), apoi orice alt grup
+const p = (emag[slug] || []).find((x) => x.id === id) || Object.values(emag).flat().find((x) => x.id === id);
+if (!p) throw new Error(`Produs lipsa in emag-products.json: ${id}`);
+---
+<ProductCard name={nume || p.name.replace(/’/g, "'")} image={p.image} price={p.price} rating={p.rating} reviews={p.reviews} badge={eticheta} specs={specs} pros={pros} cons={cons} verdict={Array.isArray(recenzie) ? recenzie.join(' ') : recenzie} outKey={'p-' + id} />

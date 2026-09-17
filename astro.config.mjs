@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
+import mdx from '@astrojs/mdx';
 
 export default defineConfig({
   site: 'https://centrocasa.ro',
@@ -8,7 +9,7 @@ export default defineConfig({
   build: {
     format: 'directory'
   },
-  integrations: [sitemap()],
+  integrations: [sitemap(), mdx()],
   vite: {
     plugins: [tailwindcss()]
   }

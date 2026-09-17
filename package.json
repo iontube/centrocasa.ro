@@ -4,11 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/gen-responsive.mjs && node scripts/gen-popular.mjs && astro build && node scripts/generate-sitemaps.js",
+    "build": "node scripts/generate-redirects.mjs && node scripts/gen-responsive.mjs && node scripts/gen-popular.mjs && astro build && node scripts/generate-sitemaps.js",
     "preview": "astro preview",
     "generate": "node scripts/generate-batch.js"
   },
   "dependencies": {
+    "@astrojs/mdx": "^4.3.14",
     "@astrojs/sitemap": "^3.7.0",
     "astro": "^5.16.15",
     "sharp": "^0.34.5",

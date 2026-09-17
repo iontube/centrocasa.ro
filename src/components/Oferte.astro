@@ -1,0 +1,10 @@
+---
+const { oferta, titlu, text = 'Reducerile din acest moment, direct pe eMAG' } = Astro.props;
+const b64 = (s) => Buffer.from(String(s)).toString('base64');
+---
+<div class="rd-offers" data-o={b64(oferta)} role="button" tabindex="0">
+  <div class="rd-offers-txt"><strong>{titlu}</strong><span>{text}</span></div>
+  <span class="rd-offers-btn">Vezi ofertele
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </span>
+</div>

@@ -1,0 +1,150 @@
+---
+// Sablon comun pentru articolele scrise in .mdx (src/pages/<slug>.mdx, layout: ../layouts/Articol.astro).
+// Frontmatter: titlu, descriere, h1, categorie, categorieSlug, data, modificat?, imagine, imagineAlt, excerpt, faq[{q,a}]
+// {an} din titlu/h1/descriere/faq se inlocuieste cu anul curent la build.
+import Layout from './Layout.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const { frontmatter: f, headings = [] } = Astro.props;
+const AN = String(new Date().getFullYear());
+const an = (s) => (s || '').replaceAll('{an}', AN);
+const slug = Astro.url.pathname.replace(/^\/|\/$/g, '');
+const luni = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+const mod = new Date(f.modificat || f.data);
+const faq = (f.faq || []).map((x) => ({ question: an(x.q), answer: an(x.a) }));
+const cuprins = headings.filter((h) => h.depth === 2);
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+---
+
+<Layout
+  title={an(f.titlu)}
+  description={an(f.descriere)}
+  image={f.imagine}
+  type="article"
+  publishedTime={f.data}
+  modifiedTime={f.modificat || f.data}
+  author="Redactia CentroCasa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: f.categorie, url: `/${f.categorieSlug}/` }, { name: an(f.scurt || f.h1) }]}
+  faq={faq}
+  preloadImage={f.imagine}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href={`/${f.categorieSlug}/`}>{f.categorie}</a><span class="breadcrumb-separator">/</span>
+      <span>{an(f.scurt || f.h1)}</span>
+    </nav>
+
+    <h1>{an(f.h1)}</h1>
+    <p class="rd-byline">de <a href="/despre/">Redactia CentroCasa</a> · actualizat {luni[mod.getMonth()]} {mod.getFullYear()}</p>
+
+    <img class="rd-hero" src={f.imagine} alt={an(f.imagineAlt || f.h1)} width="1200" height="675" fetchpriority="high" />
+
+    {cuprins.length > 2 && (
+      <details class="rd-toc">
+        <summary>Cuprins</summary>
+        <ol>
+          {cuprins.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+          {faq.length > 0 && <li><a href="#intrebari-frecvente">Intrebari frecvente</a></li>}
+        </ol>
+      </details>
+    )}
+
+    <slot />
+
+    {faq.length > 0 && (
+      <>
+        <h2 id="intrebari-frecvente">Intrebari frecvente</h2>
+        <div class="rd-faq">
+          {faq.map((x) => (
+            <details class="rd-faq-item">
+              <summary>{x.question}</summary>
+              <p>{x.answer}</p>
+            </details>
+          ))}
+        </div>
+      </>
+    )}
+
+    <div class="author-box">
+      <div class="author-avatar">CC</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/despre/" class="author-name-link">Redactia CentroCasa</a></p>
+        <p class="author-bio">Scris si verificat de Lucian Grecu si Alina Grecu, pe fisele produselor, recenziile cumparatorilor si surse publice.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug={slug} currentCategory={f.categorieSlug} articles={relatedArticles} />
+    <SimilarArticles currentSlug={slug} currentCategory={f.categorieSlug} articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style is:global>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd > ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd > ul > li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd > ul > li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+  .rd h2 { scroll-margin-top: 84px; }
+  .rd img:not(.rd-hero):not(.pcard-media img) { max-width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd .pcard-media img { margin: 0; border-radius: 0; }
+  .rd > .pcard { margin: 1.5rem 0; }
+  .rd table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; font-size: .92rem; margin: 1rem 0 1.5rem; }
+  .rd table th, .rd table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); white-space: nowrap; }
+  .rd table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+</style>
