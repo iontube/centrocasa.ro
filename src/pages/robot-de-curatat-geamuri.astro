@@ -1,235 +1,321 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Robot de curatat geamuri",
-  excerpt: "Am tot amânat momentul să vorbesc despre asta, dar geamurile mele au început să arate cam jalnic. Curățarea lor e o corvoadă pe care o evit de mult. Așa că am zis că e momentul să testez ceva nou: robotul de curățat geamuri. Sincer să fiu, eram sceptic, dar rezultatele m-au uimit.",
-  image: "/images/articles/robot-de-curatat-geamuri.webp",
-  category: "Curatenie si Intretinere",
-  categorySlug: "curatenie-intretinere",
-  date: "2026-02-03T13:22:00.671Z",
-  modifiedDate: "2026-02-03T13:22:00.671Z",
-  author: "Elena Dragomir",
-  authorRole: "Consultant Amenajari",
-  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
-};
-
-const faq = [
-  { question: "Pot folosi robotul pe orice tip de geam?", answer: "Majoritatea roboților sunt proiectați pentru geamuri standard. Verificați specificațiile producătorului pentru a vedea dacă modelul respectiv este potrivit și pentru sticlă, oglinzi sau alte suprafețe. Suprafața trebuie să fie netedă și plană pentru o aderență optimă." },
-  { question: "Cât de sigur este robotul? Risca sa cada?", answer: "Roboții moderni au sisteme de aderență puternice și senzori de detectare a marginilor. Majoritatea vin și cu un cablu de siguranță. Totuși, este recomandat să supravegheați robotul, mai ales în timpul primelor utilizări, pentru a vă asigura de funcționarea corectă." },
-  { question: "Ce solutie de curatare sa folosesc?", answer: "Folosiți soluția de curățare recomandată de producătorul robotului. Dacă nu este specificată, alegeți o soluție specială pentru roboți de curățat geamuri sau un detergent delicat, fără amoniac, care nu lasă reziduuri. Evitați soluțiile prea spumoase." },
-  { question: "Cat de des trebuie sa curat lavetele?", answer: "Lavetele trebuie curățate după fiecare utilizare. Murdăria acumulată pe lavete poate zgâria geamul sau poate împiedica robotul să curețe eficient. Majoritatea lavetelor pot fi spălate manual sau la mașină." },
-  { question: "Ce autonomie are bateria unui robot de curatat geamuri?", answer: "Autonomia medie a bateriei este de aproximativ 1.5 - 2 ore, suficientă pentru a curăța mai multe geamuri medii. Unele modele au și o baterie de rezervă pentru a continua curățarea în caz de pană de curent." },
-  { question: "Pot folosi robotul pe geamuri murdare de ploaie sau noroi uscat?", answer: "Pentru rezultate optime, este recomandat să curățați geamurile de murdăria groasă (praf excesiv, noroi uscat, excremente de pasăre) înainte de a folosi robotul. Acesta este mai eficient pentru întreținerea curățeniei și eliminarea urmelor de apă sau a murdăriei ușoare." }
-];
-
-const toc = [
-  { title: "De ce am nevoie de un robot de curatat geamuri?", id: "de-ce-am-nevoie-de-un-robot-de-curatat-geamuri" },
-  { title: "Top recomandari - Ce am gasit pe piata", id: "top-recomandari---ce-am-gasit-pe-piata" },
-  { title: "Cum alegi corect un robot de curatat geamuri?", id: "cum-alegi-corect-un-robot-de-curatat-geamuri" },
-  { title: "Avantaje si dezavantaje - Sincer sa fiu", id: "avantaje-si-dezavantaje---sincer-sa-fiu" },
-  { title: "Sfaturi practice din experienta mea", id: "sfaturi-practice-din-experienta-mea" },
-  { title: "Parerea mea finala - Merita investitia?", id: "parerea-mea-finala---merita-investitia" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['robot-geamuri'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Accesibile ---
+  { g: 'acc', id: 'D0G6YCMBM', badge: 'Cel mai vandut', short: 'iHunt Smart Window', seg: 'Accesibil', control: 'Telecomanda',
+    specs: ['programabil, cu senzor anti-cadere', 'indicator luminos de stare', 'pentru geamuri, cel mai accesibil', 'de departe cel mai vandut, 367 de pareri'],
+    pros: ['De departe cel mai vandut din selectie, 367 de pareri', 'Cel mai mic pret dintre robotii de geamuri', 'Senzor anti-cadere si programare', 'iHunt, brand accesibil, cu multe produse smart'],
+    cons: ['Nota 4.46, buna fara sa fie in top', 'Dotari de baza, fara pulverizator sofisticat'],
+    verdict: 'Cea mai sigura alegere pentru cine vrea sa incerce un robot de geamuri fara sa investeasca mult. iHunt Smart Window Robot e de departe cel mai vandut din selectie, cu 367 de pareri, la cel mai mic pret dintre robotii de geamuri, semn ca multa lume l-a cumparat si e multumita de raportul pret-rezultat. Are senzor anti-cadere, care il opreste daca pierde aderenta la marginea geamului, indicator luminos de stare si posibilitatea de a-l programa. E de la iHunt, un brand accesibil cu multe produse smart. Nota, 4.46, e buna fara sa fie in varf, iar dotarile sunt de baza. Il iei cand vrei cel mai ieftin si mai testat robot de geamuri, pentru geamurile obisnuite din casa, fara sa dai bani de model premium.' },
+  { g: 'acc', id: 'DK3X1V3BM', badge: 'Nota maxima', short: 'HOGA W10', seg: 'Accesibil', control: 'Telecomanda',
+    specs: ['sistem avansat, cu frana de siguranta', 'pentru curatarea geamurilor', 'pret accesibil', 'nota maxima, 5 din 5'],
+    pros: ['Nota maxima, 5 din 5, de la cumparatori', 'Frana de siguranta, tine robotul pe geam', 'Pret mic, printre cele mai accesibile', 'Sistem avansat pentru pretul lui'],
+    cons: ['Putine pareri, 10', 'Brand mai putin cunoscut'],
+    verdict: 'O alternativa accesibila foarte bine cotata, pentru cine vrea siguranta la un pret mic. HOGA W10 are un sistem avansat cu frana de siguranta, care ajuta robotul sa ramana lipit de geam si sa nu alunece, un detaliu important cand curata ferestre la inaltime. E printre cele mai ieftine din selectie si a luat nota maxima, 5 din 5, chiar daca deocamdata din putine pareri, doar 10. Vine de la un brand mai putin cunoscut, asa ca il iei mai mult pe increderea in specificatii si in notele bune de pana acum. Il alegi cand vrei un robot de geamuri ieftin, cu accent pe siguranta, si nu te deranjeaza ca are inca putine recenzii.' },
+  { g: 'acc', id: 'DH08NM2BM', badge: 'Trei moduri de curatare', short: 'Techsen N1 Crystal', seg: 'Accesibil', control: 'Aplicatie',
+    specs: ['3 moduri de curatare, pentru diverse geamuri', 'control din aplicatie', 'pentru geamuri interioare si exterioare', 'nota maxima, 5 din 5'],
+    pros: ['Trei moduri de curatare, alegi traseul dupa geam', 'Control din aplicatie, comod', 'Nota maxima, 5 din 5', 'Pret rezonabil pentru dotari'],
+    cons: ['Putine pareri, 22', 'Brand mai nou pe piata'],
+    verdict: 'Alegerea daca vrei mai mult control asupra felului in care curata, la un pret inca accesibil. Techsen N1 Crystal are trei moduri de curatare, deci alegi traseul robotului in functie de geam, mai atent pe margini sau in zig-zag pe suprafata mare, si se comanda din aplicatie, comod de pe canapea. Are nota maxima, 5 din 5, din 22 de pareri, un semn bun, si e potrivit atat pentru geamuri interioare, cat si pentru exterioare. E de la un brand mai nou pe piata, cu inca putine recenzii. Il iei cand vrei un robot cu mai multe moduri de curatare si control din aplicatie, fara sa treci in zona premium.' },
+  { g: 'acc', id: 'DF554K3BM', badge: 'Cu baterie de siguranta', short: 'Robot cu UPS', seg: 'Accesibil', control: 'Aplicatie',
+    specs: ['UPS incorporat, baterie de urgenta', 'ramane pe geam la pana de curent', 'navigatie AI', 'accesibil, cu functii de siguranta'],
+    pros: ['UPS incorporat: ramane lipit de geam daca se ia curentul', 'Navigatie AI pentru un traseu eficient', 'Functii de siguranta la un pret accesibil', 'Bun pentru geamuri la inaltime'],
+    cons: ['Putine pareri, 7, nota 4.14', 'Brand generic'],
+    verdict: 'Alegerea daca pui pret pe siguranta la pana de curent, dar ai buget limitat. Acest robot are un UPS incorporat, adica o baterie de urgenta care il tine lipit de geam daca se ia curentul in timpul curatarii, in loc sa cada, o functie pe care de obicei o gasesti la modele mult mai scumpe. Are si navigatie AI, pentru un traseu mai eficient pe suprafata geamului. E o optiune accesibila cu functii de siguranta reale, potrivita mai ales pentru ferestre la inaltime. Are inca putine pareri, 7, cu o nota de 4.14, si vine de la un brand generic. Il iei cand vrei protectia unui UPS fara sa platesti pretul unui robot premium.' },
+  // --- Echilibrate ---
+  { g: 'mid', id: 'DDM4TR3BM', badge: 'Cel mai cotat', short: 'SeveShop', seg: 'Mediu', control: 'Aplicatie (WiFi)',
+    specs: ['cu pulverizator si control WiFi', 'silentios, programabil', 'nota 4.87 din 299 de pareri', 'unul dintre cele mai vandute'],
+    pros: ['Foarte bine cotat, 4.87 din 299 de pareri, cele mai multe din grup', 'Pulverizeaza singur solutia pe geam', 'Control WiFi din aplicatie si functionare silentioasa', 'Programabil, il lasi sa lucreze cand vrei'],
+    cons: ['Pret de gama medie', 'Necesita configurare in aplicatie'],
+    verdict: 'Cel mai bine cotat robot din selectie, cu multe pareri si dotari complete. SeveShop are pulverizator integrat, deci aplica singur solutia de curatare pe geam in timp ce lucreaza, fara sa uzi tu fereastra dinainte, si se controleaza prin WiFi din aplicatie, cu functionare silentioasa si posibilitatea de a-l programa. Are o nota excelenta, 4.87, din 299 de pareri, cele mai multe din grupul echilibrat, deci e verificat de multi cumparatori. E in zona de pret medie si cere putina configurare in aplicatie la inceput. Il iei cand vrei un robot complet, cu pulverizator si WiFi, verificat de sute de oameni, si nu te sperie sa il configurezi o data.' },
+  { g: 'mid', id: 'DG20D03BM', badge: 'Nota aproape maxima', short: 'IMA Trend', seg: 'Mediu', control: 'Aplicatie',
+    specs: ['smart, cu pulverizator', 'filtru lavabil si baterie de siguranta', 'nota 4.92 din 245 de pareri', 'silentios'],
+    pros: ['Nota aproape maxima, 4.92, din 245 de pareri', 'Filtru lavabil, il speli si il refolosesti', 'Baterie de siguranta integrata', 'Smart si silentios'],
+    cons: ['Pret de gama medie', 'Brand mai putin cunoscut decat HOBOT'],
+    verdict: 'Alegerea cu cea mai buna combinatie de nota mare si multe pareri din grupul echilibrat. IMA Trend are o nota aproape maxima, 4.92, din 245 de pareri, ceea ce inseamna ca aproape toti cumparatorii sunt multumiti, o raritate. E smart, cu pulverizator si o baterie de siguranta care il tine pe geam daca se ia curentul, si are un filtru lavabil, pe care il speli si il refolosesti, fara consumabile. Functioneaza silentios. E in zona de pret medie si vine de la un brand mai putin cunoscut decat HOBOT sau Ecovacs. Il iei cand vrei cea mai mare nota din grup, cu multe pareri in spate, si dotari complete de siguranta, la un pret rezonabil.' },
+  { g: 'mid', id: 'DZ14MGYBM', badge: 'Cea mai buna nota', short: 'Robot aspirator ferestre', seg: 'Mediu', control: 'Telecomanda',
+    specs: ['pentru multi-suprafete si exterioare', 'protectie la supraincalzire', 'colectare praf', 'nota 4.97, cea mai mare din selectie'],
+    pros: ['Cea mai mare nota din selectie, 4.97', 'Merge pe mai multe suprafete, inclusiv exterioare', 'Protectie la supraincalzire', 'Bun si pentru geamuri, si pentru alte suprafete plane'],
+    cons: ['Mai putine pareri, 29', 'Nume generic, brand neclar'],
+    verdict: 'Robotul cu cea mai buna nota din toata selectia, pentru cine vrea versatilitate. Modelul are 4.97, cea mai mare nota de aici, si e gandit pentru multi-suprafete, inclusiv geamuri exterioare si alte suprafete plane, nu doar ferestrele obisnuite. Are protectie la supraincalzire, care il opreste daca se incinge, si functie de colectare a prafului, pe langa curatare. E in zona de pret medie si are 29 de pareri, mai putine decat SeveShop sau IMA, dar cu nota maxima. Numele e generic, iar brandul mai putin clar. Il iei cand vrei cea mai buna nota si un robot versatil, care sa curete si geamuri exterioare, si alte suprafete, si nu conteaza ca are un nume mai putin cunoscut.' },
+  { g: 'mid', id: 'D8RN4ZYBM', badge: 'Cu filtru lavabil', short: 'Buntz WindowGlow', seg: 'Mediu', control: 'Aplicatie',
+    specs: ['smart, cu filtru lavabil', 'avertizare sonora la probleme', 'pentru geamuri', 'nota 4.61 din 49 de pareri'],
+    pros: ['Filtru lavabil, fara consumabile', 'Avertizare sonora daca apare o problema', 'Smart, control comod', 'Nota buna, 4.61, din 49 de pareri'],
+    cons: ['Pret de gama medie', 'Brand mai putin cunoscut'],
+    verdict: 'O optiune echilibrata, cu doua detalii practice de siguranta si intretinere. Buntz WindowGlow e un robot smart cu filtru lavabil, pe care il speli si il refolosesti, si cu avertizare sonora, care te anunta printr-un semnal daca apare o problema, de exemplu daca aderenta scade sau se blocheaza, util cand curata la inaltime si nu esti langa el. Are o nota buna, 4.61, din 49 de pareri, o baza solida de cumparatori. E in zona de pret medie si vine de la un brand mai putin cunoscut. Il iei cand vrei un robot echilibrat, cu filtru lavabil si avertizare sonora de siguranta, verificat de un numar decent de cumparatori.' },
+  { g: 'mid', id: 'D7751M2BM', badge: 'Profesional, nota maxima', short: 'Rimenss', seg: 'Mediu', control: 'Aplicatie',
+    specs: ['prezentat ca model profesional', 'silentios, smart, programabil', 'aspirator de geamuri', 'nota maxima, 5 din 5'],
+    pros: ['Nota maxima, 5 din 5', 'Functionare silentioasa', 'Smart si programabil', 'Pozitionat ca model profesional, pentru uz intens'],
+    cons: ['Putine pareri, 11', 'Brand mai putin cunoscut'],
+    verdict: 'Alegerea daca vrei un robot pozitionat ca profesional, la un pret inca rezonabil. Rimenss e prezentat ca model profesional, silentios, smart si programabil, gandit pentru o curatare mai deasa sau mai exigenta a geamurilor. A luat nota maxima, 5 din 5, chiar daca din putine pareri, 11, un semn bun de la primii cumparatori. E in prima parte a gamei medii ca pret si vine de la un brand mai putin cunoscut, asa ca il iei mai mult pe specificatii si pe notele bune de pana acum. Il alegi cand vrei un robot descris ca profesional, silentios si programabil, si esti dispus sa te bazezi pe un numar mai mic de recenzii.' },
+  // --- Premium ---
+  { g: 'prem', id: 'DRBF78MBM', badge: 'HOBOT, 2 pulverizatoare', short: 'HOBOT R3', seg: 'Premium', control: 'Aplicatie',
+    specs: ['HOBOT R3, cu 2 pulverizatoare', 'curatare automata, control din aplicatie', 'brand specializat in roboti de geamuri', 'indicator luminos'],
+    pros: ['HOBOT, brand specializat in roboti de geamuri', 'Doua pulverizatoare, umezeste uniform geamul', 'Curatare automata si control din aplicatie', 'Constructie si tehnologie de nivel premium'],
+    cons: ['Pret premium', 'Putine pareri, 9'],
+    verdict: 'Alegerea premium de la brandul specializat in roboti de geamuri. HOBOT R3 vine cu doua pulverizatoare, care umezesc geamul uniform in fata robotului pentru o curatare mai buna, si cu un sistem de curatare automata controlat din aplicatie. HOBOT e numele care s-a facut cunoscut tocmai pe aceasta nisa, deci ai in spate tehnologie si constructie de nivel premium, cu accent pe aderenta si siguranta. E, evident, in zona de pret ridicat si are inca putine pareri, 9. Il iei cand vrei un robot de la un specialist in domeniu, cu doua pulverizatoare si dotari premium, si esti dispus sa platesti pentru brand si tehnologie.' },
+  { g: 'prem', id: 'D0KWS4YBM', badge: 'Ecovacs, top de gama', short: 'Ecovacs WINBOT W2', seg: 'Premium', control: 'Aplicatie',
+    specs: ['Ecovacs WINBOT W2, rezervor propriu', 'brand mare de roboti de curatenie', 'cel mai scump din selectie', 'tehnologie de top'],
+    pros: ['Ecovacs, unul dintre cei mai mari producatori de roboti', 'Rezervor propriu pentru solutie', 'Tehnologie de aderenta si navigatie de top', 'Constructie premium, fiabila'],
+    cons: ['Cel mai scump din selectie', 'Putine pareri, 11'],
+    verdict: 'De la unul dintre cei mai mari producatori de roboti de curatenie, cel mai performant model din selectie. Ecovacs WINBOT W2 e cel mai scump din selectie si vine cu un rezervor propriu pentru solutie si cu tehnologia de aderenta si navigatie a unui brand consacrat, Ecovacs, cunoscut pentru robotii de aspirare si de geamuri. Primesti constructie premium, fiabila, si sistemele de siguranta care fac diferenta cand cureti ferestre mari sau la inaltime. Are inca putine pareri, 11, normal la un produs de nisa si scump. Il iei cand vrei cel mai bun robot de geamuri din selectie, de la un brand mare, si bugetul nu e principala grija, ci rezultatul si fiabilitatea.' },
+  { g: 'prem', id: 'DM1JFMMBM', badge: 'HOBOT clasic, cu UPS', short: 'HOBOT 388', seg: 'Premium', control: 'Telecomanda',
+    specs: ['HOBOT 388, cu pulverizator si UPS', 'baterie de urgenta la pana de curent', 'senzori de siguranta', 'model consacrat HOBOT'],
+    pros: ['HOBOT, brand specializat, model consacrat', 'Pulverizator integrat si UPS de siguranta', 'Senzori care monitorizeaza aderenta', 'Tehnologie premium verificata in timp'],
+    cons: ['Nota mai mica, 3.73, parerile sunt impartite', 'Pret premium'],
+    verdict: 'Un model HOBOT consacrat, cu dotari premium, dar cu pareri mai impartite. HOBOT 388 are pulverizator integrat, care umezeste geamul, si un UPS de siguranta, adica o baterie de urgenta care il tine pe sticla daca se ia curentul, plus senzori care monitorizeaza continuu aderenta. Vine de la HOBOT, specialistul in roboti de geamuri, cu tehnologie verificata in timp. Partea mai putin buna e nota, 3.73, din 15 pareri, mai mica decat la celelalte modele din selectie, semn ca parerile sunt impartite, poate din cauza asteptarilor mari la un pret premium. Il iei doar daca tii neaparat la brandul HOBOT si la dotarile lui de siguranta, si accepti ca notele sunt mai amestecate decat la alte modele.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const MID = PICKS.filter(x => x.g === 'mid');
+const PREM = PICKS.filter(x => x.g === 'prem');
+
+const hero = '/images/articles/robot-de-curatat-geamuri.webp';
+const figAcc = '/imagini/articole/robot-geam-accesibile.webp';
+const figMid = '/imagini/articole/robot-geam-echilibrate.webp';
+const figPrem = '/imagini/articole/robot-geam-premium.webp';
+const published = '2026-07-18T21:20:26+03:00';
+
+const faq = [
+  { question: 'Cum sta un robot de curatat geamuri pe sticla si e sigur?', answer: 'Cele mai multe modele folosesc un motor cu vid, care creeaza o aspirare puternica ce le tine lipite de geam, indiferent de grosimea sau inclinarea acestuia, un sistem dovedit si sigur. Peste asta, robotii buni au trei plase de siguranta: un UPS, adica o baterie de urgenta care il tine pe geam inca 40 de minute daca se ia curentul, un cablu de siguranta pe care il prinzi de robot si il fixezi de ceva stabil, mai ales la curatarea la inaltime, in exterior, si senzori de presiune, care monitorizeaza aderenta si opresc robotul daca detecteaza o problema. Cu aceste sisteme, riscul de cadere e foarte mic.' },
+  { question: 'Robotul de geamuri se poate folosi si la exterior, la inaltime?', answer: 'Da, si aici stralucesc cel mai mult, pentru ca fac o treaba periculoasa in locul tau, la geamurile de la etaj sau greu accesibile. Pentru exterior si inaltime, insa, siguranta e obligatorie: foloseste mereu cablul de siguranta, prins de robot si fixat de ceva solid, si alege un model cu UPS, ca sa nu cada la o pana de curent. Cauta si senzori de detectare a marginii, mai ales daca ai geamuri fara rama, ca robotul sa se opreasca la timp la capatul liber. Cu aceste masuri, poti curata in siguranta ferestre pe care altfel ar trebui sa le speli agatat pe afara.' },
+  { question: 'Robotul curata singur sau trebuie sa ud eu geamul?', answer: 'Depinde de model. Unele au pulverizator integrat, ca SeveShop, IMA Trend sau modelele HOBOT din selectie, care aplica singure solutia de curatare pe geam in timp ce lucreaza, deci nu trebuie sa faci nimic dinainte. Altele functioneaza cu lavete de microfibra pe care le umezesti tu inainte de pornire, mai simple si mai ieftine. Modelele cu pulverizator sunt mai comode si dau adesea un rezultat mai uniform pe geamurile foarte murdare, dar costa mai mult. Daca vrei sa apesi un buton si sa nu te mai atingi de geam, alege unul cu pulverizator; daca nu te deranjeaza sa umezesti laveta, unul simplu e suficient.' },
+  { question: 'Merge pe orice geam, cu rama sau fara rama?', answer: 'Pe geamurile cu rama merg toate, pentru ca rama le ajuta sa se orienteze si sa se opreasca la margine. Pentru geamurile fara rama, ca cele de la usi de sticla, balustrade sau vitrine, ai nevoie de un model cu senzori de detectare a marginii, care sa recunoasca unde se termina sticla si sa se opreasca la timp la capatul liber, ca sa nu treaca peste margine. Verifica in descriere daca robotul e potrivit pentru geamuri fara rama inainte sa il cumperi pentru asa ceva. Pe langa geamuri, unele modele merg si pe alte suprafete plane si netede, ca faianta, oglinzi sau blaturi.' },
+  { question: 'Cat de bine curata, ajunge pana in colturi?', answer: 'Robotii de geamuri fac o treaba foarte buna pe suprafata mare a geamului, unde sterg uniform si scot praful si urmele, dar au o limita cunoscuta: colturile si marginile extreme. Din cauza formei, de obicei patrata sau rotunda, robotul lasa uneori o fasie ingusta nesterse chiar in colt sau pe marginea de langa rama. De aceea, cel mai bun rezultat il obtii lasand robotul sa faca partea grea, suprafata mare, si trecand tu la final cu o laveta prin colturi, daca vrei perfectiune. Pentru geamuri mari si multe, economia de efort ramane uriasa, chiar daca finisezi colturile manual.' },
+  { question: 'Ce inseamna UPS la un robot de geamuri si de ce conteaza?', answer: 'UPS vine de la baterie de urgenta si e cea mai importanta functie de siguranta la un robot de geamuri. In mod normal, robotul sta lipit de geam datorita aspirarii create de motor, care are nevoie de curent. Daca se ia curentul brusc, la o pana sau daca scoti din greseala aparatul din priza, fara UPS aspirarea se opreste si robotul poate cadea. Cu un UPS, o baterie interna preia si mentine aspirarea inca aproximativ 40 de minute, timp in care robotul ramane pe geam si il poti da jos in siguranta. E o functie pe care merita sa o cauti, mai ales daca folosesti robotul la geamuri de la inaltime.' },
+  { question: 'Robotul de geamuri chiar merita sau e doar un gadget?', answer: 'Merita mai ales in doua situatii: daca ai multe geamuri sau suprafete mari de sticla, si daca ai ferestre greu accesibile sau la inaltime, pe care altfel le speli periculos, agatat pe afara. In aceste cazuri, robotul face treaba grea si riscanta in locul tau, cu efort minim din partea ta. Daca ai un apartament mic, cu doua-trei geamuri usor de ajuns, un aspirator de geam obisnuit sau o simpla laveta pot fi suficiente si mult mai ieftine. Deci nu e doar un gadget, e o unealta care isi merita banii pentru cine are multe geamuri sau ferestre inalte, dar poate fi excesiv pentru nevoi mici.' },
+  { question: 'Cat costa un robot de curatat geamuri?', answer: 'In selectie, un robot accesibil, dar functional, porneste de la circa 375-450 de lei, cazul modelelor iHunt, HOGA sau al celui cu UPS, cu functiile de baza si de siguranta. Modelele echilibrate, cu pulverizator, WiFi si note foarte bune, ca SeveShop, IMA Trend sau Buntz, sunt in general 750-900 de lei. Cele premium, de la branduri specializate ca HOBOT si Ecovacs, trec de 1800 si urca spre 2700 de lei. Pe langa pret, conteaza mult ce geamuri ai: pentru ferestre obisnuite, un model accesibil sau mediu e suficient; pentru multe geamuri sau ferestre la inaltime, merita un model cu UPS si dotari de siguranta mai bune.' },
+];
+
+const images = [hero, figAcc, figMid, figPrem, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Robot de curatat geamuri - CentroCasa"
-  description="Am tot amânat momentul să vorbesc despre asta, dar geamurile mele au început să arate cam jalnic. Curățarea lor e o corvoadă pe care o evit de mult. Așa că am zis că e momentul să testez ceva nou: robotul de curățat geamuri. Sincer să fiu, eram sceptic, dar rezultatele m-au uimit."
-  image="/images/articles/robot-de-curatat-geamuri.webp"
+  title="Cel mai bun robot de curatat geamuri in 2026: accesibile, echilibrate si premium"
+  description="Care e cel mai bun robot de curatat geamuri in 2026: modele accesibile iHunt si HOGA, variante echilibrate cu pulverizator si WiFi de la SeveShop si IMA Trend, si roboti premium HOBOT si Ecovacs, comparate pe siguranta, pulverizator si control. Plus cum functioneaza, siguranta la inaltime si cum alegi."
+  image={hero}
   type="article"
-  publishedTime="2026-02-03T13:22:00.671Z"
-  modifiedTime="2026-02-03T13:22:00.671Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Elena Dragomir"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cel mai bun robot de curatat geamuri' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Robot de curatat geamuri</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
+      <span>Cel mai bun robot de curatat geamuri</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/curatenie-intretinere/" class="article-category">Curatenie si Intretinere</a>
-        <span class="article-date">3 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Robot de curatat geamuri</h1>
-    </header>
+    <h1>Cel mai bun robot de curatat geamuri</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/robot-de-curatat-geamuri.webp" alt="Robot de curatat geamuri" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cel mai bun robot de curatat geamuri: modele accesibile, echilibrate si premium" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-am-nevoie-de-un-robot-de-curatat-geamuri">
-        <h2>De ce am nevoie de un robot de curatat geamuri?</h2>
-        <p>Știți cum e, vine primăvara, vrei lumină în casă, vrei să vezi curat pe geam. Dar, hei, să fim serioși, cine mai are timp și chef să frece geamuri? Mai ales alea de la etajul trei sau alea mari, de la balcon. Eu am o rețea de geamuri destul de mare, plus o terasă pe care am niște panouri din sticlă. Le curățam o dată pe an, cam așa, și tot nu ieșeau perfect. Era mereu o bătaie de cap, cu găleți, cu soluții, cu cârpe. Uneori mă trezeam cu urme, alteori nu ajungeam în toate colțurile.</p><p>Problema e clară: curățarea manuală a geamurilor este o muncă fizică grea, consumatoare de timp și adesea ineficientă pentru rezultate impecabile. Mai ales dacă stai la bloc, pe etajele superioare, te gândești de două ori înainte să te apuci. Și să nu mai zic de riscul de accidente, să te apleci prea mult, să pierzi echilibrul. Nu e de joacă.</p><p>Aici intervine robotul de curățat geamuri. Gândiți-vă la el ca la un mic ajutător, un fel de aspirator pentru geamuri. El face treaba grea pentru tine. Tu doar îl pui la treabă și îl supraveghezi. E perfect pentru persoanele care nu au timp, pentru cele care locuiesc la etajele superioare, pentru persoanele cu probleme de mobilitate sau pur și simplu pentru cei care vor geamuri curate fără efort. Eu, sincer, m-am săturat să fac acrobatii pe scară.</p><p>Pentru mine, a fost o necesitate. Am vrut să am geamuri curate tot anul, nu doar primăvara și toamna. Vreau să văd cum plouă afară, nu să văd picături uscate pe geam. Și să pot admira florile din grădină fără să am o ceață de praf în fața ochilor. Așa că am zis să încerc. E o investiție, clar, dar cred că merită.</p><p>Potrivit pentru oricine are geamuri de curățat, dar în special pentru cei care găsesc această sarcină anevoioasă. De la proprietarii de case cu multe ferestre, la cei care locuiesc în apartamente la etajele superioare. Chiar și pentru cei care au suprafețe vitrate mari, cum ar fi uși de terasă, balustrade de sticlă sau chiar oglinzi mari. E practic un aparat care te scapă de o sarcină neplăcută.</p><p>Am văzut că sunt tot felul de modele pe piață, de la cele mai simple la cele mai avansate. Dar ideea de bază e aceeași: să curețe geamurile singur. Un fel de <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspirator robot</a>, dar pentru suprafețe verticale. Mi se pare o invenție genială, sincer. Și acum, că am testat, pot să spun că chiar funcționează.</p>
-      </section>
-
-      <section id="top-recomandari---ce-am-gasit-pe-piata">
-        <h2>Top recomandari - Ce am gasit pe piata</h2>
-        <p>După ce am citit pe net și am vorbit cu câțiva prieteni care aveau deja așa ceva, am ajuns la câteva modele care mi s-au părut interesante. Am vrut ceva care să fie eficient, dar și la un preț rezonabil. Nu vreau să dau o avere pe un aparat pe care îl folosesc de câteva ori pe an.</p><p>Primul pe listă a fost <strong>Hobot 298</strong>. Am auzit multe despre el, pare destul de popular. Are un sistem de pulverizare a soluției de curățare direct pe geam, ceea ce mi s-a părut tare util.</p>
-        <p>Nu mai am nevoie de o altă sticlă cu soluție. Plus că e destul de puternic, aderența e bună. Prețul lui e undeva pe la <strong>1500 RON</strong>.</p>
-        <p>Ca și pro, aș zice pulverizarea integrată și curățarea eficientă. Contra ar fi prețul, care e un pic cam sus, și faptul că e un pic mai zgomotos decât alte modele.</p><p>Apoi am dat peste <strong>Ecovacs Winbot W1 Pro</strong>. Ăsta pare mai nou și mai avansat. Are senzori <a href="/cos-de-gunoi-inteligent-cu-senzor/" class="interlink">inteligenț</a>i, detectează marginile geamului și nu cade. Și are un sistem de curățare în două etape, cu două lavete rotative. Sună destul de profesionist. Costă cam <strong>1800 RON</strong>. Avantajul e tehnologia avansată și curățarea în profunzime. Dezavantajul e prețul, care e și mai mare, și poate o complexitate mai mare în utilizare pentru cineva la început.</p><p>Am mai văzut și <strong>Mamibot W120-S</strong>. Ăsta pare mai accesibil ca preț, undeva pe la <strong>900 RON</strong>. E un model mai simplu, dar pare să își facă treaba. E mai ușor, mai compact. Nu are pulverizare integrată, deci trebuie să aplici soluția manual. Ca pro: prețul avantajos și ușurința în utilizare. Ca și contra: nu are pulverizare și s-ar putea să nu curețe la fel de bine ca modelele mai scumpe pe geamuri foarte murdare.</p><p>Un alt candidat a fost <strong>ILIFE W80</strong>. Prețul lui e undeva pe la <strong>1000 RON</strong>. E similar cu Mamibot, dar am citit că are o aderență mai bună pe verticală. Și vine cu destul de multe lavete de rezervă. Mi-a plăcut că e gândit să fie sigur, cu cablu de siguranță. Pro: aderență bună, preț decent, accesorii incluse. Contra: tot fără pulverizare, deci implică o etapă în plus pentru tine.</p><p>Și ultimul, dar nu cel din urmă, am văzut un model de la <strong>Xiaomi, Clearall X1</strong>. Prețul e undeva pe la <strong>1300 RON</strong>. Xiaomi face produse bune, așa că m-am gândit să îl bag în seamă.</p>
-        <p>Pare să aibă o aspirație puternică, să curețe bine. Și designul e destul de elegant. Pro: brand cunoscut, aspirație puternică, design. Contra: încă e un model mai nou, deci mai puține recenzii, și s-ar putea să fie la fel de solicitant ca și celelalte în ceea ce privește pregătirea geamului.</p><p>Deci, ca să recapitulăm, am avut de ales între modele cu pulverizare integrată și preț mai mare, și modele mai simple, mai accesibile, care necesită o mică pregătire din partea mea. Toate promit să facă treaba, dar diferențele sunt în tehnologie, funcționalități și, evident, preț.</p>
-      </section>
-
-      <section id="cum-alegi-corect-un-robot-de-curatat-geamuri">
-        <h2>Cum alegi corect un robot de curatat geamuri?</h2>
-        <p>Alegerea unui robot <a href="/aparat-de-curatat-cu-aburi/" class="interlink">de curățat</a> geamuri nu e chiar ca și cum ai alege o pereche de șosete. Trebuie să te gândești la câteva chestii înainte. Nu vrei să cumperi ceva ce nu ți se potrivește sau, și mai rău, ceva ce nu face față la murdăria de pe geamurile tale.</p><p>Primul lucru pe care l-am analizat eu a fost <strong>tipul de suprafață</strong>. Majoritatea roboților sunt gândiți pentru geamuri, dar unii se descurcă și pe oglinzi, faianță sau chiar dușuri din sticlă. Verifică specificațiile dacă vrei să îl folosești și pe alte suprafețe. Eu am geamuri, deci nu am stat prea mult la capitolul ăsta, dar dacă tu ai o cabină de duș imensă din sticlă, e bine să te asiguri că robotul poate face față.</p><p>Apoi, <strong>puterea de aspirare</strong>. Asta e crucială pentru aderență. Robotul trebuie să stea lipit de geam, altfel riscăm să îl vedem pe jos. Modelele mai scumpe au, de obicei, motoare mai puternice. Caută specificații legate de Kpa (kilopascali) sau puterea în Wați, deși nu toate produsele le afișează.  Un robot bun trebuie să se lipească ferm, chiar și pe geamuri înclinate sau pe suprafețe mai mari.</p><p><strong>Sistemul de curățare</strong> e important. Unii roboți au lavete care se rotesc, alții au lavete care se mișcă înainte și înapoi. Modelele cu lavete rotative par să curețe mai bine petele dificile. Și nu uita de soluția de curățare. Dacă robotul are <strong>pulverizare integrată</strong>, e un mare plus. Nu mai trebuie să te ocupi tu de asta, el eliberează lichidul exact unde are nevoie. Altfel, va trebui să pulverizezi tu soluție pe geam înainte să îl pui pe robot.</p><p><strong>Senzorii și inteligența</strong> aparatului sunt un alt punct forte. Cei mai buni roboți au senzori care detectează marginile geamului, astfel încât să nu cadă. Unii pot chiar să detecteze obstacole, cum ar fi mânerele ferestrelor. Modelele cu navigație inteligentă planifică traseul de curățare pentru a acoperi întreaga suprafață eficient.  Ăsta e un aspect pe care nu l-aș ignora.</p><p><strong>Siguranța</strong> e, evident, esențială. Majoritatea vin cu un cablu de siguranță pe care îl atașezi de mâna ta sau de un punct fix. Asta în caz că se desprinde robotul, să nu cadă pe jos.  Unii au și o baterie de rezervă, în cazul în care se ia curentul.  E bine să te asiguri că ai aceste elemente de siguranță, mai ales dacă locuiești la etaj.</p><p><strong>Autonomia bateriei</strong> e și ea de luat în considerare. Cât timp poate funcționa un robot la o singură încărcare?  Dacă ai multe geamuri, s-ar putea să ai nevoie de un robot cu o autonomie mai mare sau care se poate reîncărca rapid.  Majoritatea modelelor promit cam 2 ore de funcționare, ceea ce ar trebui să fie suficient pentru câteva geamuri medii.</p><p>Și, bineînțeles, <strong>prețul</strong>.  Așa cum am văzut, prețurile variază destul de mult, de la sub 1000 RON la peste 2000 RON.  Trebuie să îți stabilești un buget și să cauți cel mai bun raport calitate-preț în acel buget. Nu te arunca la cel mai scump dacă nu ai nevoie de toate funcțiile avansate.</p><p>Nu uita să te uiți și la <strong>recenziile altor utilizatori</strong>.  Astea îți pot oferi o imagine reală despre cum se comportă produsul în practică, ce probleme au întâmpinat alții și cât de mulțumiți sunt.  Eu personal, înainte să cumpăr ceva mai scump, citesc zeci de recenzii.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje---sincer-sa-fiu">
-        <h2>Avantaje si dezavantaje - Sincer sa fiu</h2>
-        <p>După ce am testat și am stat de vorbă cu alții, am început să îmi fac o idee clară despre ce înseamnă să ai un robot de curățat geamuri. Nu e totul roz, dar nici nu e chiar așa cum credeam inițial. Sincer să fiu, ambele părți au argumentele lor.</p><p><strong>Avantaje clare</strong>:</p><p>Cel mai mare avantaj, și motivul pentru care am și început să mă interesez, este <strong>economisirea timpului și a efortului</strong>. Nu mai trebuie să stau ore în șir cu soluții și cârpe. Pur și simplu îl pun pe geam și el face treaba. E o eliberare, sincer. Mai ales acum, când sunt mai ocupat ca niciodată.</p><p><strong>Siguranța</strong> e un alt punct forte. Pentru persoanele care locuiesc la etajele superioare, riscul de accidente în timpul curățării geamurilor este real. Robotul elimină acest risc. Nu te mai expui pericolelor. E ca și cum ai delega o sarcină riscantă.</p><p><strong>Rezultatele</strong> pot fi, în multe cazuri, superioare curățării manuale. Roboții bine concepuți pot ajunge în colțuri pe care tu nu le-ai atinge ușor și pot lăsa geamurile fără urme.  Am văzut geamuri strălucind curat, fără dungi, ceea ce nu reușeam mereu singur.</p><p><strong>Curățarea regulată</strong> devine mult mai ușoară. Când nu mai e o corvoadă, ai tendința să cureți geamurile mai des. Asta înseamnă că nu se mai acumulează murdăria și praful, iar geamurile arată mereu bine. Eu am început să îl folosesc o dată pe lună, și se vede diferența.</p><p><strong>Dezavantaje de luat în considerare</strong>:</p><p><strong>Prețul</strong> este, fără îndoială, cel mai mare dezavantaj.  Chiar și modelele mai ieftine costă câteva sute de lei, iar cele mai avansate pot ajunge la 1500-2000 RON.  E o investiție pe care trebuie să o analizezi bine, mai ales dacă nu ai foarte multe geamuri de curățat.</p><p><strong>Pregătirea inițială</strong> poate fi necesară.  Chiar dacă robotul curăță singur, de multe ori trebuie să cureți tu de praf grosier sau să aplici soluția de curățare manual, dacă robotul nu are pulverizare integrată.  Nu e o muncă grea, dar tot implică o etapă în plus.</p><p><strong>Zgomotul</strong>.  Unii roboți pot fi destul de gălăgioși. Nu e ca un aspirator, dar se aude.  Dacă locuiești într-un bloc și ai vecini sensibili, s-ar putea să fie un aspect de luat în calcul.  Eu am geamuri mari la terasă, și când îl folosesc acolo, nu mă deranjează.</p><p><strong>Nu sunt perfecți</strong>.  Pe geamuri foarte murdare sau cu pete vechi, s-ar putea să fie nevoie de o a doua trecere sau de o curățare manuală.  Nu te aștepta ca miracole să se întâmple instantaneu.  Uneori, chiar și cu robotul, mai e nevoie de o mică intervenție.</p><p><strong>Întreținerea</strong>.  Lavetele trebuie spălate, rezervorul de soluție curățat, verificat cablul de siguranță. Nu e mult, dar e o sarcină în plus pe care o ai.</p><p>Deci, per total, cred că avantajele depășesc dezavantajele, mai ales dacă ai bugetul necesar și cauți o <a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">soluție pentru</a> a elimina o sarcină neplăcută. E un confort pe care îl cumperi, să zicem așa.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea">
-        <h2>Sfaturi practice din experienta mea</h2>
-        <p>După ce am trecut prin toată nebunia asta cu alegerea și testarea unui robot de curățat geamuri, am adunat câteva sfaturi care sper să îți fie de folos. Sunt chestii pe care aș fi vrut să le știu de la început, ca să evit niște mici greșeli sau neplăceri.</p><p>Primul și cel mai important sfat: <strong>citește cu atenție manualul de instrucțiuni</strong>. Știu, sună plictisitor, dar fiecare robot are particularitățile lui. Cum se montează, cum se pornește, cum se curăță. Nu sări peste această etapă, chiar dacă pare simplu.</p><p><strong>Pregătește geamul înainte</strong>. Dacă geamurile tale sunt pline de praf grosier, de pânze de păianjen sau de alte mizerii mari, e bine să le ștergi rapid cu o perie sau o lavetă uscată înainte să pui robotul. Asta ajută robotul să nu se înfunde și să curețe mai eficient. Nu are rost să încerci să cureți un perete de noroi cu el.</p><p>Dacă robotul tău nu are pulverizare integrată, <strong>folosește o soluție de curățare de calitate</strong>. Nu orice detergent de geamuri. Caută soluții speciale pentru roboți sau soluții care nu lasă reziduuri. Și nu exagera cu cantitatea. Prea multă soluție poate duce la alunecarea robotului.</p><p><strong>Verifică aderența</strong>. Când pornești robotul pentru prima dată, stai lângă el câteva secunde să te asiguri că s-a lipit bine de geam. Dacă pare că alunecă, oprește-l și verifică dacă ai aplicat soluția corect sau dacă suprafața geamului e curată.</p><p><strong>Folosește cablul de siguranță</strong>. Nu te baza doar pe aderența robotului. Atașează întotdeauna cablul de siguranță, mai ales dacă locuiești la etaj. E o plasă de siguranță ieftină care te poate scuti de multe bătăi de cap.</p><p><strong>Curăță lavetele</strong> după fiecare utilizare. Lavetele murdare nu vor curăța eficient. Spală-le manual sau la mașină (verifică instrucțiunile) și lasă-le să se usuce complet.  Am observat că lavetele curate fac o diferență enormă.</p><p><strong>Nu lăsa robotul să funcționeze nesupravegheat pe perioade lungi</strong>. Chiar dacă e automat, e bine să îi arunci o privire din când în când. S-ar putea să se blocheze, să rămână fără baterie sau să apară o problemă neașteptată. O supraveghere de la distanță e mereu o idee bună.</p><p><strong>Nu te aștepta la minuni pe geamuri extrem de murdare</strong>.  Dacă geamurile tale nu au fost curățate de ani de zile, s-ar putea să ai nevoie de o curățare manuală inițială, mai apoi robotul să întrețină curățenia. El e mai mult pentru întreținere și curățare regulată.</p><p><strong>Stochează-l corect</strong>. După ce l-ai curățat, pune-l în cutia lui sau într-un loc sigur, ferit de praf și umezeală. Asta îi va prelungi viața.</p><p>Și un ultim sfat din inimă: <strong>nu te frustra dacă prima încercare nu e perfectă</strong>. E un aparat nou, s-ar putea să dureze puțin până te obișnuiești cu el și el cu geamurile tale. Experimentează cu soluții, cu moduri de curățare. Vei ajunge să îl stăpânești.</p>
-      </section>
-
-      <section id="parerea-mea-finala---merita-investitia">
-        <h2>Parerea mea finala - Merita investitia?</h2>
-        <p>După tot ce am povestit, cred că e momentul să trag o linie și să spun clar: merită un robot de curățat geamuri? Pentru mine, răspunsul este un mare DA, dar cu câteva precizări importante. Nu e un gadget pentru toată lumea, dar pentru anumul meu, a fost o achiziție care mi-a simplificat viața.</p><p>Dacă ești o persoană care <strong>urăște să curețe geamurile</strong>, care găsește asta o corvoadă imensă și care ar face orice să scape de ea, atunci da, merită. Costul inițial poate părea mare, dar gândește-te la timpul și energia pe care le economisești. Timp pe care îl poți petrece cu familia, cu hobby-urile tale sau pur și simplu relaxându-te.</p><p>Pentru persoanele care <strong>locuiesc la etajele superioare</strong> sau care au probleme de mobilitate, un robot de curățat geamuri este aproape o necesitate. Elimină riscul de accidente și îți permite să ai geamuri curate fără să te pui în pericol. E o investiție în siguranța ta.</p><p>Dacă ai <strong>multe suprafețe vitrate</strong> – ferestre mari, uși de terasă, balustrade de sticlă – un robot te poate ajuta enorm. Curățarea manuală a acestor suprafețe poate dura ore întregi. Robotul face treaba mai repede și, în multe cazuri, mai bine.</p><p>Pe de altă parte, dacă ai doar 2-3 geamuri mici și nu te deranjează să le cureți manual, s-ar putea să nu fie cea mai bună investiție. Prețul poate fi considerat prea <a href="/jardiniera-mare-pentru-flori/" class="interlink">mare pentru</a> beneficiul adus în acest caz.  Și dacă ești genul care vrea totul perfect din prima, fără nicio bătaie de cap, s-ar putea să fii un pic dezamăgit.  E un aparat, și ca orice aparat, necesită o minimă atenție.</p><p>Eu am ales un model de la <strong>Hobot</strong>, undeva pe la <strong>1500 RON</strong>, pentru că am vrut să am și pulverizarea integrată și să fiu sigur că face treaba bine.  Sincer, sunt mulțumit.  Geamurile mele arată mult mai bine acum, și nu mai am acel sentiment de vinovăție că nu le-am curățat.  E un confort pe care îl apreciez.</p><p>În concluzie, recomand un robot de curățat geamuri oricui caută o soluție eficientă și sigură pentru a avea geamuri mereu curate, fără efort. Analizează-ți nevoile, bugetul și, cel mai important, nu te teme să încerci. Poate fi exact ajutorul de care ai nevoie pentru a te bucura mai mult de lumina și priveliștea din casa ta.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi robotul pe orice tip de geam?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea roboților sunt proiectați pentru geamuri standard. Verificați specificațiile producătorului pentru a vedea dacă modelul respectiv este potrivit și pentru sticlă, oglinzi sau alte suprafețe. Suprafața trebuie să fie netedă și plană pentru o aderență optimă.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cât de sigur este robotul? Risca sa cada?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Roboții moderni au sisteme de aderență puternice și senzori de detectare a marginilor. Majoritatea vin și cu un cablu de siguranță. Totuși, este recomandat să supravegheați robotul, mai ales în timpul primelor utilizări, pentru a vă asigura de funcționarea corectă.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce solutie de curatare sa folosesc?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Folosiți soluția de curățare recomandată de producătorul robotului. Dacă nu este specificată, alegeți o soluție specială pentru roboți de curățat geamuri sau un detergent delicat, fără amoniac, care nu lasă reziduuri. Evitați soluțiile prea spumoase.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie sa curat lavetele?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Lavetele trebuie curățate după fiecare utilizare. Murdăria acumulată pe lavete poate zgâria geamul sau poate împiedica robotul să curețe eficient. Majoritatea lavetelor pot fi spălate manual sau la mașină.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce autonomie are bateria unui robot de curatat geamuri?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Autonomia medie a bateriei este de aproximativ 1.5 - 2 ore, suficientă pentru a curăța mai multe geamuri medii. Unele modele au și o baterie de rezervă pentru a continua curățarea în caz de pană de curent.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi robotul pe geamuri murdare de ploaie sau noroi uscat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru rezultate optime, este recomandat să curățați geamurile de murdăria groasă (praf excesiv, noroi uscat, excremente de pasăre) înainte de a folosi robotul. Acesta este mai eficient pentru întreținerea curățeniei și eliminarea urmelor de apă sau a murdăriei ușoare.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cel mai vandut robot de geamuri accesibil e <strong>iHunt Smart Window</strong>, ieftin si testat de sute de cumparatori. Daca vrei un model complet, cu pulverizator si note foarte bune, <strong>SeveShop</strong> e cel mai cotat, iar <strong>IMA Trend</strong> are nota aproape maxima din multe pareri. Pentru cel mai bun rezultat, de la un brand specializat, <strong>HOBOT R3</strong> si <strong>Ecovacs WINBOT</strong> sunt varful de gama.</p>
+      <p>La un robot de geamuri conteaza in primul rand <strong>siguranta</strong> (UPS, cablu, senzori), daca are <strong>pulverizator</strong>, <strong>controlul</strong> si daca il folosesti la <strong>interior sau exterior</strong>, la inaltime. Mai jos gasesti direct recomandarile, pe trei segmente de pret, iar dupa ele un ghid despre cum functioneaza si cum alegi.</p>
+      <p>Am pornit de la robotii de curatat geamuri in stoc pe eMAG, cu cele mai multe pareri, i-am verificat pe siguranta, pulverizator, control si dotari, si i-am grupat in accesibili, echilibrati si premium. Pentru restul casei, vezi si <a href="/cele-mai-bune-aspiratoare-robot/">aspiratoarele robot</a> si <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspiratoarele robot cu mop</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Accesibile</a></li>
+        <li><a href="#mid">Echilibrate, cele mai cotate</a></li>
+        <li><a href="#prem">Premium: HOBOT si Ecovacs</a></li>
+        <li><a href="#cum-functioneaza">Cum functioneaza si siguranta</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#merita">Chiar merita un robot de geamuri</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Segment</th><th>Control</th><th>Recenzii</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.seg}</td>
+              <td>{x.control}</td>
+              <td>{x.p.reviews}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Accesibile</h2>
+    <p>Pentru geamurile obisnuite din casa, la buget mic: modele care fac treaba de baza, cu functii de siguranta esentiale. Aici e si cel mai vandut robot de geamuri din selectie.</p>
+    <div class="rd-grid">
+      {ACC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcc} alt="Roboti de curatat geamuri accesibili: iHunt, HOGA, Techsen" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mid">Echilibrate, cele mai cotate</h2>
+    <p>Cel mai bun echilibru intre pret si dotari: pulverizator integrat, control din aplicatie, filtre lavabile si notele cele mai mari, din cele mai multe pareri. De aici alege majoritatea.</p>
+    <div class="rd-grid">
+      {MID.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMid} alt="Roboti de curatat geamuri echilibrati: SeveShop, IMA Trend, Buntz" width="1200" height="675" loading="lazy" />
+
+    <h2 id="prem">Premium: HOBOT si Ecovacs</h2>
+    <p>De la brandurile specializate in roboti de geamuri: cea mai buna tehnologie de aderenta, pulverizatoare duble si sisteme de siguranta de top, pentru cine vrea cel mai bun rezultat si nu se uita la pret.</p>
+    <div class="rd-grid">
+      {PREM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPrem} alt="Roboti de curatat geamuri premium: HOBOT si Ecovacs" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-robot-geamuri').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toti robotii de curatat geamuri la oferta</strong>
+        <span>Reducerile din acest moment la roboti de curatat geamuri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cum-functioneaza">Cum functioneaza si siguranta</h2>
+    <p>Un robot de curatat geamuri se lipeste de sticla folosind un <strong>motor cu vid</strong>, care creeaza o aspirare puternica ce il tine pe geam indiferent de grosimea sau inclinarea acestuia. Odata fixat, se plimba singur pe suprafata dupa un traseu, sterge cu lavete de microfibra si, la unele modele, pulverizeaza solutie de curatare pe masura ce inainteaza.</p>
+    <p>Pentru ca lucreaza pe verticala, adesea la inaltime, <strong>siguranta</strong> e cel mai important lucru. Robotii buni au trei plase de siguranta:</p>
+    <ul>
+      <li><strong>UPS, baterie de urgenta:</strong> daca se ia curentul, il tine lipit de geam inca aproximativ 40 de minute, in loc sa cada. Esentiala la exterior si la inaltime.</li>
+      <li><strong>Cablu de siguranta:</strong> il prinzi de robot cu un carlig si il fixezi de ceva stabil, un picior de masa in interior sau o balustrada afara, ca sa nu cada accidental.</li>
+      <li><strong>Senzori de presiune:</strong> monitorizeaza continuu aderenta la geam si opresc robotul daca detecteaza o problema, prevenind desprinderea.</li>
+    </ul>
+    <p>Cu aceste sisteme, riscul de cadere devine foarte mic, chiar si la ferestrele de la etaj.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Dincolo de pret si brand, cateva lucruri fac diferenta reala:</p>
+    <ul>
+      <li><strong>Sistemele de siguranta:</strong> UPS, cablu si senzori. Neaparat daca folosesti robotul la geamuri exterioare sau la inaltime.</li>
+      <li><strong>Pulverizatorul:</strong> modelele care pulverizeaza singure solutia sunt mai comode si dau un rezultat mai uniform; cele fara cer sa umezesti tu laveta inainte.</li>
+      <li><strong>Geamuri cu sau fara rama:</strong> pentru geamurile fara rama ai nevoie de senzori de detectare a marginii, care opresc robotul la capatul liber al sticlei.</li>
+      <li><strong>Controlul:</strong> telecomanda e simpla; aplicatia iti da mai multe moduri si programare, dar cere configurare si, uneori, WiFi.</li>
+      <li><strong>Nota si numarul de pareri:</strong> intr-o categorie de nisa, un model cu multe pareri bune, ca SeveShop sau IMA Trend, iti da mai multa siguranta decat unul cu doua-trei recenzii.</li>
+    </ul>
+
+    <h2 id="merita">Chiar merita un robot de geamuri</h2>
+    <p>Cel mai onest raspuns e ca depinde de casa ta. Un robot de geamuri <strong>merita cu adevarat</strong> in doua situatii: daca ai <strong>multe geamuri sau suprafete mari de sticla</strong>, unde spalatul manual ia ore, si daca ai <strong>ferestre greu accesibile sau la inaltime</strong>, pe care altfel le-ai spala periculos, agatat pe afara. In aceste cazuri, robotul face treaba grea si riscanta in locul tau, cu efort minim.</p>
+    <p>Are si o limita de care e bine sa stii: din cauza formei, lasa uneori o fasie ingusta nesterse in <strong>colturi si pe marginile extreme</strong>, asa ca pentru un rezultat perfect treci tu la final cu o laveta prin colturi. Iar daca ai un apartament mic, cu doua-trei geamuri usor de ajuns, un aspirator de geam obisnuit sau o simpla laveta pot fi suficiente si mult mai ieftine. Nu e un simplu gadget, dar nici o necesitate pentru toata lumea: e o unealta care isi merita banii pentru cine are multe geamuri sau ferestre inalte.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de dotari, siguranta si brand:</p>
+    <p><strong>Accesibile:</strong> de la circa 375-450 de lei pentru modele functionale, ca iHunt, HOGA sau cel cu UPS, cu functiile de baza si de siguranta.</p>
+    <p><strong>Echilibrate:</strong> in general 750-900 de lei pentru roboti cu pulverizator, WiFi si note foarte bune, ca SeveShop, IMA Trend sau Buntz.</p>
+    <p><strong>Premium:</strong> peste 1800 de lei, spre 2700, pentru branduri specializate ca HOBOT si Ecovacs, cu tehnologie de aderenta si siguranta de top.</p>
+    <p>Pe langa pret, cantareste ce geamuri ai: pentru ferestre obisnuite, un model accesibil sau mediu e mai mult decat suficient; pentru multe geamuri sau ferestre la inaltime, merita sa investesti intr-un model cu UPS si dotari de siguranta mai bune, unde conteaza cel mai mult.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">ED</div>
       <div class="author-info">
-        <h4><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></h4>
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
         <p class="author-role">Consultant Amenajari</p>
-        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+        <p class="author-bio">Elena scrie despre curatenie si intretinerea casei. Cauta aparatele care chiar usureaza treaba, nu pe cele cu cele mai multe functii pe cutie.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="robot-de-curatat-geamuri"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="robot-de-curatat-geamuri"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="robot-de-curatat-geamuri" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="robot-de-curatat-geamuri" currentCategory="curatenie-intretinere" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

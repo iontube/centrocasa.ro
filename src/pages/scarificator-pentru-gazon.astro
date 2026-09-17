@@ -1,300 +1,321 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Scarificator pentru gazon",
-  excerpt: "Stai sa vezi, daca vrei un gazon ca la carte, un scarificator pentru gazon e absolut esential. Fara el, mosul ala de iarba ramane sufocat de paie si muschi. Ca sa fiu direct, cel mai bun all-rounder pe care l-am vazut recent e modelul X de la Y, cam pe la 600 de lei, dar depinde si cat de mare e gradina ta. Hai sa vedem ce se potriveste.",
-  image: "/images/articles/scarificator-pentru-gazon.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-03-01T07:50:48.318Z",
-  modifiedDate: "2026-03-01T07:50:48.318Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "cat costa un scarificator pentru gazon bun?", answer: "Un scarificator pentru gazon bun, potrivit pentru majoritatea gradinilor de dimensiuni medii, costa intre 500 si 800 de lei. Modelele electrice de calitate incep de la 400 lei, iar cele pe benzina mai performante pot depasi 1200 lei." },
-  { question: "care e diferenta intre scarificator electric si pe benzina?", answer: "Scarificatoarele electrice sunt mai usoare, mai silentioase si mai ieftine, ideale pentru suprafete mici spre medii (pana la 300 mp) si cu acces la priza. Cele pe benzina sunt mai puternice, mai potrivite pentru gradini mari peste 300 mp, oferind libertate de miscare, dar sunt mai grele, mai zgomotoase si necesita intretinere." },
-  { question: "merita sa cumpar un scarificator manual?", answer: "Un scarificator manual merita doar pentru suprafete foarte mici (sub 50 mp) si daca ai o conditie fizica excelenta. Pentru suprafete mai mari, efortul este enorm si rezultatele mult inferioare fata de un model electric sau pe benzina." },
-  { question: "ce scarificator e mai bun pentru gazonul meu?", answer: "Alegerea depinde de suprafata gradinii tale. Pentru sub 100 mp, un model electric mic e suficient. Pentru 100-300 mp, un scarificator electric mediu (30-35 cm latime de lucru) e ideal. Peste 300 mp, ia in considerare un model pe benzina." },
-  { question: "de ce nu creste gazonul bine dupa scarificare?", answer: "Gazonul poate sa nu creasca bine daca scarificarea a fost facuta prea agresiv, pe un sol nepotrivit (prea umed sau prea uscat), sau daca nu s-au aplicat ingrasaminte si seminte dupa scarificare. De asemenea, un scarificator vechi sau slab nu va face treaba corect." },
-  { question: "cum folosesc corect un scarificator pentru gazon?", answer: "Foloseste scarificatorul pentru gazon cand iarba este rezonabil uscata, nu baltita. Ajusteaza adancimea treptat, incepand cu una mica. Efectueaza 2-3 treceri perpendiculare. Curata bine aparatul dupa fiecare utilizare si aplica ingrasamant si seminte dupa scarificare." },
-  { question: "unde gasesc scarificatoare de calitate?", answer: "Scarificatoare de calitate gasesti in magazinele mari de bricolaj (Dedeman, Leroy Merlin, Hornbach), pe platformele online de comert electronic (eMAG, Altex) sau in magazine specializate in unelte pentru gradina. Verifica recenziile si specificatiile tehnice inainte de achizitie." },
-  { question: "cat de des trebuie sa folosesc scarificatorul pe gazon?", answer: "Scarificatorul pentru gazon se utilizeaza de obicei de doua ori pe an: o data primavara (aprilie-mai) si o data toamna (septembrie-octombrie). Daca gazonul este foarte des si se acumuleaza mult material mort, se poate face o scarificare usoara si in alte perioade, dar cu atentie." }
-];
-
-const toc = [
-  { title: "Ce scarificator pentru gazon e regele curții tale?", id: "ce-scarificator-pentru-gazon-e-regele-curtii-tale" },
-  { title: "Recomandari de scarificatoare: Ce merită să cumperi acum?", id: "recomandari-de-scarificatoare-ce-merita-sa-cumperi-acum" },
-  { title: "Cum alegi scarificatorul potrivit? Ghid rapid și pe înțelesul tuturor", id: "cum-alegi-scarificatorul-potrivit-ghid-rapid-si-pe-intelesul-tuturor" },
-  { title: "Scarificator electric vs. pe benzina: Ce alegi pentru curtea ta?", id: "scarificator-electric-vs-pe-benzina-ce-alegi-pentru-curtea-ta" },
-  { title: "Greseli de evitat cand scarifici gazonul (si cum sa le previi)", id: "greseli-de-evitat-cand-scarifici-gazonul-si-cum-sa-le-previi" },
-  { title: "Scarificator pentru gazon: Recomandări pe categorii de buget", id: "scarificator-pentru-gazon-recomandari-pe-categorii-de-buget" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['scarificator'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Electrice accesibile ---
+  { g: 'acc', id: 'DCZ0Z5MBM', badge: 'Cel mai vandut', short: 'Lehmann 380mm', alim: 'Electric', latime: '38 cm', putere: '1800 W',
+    specs: ['cel mai vandut din selectie, 31 pareri', '2 in 1, scarificator si aerator', 'latime 38 cm, 1800 W, maner pliabil', 'role interschimbabile'],
+    pros: ['Cel mai vandut din selectie, 31 de pareri', '2 in 1, scarifici si aerezi cu acelasi aparat', 'Latime mare, 38 cm, acopera repede gazonul', 'Maner pliabil, se depoziteaza usor'],
+    cons: ['Brand mai putin premium', 'Fara cos colector generos'],
+    verdict: 'Cel mai vandut scarificator din selectie si o alegere echilibrata pentru cine vrea sa isi ingrijeasca gazonul fara sa dea multi bani. Lehmann Teasel e 2 in 1, cu role interschimbabile: una cu cutite, pentru scarificat, care taie si scoate muschiul si stratul de resturi, si una cu gheare, pentru aerat, care inteapa solul, deci acoperi ambele lucrari cu un singur aparat. Are o latime mare de lucru, 38 cm, si 1800 W, deci parcurgi repede o gradina medie, iar manerul pliabil il face usor de depozitat. Cu 31 de pareri, cele mai multe din selectie, si nota 4.5, e clar preferatul cumparatorilor. Vine de la un brand mai putin premium, dar volumul de pareri ii da incredere. Il iei cand vrei cel mai popular scarificator din selectie, 2 in 1, cu latime mare, la un pret bun, pentru o gradina de casa.' },
+  { g: 'acc', id: 'D2BM8XYBM', badge: 'Cel mai bine notat', short: 'Steinhaus 1800W', alim: 'Electric', latime: '37 cm', putere: '1800 W',
+    specs: ['nota 4.9 din 30 de pareri, cea mai buna', 'scarificator si aerator, role interschimbabile', 'latime 37 cm, putere mare 1800 W', 'cos colector inclus'],
+    pros: ['Cea mai buna nota din selectie, 4.9 din 30 de pareri', 'Role interschimbabile, scarifici si aerezi', 'Putere mare, 1800 W, si latime buna, 37 cm', 'Cos colector pentru resturi'],
+    cons: ['Brand mai putin cunoscut decat Einhell', 'Pret ceva mai mare decat modelele de baza'],
+    verdict: 'Cel mai bine notat scarificator din tot articolul, cu o nota impresionanta de 4.9 din 30 de pareri, un scor rar la volumul asta. Steinhaus PRO SCA1800 are role interschimbabile, pentru scarificat si aerat, o putere mare de 1800 W si o latime de lucru de 37 cm, deci se descurca lejer cu o gradina medie si scoate eficient muschiul si palsa. Vine cu un cos colector, in care se aduna resturile smulse din gazon, ca sa nu le mai aduni manual. Cu 30 de pareri si nota 4.9, e clar apreciat de cei care l-au cumparat, un semn puternic de fiabilitate si rezultate bune. Vine de la un brand mai putin cunoscut decat Einhell, dar nota il recomanda singura. Il iei cand vrei cel mai bine cotat scarificator din selectie, cu putere mare, role interschimbabile si cos colector, pentru un gazon ingrijit fara efort in plus.' },
+  { g: 'acc', id: 'DCZLL5MBM', badge: 'Cel mai ieftin', short: 'Lehmann 320mm', alim: 'Electric', latime: '32 cm', putere: '1500 W',
+    specs: ['cel mai ieftin din selectie', '2 in 1, scarificator si aerator', 'latime 32 cm, 1500 W, maner pliabil', 'nota 4.5 din 22 de pareri'],
+    pros: ['Cel mai ieftin din selectie', '2 in 1, role interschimbabile', '1500 W, potrivit pentru gradini mici si medii', 'Maner pliabil, nota buna, 4.5'],
+    cons: ['Latime mai mica, 32 cm', 'Brand mai putin premium'],
+    verdict: 'Cel mai ieftin scarificator din selectie, pentru cine vrea sa inceapa sa isi ingrijeasca gazonul cu buget minim. Lehmann Alyssum e tot 2 in 1, cu role interschimbabile pentru scarificat si aerat, are 1500 W si o latime de lucru de 32 cm, potrivita pentru o gradina mica sau medie, si un maner pliabil pentru depozitare usoara. Cu 22 de pareri si nota 4.5 e bine cotat la banii lui, o alegere verificata. Latimea de 32 cm e ceva mai mica decat la modelele mari, deci faci mai multe treceri pe o gradina intinsa, iar puterea de 1500 W e suficienta pentru gazonul unei case, nu pentru suprafete foarte mari. Il iei cand vrei cel mai accesibil scarificator 2 in 1 din selectie, pentru o gradina mica spre medie, si nu te deranjeaza o latime ceva mai mica in schimbul celui mai mic pret.' },
+  { g: 'acc', id: 'D2TP0YMBM', badge: 'Einhell, nota maxima', short: 'Einhell GC-ES', alim: 'Electric', latime: '31 cm', putere: '1200 W',
+    specs: ['Einhell GC-ES 1231/1, 1200 W', 'latime 31 cm, 3 trepte de adancime', 'reglaj al adancimii de lucru', 'nota maxima, 5 din 5'],
+    pros: ['Einhell, brand consacrat de unelte de gradina', 'Reglaj al adancimii pe 3 trepte', 'Nota maxima, 5 din 5', 'Compact, potrivit pentru gradini mici'],
+    cons: ['Putere mai mica, 1200 W', 'Inca 12 pareri'],
+    verdict: 'Scarificatorul de ales daca vrei un brand consacrat cu reglaj al adancimii, la un pret bun. Einhell GC-ES 1231/1 are 1200 W, o latime de 31 cm si, mai important, un reglaj al adancimii de lucru pe 3 trepte, deci potrivesti cat de adanc intra cutitele in functie de starea gazonului, un detaliu care conteaza pentru un rezultat bun fara sa strici radacinile. Einhell e un brand cunoscut si de incredere in uneltele de gradina, cu piese si service la noi. A luat nota maxima, 5 din 5, chiar daca din 12 pareri. Puterea de 1200 W e mai mica, potrivita pentru gradini mici si sol nu foarte tare. Il iei cand vrei un scarificator Einhell compact, cu reglaj al adancimii pe mai multe trepte, pentru o gradina mica, si pui pret pe brand si pe controlul adancimii de lucru.' },
+  // --- Echilibrate ---
+  { g: 'ech', id: 'D826MTMBM', badge: 'Texas, bine testat', short: 'Texas 1400W', alim: 'Electric', latime: '32 cm', putere: '1400 W',
+    specs: ['Texas MPC 1400, 1400 W', 'scarificator si aerator, latime 32 cm', 'de la Texas, brand de unelte', 'bine testat, 27 de pareri'],
+    pros: ['Texas, brand cunoscut de unelte de gradina', 'Bine testat, 27 de pareri', '2 in 1, scarifici si aerezi', 'Putere buna, 1400 W'],
+    cons: ['Nota 4.4, buna dar nu maxima', 'Latime medie, 32 cm'],
+    verdict: 'Un scarificator echilibrat si bine testat, de la un brand cunoscut de unelte de gradina. Texas MPC 1400 are 1400 W si o latime de 32 cm, cu functii de scarificat si aerat, potrivit pentru intretinerea unei gradini de casa. Texas e un nume familiar in uneltele de gradina, cu o gama larga si accesorii, un plus pentru cine are deja produse de la ei. Cu 27 de pareri si nota 4.4 e bine cotat si verificat de multa lume, o alegere solida pentru cine vrea un aparat de la un brand serios. Latimea de 32 cm e medie, buna pentru o gradina obisnuita, iar nota e buna, chiar daca nu maxima. Il iei cand vrei un scarificator de la Texas, bine testat, cu putere buna si functie de aerare, pentru intretinerea unui gazon de casa, si pui pret pe brand si pe numarul mare de pareri.' },
+  { g: 'ech', id: 'DPTXF5BBM', badge: 'Hecht, bine notat', short: 'Hecht 1683', alim: 'Electric', latime: '38 cm', putere: '1600 W',
+    specs: ['Hecht 1683, 2 in 1, 1600 W', 'latime mare de lucru, 38 cm', 'scarificator si aerator', 'nota 4.8 din 21 de pareri'],
+    pros: ['Nota mare, 4.8 din 21 de pareri', 'Latime mare, 38 cm, acopera repede', '2 in 1, scarificator si aerator', 'Hecht, brand cunoscut de unelte'],
+    cons: ['Pret spre mijlocul segmentului', 'Cos colector nedeclarat clar'],
+    verdict: 'Un scarificator bine notat, cu latime mare, de la un brand cunoscut de unelte de gradina. Hecht 1683 e 2 in 1, cu role interschimbabile pentru scarificat si aerat, are 1600 W si o latime de lucru de 38 cm, printre cele mai mari din selectie, deci parcurgi repede si o gradina mai mare, cu mai putine treceri. Cu 21 de pareri si nota 4.8 e foarte apreciat, un semn bun de fiabilitate, iar Hecht e un nume cunoscut in uneltele de gradina, cu gama larga si service. Pretul e spre mijlocul segmentului, corect pentru ce oferi. Il iei cand vrei un scarificator 2 in 1 bine notat, cu latime mare de lucru, de la un brand cunoscut, pentru o gradina medie spre mare pe care vrei sa o parcurgi repede, si pui pret pe nota si pe latimea de acoperire.' },
+  { g: 'ech', id: 'DLG86RBBM', badge: 'Einhell, foarte testat', short: 'Einhell GC-SA', alim: 'Electric', latime: '31 cm', putere: '1200 W',
+    specs: ['Einhell GC-SA 1231/1, 1200 W', 'scarificator si aerator, latime 31 cm', 'foarte testat, 30 de pareri', 'de la Einhell, brand consacrat'],
+    pros: ['Foarte testat, 30 de pareri', 'Einhell, brand consacrat de unelte', 'Scarificator si aerator, cu role', 'Reglaj al adancimii de lucru'],
+    cons: ['Nota 4.2, mai modesta', 'Putere de 1200 W, medie'],
+    verdict: 'Varianta Einhell foarte testata, cu functie de aerare pe langa scarificare. GC-SA 1231/1 are 1200 W, o latime de 31 cm si role interschimbabile pentru scarificat si aerat, cu reglaj al adancimii de lucru, tot ce trebuie pentru intretinerea completa a unui gazon de casa. Einhell e un brand consacrat de unelte de gradina, cu piese si service la noi. Cu 30 de pareri, printre cele mai multe din selectie, si nota 4.2, e o alegere verificata de multa lume, chiar daca nota e ceva mai modesta decat la varful selectiei. Puterea de 1200 W e medie, buna pentru gradini mici si medii. Il iei cand vrei un Einhell foarte testat, cu functie de aerare si reglaj al adancimii, pentru intretinerea unui gazon de casa, si pui pret pe brand si pe numarul mare de pareri.' },
+  { g: 'ech', id: 'DR29S4MBM', badge: 'Cu 20 de lame de otel', short: 'Hecht 1848', alim: 'Electric', latime: '40 cm', putere: '1800 W',
+    specs: ['Hecht 1848, 2 in 1, 1800 W', 'latime mare, 40 cm, 20 de lame din otel', 'scarificator si aerator', 'pentru gradini mai mari'],
+    pros: ['Latime mare, 40 cm, cea mai buna acoperire', '20 de lame din otel pentru scarificat eficient', 'Putere mare, 1800 W, 2 in 1', 'Hecht, brand cunoscut de unelte'],
+    cons: ['Nota 4.1, mai modesta', 'Mai greu, pentru gradini mai mari'],
+    verdict: 'Scarificatorul de ales daca ai o gradina mai mare si vrei latime si putere. Hecht 1848 are 1800 W si o latime de lucru de 40 cm, cea mai mare dintre modelele electrice din selectie, deci acoperi repede o suprafata intinsa, cu mai putine treceri, si e 2 in 1, cu role pentru scarificat si aerat. Rola de scarificat are 20 de lame din otel, care taie eficient muschiul si stratul de palsa din gazon. Cu 16 pareri si nota 4.1 e o alegere corecta, chiar daca nota e mai modesta. Fiind mai lat si mai puternic, e ceva mai greu, potrivit pentru gradini medii spre mari, nu pentru curti mici. Il iei cand ai o gradina mai mare, vrei cea mai mare latime electrica din selectie si o rola cu multe lame de otel, si nu te deranjeaza greutatea mai mare a unui aparat mai lat.' },
+  // --- Puternice, pe benzina si manuale ---
+  { g: 'put', id: 'D7V6PMBBM', badge: 'Makita, bine testat', short: 'Makita UV3200', alim: 'Electric', latime: '32 cm', putere: '1300 W',
+    specs: ['Makita UV3200, 1300 W', 'latime 32 cm, calitate profesionala', 'de la Makita, brand premium', 'bine testat, 24 de pareri'],
+    pros: ['Makita, brand premium de scule si unelte', 'Constructie de calitate, durabila', 'Bine testat, 24 de pareri', 'Latime buna, 32 cm'],
+    cons: ['Nota 3.8, mai modesta, verifica recenziile', 'Pret premium pentru specificatii medii'],
+    verdict: 'Un scarificator de la Makita, pentru cine pune pret pe brandul premium si pe durabilitate. UV3200 are 1300 W si o latime de 32 cm, cu constructia si finisajele de calitate specifice Makita, un nume recunoscut in scule si unelte de gradina, gandit sa reziste la folosire repetata. Cu 24 de pareri e bine testat, o alegere pentru cine vrea siguranta unui brand mare. Nota de 3.8 e insa mai modesta decat la alte modele din selectie, asa ca merita sa citesti atent recenziile inainte de a comanda, iar pretul e premium pentru niste specificatii medii, deci platesti si pentru brand. Il iei cand vrei un scarificator de la Makita, cu constructie durabila si un brand de incredere, si esti dispus la un pret mai mare, dupa ce verifici parerile pentru nota ceva mai jos.' },
+  { g: 'put', id: 'DBYKFDMBM', badge: 'Pe benzina, teren mare', short: 'Ruris benzina', alim: 'Benzina', latime: '40 cm', putere: '5.3 CP',
+    specs: ['pe benzina, motor 212 cc, 5.3 CP', 'latime 40 cm, pentru suprafete mari', 'lucrezi oriunde, fara cablu', 'scarificator si aerator'],
+    pros: ['Pe benzina, pentru suprafete mari, peste 1000 mp', 'Motor puternic, 212 cc, 5.3 CP', 'Latime mare, 40 cm', 'Lucrezi oriunde, fara cablu si fara priza'],
+    cons: ['Mai zgomotos si cu intretinere de motor termic', 'Pret ridicat, mai greu'],
+    verdict: 'Scarificatorul de ales daca ai un gazon mare, de peste 1000 de metri patrati. Ruris RXH999 are un motor pe benzina de 212 cc si 5.3 CP, mult mai puternic decat modelele electrice, si o latime de lucru de 40 cm, deci parcurgi repede o suprafata intinsa, iar fiind pe benzina lucrezi oriunde, fara cablu si fara priza, un avantaj real pe un teren mare, departe de casa. E 2 in 1, cu functie de scarificat si aerat. Cu 7 pareri si nota 4.3 e bine primit. In schimb, e mai zgomotos decat electricele, cere intretinerea unui motor termic, ulei, bujie, filtru, si e mai greu si mai scump. Il iei cand ai un gazon mare, de peste 1000 mp, si vrei putere si autonomie fara cablu, si accepti zgomotul, greutatea si intretinerea unui motor pe benzina.' },
+  { g: 'put', id: 'DPZ0GJMBM', badge: 'Premium, Husqvarna', short: 'Husqvarna S138', alim: 'Electric', latime: '38 cm', putere: '1600 W',
+    specs: ['Husqvarna S138C, 1600 W', 'latime mare, 37 cm', 'de la Husqvarna, brand premium de gradina', 'nota maxima, 5 din 5'],
+    pros: ['Husqvarna, brand premium specializat in gradina', 'Putere buna, 1600 W, si latime mare, 37 cm', 'Constructie de top, durabila', 'Nota maxima, 5 din 5'],
+    cons: ['Pret premium', 'Inca 5 pareri'],
+    verdict: 'Alegerea premium electrica, de la Husqvarna, un brand specializat in echipamente de gradina. S138C are 1600 W si o latime de lucru de 37 cm, cu constructia si finisajele de top pe care le astepti de la Husqvarna, un nume de referinta pentru unelte de gazon, gandit sa functioneze impecabil si sa dureze. A luat nota maxima, 5 din 5, chiar daca din doar 5 pareri, iar reputatia brandului iti da incredere in plus. E o alegere premium, cu un pret pe masura, justificat daca pui pret pe calitate si pe un brand de top pentru gradina. Il iei cand vrei cel mai bun scarificator electric ca brand din selectie, de la Husqvarna, cu putere buna si latime mare, si esti dispus la un pret premium pentru calitatea si reputatia marcii.' },
+  { g: 'put', id: 'DV8CWVMBM', badge: 'Manual, fara motor', short: 'Wolf-Garten manual', alim: 'Manual', latime: '30 cm', putere: '—',
+    specs: ['scarificator manual cu roti', 'Wolf-Garten UR-M3, latime 30 cm', 'fara motor, il impingi', 'pentru gradini mici'],
+    pros: ['Fara motor, fara cablu, fara benzina', 'Silentios si fara intretinere de motor', 'Wolf-Garten, brand german de gradina', 'Ieftin de folosit, ecologic'],
+    cons: ['Cere efort fizic, il impingi tu', 'Doar pentru gradini mici'],
+    verdict: 'Scarificatorul de ales pentru o gradina mica, daca vrei ceva simplu, silentios si fara intretinere. Wolf-Garten UR-M3 e un scarificator manual cu roti, pe care il impingi tu, cu o latime de 30 cm, fara motor, cablu sau benzina, deci nu are zgomot, nu consuma curent sau combustibil si nu cere nicio intretinere de motor. Wolf-Garten e un brand german de referinta pentru unelte de gradina, cu produse de calitate. E cea mai ecologica si mai ieftina de folosit varianta, ideala pentru un gazon mic, unde nu merita un aparat electric. In schimb, cere efort fizic, pentru ca tu il impingi si tu dai forta, si se descurca doar cu suprafete mici. Il iei cand ai o gradina mica si vrei un scarificator simplu, silentios, fara motor si fara intretinere, si nu te deranjeaza efortul de a-l impinge singur.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const ECH = PICKS.filter(x => x.g === 'ech');
+const PUT = PICKS.filter(x => x.g === 'put');
+
+const hero = '/images/articles/scarificator-pentru-gazon.webp';
+const figAcc = '/imagini/articole/scarif-accesibile.webp';
+const figEch = '/imagini/articole/scarif-echilibrate.webp';
+const figPut = '/imagini/articole/scarif-puternice.webp';
+const published = '2026-07-19T14:46:44+03:00';
+
+const faq = [
+  { question: 'Care e diferenta dintre scarificator si aerator?', answer: 'Sunt doua lucrari diferite, dar complementare. Scarificatorul taie si scoate muschiul, iarba uscata si stratul de resturi vegetale, numit palsa, de la suprafata solului, folosind cutite sau lame din otel care patrund cativa milimetri in pamant. Aeratorul, in schimb, perforeaza solul cu gheare sau tepi, creand canale prin care aerul, apa si nutrientii ajung mai usor la radacini, fara sa taie nimic. Multe aparate, inclusiv majoritatea din selectie, sunt 2 in 1, cu role interschimbabile: una cu cutite pentru scarificat, una cu gheare pentru aerat. Asa faci ambele lucrari cu un singur aparat: intai scarifici, ca sa scoti palsa, apoi aerezi, ca sa oxigenezi solul.' },
+  { question: 'Cand si cat de des trebuie sa scarific gazonul?', answer: 'De regula, sunt suficiente doua scarificari pe an: una primavara, dupa ce gazonul a pornit in crestere, si una toamna, inainte de racirea vremii. Aceste doua momente sunt ideale pentru ca gazonul are timp sa se refaca. In functie de starea lui, poti ajusta frecventa, dar nu e recomandat sa scarifici mai mult de trei ori pe an, pentru ca lucrarea e destul de agresiva si un gazon scarificat prea des nu apuca sa se regenereze. Scarifica pe vreme uscata, cand gazonul nu e ud, la o adancime mica, de aproximativ 3 milimetri, si tunde-l scurt inainte. Dupa scarificare, gazonul poate arata deteriorat cateva zile, dar isi revine mai des si mai frumos.' },
+  { question: 'Ce putere si latime imi trebuie?', answer: 'Depinde de marimea gradinii. Pentru un gazon sub 1000 de metri patrati, un scarificator electric cu o putere intre 1400 si 1800 W e mai mult decat suficient, iar majoritatea modelelor din selectie se incadreaza aici. Pentru suprafete mai mari, de peste 1000 mp, e indicat unul pe benzina, cu un motor de 3-6 CP, care are mai multa putere si autonomie fara cablu. Latimea de lucru conteaza pentru viteza: cu cat e mai mare, cu atat acoperi terenul din mai putine treceri. Modelele din selectie au intre 30 si 40 cm; pentru o gradina mica, 30-32 cm ajung, iar pentru una medie spre mare, o latime de 37-40 cm iti scurteaza mult munca.' },
+  { question: 'Scarificator electric, pe benzina sau manual?', answer: 'Depinde de marimea gradinii si de cat de des il folosesti. Cel electric e alegerea potrivita pentru majoritatea gradinilor de casa, sub 1000 mp: e usor, silentios, porneste instant si cere intretinere minima, dar te tine legat de o priza printr-un cablu. Cel pe benzina e pentru suprafete mari, peste 1000 mp, unde conteaza puterea si libertatea fara cablu, dar e mai greu, mai zgomotos, mai scump si cere intretinerea unui motor termic. Cel manual, pe care il impingi tu, e bun doar pentru gazoane mici: e ieftin, silentios, fara intretinere si ecologic, dar cere efort fizic. Alege electricul pentru o gradina medie, benzina pentru una mare si manualul pentru una mica.' },
+  { question: 'La ce foloseste cosul colector?', answer: 'Cand scarifici, aparatul scoate din gazon muschiul, iarba uscata si stratul de palsa, iar acestea raman pe suprafata daca nu sunt colectate. Cosul colector, montat in spatele aparatului, aduna aceste resturi pe masura ce lucrezi, ca sa nu le mai aduni tu manual dupa, cu grebla. E un plus de comoditate real, mai ales pe o gradina mare, unde cantitatea de material smuls poate fi considerabila. Nu toate modelele au un cos generos, iar unele cer sa aduni resturile separat. Daca vrei sa scapi de munca de strangere dupa scarificare, cauta un model cu cos colector, ca Steinhaus din selectie, si goleste-l cand se umple, in timpul lucrului.' },
+  { question: 'Cum reglez adancimea de lucru?', answer: 'Multe scarificatoare au un reglaj al adancimii pe mai multe trepte, ca modelele Einhell din selectie, cu care alegi cat de adanc intra cutitele in gazon. E o functie utila, pentru ca adancimea potrivita depinde de starea gazonului: pentru un gazon sanatos, o adancime mica, de circa 3 milimetri, e suficienta, iar pentru unul cu mult muschi sau palsa, mergi ceva mai adanc. Nu exagera insa cu adancimea, pentru ca o scarificare prea agresiva raneste radacinile si slabeste gazonul in loc sa il ajute. Regleaza intai pe o treapta mica, verifica rezultatul pe o portiune, si creste doar daca e nevoie. Un reglaj pe mai multe trepte iti da acest control fin.' },
+  { question: 'Cum ingrijesc gazonul dupa scarificare?', answer: 'Scarificarea e o lucrare agresiva, iar gazonul are nevoie de putina grija dupa, ca sa se refaca frumos. Dupa ce ai scarificat si ai adunat resturile, e momentul ideal sa reinsamantezi portiunile rarite, pentru ca semintele au acum contact direct cu solul, si sa aplici un ingrasamant, care ajuta gazonul sa isi revina si sa creasca des. Uda apoi terenul, mai ales daca reinsamantezi, si evita sa calci mult pe el cateva zile. Gazonul poate arata deteriorat imediat dupa scarificare, dar cu apa, ingrasamant si putina rabdare isi revine in una-doua saptamani, mai des, mai verde si mai sanatos decat inainte. Scarificarea urmata de reinsamantare si fertilizare e reteta unui gazon dens.' },
+  { question: 'Cat costa un scarificator pentru gazon?', answer: 'In selectie, scarificatoarele electrice accesibile pornesc de la circa 300 de lei, ca Lehmann, si merg pana spre 550 de lei pentru modele cu latime mare si putere de brand, ca Steinhaus, Texas sau Hecht. Segmentul echilibrat, cu latimi de 38-40 cm si putere mare, se aseaza intre circa 550 si 1100 de lei. Modelele premium, ca Makita sau Husqvarna, si cele pe benzina, pentru suprafete mari, trec de 1000 si urca spre 2000 de lei. La capatul de jos, un scarificator manual pentru gradini mici costa in jur de 340 de lei. Cel mai bun raport il gasesti alegand alimentarea si latimea potrivite marimii gazonului tau, nu neaparat cel mai puternic model.' },
+];
+
+const images = [hero, figAcc, figEch, figPut, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Scarificator pentru gazon - CentroCasa"
-  description="Stai sa vezi, daca vrei un gazon ca la carte, un scarificator pentru gazon e absolut esential. Fara el, mosul ala de iarba ramane sufocat de paie si muschi. Ca sa fiu direct, cel mai bun all-rounder pe care l-am vazut recent e modelul X de la Y, cam pe la 600 de lei, dar depinde si cat de mare e gradina ta. Hai sa vedem ce se potriveste."
-  image="/images/articles/scarificator-pentru-gazon.webp"
+  title="Cele mai bune scarificatoare pentru gazon in 2026: electrice, pe benzina si manuale"
+  description="Care sunt cele mai bune scarificatoare pentru gazon in 2026: modele electrice accesibile de la Lehmann si Steinhaus, echilibrate de la Texas, Hecht si Einhell, si puternice de la Makita, Husqvarna si Ruris, plus unul manual, comparate pe alimentare, latime si putere. Plus scarificator vs aerator si cand scarifici."
+  image={hero}
   type="article"
-  publishedTime="2026-03-01T07:50:48.318Z"
-  modifiedTime="2026-03-01T07:50:48.318Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cele mai bune scarificatoare pentru gazon' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Scarificator pentru gazon</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune scarificatoare pentru gazon</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">1 martie 2026</span>
-      </div>
-      <h1 class="article-title">Scarificator pentru gazon</h1>
-    </header>
+    <h1>Cele mai bune scarificatoare pentru gazon</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/scarificator-pentru-gazon.webp" alt="Scarificator pentru gazon" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune scarificatoare pentru gazon: electrice, pe benzina si manuale" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="ce-scarificator-pentru-gazon-e-regele-curtii-tale">
-        <h2>Ce scarificator pentru gazon e regele curții tale?</h2>
-        <p>Uite care-i treaba: un <strong>scarificator pentru gazon</strong> nu-i un moft, e o necesitate daca vrei sa arate gradina aia cum trebuie. Partea aia de "paie" si muschi care se aduna sub iarba ii taie aerul si nutrientii. Deci, inainte sa te gandesti la ingrasaminte sau la seminte, ai nevoie de uneltele potrivite.</p>
-        <p>Daca ma intrebi pe mine, pentru o gradina de dimensiuni medii, undeva intre 100-300 mp, un model electric, cum e cel de la <strong>Brand A</strong>, modelul <strong>EcoCut 300</strong>, e o alegere destul de sigura. Costa in jur de 550 de lei, nu e foarte greu si isi face treaba brici. Are o latime de lucru de 30 cm, ceea ce e suficient pentru majoritatea curților.</p>
-        <p>Acum, daca ai o gradina mai mare, peste 300 mp, sau pur si simplu vrei ceva mai performant, un <strong>scarificator pentru gazon</strong> pe <a href="/motocoasa-electrica-sau-pe-benzina/">benzina</a> ar fi ideal. Alea-s bestii, dar si mai scumpe si mai greu de manevrat. Un exemplu bun e <strong>Brand B</strong>, modelul <strong>PowerScarff 40</strong>, care sare de 1200 de lei, dar are o latime de lucru de 40 cm si un motoras pe benzina care nu te lasa balta.</p>
-        <p>Exista si scarificatoare manuale, alea cu dintii aia lungi pe care le impingi prin iarba. Sunt cele mai ieftine, sub 200 de lei, dar sincer, pe suprafete mai mari de 50 mp, te rup la efort si nu prea fac treaba ca lumea. E ca si cum ai vrea sa cureti un munte cu o lopatica.</p>
-        <p>Deci, ca un prim sfat: gandeste-te la suprafata gradinii si la bugetul tau. Nu te arunca la cel mai scump, dar nici la cel mai ieftin daca stii ca o sa te chinui cu el. Un <strong>scarificator pentru gazon</strong> bun te tine ani de zile.</p>
-      </section>
-
-      <section id="recomandari-de-scarificatoare-ce-merita-sa-cumperi-acum">
-        <h2>Recomandari de scarificatoare: Ce merită să cumperi acum?</h2>
-        <p>Bun, hai sa fim practici. Am testat pe pielea mea, am vorbit cu baietii de la magazine, am vazut si ce zic vecinii pe grupuri. Iata cateva modele care mi s-au parut ok, cu bune si rele.</p>
-        <ul><li><strong>Brand A, model EcoCut 300 (Electric)</strong><br>  Pret: ~550 lei<br>  Avantaje: Usor de manevrat, nu scoate fum, pret bun pentru ce ofera, bun pentru suprafete de pana la 250 mp. Si vine cu tambur de aerare inclus, nu doar cel de scarificare. <br>  Dezavantaje: Cablul electric poate fi incomod la gradinile cu multe obstacole, puterea motorului nu e la fel ca la cele pe benzina.</li><li><strong>Brand B, model PowerScarff 40 (Benzina)</strong><br>  Pret: ~1200 lei<br>  Avantaje: Puternic, independent de priza, latime mare de lucru (40 cm), ideal pentru gradini mari peste 300 mp. Il poti folosi si in zone fara curent. <br>  Dezavantaje: Mai greu, mai zgomotos, necesita intretinere specifica motoarelor pe benzina (ulei, benzina), pretul e mai piperat.</li><li><strong>Brand C, model CompactScarff 20 (Electric)</strong><br>  Pret: ~400 lei<br>  Avantaje: Cel mai ieftin din lista, usor, compact, bun pentru suprafete mici (sub 100 mp). E ca un fel de <a href="/aspirator-de-frunze-pentru-curte/" class="interlink">aspirator de</a> frunze, dar pentru paie. <br>  Dezavantaje: Putere mica, se poate bloca usor daca paiele sunt prea dese sau prea groase, tamburul de scarificare nu e la fel de agresiv.</li><li><strong>Brand D, model ProScarff 45 (Benzina - semi-profesional)</strong><br>  Pret: ~1800 lei<br>  Avantaje: Foarte robust, latime mare de lucru (45 cm), motor puternic, durabil, pentru cei care vor ce-i mai bun si au gradini mari (peste 500 mp) sau chiar mici afaceri cu amenajari. <br>  Dezavantaje: Scump, greu, necesita un pic de experienta sa-l manevrezi cum trebuie, probabil overkill pentru majoritatea gradinilor de acasa.</li></ul>
-        <p>Am avut un <strong>scarificator pentru gazon</strong> electric de la Brand C acum vreo 3 ani. Era ok pentru terasă, dar cand am mutat la casa mai mare cu 200 mp de gazon, a inceput sa se chinuie. Pana la urma, am luat unul electric mai mare, tot de la Brand A, si diferenta e uriasa.
-Ca idee, tamburul de scarificare are niste cutite care zgaraie suprafata, iar cel de aerare are niste arcuri care ridica paiele. Majoritatea modelelor vin cu ambele, dar uneori trebuie sa cumperi separat tamburul.</p>
-      </section>
-
-      <section id="cum-alegi-scarificatorul-potrivit-ghid-rapid-si-pe-intelesul-tuturor">
-        <h2>Cum alegi scarificatorul potrivit? Ghid rapid și pe înțelesul tuturor</h2>
-        <p>Sa zicem ca ai decis ca ai nevoie de un <strong>scarificator pentru gazon</strong>. Acum vine partea grea: cum alegi? Nu te lasa pacalit de reclame. Uite pe ce sa te uiti:</p>
-        <h3>Suprafata gradinii</h3>
-        <p>Asta e prima chestie. Pentru o <a href="/motosapa-electrica-pentru-gradina-mica/">gradina mica</a>, sub 100 mp, un scarificator electric micut sau chiar unul manual (daca ai muschi) e de ajuns. Daca ai intre 100 si 300 mp, mergi pe un model electric mai serios. Peste 300 mp, gandeste-te la unul pe benzina. Nu are rost sa iei un monstru pe benzina pentru 50 mp, ca te chinui cu el si cu cablul ala. Si nici invers, sa iei un pitic electric pentru 500 mp, ca o sa-l arzi.</p>
-        <h3>Tipul de motorizare</h3>
-        <p>Aici ai de ales:</p>
-        <ul><li><strong>Electric:</strong> Mai ieftine, mai silențioase, mai ușoare, nu poluează. Ideale pentru gradini mici și medii, cu acces la priză. Minusul e cablul, care te poate incomoda.</li><li><strong><a href="/motocoasa-electrica-sau-pe-benzina/" class="interlink">Pe benzina</a>:</strong> Mai puternice, mai eficiente pe suprafețe mari, nu depinzi de curent. Dezavantajele sunt greutatea, zgomotul, vibrațiile și necesitatea de a le întreține (ulei, benzină).</li><li><strong>Manual:</strong> Cele mai ieftine, fără consumabile, dar necesită mult efort fizic. Bun doar pentru suprafețe foarte mici și dacă vrei să te antrenezi.</li></ul>
-        <h3>Latimea de lucru</h3>
-        <p>Cu cat e mai mare latimea de lucru, cu atat termini mai repede. Un scarificator cu latime de 30-35 cm e ok pentru majoritatea grădinilor. Daca ai peste 400 mp, caută unul de 40-45 cm.</p>
-        <h3>Adancimea de lucru</h3>
-        <p>Asta e importanta. Un <strong>scarificator pentru gazon</strong> bun ar trebui sa-ti permita sa ajustezi adancimea de la care sa rupa paiele. De obicei, se ajusteaza din maneta sau din rotite. Nu vrei sa fie prea adânc din prima, ca rupi iarba. Nici prea superficial, ca nu face treaba.</p>
-        <h3>Greutatea si manevrabilitatea</h3>
-        <p>Daca ai o gradina cu pante sau cu multe obstacole (copaci, tufe), un scarificator mai ușor și mai agil e de preferat. Am văzut un prieten cu un model pe benzina de 30kg care se chinuia sa-l urnească din loc pe urcuș. Nu-i placut.</p>
-        <h3>Tamburi</h3>
-        <p>Majoritatea vin cu tambur de scarificare (cutite) și tambur de aerare (arcuri). Verifică dacă sunt incluse sau dacă trebuie cumpărate separat. Un tambur de calitate, din oțel călit, e mai durabil.
-Uite, am avut un model electric la care tamburul de scarificare s-a tocit in 2 ani. Nu mai rupea paiele cum trebuie. Cand am luat unul cu tambur mai bun, diferenta a fost vizibila.</p>
-      </section>
-
-      <section id="scarificator-electric-vs-pe-benzina-ce-alegi-pentru-curtea-ta">
-        <h2>Scarificator electric vs. pe benzina: Ce alegi pentru curtea ta?</h2>
-        <p>Asta-i dilema clasică: electric sau pe benzina? Hai sa le luam pe rand, ca sa nu te mai invarti in cerc.</p>
-        <h3>Scarificator electric</h3>
-        <p>Ca sa fiu sincer, pentru 90% din gradinile de la noi, un <strong>scarificator pentru gazon</strong> electric e suficient. Sunt mai silențioase, nu scot fum, nu trebuie sa te chinui cu benzina si uleiul. In plus, sunt mai ieftine.</p>
-        <p>Un model bun, cum e cel de la Brand A, te scoate din impas cu 500-700 lei. Latimea de lucru e de obicei intre 30 si 38 cm, ceea ce e perfect pentru suprafete de pana la 300 mp. Am testat personal un model electric vreo 3 sezoane si n-am avut probleme, atat timp cat nu l-am fortat pe pamant prea umed sau cu prea multe resturi.</p>
-        <p>Partea proasta? Cablul. Daca ai o gradina cu multe flori, copaci sau pur si simplu e plina de obstacole, te tot impiedici de cablu sau trebuie sa fii atent sa nu-l tai. La fel, daca nu ai o priza la indemana, trebuie sa folosesti prelungitoare, ceea ce poate fi incomod.</p>
-        <h3>Scarificator pe benzina</h3>
-        <p>Astea-s bestiile. Daca ai o gradina mare, peste 300-400 mp, sau pur si simplu vrei putere si libertate de miscare, atunci un <strong>scarificator pentru gazon</strong> pe benzina e solutia. Motoarele lor au mai multa forta, poti lucra mai mult timp fara pauza (doar daca nu se incinge) si nu te incurca cablul.</p>
-        <p>Modelele de la Brand B, de exemplu, incep de pe la 1000-1200 lei si pot ajunge si la 2000 lei pentru cele mai performante. Ce nu-mi place la ele? Sunt mai grele, mai zgomotoase si au nevoie de intretinere. Trebuie sa cumperi benzina, sa verifici nivelul de ulei, sa cureti filtrul de aer.</p>
-        <p>Si cand se strica ceva la motor, reparatiile sunt mai scumpe. Am avut un vecin care si-a luat unul pe <a href="/drujba-pe-benzina-pentru-lemne/" class="interlink">benzina pentru</a> o gradina de 150 mp, si toata ziua se plangea de greutatea lui si de zgomot.</p>
-        <h3>Verdict</h3>
-        <p>Daca ma intrebi pe mine, pentru majoritatea romanilor care au gradina la casa sau la vila, un <strong>scarificator pentru gazon</strong> electric e cea mai buna alegere. E un echilibru bun intre pret, performanta si usurinta in utilizare. Investeste intr-un model de calitate, cu o latime de lucru decenta (30-35 cm), si o sa fii multumit. Daca ai o suprafata imensa sau vrei neaparat performanta de profesionist, atunci mergi pe benzina.</p>
-      </section>
-
-      <section id="greseli-de-evitat-cand-scarifici-gazonul-si-cum-sa-le-previi">
-        <h2>Greseli de evitat cand scarifici gazonul (si cum sa le previi)</h2>
-        <p>Multi fac greseala sa creada ca un <strong>scarificator pentru gazon</strong> e o unealta magica. Nu e chiar asa. Ca sa obtii rezultate bune, trebuie sa stii cand si cum sa-l folosesti. Si, mai ales, ce sa NU faci.</p>
-        <p>Prima greseala majora: scarificarea pe un gazon prea umed sau prea uscat. Daca e prea umed, paiele se lipesc de sol si scarificatorul doar o sa ingenuncheze iarba, nu o sa o curete. Daca e prea uscat, iarba se rupe si te trezesti cu pete mari de pamant gol. Cel mai bun moment e cand solul e rezonabil umed, dar nu baltit. Dupa o ploaie usoara sau dupa ce ai udat gradina cu o zi inainte.</p>
-        <p>A doua greseala: scarificarea prea agresiva din prima. Nu te apuca sa setezi scarificatorul la adancimea maxima din prima zi. O sa rupi iarba si o sa faci mai mult rau decat bine. Incepe cu o adancime mica, cat sa zgarii suprafata, si vezi cum reactioneaza <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">gazonul</a>. Daca e nevoie, mai adancesti treptat. E ca la ras, nu te tai din prima daca te razi cu lama noua.</p>
-        <p>A treia greseala: sa crezi ca un singur pas de scarificare e de ajuns. De obicei, ai nevoie de minim 2 treceri, una pe lungime si una pe latime, pentru a curata bine. Daca gazonul e foarte incarcat cu paie, s-ar putea sa fie nevoie si de o a treia trecere.</p>
-        <p>A patra greseala: sa uiti sa cureti scarificatorul dupa folosire. Paiele si pamantul se usuca pe cutite si pe carcasa, si la urmatoarea utilizare o sa se intepenescă. Curata-l imediat dupa ce termini, e mult mai usor. Si verifica suruburile sa fie stranse. Am patit odata sa-mi sara un cutit pe parcurs, nu e deloc placut.</p>
-        <p>A cincea greseala: scarificarea prea tarziu in toamna sau prea devreme in primavara. Cele mai bune perioade sunt primavara (dupa ce a inceput iarba sa creasca activ, de obicei prin aprilie) si toamna (septembrie-octombrie), inainte de a veni frigul. Daca scarifici prea tarziu in toamna, gazonul nu mai are timp sa se refaca si ramane vulnerabil la boli.</p>
-        <p>Si inca un sfat de la mine: dupa ce ai scarificat, aduna cat mai bine paiele. Le poti pune la compost sau pur si simplu le arunci. Apoi, e momentul ideal sa aplici un ingrasamant pentru gazon si, daca e cazul, sa resemezi zonele mai rare. Practic, scarificatorul pregateste terenul pentru ce urmeaza.</p>
-      </section>
-
-      <section id="scarificator-pentru-gazon-recomandari-pe-categorii-de-buget">
-        <h2>Scarificator pentru gazon: Recomandări pe categorii de buget</h2>
-        <p>Na, ca am ajuns si la partea cu bugetul. Ca sa fiu direct, preturile la un <strong>scarificator pentru gazon</strong> variaza destul de mult. Dar am sa-ti dau niste repere sa stii la ce sa te astepti.</p>
-        <h3>Buget mic (sub 400 lei)</h3>
-        <p>Aici vorbim de modele electrice entry-level sau, daca ai noroc, de promotii la modele putin mai rasarite. De exemplu, Brand C, model CompactScarff 20, se incadreaza aici. Sunt bune pentru suprafete mici, sub 100 mp, si daca nu ai pretentii foarte mari.</p>
-        <p>Nu te astepta la minuni, dar pentru o curatare superficiala si ocazionala, isi fac treaba. Minusurile sunt puterea mica si durabilitatea mai redusa. E ca si cum ai lua o bicicleta second-hand, poate merge, dar nu te astepta sa castigi turul Frantei cu ea.</p>
-        <h3>Buget mediu (400 - 800 lei)</h3>
-        <p>Aici gasesti cele mai multe modele echilibrate, atat electrice, cat si cateva pe benzina mai simple. Brand A, model EcoCut 300, se incadreaza perfect aici, pe la 550 lei. Aceste modele sunt potrivite pentru majoritatea gradinilor de dimensiuni medii (pana la 250-300 mp). Au o putere decenta, o latime de lucru buna (30-35 cm) si sunt mai fiabile. Poti sa gasesti si modele pe benzina mai slabe, dar de obicei nu merita diferenta de pret si efortul in plus.</p>
-        <h3>Buget mare (peste 800 lei)</h3>
-        <p>In categoria asta intra scarificatoarele pe benzina mai puternice, cu latime de lucru mai mare (40-45 cm), si cele electrice <a href="/set-unelte-de-gradinarit-profesionale/" class="interlink">profesionale</a>. Daca ai o gradina mare, peste 300-400 mp, sau pur si simplu vrei un aparat robust, pe care sa te bazezi ani de zile, atunci merita sa investesti aici. Modelele de la Brand B, cum ar fi PowerScarff 40, intra in aceasta zona.</p>
-        <p>Sunt mai grele, mai puternice, mai scumpe, dar si mai eficiente pe suprafete mari. Daca ai o afacere cu amenajari peisagistice sau pur si simplu iubesti gazonul si vrei tot ce e mai bun, poti merge si spre modele ca Brand D, ProScarff 45, care sar de 1500 lei, dar alea sunt deja pentru utilizare intensiva. Eu, personal, am mers pe un model din zona de mijloc, electric, si sunt multumit.</p>
-        <p>Nu am o gradina uriasa, dar nici nu vreau sa ma chinui. Daca bugetul iti permite, ia unul cu putere mai mare, ca nu strica niciodata.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa un scarificator pentru gazon bun?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un scarificator pentru gazon bun, potrivit pentru majoritatea gradinilor de dimensiuni medii, costa intre 500 si 800 de lei. Modelele electrice de calitate incep de la 400 lei, iar cele pe benzina mai performante pot depasi 1200 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre scarificator electric si pe benzina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Scarificatoarele electrice sunt mai usoare, mai silentioase si mai ieftine, ideale pentru suprafete mici spre medii (pana la 300 mp) si cu acces la priza. Cele pe benzina sunt mai puternice, mai potrivite pentru gradini mari peste 300 mp, oferind libertate de miscare, dar sunt mai grele, mai zgomotoase si necesita intretinere.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar un scarificator manual?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un scarificator manual merita doar pentru suprafete foarte mici (sub 50 mp) si daca ai o conditie fizica excelenta. Pentru suprafete mai mari, efortul este enorm si rezultatele mult inferioare fata de un model electric sau pe benzina.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce scarificator e mai bun pentru gazonul meu?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Alegerea depinde de suprafata gradinii tale. Pentru sub 100 mp, un model electric mic e suficient. Pentru 100-300 mp, un scarificator electric mediu (30-35 cm latime de lucru) e ideal. Peste 300 mp, ia in considerare un model pe benzina.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                de ce nu creste gazonul bine dupa scarificare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Gazonul poate sa nu creasca bine daca scarificarea a fost facuta prea agresiv, pe un sol nepotrivit (prea umed sau prea uscat), sau daca nu s-au aplicat ingrasaminte si seminte dupa scarificare. De asemenea, un scarificator vechi sau slab nu va face treaba corect.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cum folosesc corect un scarificator pentru gazon?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Foloseste scarificatorul pentru gazon cand iarba este rezonabil uscata, nu baltita. Ajusteaza adancimea treptat, incepand cu una mica. Efectueaza 2-3 treceri perpendiculare. Curata bine aparatul dupa fiecare utilizare si aplica ingrasamant si seminte dupa scarificare.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc scarificatoare de calitate?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Scarificatoare de calitate gasesti in magazinele mari de bricolaj (Dedeman, Leroy Merlin, Hornbach), pe platformele online de comert electronic (eMAG, Altex) sau in magazine specializate in unelte pentru gradina. Verifica recenziile si specificatiile tehnice inainte de achizitie.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat de des trebuie sa folosesc scarificatorul pe gazon?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Scarificatorul pentru gazon se utilizeaza de obicei de doua ori pe an: o data primavara (aprilie-mai) si o data toamna (septembrie-octombrie). Daca gazonul este foarte des si se acumuleaza mult material mort, se poate face o scarificare usoara si in alte perioade, dar cu atentie.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cel mai vandut scarificator din selectie e <strong>Lehmann de 38 cm</strong>, 2 in 1, iar cel mai bine notat e <strong>Steinhaus PRO</strong>, cu 4.9 din 30 de pareri. Pentru o gradina mare, <strong>Ruris pe benzina</strong> are 5.3 CP, iar dintre premium, <strong>Husqvarna</strong> aduce calitatea unui brand de top pentru gradina.</p>
+      <p>Un scarificator scoate muschiul si stratul de resturi din gazon, ca acesta sa respire si sa creasca des, iar multe modele sunt <strong>2 in 1</strong>, si scarifica, si aereaza. Cand alegi, conteaza <strong>alimentarea</strong> potrivita cu marimea gazonului, <strong>latimea de lucru</strong>, <strong>puterea</strong> si reglajul adancimii. Mai jos gasesti direct recomandarile, pe trei categorii, iar sub ele un ghid despre cum alegi si cand scarifici.</p>
+      <p>Am pornit de la scarificatoarele de gazon in stoc pe eMAG, cu cele mai multe pareri, si le-am impartit in electrice accesibile, echilibrate si puternice, incluzand aici si un model pe benzina, pentru suprafete mari, si unul manual, pentru gradini mici. Dupa scarificare, pentru tuns vezi si <a href="/masina-de-tuns-gazonul-electrica/">masinile de tuns gazonul</a> si <a href="/sistem-de-irigare-automata-pentru-gradina/">sistemele de irigare automata</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Electrice accesibile</a></li>
+        <li><a href="#ech">Echilibrate</a></li>
+        <li><a href="#put">Puternice, pe benzina si manuale</a></li>
+        <li><a href="#de-ce">De ce scarifici gazonul</a></li>
+        <li><a href="#scarif-aerator">Scarificator sau aerator</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#cand">Cand si cum scarifici</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Alimentare</th><th>Latime</th><th>Putere</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.alim}</td>
+              <td>{x.latime}</td>
+              <td>{x.putere}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Electrice accesibile</h2>
+    <p>Usoare, silentioase si ieftine, cu putere de 1200-1800 W: acopera nevoile unei gradini de casa si sunt saltul ideal daca vrei un gazon ingrijit fara sa investesti mult. Cele mai multe sunt 2 in 1, scarifica si aereaza.</p>
+    <div class="rd-grid">
+      {ACC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcc} alt="Scarificatoare electrice accesibile: Lehmann, Steinhaus, Einhell" width="1200" height="675" loading="lazy" />
+
+    <h2 id="ech">Echilibrate</h2>
+    <p>Branduri cunoscute, latimi mai mari, de 32-40 cm, si putere buna, pentru gradini medii spre mari pe care vrei sa le parcurgi mai repede. De aici alegi daca vrei un aparat solid, de la un nume de incredere.</p>
+    <div class="rd-grid">
+      {ECH.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figEch} alt="Scarificatoare echilibrate: Texas, Hecht, Einhell" width="1200" height="675" loading="lazy" />
+
+    <h2 id="put">Puternice, pe benzina si manuale</h2>
+    <p>De la modele premium electrice, la unul pe benzina pentru suprafete mari si unul manual pentru gradini mici. Pentru situatii care ies din tiparul obisnuit, de la gazon intins la unul mic, ingrijit fara motor.</p>
+    <div class="rd-grid">
+      {PUT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPut} alt="Scarificatoare puternice, pe benzina si manuale: Makita, Ruris, Husqvarna, Wolf-Garten" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-scarificator').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate scarificatoarele la oferta</strong>
+        <span>Reducerile din acest moment la scarificatoare si aeratoare de gazon, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce scarifici gazonul</h2>
+    <p>In timp, la baza firelor de iarba se aduna un strat de muschi, iarba uscata si resturi vegetale, numit palsa, care sufoca gazonul: impiedica apa, aerul si ingrasamantul sa ajunga la radacini, iar iarba se rareste si se ingalbeneste. Scarificarea <strong>scoate acest strat</strong> si lasa gazonul sa respire din nou.</p>
+    <p>Rezultatul se vede in cateva saptamani: un gazon <strong>mai des, mai verde si mai sanatos</strong>, cu radacini care primesc din nou apa si nutrienti. Scarificarea combate eficient muschiul, o problema frecventa mai ales in zonele umede si umbrite, si pregateste terenul pentru reinsamantare, pentru ca semintele au contact direct cu solul. Impreuna cu aerarea, care oxigeneaza solul in profunzime, e una dintre cele mai importante lucrari de intretinere a unui gazon frumos. Fara ea, chiar si un gazon udat si tuns regulat se degradeaza in timp, sufocat de propriul strat de palsa.</p>
+
+    <h2 id="scarif-aerator">Scarificator sau aerator</h2>
+    <p>Sunt doua lucrari diferite, care se completeaza, si multe aparate le fac pe amandoua. <strong>Scarificarea</strong> taie si scoate muschiul si palsa de la suprafata, cu cutite sau lame din otel care patrund cativa milimetri in sol, ca sa curete si sa regenereze gazonul. <strong>Aerarea</strong> perforeaza solul cu gheare sau tepi, creand canale prin care aerul, apa si nutrientii ajung mai adanc, la radacini, fara sa taie nimic; e mai bland si oxigeneaza solul in profunzime.</p>
+    <p>Vestea buna e ca majoritatea aparatelor din selectie sunt <strong>2 in 1</strong>, cu role interschimbabile: una cu cutite pentru scarificat, una cu gheare pentru aerat. Le schimbi in cateva minute si faci ambele lucrari cu acelasi aparat. Ordinea recomandata e sa scarifici intai, ca sa scoti palsa, apoi sa aerezi, ca sa oxigenezi solul curatat. Daca vrei sa iti ingrijesti complet gazonul, un aparat 2 in 1 e cea mai buna alegere, pentru ca acopera ambele nevoi fara sa cumperi doua unelte separate.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua scarificatoare:</p>
+    <ul>
+      <li><strong>Alimentarea:</strong> electric pentru gradini sub 1000 mp, silentios si usor; benzina pentru suprafete mari; manual pentru gazoane mici, fara motor.</li>
+      <li><strong>Latimea de lucru:</strong> 30-32 cm pentru gradini mici, 37-40 cm pentru medii si mari, ca sa acoperi terenul din mai putine treceri.</li>
+      <li><strong>Puterea:</strong> 1400-1800 W la modelele electrice pentru o gradina de casa; pe benzina, 3-6 CP pentru suprafete mari.</li>
+      <li><strong>Reglajul adancimii:</strong> pe mai multe trepte, iti permite sa potrivesti cat de adanc intra cutitele, in functie de starea gazonului.</li>
+      <li><strong>Functia 2 in 1:</strong> role interschimbabile pentru scarificat si aerat, ca sa faci ambele lucrari cu un singur aparat.</li>
+      <li><strong>Cosul colector:</strong> aduna resturile smulse pe masura ce lucrezi, ca sa nu le aduni manual cu grebla dupa.</li>
+    </ul>
+
+    <h2 id="cand">Cand si cum scarifici</h2>
+    <p>Momentul conteaza mult. Se recomanda <strong>doua scarificari pe an</strong>, una primavara, dupa ce gazonul a pornit in crestere, si una toamna, inainte de racirea vremii, cand iarba are timp sa se refaca. Nu scarifica mai mult de trei ori pe an, pentru ca lucrarea e agresiva si un gazon scarificat prea des nu apuca sa se regenereze. Alege o zi cu vreme uscata, cand gazonul nu e ud, si tunde-l scurt inainte.</p>
+    <p>La lucru, regleaza adancimea la o valoare mica, de aproximativ <strong>3 milimetri</strong>, si verifica rezultatul pe o portiune inainte sa mergi mai adanc, ca sa nu ranesti radacinile. Treci uniform peste gazon, pe randuri, si goleste cosul colector cand se umple. Dupa scarificare, e momentul ideal sa <strong>reinsamantezi</strong> portiunile rarite, pentru ca semintele au contact direct cu solul, si sa aplici un ingrasamant. Uda apoi terenul si ai rabdare: gazonul poate arata deteriorat cateva zile, dar isi revine in una-doua saptamani, mai des si mai verde. Scarificarea urmata de reinsamantare si fertilizare e reteta unui gazon dens si sanatos.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de alimentare, latime si brand:</p>
+    <p><strong>Electrice accesibile:</strong> de la circa 300 de lei, ca Lehmann, si pana spre 550 de lei pentru modele cu latime mare si putere de brand, ca Steinhaus, Texas sau Hecht.</p>
+    <p><strong>Echilibrate:</strong> intre circa 550 si 1100 de lei, cu latimi de 38-40 cm si putere mare, pentru gradini medii spre mari.</p>
+    <p><strong>Premium si benzina:</strong> Makita si Husqvarna, precum si modelele pe benzina pentru suprafete mari, trec de 1000 si urca spre 2000 de lei. La capatul de jos, un scarificator manual pentru gradini mici e in jur de 340 de lei.</p>
+    <p>Pe langa pret, alege in functie de <strong>marimea gazonului</strong>: pentru o gradina mica, un model electric accesibil sau chiar unul manual ajunge; pentru una medie, un electric de 1400-1800 W cu latime buna e ideal; iar pentru un teren mare, un scarificator pe benzina merita banii. Cel mai bun raport il gasesti potrivind aparatul cu suprafata reala, nu cu cel mai mare pret. Pentru comparatie pe tunsul ierbii, vezi <a href="/cele-mai-bune-masini-de-tuns-iarba/">masinile de tuns iarba</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
         <p class="author-role">Expert Gradinarit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="scarificator-pentru-gazon"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="scarificator-pentru-gazon"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="scarificator-pentru-gazon" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="scarificator-pentru-gazon" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

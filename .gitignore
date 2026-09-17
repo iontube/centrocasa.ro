@@ -11,3 +11,6 @@ generation.log
 .DS_Store
 src/data/emag-raw.json
 functions/out/[slug].js
+deploy.sh
+.wrangler/
+*.log

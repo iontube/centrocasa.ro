@@ -1,0 +1,291 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['cabine-dus'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Paravane (walk-in, doar sticla) ---
+  { g: 'paravan', id: 'DGVW62BBM', badge: 'Cel mai bine notat paravan', short: 'Belform 120x90', forma: 'Dreptunghi', usa: 'Culisanta', sticla: 'securizata',
+    specs: ['paravan walk-in, doar sticla', '120 x 90 cm, usi culisante', 'sticla securizata, profil cromat', 'reversibil, fara cadita'],
+    pros: ['Nota cea mai mare dintre paravane, aproape de maxim', 'Usi culisante, nu cer spatiu de deschidere', 'Sticla securizata cu profil cromat, aspect modern', 'Reversibil, il montezi pe stanga sau pe dreapta'],
+    cons: ['Fara cadita, ai nevoie de o baie deja placata cu scurgere in pardoseala', 'Montajul cere pereti drepti si etansare atenta'],
+    verdict: 'Cel mai bine notat paravan din selectie si alegerea daca vrei un dus modern, deschis, intr-o baie deja placata. E un paravan de tip walk-in: doar peretele de sticla, fara cadita si fara usa completa de cabina, care delimiteaza zona de dus si opreste apa sa stropeasca in rest. Usile culisante gliseaza pe sina, deci nu ai nevoie de spatiu de deschidere in fata, un avantaj real intr-o baie mica. Sticla securizata cu profil cromat arata curat si se curata usor, fara colturi in care sa se adune calcarul. Ai nevoie de o pardoseala cu scurgere, o cadita plata sau o rigola. Il iei cand vrei aspect modern si intretinere usoara, si baia e pregatita pentru el.' },
+  { g: 'paravan', id: 'D48M7MBBM', badge: 'Cele mai multe pareri', short: 'Belform Clear 120x80', forma: 'Dreptunghi', usa: 'Culisanta', sticla: 'securizata',
+    specs: ['paravan walk-in Clear', '120 x 80 cm, usa culisanta', 'sticla securizata transparenta', 'reversibil, fara cadita'],
+    pros: ['Cele mai multe pareri dintre paravane, cu nota buna', 'Usa culisanta, potrivita si pentru bai inguste', 'Sticla Clear transparenta, luminoasa', 'Reversibil, se monteaza pe oricare parte'],
+    cons: ['Fara cadita, cere pardoseala cu scurgere', 'La 80 cm latime, zona de dus e mai stramta'],
+    verdict: 'Fratele mai ingust al modelului de mai sus si paravanul cu cele mai multe pareri din selectie, semn ca merge bine pentru multa lume. Are aceeasi sticla securizata transparenta si usa culisanta, dar la 120 x 80 cm, potrivit pentru o baie ceva mai stramta, unde nu incape un dus lat. Sticla Clear lasa lumina sa treaca si face baia sa para mai mare, iar fiind reversibil il montezi pe partea care iti convine. Ca la orice walk-in, ai nevoie de o pardoseala placata cu scurgere sau o cadita joasa. Il iei cand vrei un paravan modern, verificat de multi cumparatori, pentru o baie de dimensiuni normale spre mici.' },
+  { g: 'paravan', id: 'DS8M7MBBM', badge: 'Pentagonal, pentru colt', short: 'Belform pentagonal', forma: 'Pentagon', usa: 'Batanta', sticla: 'securizata',
+    specs: ['paravan pentagonal de colt', '90 x 90 cm, usa batanta', 'sticla securizata, profil cromat', 'inchide un colt de baie'],
+    pros: ['Forma pentagonala, ocupa eficient un colt', 'Nota maxima de la cumparatori', 'Sticla securizata cu profil cromat', 'Inchide dusul mai bine decat un walk-in drept'],
+    cons: ['Usa batanta, cere spatiu de deschidere in fata', 'Tot fara cadita, ai nevoie de scurgere in pardoseala'],
+    verdict: 'Alegerea daca vrei sa inchizi un colt de baie cu un dus care ocupa spatiul eficient. Forma pentagonala taie coltul in diagonala, deci castiga loc fata de un dus patrat si arata mai interesant. Are usa batanta, care se deschide in fata, deci lasa putin spatiu liber in jur, spre deosebire de variantele culisante. Sticla securizata cu profil cromat il face rezistent si usor de intretinut, iar nota de la cumparatori e maxima. Fiind un paravan, nu vine cu cadita, deci ai nevoie de o pardoseala cu scurgere. Il iei cand ai un colt de baie de valorificat si vrei un dus inchis, nu doar un perete de sticla.' },
+  // --- Cabine (inchidere completa) ---
+  { g: 'cabina', id: 'DJ0NZYBBM', badge: 'Cel mai bun pret', short: 'Italbox Luna Lux', forma: 'Patrat', usa: 'Pliabila (armonica)', sticla: 'PVC',
+    specs: ['cabina completa, usi armonice', '90 x 90 x 185 cm, material PVC', 'fara cadita, se monteaza in colt', 'include dibluri si suruburi'],
+    pros: ['Cel mai mic pret din selectie, sub 850 de lei', 'De departe cele mai multe pareri, aproape 60', 'Usi pliabile (armonice), ocupa foarte putin loc', 'Cabina completa, o pui intr-un colt fara alte modificari'],
+    cons: ['Usile si peretii sunt din PVC, nu sticla, mai putin durabile', 'Aspect mai simplu decat o cabina cu sticla'],
+    verdict: 'Un dus inchis intr-un colt la cel mai mic pret, si modelul cu cele mai multe pareri din selectie, aproape 60. Italbox Luna Lux e o cabina completa cu usi armonice, adica pliabile ca un acordeon, care ocupa foarte putin loc cand le deschizi, ideal intr-o baie mica. Fiind din PVC, nu din sticla, e mai usoara si mai ieftina, dar si mai putin durabila si cu un aspect mai simplu. Se monteaza intr-un colt fara sa placi peretii sau sa schimbi scurgerea, cu diblurile si suruburile incluse. O iei cand vrei o cabina completa la cel mai mic pret si nu te deranjeaza ca e din PVC, nu din sticla.' },
+  { g: 'cabina', id: 'DS3L4HMBM', badge: 'Semirotunda, pentru bai mici', short: 'Kroner Ecoround', forma: 'Semirotund', usa: 'Culisanta', sticla: 'securizata 4 mm',
+    specs: ['cabina semirotunda de colt', '80 x 80 x 180 cm, 2 usi culisante', 'sticla securizata, geam gri', 'ocupa eficient un colt'],
+    pros: ['Forma semirotunda, cea mai buna la economisit spatiul intr-un colt', 'Pret mic pentru o cabina cu sticla', 'Usi culisante, fara spatiu de deschidere', 'Geam gri securizat, mai intim'],
+    cons: ['Sticla subtire, de 4 mm', 'Fara cadita in pachet la acest cod'],
+    verdict: 'Alegerea pentru o baie mica, unde conteaza fiecare centimetru. Forma semirotunda taie coltul intr-un sfert de cerc, deci ocupa cel mai putin loc dintre toate si lasa restul baii liber. Are doua usi culisante care gliseaza fara spatiu de deschidere si un geam gri securizat, care da si un pic de intimitate. E o cabina cu sticla la un pret mult sub paravanele de brand, iar sticla de 4 mm e mai subtire, normal la pretul asta. Verifica daca vine cu cadita la codul comandat. O iei cand ai o baie mica si vrei o cabina cu sticla, in colt, la buget mic.' },
+  { g: 'cabina', id: 'DFVP35MBM', badge: 'Sticla groasa de 8 mm', short: 'Diplon BR6611', forma: 'Patrat', usa: 'Batanta', sticla: 'securizata 8 mm',
+    specs: ['cabina patrata, sticla 8 mm', '90 x 90 cm, usa batanta', 'sticla transparenta securizata', 'profil aluminiu negru'],
+    pros: ['Sticla groasa de 8 mm, cea mai solida din selectie', 'Nota maxima de la cumparatori', 'Sticla transparenta, aspect curat si luminos', 'Profil aluminiu negru, la moda'],
+    cons: ['Usa batanta, cere spatiu de deschidere in fata', 'Fara cadita, ai nevoie de pardoseala cu scurgere'],
+    verdict: 'Alegerea daca vrei o cabina cu sticla serioasa, groasa, care se simte solida. Diplon BR6611 are sticla securizata de 8 mm, cea mai groasa din selectie, mult peste cei 4-6 mm ai modelelor ieftine, deci e mai rigida, mai stabila si mai putin zgomotoasa la inchidere. Forma patrata de 90 x 90 cm si profilul de aluminiu negru ii dau un aspect modern, la moda in baile de acum. Usa batanta cere ceva spatiu in fata la deschidere. Fiind fara cadita, ai nevoie de o pardoseala placata cu scurgere. O iei cand vrei calitatea sticlei groase si un aspect curat, transparent, cu profil negru.' },
+  { g: 'cabina', id: 'DYDDR7YBM', badge: 'Dreptunghiulara, negru mat', short: 'Diplon BR6612', forma: 'Dreptunghi', usa: 'Culisanta', sticla: 'securizata 6 mm',
+    specs: ['cabina dreptunghiulara', '80 x 100 x 195 cm, usa culisanta', 'sticla securizata 6 mm transparenta', 'profil aluminiu negru mat'],
+    pros: ['Forma dreptunghiulara, zona de dus mai generoasa', 'Usa culisanta, fara spatiu de deschidere', 'Sticla securizata de 6 mm, echilibru bun', 'Profil negru mat, elegant'],
+    cons: ['Fara cadita, cere pardoseala cu scurgere', 'Inca putine pareri'],
+    verdict: 'Alegerea pentru un dus dreptunghiular mai spatios, cand ai loc pe un perete lung. La 80 x 100 cm iti da o zona de dus mai generoasa decat un patrat de 90, cat sa te misti confortabil. Usa culisanta gliseaza pe sina, deci nu cere spatiu de deschidere, iar sticla securizata de 6 mm e un echilibru bun intre soliditate si pret, peste cei 4 mm ieftini fara sa ajungi la 8. Profilul de aluminiu negru mat ii da un aspect elegant, la moda. Ca la celelalte, e fara cadita, deci ai nevoie de scurgere in pardoseala. O iei cand vrei un dus dreptunghiular mai incapator, cu sticla de calitate medie si aspect negru mat.' },
+  // --- Completa cu hidromasaj ---
+  { g: 'completa', id: 'DDXXJ0BBM', badge: 'Completa, cu hidromasaj', short: 'Sanotechnik BH1171', forma: 'Semirotund', usa: 'Culisanta', sticla: 'securizata',
+    specs: ['cabina completa cu hidromasaj', '100 x 100 x 210 cm, cu cadita joasa', 'panou touch, radio FM, 6 duze', 'inchisa, cu tavan si ventilator'],
+    pros: ['Cabina completa: vine cu tot, cadita, tavan si baterie', 'Hidromasaj cu 6 duze, panou cu touch si radio FM', 'Nu cere placarea sau scurgerea din pardoseala', 'Se monteaza ca un intreg, gata de folosit'],
+    cons: ['Cea mai complexa, montaj si racorduri mai multe', 'Multe functii electronice care se pot defecta in timp'],
+    verdict: 'Alegerea daca vrei un dus tip spa, cu tot ce trebuie intr-un singur produs. Sanotechnik BH1171 e o cabina completa, inchisa, cu tavan, cadita joasa proprie, hidromasaj cu sase duze, panou cu touch si chiar radio FM. Spre deosebire de un paravan sau o cabina simpla, nu ai nevoie sa placi peretii sau sa faci scurgere in pardoseala: vine cu cadita si sifon, deci se monteaza ca un intreg si e gata de folosit. In schimb, are mai multe racorduri la montaj si multe functii electronice, care raman puncte care se pot defecta in ani. O iei cand vrei experienta de spa acasa, cu hidromasaj, intr-un singur produs care nu cere sa modifici baia.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const PARAVAN = PICKS.filter(x => x.g === 'paravan');
+const CABINA = PICKS.filter(x => x.g === 'cabina');
+const COMPLETA = PICKS.filter(x => x.g === 'completa');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/cabine-dus.webp';
+const figParavan = '/imagini/articole/cabine-dus-paravane.webp';
+const figCabina = '/imagini/articole/cabine-dus-cabine.webp';
+const figCompleta = '/imagini/articole/cabine-dus-completa.webp';
+const published = '2026-07-18T10:07:59+03:00';
+
+const faq = [
+  { question: 'Cabina de dus sau paravan walk-in?', answer: 'O cabina de dus e o inchidere completa, cu usi si de multe ori cu cadita, care se monteaza intr-un colt fara alte modificari, potrivita pentru orice baie, chiar si mica. Un paravan walk-in e doar un perete de sticla, fara usa completa, care delimiteaza dusul si opreste apa; are aspect modern si se curata mai usor, dar cere o baie deja placata, cu o cadita plata sau o scurgere in pardoseala. Alege cabina daca nu vrei sa modifici baia si vrei ceva de sine statator, si paravanul daca renovezi si vrei un dus deschis, modern.' },
+  { question: 'Ce forma de cabina aleg pentru o baie mica?', answer: 'Pentru o baie mica, forma semirotunda e cea mai buna, pentru ca taie coltul intr-un sfert de cerc si ocupa cel mai putin loc, lasand restul baii liber. Forma pentagonala e o alternativa buna, tot de colt. Cabina patrata de 80-90 cm e potrivita cand ai un colt clar de folosit, iar cea dreptunghiulara cere un perete mai lung, dar iti da o zona de dus mai incapatoare. Indiferent de forma, alege usi culisante sau pliabile, care nu cer spatiu de deschidere in fata.' },
+  { question: 'Ce grosime de sticla e buna?', answer: 'Sticla cabinelor si paravanelor e securizata, adica tratata termic sa fie de cateva ori mai rezistenta si sa se sparga in cioburi mici, fara muchii taioase. Grosimea uzuala merge de la 4 la 8 mm. Cea de 4 mm o gasesti la modelele ieftine, e suficienta dar mai subtire si mai zgomotoasa. Cea de 6 mm e un echilibru bun intre pret si soliditate. Cea de 8 mm e cea mai solida, se simte premium si e mai stabila la inchidere, dar costa mai mult. Pentru o cabina folosita zilnic, tinteste macar 6 mm.' },
+  { question: 'Ce inseamna sticla anticalcar?', answer: 'Sticla anticalcar are un tratament, deseori pe baza de nanoparticule, care face suprafata neteda si respingatoare de apa. Apa aluneca in picaturi in loc sa se intinda si sa se usuce, deci ramane mai putin calcar si pete, iar cabina se curata mult mai usor. Nu inlocuieste stersul, dar il rareste si pastreaza sticla limpede mai mult timp. Merita cautat, mai ales daca ai apa dura. Poti obtine un efect asemanator si aplicand periodic un tratament hidrofob pe o sticla obisnuita.' },
+  { question: 'Cum se etanseaza o cabina de dus?', answer: 'Etansarea se face cu chedere si garnituri de silicon montate pe marginile usilor si acolo unde cabina se sprijina pe perete si pe cadita sau pardoseala. Garniturile de calitate, rezistente la apa si la mucegai, sunt esentiale ca apa sa nu curga in rest. La montaj, imbinarea cu peretele si cu cadita se sileconeaza suplimentar. Verifica din timp ca peretii sunt drepti, pentru ca in baile vechi, cu pereti stramti, paravanul nu se lipeste bine si apa scapa pe la margini.' },
+  { question: 'Am nevoie de cadita?', answer: 'Depinde de tip. O cabina cu cadita vine cu tava proprie si un sifon, deci se monteaza fara sa placi pardoseala si e cea mai simpla varianta. O cabina sau un paravan fara cadita cer o pardoseala deja placata, cu o scurgere in podea, o cadita plata incastrata sau o rigola liniara. Varianta fara cadita, tip walk-in, arata mai modern si e mai comoda, fara prag de trecut, dar presupune ca faci sau ai deja scurgerea in pardoseala. Daca nu vrei sa modifici baia, alege un model cu cadita.' },
+  { question: 'Cat de greu e montajul unei cabine de dus?', answer: 'O cabina simpla, cu cadita, o poate monta un om priceput la bricolaj intr-o dupa-amiaza, urmarind instructiunile: asamblezi cadita si sifonul, ridici peretii, prinzi profilele in dibluri si etansezi cu silicon. Un paravan walk-in fara cadita e mai pretentios, pentru ca depinde de o pardoseala bine placata si de pereti drepti. O cabina completa cu hidromasaj are cele mai multe racorduri, la apa si uneori la curent, si aici merita un instalator. Cheia peste tot e etansarea corecta, ca sa nu ai infiltratii mai tarziu.' },
+  { question: 'Cum intretin sticla cabinei ca sa nu se depuna calcarul?', answer: 'Cel mai simplu obicei e sa stergi sticla dupa fiecare dus cu o racleta de geam sau o laveta, cat inca e uda, ca sa nu apuce sa se usuce apa si sa lase calcar. O data pe saptamana, curata cu o solutie anticalcar sau cu otet diluat, apoi clateste si sterge. Daca sticla are tratament anticalcar din fabrica, apa aluneca singura si depunerile sunt mult mai mici. Evita bureti abrazivi, care zgarie sticla si o fac sa retina si mai mult calcarul.' },
+];
+
+const images = [hero, figParavan, figCabina, figCompleta, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune cabine de dus in 2026: paravane walk-in, cabine si complete"
+  description="Ce cabina de dus sa iei in 2026: paravane walk-in din sticla, cabine complete pentru colt si modele cu hidromasaj, comparate pe forma, sticla si montaj. Plus cabina vs paravan, cu cadita sau fara si etansare."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Radu Popescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Amenajari si Instalatii', url: '/amenajari-instalatii/' }, { name: 'Cele mai bune cabine de dus' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/amenajari-instalatii/">Amenajari si Instalatii</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune cabine de dus</span>
+    </nav>
+
+    <h1>Cele mai bune cabine de dus in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/radu-popescu/">Radu Popescu</a>, Consultant Amenajari · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune cabine de dus: paravane walk-in, cabine si complete cu hidromasaj" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Daca renovezi si vrei un dus modern, deschis, ia un <strong>paravan walk-in</strong> din sticla, ca Belform 120x90. Daca nu vrei sa modifici baia, o <strong>cabina completa</strong> se pune intr-un colt fara alte lucrari, iar cea mai ieftina e Italbox Luna Lux. Pentru o baie mica, o <strong>cabina semirotunda</strong> ca Kroner Ecoround ocupa cel mai putin loc, iar pentru un dus tip spa, o cabina <strong>cu hidromasaj</strong> ca Sanotechnik vine cu tot.</p>
+      <p>La dus, prima intrebare e <strong>cabina sau paravan</strong>: o cabina e o inchidere completa, de sine statatoare, un paravan e doar peretele de sticla, mai modern dar cu baia pregatita dinainte. Apoi conteaza <strong>cu cadita sau fara</strong>, <strong>ce forma</strong> incape la tine si <strong>ce sticla</strong> alegi. Le luam pe rand.</p>
+      <p>Am pornit de la cabinele si paravanele vandute pe eMAG, le-am verificat tipul, forma, sticla si modul de montaj, si le-am grupat pe paravane walk-in, cabine complete si o cabina cu hidromasaj. Pentru relaxare, vezi si <a href="/cele-mai-bune-saune-pentru-acasa/">saunele pentru acasa</a>, iar pentru restul casei, <a href="/cele-mai-bune-usi-pentru-casa/">usile</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#cabina-paravan">Cabina sau paravan walk-in</a></li>
+        <li><a href="#cadita-forma">Cu cadita sau fara, si ce forma</a></li>
+        <li><a href="#paravane">Paravane walk-in (doar sticla)</a></li>
+        <li><a href="#cabine">Cabine complete</a></li>
+        <li><a href="#completa">Cabina cu hidromasaj</a></li>
+        <li><a href="#sticla">Sticla: grosime si anticalcar</a></li>
+        <li><a href="#montaj">Montaj si etansare</a></li>
+        <li><a href="#cat-costa">Cat costa o cabina de dus</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="cabina-paravan">Cabina sau paravan walk-in</h2>
+    <p>Prima alegere schimba si aspectul, si lucrarile din baie:</p>
+    <p><strong>Cabina de dus</strong> e o inchidere completa, cu usi si de multe ori cu cadita proprie. Se monteaza intr-un colt fara sa placi pardoseala sau sa muti scurgerea, deci merge in orice baie, chiar si intr-una mica sau nerenovata. E solutia simpla, de sine statatoare.</p>
+    <p><strong>Paravanul walk-in</strong> e doar un perete de sticla, fara usa completa, care delimiteaza dusul si opreste apa sa stropeasca. Arata modern si deschis, se curata mult mai usor, fara colturi in care se aduna calcarul, dar cere o baie deja placata, cu o cadita plata sau o scurgere in pardoseala.</p>
+    <p>Pe scurt: cabina daca nu vrei sa modifici baia, paravan daca renovezi si vrei un dus deschis, la moda.</p>
+
+    <h2 id="cadita-forma">Cu cadita sau fara, si ce forma</h2>
+    <p>Doua detalii care decid cat de mult sapi in baie si cat loc ocupa dusul:</p>
+    <ul>
+      <li><strong>Cu cadita:</strong> vine cu tava proprie si sifon, se monteaza fara sa placi pardoseala. Cea mai simpla varianta.</li>
+      <li><strong>Fara cadita (walk-in):</strong> cere o pardoseala placata cu scurgere sau o rigola. Arata modern, fara prag de trecut, dar presupune ca ai sau faci scurgerea.</li>
+      <li><strong>Semirotunda:</strong> taie coltul intr-un sfert de cerc, ocupa cel mai putin loc, ideala pentru bai mici.</li>
+      <li><strong>Patrata sau pentagonala:</strong> pentru un colt clar, un echilibru bun intre spatiu si zona de dus.</li>
+      <li><strong>Dreptunghiulara:</strong> cere un perete mai lung, dar iti da cea mai incapatoare zona de dus.</li>
+    </ul>
+    <p>Indiferent de forma, alege usi <strong>culisante</strong> sau <strong>pliabile</strong> daca ai spatiu putin: nu cer loc de deschidere in fata, spre deosebire de cele batante.</p>
+
+    <h2 id="paravane">Paravane walk-in (doar sticla)</h2>
+    <p>Aspect modern, deschis si intretinere usoara, pentru o baie deja placata cu scurgere in pardoseala. Doar peretele de sticla, fara cadita.</p>
+    <div class="rd-grid">
+      {PARAVAN.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figParavan} alt="Paravane de dus walk-in Belform din sticla securizata" width="1200" height="675" loading="lazy" />
+
+    <h2 id="cabine">Cabine complete (pentru colt)</h2>
+    <p>Inchidere completa care se pune intr-un colt fara alte lucrari, de la variante PVC ieftine la sticla groasa de 8 mm. Alegerea cand nu vrei sa modifici baia.</p>
+    <div class="rd-grid">
+      {CABINA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figCabina} alt="Cabine de dus complete Italbox, Kroner si Diplon" width="1200" height="675" loading="lazy" />
+
+    <h2 id="completa">Cabina cu hidromasaj</h2>
+    <p>Un dus tip spa intr-un singur produs: cabina inchisa, cu cadita, hidromasaj si electronice, care nu cere sa modifici baia.</p>
+    <div class="rd-grid">
+      {COMPLETA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figCompleta} alt="Cabina de dus completa cu hidromasaj Sanotechnik" width="1200" height="675" loading="lazy" />
+
+    <h2 id="sticla">Sticla: grosime si anticalcar</h2>
+    <p>La orice cabina sau paravan cu sticla, doua lucruri fac diferenta:</p>
+    <p><strong>Grosimea:</strong> sticla e securizata, adica tratata termic sa fie mult mai rezistenta si sa se sparga in cioburi mici, fara muchii taioase. Merge de la 4 la 8 mm. Cea de 4 mm e la modelele ieftine, subtire si mai zgomotoasa la inchidere. Cea de 6 mm e echilibrul bun pret-soliditate. Cea de 8 mm e cea mai solida si se simte premium. Pentru un dus folosit zilnic, tinteste macar 6 mm.</p>
+    <p><strong>Tratamentul anticalcar:</strong> un strat, deseori pe baza de nanoparticule, care face sticla sa respinga apa. Picaturile aluneca in loc sa se usuce, deci se depune mai putin calcar si cabina se curata mult mai usor. Merita cautat, mai ales daca ai apa dura. Poti obtine un efect asemanator aplicand periodic o solutie hidrofoba pe o sticla obisnuita.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-cabine-dus')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate cabinele de dus la oferta</strong>
+        <span>Reducerile din acest moment la cabine si paravane, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="montaj">Montaj si etansare</h2>
+    <p>Aici se vede daca o cabina e bine pusa sau iti curge apa in baie peste cateva luni:</p>
+    <ul>
+      <li><strong>Etansarea cu silicon:</strong> chedere si garnituri de silicon pe marginile usilor si acolo unde cabina se sprijina pe perete, pe cadita sau pe pardoseala. Alege garnituri rezistente la apa si la mucegai.</li>
+      <li><strong>Verifica peretii:</strong> in baile vechi, cu pereti stramti sau necoplanari, paravanul nu se lipeste bine si apa scapa pe la margini. Masoara si corecteaza inainte.</li>
+      <li><strong>Reversibil:</strong> multe modele se monteaza pe stanga sau pe dreapta, deci verifica sa se potriveasca la orientarea baii tale.</li>
+      <li><strong>Cine il monteaza:</strong> o cabina simpla cu cadita o pui singur intr-o dupa-amiaza; un walk-in fara cadita depinde de o pardoseala bine placata; o cabina cu hidromasaj, cu racorduri la apa si curent, cere un instalator.</li>
+    </ul>
+    <p>Peste tot, cheia e etansarea corecta si un teren, adica perete si pardoseala, drept si bine pregatit. Un montaj facut in graba se plateste cu infiltratii mai tarziu.</p>
+
+    <h2 id="cat-costa">Cat costa o cabina de dus</h2>
+    <p>Preturile pornesc de la cateva sute de lei si urca in functie de material si dotari:</p>
+    <p><strong>Cabine de buget, din PVC:</strong> 500-850 de lei pentru o cabina completa cu usi armonice sau o semirotunda cu sticla subtire. Cea mai ieftina cale de a inchide un dus.</p>
+    <p><strong>Cabine si paravane cu sticla:</strong> in general 1200-1800 de lei pentru sticla securizata de 6-8 mm, cu profil de aluminiu si aspect modern. Aici intra paravanele walk-in de brand si cabinele Diplon.</p>
+    <p><strong>Cabine complete cu hidromasaj:</strong> de la circa 1800 de lei in sus, pentru un dus tip spa cu cadita, duze de hidromasaj si electronice.</p>
+    <p>Pe langa pretul cabinei, pune la buget silicoanele si garniturile, eventual cadita si sifonul daca modelul nu le include, si, la variantele fara cadita, lucrarea de placare cu scurgere in pardoseala. La cabinele cu hidromasaj, pune si un instalator pentru racorduri.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">RP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/radu-popescu/" class="author-name-link">Radu Popescu</a></p>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Radu are peste 9 ani in amenajari si dotari pentru casa, de la usi si cabine de dus la piscine si panouri solare, si explica pe intelesul tuturor ce conteaza la forma, sticla si montaj.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-cabine-de-dus" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-cabine-de-dus" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

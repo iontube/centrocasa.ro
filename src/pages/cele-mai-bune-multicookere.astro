@@ -1,0 +1,307 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['multicookere'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Cu presiune (Instant Pot-style) ---
+  { g: 'presiune', id: 'DFXPDZBBM', rol: 'Cel mai vandut, face si presiune, si lent', short: 'Tefal One Pot 5.8 l', tip: 'Cu presiune', cap: '5.8 l', prog: '25', pret: '544 lei',
+    specs: ['5.8 litri, 1200 W, gatire sub presiune', '25 de programe, inclusiv slow cook si aburi', 'sote direct in vas, apoi presiune', 'pastrare la cald automata'],
+    pros: ['2096 de pareri, de departe cel mai testat din articol', 'Face si presiune rapida, si gatire lenta', 'Sotezi in acelasi vas, fara alta tigaie', '25 de programe pentru aproape orice fel'],
+    cons: ['Interfata cu multe butoane cere obisnuinta', 'Vasul mare ocupa loc pe blat'],
+    verdict: 'Cu 2096 de pareri, e cel mai cumparat aparat din articol, si tocmai pentru ca nu te obliga sa alegi tabara: acelasi vas gateste o tocana sub presiune in jumatate de ora sau o lasa la foc mic toata dupa-amiaza. La 5.8 litri si 1200 W, acopera o familie, iar cele 25 de programe merg de la orez si aburi la carne si supe. Marele avantaj practic e ca sotezi ceapa si carnea direct in vas inainte de gatit, deci nu murdaresti inca o tigaie. Reversul e ca panoul cu multe butoane sperie la inceput si iti ia cateva folosiri sa il stapanesti. Il iei cand vrei un singur aparat care le face pe amandoua, rapid sau lent, si nu te deranjeaza sa inveti un panou mai incarcat.' },
+  { g: 'presiune', id: 'DPHDBJ3BM', rol: 'Cel mai ieftin cu gatire sub presiune', short: 'AIRNOVA GustoVita 6 l', tip: 'Cu presiune', cap: '6 l', prog: '14', pret: '280 lei',
+    specs: ['6 litri, 1000 W, gatire sub presiune', '14 programe, ecran digital', 'nota 4.93, printre cele mai mari din articol', 'pretul cel mai mic pentru presiune'],
+    pros: ['Presiune la doar 280 de lei, cel mai accesibil', '6 litri, capacitate de familie', 'Nota 4.93, foarte bine cotat', '14 programe pentru gatit variat'],
+    cons: ['Brand mai putin cunoscut, 82 de pareri', 'Fara reteaua de service a marcilor mari'],
+    verdict: 'Daca vrei sa incerci gatirea sub presiune fara sa dai multi bani, aici e intrarea. AIRNOVA iti da 6 litri, 1000 W si 14 programe la 280 de lei, adica jumatate din pretul unui aparat de brand cu presiune si capacitate similara. Cele 82 de pareri sunt putine fata de un Tefal, dar nota de 4.93 arata ca cei care l-au luat sunt aproape unanim multumiti. Compromisul e cel obisnuit la brandurile mai putin cunoscute: nu ai in spate o retea nationala de service, deci daca apare o defectiune, rezolvarea e mai incerta decat la Tefal sau Crock-Pot. Cu asteptarea asta, ramane cel mai bun raport din articol pe capitolul presiune. Il iei cand vrei presiune si capacitate mare pe buget mic.' },
+  { g: 'presiune', id: 'DT5L0VBBM', rol: 'Presiune de la un brand specializat', short: 'Crock-Pot Express 5.6 l', tip: 'Cu presiune', cap: '5.6 l', prog: '8', pret: '624 lei',
+    specs: ['5.6 litri, 1000 W, gatire sub presiune', '8 programe, inclusiv slow cook', 'de la Crock-Pot, brandul care a inventat slow cooking-ul', 'sote si pastrare la cald'],
+    pros: ['Crock-Pot, specialist recunoscut in gatit lent', 'Combina presiune rapida cu slow cooking', '325 de pareri, bine cotat', 'Panou simplu, usor de folosit'],
+    cons: ['Doar 8 programe, mai putine decat concurenta', 'Mai scump decat modelele generice'],
+    verdict: 'Crock-Pot este brandul care a facut celebra gatirea lenta, iar aici o combina cu presiunea rapida in acelasi aparat. Diferenta fata de un multicooker generic o dai pe increderea in nume: cine face slow cooking de zeci de ani stie cum sa tina o temperatura constanta ore intregi. La 5.6 litri si cu 8 programe, are mai putine presetari decat un Tefal sau un Moulinex, dar cele de baza, presiune, gatire lenta, sote, aburi, sunt acoperite, iar panoul mai simplu e chiar un avantaj pentru cine nu vrea sa se piarda printre butoane. Costa mai mult decat un aparat no-name, insa platesti expertiza brandului pe partea de gatit lent. Il iei cand vrei un aparat mixt de la un specialist, cu operare simpla.' },
+  { g: 'presiune', id: 'D4CYL4MBM', rol: 'Cele mai multe programe la pret bun', short: 'Moulinex One Pot 6 l', tip: 'Cu presiune', cap: '6 l', prog: '25', pret: '508 lei',
+    specs: ['6 litri, 1200 W, gatire sub presiune', '25 de programe, la fel ca modelele scumpe', 'nota 4.85, ecran digital', 'sote, aburi, slow cook incluse'],
+    pros: ['25 de programe, cele mai multe la acest pret', '6 litri si 1200 W, putere de familie', 'Nota 4.85, foarte bine cotat', 'Brand cunoscut, cu service'],
+    cons: ['Interfata incarcata, ca la Tefal', '95 de pareri, mai putine ca la liderii de vanzari'],
+    verdict: 'Moulinex aduce aceeasi bogatie de programe ca varful gamei, 25 la numar, dar la 508 lei, adica sub multe modele cu jumatate din presetari. Practic e ruda apropiata a lui Tefal One Pot, cu 6 litri, 1200 W si aceeasi filozofie de aparat care face totul, de la presiune si slow cook la sote si aburi. Nota de 4.85 e printre cele mai bune din grupa de presiune, iar in spate e un brand cu service in tara. Vine si cu reversul lui Tefal: panoul cu multe optiuni cere putina rabdare la inceput. Cu 95 de pareri, e mai putin testat decat liderii, dar bine notat de cei care l-au luat. Il iei cand vrei maximum de programe la un pret echilibrat, de la un brand de incredere.' },
+  { g: 'presiune', id: 'D3HP6B2BM', rol: 'Reperul international al gatirii sub presiune', short: 'Instant Pot Duo 5.7 l', tip: 'Cu presiune', cap: '5.7 l', prog: '13', pret: '581 lei',
+    specs: ['5.7 litri, 1000 W, 13 programe', 'Instant Pot, aparatul care a lansat moda', 'nota 4.95, cea mai mare din articol', 'presiune, slow cook, orez, iaurt, sote'],
+    pros: ['Nota 4.95, cea mai mare din tot articolul', 'Instant Pot, reperul dupa care se ghideaza toti', 'Comunitate uriasa de retete online', 'Fiabil si bine pus la punct'],
+    cons: ['Interfata in engleza pe unele versiuni', 'Nu are cele mai multe programe din grupa'],
+    verdict: 'Instant Pot este numele care a lansat practic moda multicooker-ului cu presiune, iar Duo e modelul lui de referinta. Nota de 4.95 e cea mai mare din tot articolul, ceva ce nu se intampla intamplator: aparatul e rafinat de ani de zile si face exact ce promite, previzibil. In practica, cel mai mare avantaj e ecosistemul: fiindca atatia oameni au un Instant Pot, gasesti online mii de retete cu timpi si presiuni verificate exact pentru el, deci nu ghicesti. Are 13 programe, mai putine decat un Tefal cu 25, dar acopera tot ce folosesti des, plus functia de iaurt. Un mic minus: pe unele loturi, interfata si manualul sunt in engleza. Il iei cand vrei reperul dovedit al categoriei si comunitatea de retete din spate.' },
+  { g: 'presiune', id: 'DXHKTXMBM', rol: 'Compact, pentru bucatarii mici', short: 'Tefal Turbo Cuisine 4.8 l', tip: 'Cu presiune', cap: '4.8 l', prog: '10', pret: '550 lei',
+    specs: ['4.8 litri, 1090 W, gatire sub presiune', '10 programe, ecran digital', 'mai compact decat modelele de 6 litri', 'sote si pastrare la cald'],
+    pros: ['Mai mic, incape mai usor pe un blat aglomerat', '4.8 litri, suficient pentru 3-4 persoane', 'Brand Tefal, cu service in tara', '10 programe pentru gatit obisnuit'],
+    cons: ['Mai scump raportat la capacitate', '4.8 litri, la limita pentru familie mare'],
+    verdict: 'Pentru o bucatarie mica, unde fiecare centimetru de blat conteaza, Turbo Cuisine e varianta compacta a gatirii sub presiune de la Tefal. La 4.8 litri e putin mai mic decat modelele de 6, dar acopera bine 3-4 persoane, iar cei 1090 W duc gatirea sub presiune fara probleme. Are 10 programe, panou digital si linistea unui brand cu service in tara. Compromisul e ca platesti cam la fel ca pentru un model de 6 litri, deci alegi capacitatea mai mica intentionat, pentru spatiu, nu ca sa economisesti. Pentru o familie numeroasa care gateste des in cantitate, un vas de 6 litri e mai potrivit. Il iei cand spatiul conteaza si gatesti pentru una-patru persoane.' },
+  // --- B. Slow cooker (gatire lenta) ---
+  { g: 'slow', id: 'DC60RMBBM', rol: 'Slow cooker clasic, il pornesti si pleci', short: 'Crock-Pot 4.7 l', tip: 'Slow cooker', cap: '4.7 l', prog: '2 setari', pret: '290 lei',
+    specs: ['4.7 litri, gatire lenta, fara presiune', '2 setari de temperatura, low si high', 'vas de ceramica, se pune si pe masa', 'il lasi ore intregi nesupravegheat'],
+    pros: ['De la Crock-Pot, inventatorul slow cooking-ului', 'Simplu ca o lampa: doua setari, il pornesti si pleci', 'Vasul de ceramica se serveste direct la masa', 'Pret mic, 290 de lei'],
+    cons: ['Doar gatire lenta, fara presiune sau alte functii', 'Gatitul dureaza ore, nu minute'],
+    verdict: 'Aici e opusul aparatelor cu presiune, si e important sa stii ca il vrei anume asa. Un slow cooker nu grabeste nimic: pui ingredientele dimineata, il lasi la foc mic si seara gasesti o tocana facuta, cat tu ai fost la serviciu. Nu adaugi apa multa, pentru ca temperatura joasa si constanta pastreaza umezeala inauntru, iar carnea tare, de tocana sau de rasol, iese moale cum nu iese la gatit rapid. Crock-Pot a inventat categoria, iar modelul asta e cat se poate de simplu: doua setari, low si high, un vas de ceramica pe care il pui direct pe masa. Nu are presiune si nici zeci de programe, si tocmai in asta sta farmecul. Il iei cand vrei mancare gatita lent, fara efort, si nu te grabesti.' },
+  { g: 'slow', id: 'D41MRBMBM', rol: 'Slow cooker mare, cu timer digital', short: 'Crock-Pot 7.5 l digital', tip: 'Slow cooker', cap: '7.5 l', prog: 'Digital', pret: '438 lei',
+    specs: ['7.5 litri, cea mai mare capacitate din articol', 'gatire lenta cu timer digital si pastrare la cald', 'vas de ceramica, capac de sticla', 'trece automat pe cald cand termina'],
+    pros: ['7.5 litri, pentru familie mare sau gatit in avans', 'Timer digital, se opreste singur si tine cald', 'Vasul de ceramica, se serveste la masa', 'Nota 4.86, foarte bine cotat'],
+    cons: ['Tot doar gatire lenta, fara presiune', 'Vas mare, ocupa spatiu de depozitare'],
+    verdict: 'Acelasi principiu de gatire lenta ca modelul de mai sus, dar la scara mare si cu un plus de comoditate. La 7.5 litri, e cel mai incapator aparat din articol, gandit pentru o familie numeroasa sau pentru cine gateste in avans o oala pentru mai multe zile. Fata de varianta simpla, are timer digital: setezi cate ore sa gateasca, iar la final trece singur pe pastrare la cald, deci nu conteaza daca ajungi acasa mai tarziu, mancarea te asteapta calda, nu arsa. Vasul de ceramica si capacul de sticla merg direct pe masa. Ramane un aparat de un singur scop, gatit lent, fara presiune, iar dimensiunea cere loc de depozitare. Il iei cand gatesti mult, in avans, si vrei sa se opreasca singur.' },
+  // --- C. Fara presiune, multifunctionale si orez ---
+  { g: 'multi', id: 'DY76QBBBM', rol: 'Multicooker fara presiune, bine vandut', short: 'Tefal Fuzzy Logic 5 l', tip: 'Fara presiune', cap: '5 l', prog: '12', pret: '405 lei',
+    specs: ['5 litri, 750 W, 12 programe, fara presiune', 'tehnologie Fuzzy Logic, ajusteaza singur gatitul', 'timer si pastrare la cald', 'gateste orez, supe, tocane, aburi'],
+    pros: ['212 pareri, bine vandut si testat', 'Fuzzy Logic regleaza singur temperatura si timpul', '12 programe pentru feluri variate', 'Mai simplu si mai sigur, fara presiune'],
+    cons: ['Fara presiune, deci gateste mai lent decat un Instant Pot', '750 W, putere modesta'],
+    verdict: 'Nu toata lumea vrea presiune, iar pentru cine prefera un aparat mai simplu si mai bland, asta e alegerea din articol cu cele mai multe pareri in grupa ei. Tefal Fuzzy Logic gateste fara presiune, ceea ce inseamna ca dureaza mai mult decat un Instant Pot, dar e mai simplu de folosit si nu ai de-a face cu abur sub presiune. Numele vine de la tehnologia care ajusteaza singura temperatura si timpul in functie de ce gatesti, deci orezul iese constant, nu lipit sau crud. Cu 5 litri si 12 programe, acopera orez, supe, tocane si aburi pentru o familie. Cei 750 W arata ca nu e un aparat de forta, ci unul de gatit asezat. Il iei cand vrei simplitate si rezultate constante, fara complicatia presiunii.' },
+  { g: 'multi', id: 'D89Y22MBM', rol: 'Cu 16 functii intr-un singur aparat', short: 'Tefal SpheriCook 16in1', tip: 'Fara presiune', cap: '5 l', prog: '16', pret: '530 lei',
+    specs: ['5 litri, 820 W, 16 functii', 'de la orez si tocane la iaurt si prajituri', 'vas cu forma sferica pentru amestecare uniforma', 'timer si pastrare la cald'],
+    pros: ['16 functii, cele mai multe din grupa fara presiune', 'Face inclusiv iaurt si aluaturi', 'Vas sferic pentru gatit uniform', 'Brand Tefal, cu service'],
+    cons: ['Fara presiune, gateste mai lent', 'Multe functii pe care poate nu le folosesti'],
+    verdict: 'Daca ideea de multicooker te atrage tocmai prin varietate, SpheriCook impinge conceptul la 16 functii, cele mai multe din grupa fara presiune. Pe langa orez, supe si tocane, face iaurt, prajituri si chiar aluat, ceea ce il apropie de un mic laborator de bucatarie. Forma sferica a vasului nu e marketing gol: peretii rotunjiti ajuta caldura si amestecul sa se distribuie uniform, fara colturi in care mancarea sa se lipeasca. Gateste fara presiune, deci mai asezat, iar cei 820 W confirma ca e un aparat de finete, nu de viteza. Onest, multe dintre cele 16 functii vor ramane nefolosite pentru un gospodar obisnuit, dar daca iti place sa experimentezi, le ai acolo. Il iei cand vrei cat mai multa versatilitate intr-un aparat bland, fara presiune.' },
+  { g: 'multi', id: 'DY8RLFYBM', rol: 'Doar pentru orez, dar perfect', short: 'Xiaomi Rice Cooker 1 l', tip: 'Orez', cap: '1 l', prog: '8', pret: '249 lei',
+    specs: ['1 litru, 710 W, specializat pe orez', '8 programe, control prin aplicatie', 'nota 4.87, compact', 'trece pe pastrare la cald automat'],
+    pros: ['Face orezul perfect, de fiecare data', 'Foarte compact, incape oriunde', 'Control si programe din aplicatia Xiaomi', 'Nota 4.87, ieftin la 249 de lei'],
+    cons: ['Doar 1 litru, pentru 1-2 portii', 'Specializat pe orez, nu un multicooker complet'],
+    verdict: 'Nu orice bucatarie are nevoie de un aparat care face totul; unele au nevoie de unul care face un lucru impecabil. Rice cooker-ul Xiaomi e specializat pe orez, iar asta e si punctul lui forte: masoara singur cand apa a fost absorbita si trece pe pastrare la cald, deci orezul iese pufos si nelipit fara sa stai cu ochii pe el. La 1 litru e mic, pentru 1-2 portii, si il controlezi din aplicatia Xiaomi, cu programe pentru tipuri diferite de orez sau chiar terci. Nu e un multicooker complet si nu incearca sa fie, tocmai de aceea o face pe partea lui atat de bine. Il iei cand mananci des orez si vrei sa iasa perfect fara efort, sau ca al doilea aparat mic pe langa unul mare.' },
+  { g: 'multi', id: 'D7HP6B2BM', rol: 'Presiune si air fryer intr-unul singur', short: 'Instant Pot Pro Crisp 8 l', tip: 'Combi', cap: '8 l', prog: 'Presiune + air fryer', pret: '945 lei',
+    specs: ['8 litri, gatire sub presiune plus air fryer', 'doua capace: unul de presiune, unul de rumenire', 'faci tocana si apoi o rumenesti in acelasi vas', 'de la Instant Pot, brand de referinta'],
+    pros: ['Combina presiune si air fryer, doua aparate intr-unul', 'Rumenesti dupa gatire, fara alta tigaie', '8 litri, capacitate mare', 'Nota 4.88, foarte bine cotat'],
+    cons: ['Cel mai scump din articol', 'Aparat mare, cu doua capace de gestionat'],
+    verdict: 'Cel mai ambitios aparat din articol combina doua electrocasnice populare intr-unul singur: gatire sub presiune si air fryer. Vine cu doua capace, unul care sigileaza pentru presiune si unul cu rezistenta si ventilator pentru rumenire. Asta rezolva o limita reala a gatirii sub presiune: iese totul fraged, dar palid, fara crusta. Cu Pro Crisp, gatesti o pulpa sub presiune ca sa se faca moale, apoi schimbi capacul si o rumenesti crocant, in acelasi vas. La 8 litri si de la Instant Pot, e capabil si bine cotat, cu 4.88. Reversul e pretul, cel mai mare din articol, si gestionarea a doua capace, care cere loc de depozitare. Daca vrei mai ales rumenire si mai putin presiune, o friteuza cu aer cald dedicata te-ar multumi mai mult. Il iei cand vrei presiune si rumenire la un loc si ai bugetul pentru asta.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const PRESIUNE = PICKS.filter(x => x.g === 'presiune');
+const SLOW = PICKS.filter(x => x.g === 'slow');
+const MULTI = PICKS.filter(x => x.g === 'multi');
+
+const hero = '/imagini/articole/cele-mai-bune-multicookere.webp';
+const figPresiune = '/imagini/articole/multicookere-presiune.webp';
+const figSlow = '/imagini/articole/multicookere-slow.webp';
+const figMulti = '/imagini/articole/multicookere-multifunctionale.webp';
+const published = '2026-07-21T16:11:55+03:00';
+
+const faq = [
+  { question: 'Care e diferenta intre multicooker, oala sub presiune si slow cooker?', answer: 'Un slow cooker gateste doar lent, la foc mic, ore intregi. O oala sub presiune electrica gateste doar rapid, sub presiune, in minute. Un multicooker le combina pe amandoua intr-un aparat, plus functii ca sote, aburi, orez sau iaurt. Instant Pot, de exemplu, este in esenta o oala sub presiune care are si programe de gatire lenta si orez. Practic, daca vrei un singur aparat care le face pe toate, iei un multicooker; daca vrei anume gatire lenta clasica, un slow cooker dedicat, ca Crock-Pot, e mai simplu de folosit.' },
+  { question: 'Cu presiune sau slow cooker, ce sa aleg?', answer: 'Depinde de cum gatesti. Gatirea sub presiune e pentru cine vrea rezultate rapide: o tocana care ar cere doua ore la foc iese in aproximativ 30 de minute. Slow cooking-ul e pentru cine planifica: pui ingredientele dimineata, pleci si seara gasesti mancarea facuta, iar carnea tare iese exceptional de frageda. Multi aleg un multicooker tocmai ca sa aiba ambele si sa decida in functie de zi. Daca insa gatesti mereu grabit, mergi pe presiune; daca iti place sa lasi mancarea la foc mic cat esti plecat, un slow cooker simplu e suficient.' },
+  { question: 'Ce capacitate imi trebuie?', answer: 'Pentru 1-2 persoane, 3-4 litri ajung. Pentru o familie de 3-4, 5-6 litri sunt zona corecta, iar cele mai multe modele din articol sunt exact acolo. Peste 7 litri, doar daca ai familie mare sau gatesti in avans, o oala pentru mai multe mese. Un detaliu util la aparatele cu presiune: nu se umplu niciodata pana sus, ci pana la doua treimi, pentru ca lichidul si aburul au nevoie de spatiu. Deci un vas de 6 litri nu inseamna 6 litri de mancare, ci in jur de 4. Daca esti la limita intre doua marimi, ia-o pe cea mai mare.' },
+  { question: 'Chiar pot lasa un slow cooker pornit cat sunt plecat?', answer: 'Da, exact pentru asta e conceput. Un slow cooker functioneaza la temperatura joasa si constanta, iar producatorii il proiecteaza sa fie lasat nesupravegheat 4 pana la 8 ore, chiar mai mult pe setarea low. E, de altfel, principalul lui motiv de a exista: gatit fara supraveghere. Bunul simt ramane valabil, il pui pe o suprafata rezistenta la caldura, nu langa materiale inflamabile, si verifici sa fie in stare buna cablul, dar ideea de a-l lasa sa lucreze cat esti la serviciu e chiar rostul aparatului, nu un risc.' },
+  { question: 'E sigura o oala sub presiune electrica?', answer: 'Mult mai sigura decat vechile oale sub presiune de pe aragaz. Modelele electrice moderne au mai multe sisteme de siguranta: capac care se blocheaza si nu se poate deschide cat timp e presiune inauntru, valve de eliberare a aburului si senzori care opresc incalzirea daca ceva nu e in regula. Spre deosebire de oala clasica, unde controlai focul manual, aici electronica regleaza totul. Trebuie doar sa respecti instructiunile: sa nu umpli peste limita, sa verifici garnitura capacului si sa eliberezi aburul asa cum spune manualul inainte sa deschizi. Cu astea, e un aparat sigur pentru uz zilnic.' },
+  { question: 'Ce pot gati intr-un multicooker?', answer: 'Mai mult decat te astepti. De baza: tocane, supe, ciorbe, carne, orez, paste, legume la aburi. Cu functia de sote calesti ceapa si rumenesti carnea in acelasi vas inainte de gatit. Multe modele fac si iaurt, terci de ovaz, compot sau chiar prajituri simple. Cele cu presiune sunt imbatabile la fasole, naut sau carne tare, care altfel cer ore. Cele fara presiune, ca Fuzzy Logic sau SpheriCook, sunt bune la gatit asezat si la orez constant. Practic, un multicooker inlocuieste mai multe oale si aparate mici, iar asta e si motivul pentru care economiseste spatiu in bucatarie.' },
+  { question: 'Merita un model combi cu air fryer?', answer: 'Merita daca te enerveaza limita clasica a gatirii sub presiune: mancarea iese frageda, dar palida, fara crusta. Un combi ca Instant Pot Pro Crisp are doua capace, unul de presiune si unul cu ventilator pentru rumenire, deci gatesti carnea moale sub presiune si apoi o faci crocanta in acelasi vas. E doua aparate intr-unul si economiseste spatiu. Reversul e pretul mai mare si al doilea capac de depozitat. Daca vrei mai ales rumenire si mai putin presiune, s-ar putea sa fii mai multumit cu o friteuza cu aer cald dedicata. Daca vrei ambele si nu vrei doua aparate, combi-ul are sens.' },
+  { question: 'Cum curat un multicooker?', answer: 'Vasul interior, cel in care gatesti, se scoate si se spala cu apa calda si detergent, iar la multe modele e compatibil cu masina de spalat vase, verifica in manual. La aparatele cu presiune, curata dupa fiecare folosire si garnitura de silicon a capacului si supapa de abur, pentru ca acolo se prind mirosuri si resturi; garnitura se scoate usor si se spala separat. Corpul cu rezistenta il stergi doar cu o carpa umeda, nu il bagi in apa. La slow cookere, vasul de ceramica se spala ca o oala obisnuita. Curatarea la timp a garniturii e ce tine aparatul fara miros in timp.' },
+];
+
+const images = [hero, figPresiune, figSlow, figMulti, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune multicookere in ${SEO_YEAR}: cu presiune, slow cooker sau fara presiune`}
+  description="12 multicookere comparate pe tip: cu presiune, slow cooker si fara presiune, de la 249 la 945 de lei. Cand alegi viteza si cand rabdarea la foc mic."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune multicookere' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune multicookere</span>
+    </nav>
+
+    <h1>Cele mai bune multicookere</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune multicookere: de la oale sub presiune electrice la slow cookere si aparate multifunctionale" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Cuvantul "multicooker" ascunde doua aparate care fac exact opusul unul fata de celalalt. Unele gatesc <strong>sub presiune</strong> si iti scot o tocana in jumatate de ora. Altele o lasa la <strong>foc mic ore intregi</strong>, cat esti tu plecat de acasa. Inainte de programe si de litri, asta e prima alegere reala: viteza sau rabdare.</p>
+      <p>Vestea buna e ca multe modele le fac pe amandoua. Cea mai vanduta din articol, <strong>Tefal One Pot</strong>, cu peste 2000 de pareri, gateste si sub presiune, si lent, in acelasi vas. Daca vrei anume gatire lenta clasica, fara complicatii, <strong>Crock-Pot</strong> a inventat categoria. Iar daca vrei reperul international al presiunii, <strong>Instant Pot Duo</strong> are cea mai mare nota din selectie.</p>
+      <p>Al doilea lucru de inteles: un multicooker <strong>inlocuieste mai multe aparate</strong>. Sotezi, gatesti sub presiune sau lent, faci orez, aburi, uneori iaurt, totul intr-un singur vas care apoi tine mancarea calda. De aceea le-am impartit dupa tip, nu dupa pret: cu presiune, slow cooker si fara presiune sunt filozofii diferite, iar alegerea gresita a tipului te lasa nemultumit indiferent cat ai platit.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#presiune">Cu presiune, gatesc rapid</a></li>
+        <li><a href="#slow">Slow cooker, gatire lenta la foc mic</a></li>
+        <li><a href="#multi">Fara presiune, multifunctionale si orez</a></li>
+        <li><a href="#presiune-vs-slow">Presiune sau gatire lenta: cum alegi</a></li>
+        <li><a href="#capacitate">Ce capacitate iti trebuie</a></li>
+        <li><a href="#siguranta">Cat de sigura e o oala sub presiune electrica</a></li>
+        <li><a href="#ce-gatesti">Ce poti gati intr-un multicooker</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Capacitate</th><th>Programe</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.cap}</td>
+              <td>{x.prog}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="presiune">Cu presiune, gatesc rapid</h2>
+    <p>Aparatele cu gatire sub presiune, popularizate de Instant Pot, sunt pentru cine vrea rezultate rapide: presiunea ridica temperatura peste punctul normal de fierbere, iar o tocana care ar cere doua ore iese in jur de 30 de minute. Aproape toate au si program de gatire lenta, sote si aburi, deci sunt cele mai versatile din articol.</p>
+    {PRESIUNE.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPresiune} alt="Multicookere cu gatire sub presiune, Tefal One Pot, Crock-Pot Express si Instant Pot Duo" width="1600" height="900" loading="lazy" />
+
+    <h2 id="slow">Slow cooker, gatire lenta la foc mic</h2>
+    <p>La polul opus, slow cookerele nu grabesc nimic si nici nu incearca. Gatesc la temperatura joasa si constanta, ore intregi, iar tu le pornesti si pleci. Carnea tare iese exceptional de frageda, iar mancarea te asteapta gata cand ajungi acasa. Sunt simple, ieftine si fac un singur lucru, dar il fac impecabil.</p>
+    {SLOW.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figSlow} alt="Slow cookere Crock-Pot de 4.7 si 7.5 litri pentru gatire lenta la foc mic" width="1600" height="900" loading="lazy" />
+
+    <h2 id="multi">Fara presiune, multifunctionale si orez</h2>
+    <p>Intre cele doua extreme stau aparatele fara presiune, mai blande si mai simple de folosit: gatesc mai lent decat presiunea, dar fara aburul sub tensiune si fara panouri complicate. Aici intra multicookerele cu multe programe, aparatele specializate pe orez si combinatiile care adauga rumenirea la gatit.</p>
+    {MULTI.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMulti} alt="Multicookere fara presiune si aparate de gatit orez, Tefal Fuzzy Logic, Xiaomi si Instant Pot Pro Crisp" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-multicookere').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate multicookerele la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="presiune-vs-slow">Presiune sau gatire lenta: cum alegi</h2>
+    <p>E decizia care conteaza cel mai mult, si tine de cum traiesti, nu de cat de scump e aparatul.</p>
+    <p>Gatirea <strong>sub presiune</strong> e pentru viteza. Vasul se sigileaza, presiunea ridica temperatura, iar mancarea se face in fractiuni din timpul normal: fasole fara inmuiere, o supa de vita in mai putin de o ora, orez in cateva minute. E pentru cine decide seara, la 19, ce mananca la 19:45.</p>
+    <p>Gatirea <strong>lenta</strong> e pentru planificare si pentru gust. La foc mic, ore intregi, colagenul din carnea tare se transforma si iese o textura pe care presiunea nu o da la fel. Pui totul dimineata, iar aparatul lucreaza singur cat esti plecat.</p>
+    <p>Cum alegi, pe scurt:</p>
+    <ul>
+      <li>Gatesti mereu <strong>pe fuga</strong>, decizi tarziu ce mananci: mergi pe <strong>presiune</strong>.</li>
+      <li>Iti place sa <strong>pui dimineata si sa uiti</strong>, vrei carne foarte frageda: alege <strong>slow cooker</strong>.</li>
+      <li>Vrei sa nu fii nevoit sa alegi: ia un <strong>multicooker cu presiune</strong>, care are si program de gatire lenta.</li>
+    </ul>
+
+    <h2 id="capacitate">Ce capacitate iti trebuie</h2>
+    <p>Ca la orice aparat de gatit, dimensioneaz-o dupa cati sunteti, dar cu o particularitate la modelele cu presiune.</p>
+    <ul>
+      <li><strong>3-4 litri</strong> pentru 1-2 persoane.</li>
+      <li><strong>5-6 litri</strong> pentru o familie de 3-4, zona in care sunt cele mai multe modele.</li>
+      <li><strong>7 litri si peste</strong> pentru familie mare sau gatit in avans.</li>
+    </ul>
+    <p>Particularitatea: aparatele cu presiune <strong>nu se umplu niciodata pana sus</strong>, ci pana la aproximativ doua treimi, pentru ca lichidul si aburul au nevoie de spatiu. Deci un vas de 6 litri iti da in jur de 4 litri de mancare efectiva. Slow cookerele si aparatele fara presiune se pot umple mai mult, dar si acolo lasi o margine. Daca esti nehotarat intre doua marimi, ia-o pe cea mai mare, pentru ca supraaglomerarea la presiune e o problema de siguranta, nu doar de spatiu.</p>
+
+    <h2 id="siguranta">Cat de sigura e o oala sub presiune electrica</h2>
+    <p>E o intrebare fireasca, mai ales pentru cine tine minte oala sub presiune de pe aragaz a bunicii, cu supapa care suiera. Modelele electrice moderne sunt insa mult mai sigure.</p>
+    <p>Au mai multe sisteme care lucreaza in fundal: capacul se <strong>blocheaza si nu se poate deschide</strong> cat timp e presiune inauntru, o valva elibereaza aburul controlat, iar senzorii opresc incalzirea daca ceva iese din parametri. Spre deosebire de oala clasica, unde tu reglai focul, aici electronica face totul.</p>
+    <p>Ce ramane in sarcina ta e simplu: nu umple peste linia maxima, verifica periodic garnitura de silicon a capacului sa fie curata si intreaga, si elibereaza aburul asa cum spune manualul inainte sa deschizi. Cu regulile astea, o oala sub presiune electrica e un aparat sigur pentru uz zilnic, folosit de milioane de oameni.</p>
+
+    <h2 id="ce-gatesti">Ce poti gati intr-un multicooker</h2>
+    <p>Mai mult decat pare la prima vedere, si asta e chiar argumentul pentru care merita locul pe blat.</p>
+    <ul>
+      <li><strong>De baza:</strong> tocane, supe, ciorbe, carne, orez, paste, legume la aburi.</li>
+      <li><strong>Cu functia de sote:</strong> calesti ceapa si rumenesti carnea in acelasi vas, inainte de gatit, fara alta tigaie.</li>
+      <li><strong>La presiune:</strong> fasole si naut fara inmuiere peste noapte, carne tare fragezita in sub o ora.</li>
+      <li><strong>Bonus, dupa model:</strong> iaurt, terci de ovaz, compot, chiar prajituri simple.</li>
+    </ul>
+    <p>Practic, un multicooker inlocuieste mai multe oale si cateva aparate mici, iar asta e si motivul real pentru care se cumpara: economiseste spatiu si vase. Se completeaza bine cu <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o friteuza cu aer cald</a> pentru partea de crocant si cu <a href="/cele-mai-bune-blendere/">un blender</a> pentru supe crema si smoothie.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Confunzi tipurile.</strong> Cumperi un slow cooker sperand sa gatesti rapid, sau o oala sub presiune vrand sa lasi mancarea la foc mic toata ziua. Alege intai tipul, apoi modelul.</li>
+      <li><strong>Te sperii de numarul de programe.</strong> 25 de presetari suna impresionant, dar folosesti in practica 4-5. Nu plati doar pentru cifra de pe cutie.</li>
+      <li><strong>Iei capacitatea gresit la presiune.</strong> Un vas de 6 litri da vreo 4 litri de mancare, pentru ca nu se umple pana sus. Nu il subdimensiona.</li>
+      <li><strong>Ignori garnitura si intretinerea.</strong> La aparatele cu presiune, garnitura de silicon prinde miros daca nu o speli. E parte din costul de folosire.</li>
+      <li><strong>Astepti crusta de la presiune.</strong> Gatirea sub presiune fragezeste, dar nu rumeneste. Pentru crusta iti trebuie functie de sote, un capac de rumenire sau o friteuza separata.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la multicookerele in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca aceleasi aparate apar listate de mai multe ori, in variante si coduri diferite, la preturi apropiate.</p>
+    <p><strong>Le-am grupat dupa tip, nu dupa pret</strong>, pentru ca tipul, cu presiune, slow cooker sau fara presiune, e decizia care conteaza. Un cumparator care alege tipul gresit ramane nemultumit oricat ar fi platit, fiindca aparatul face bine altceva decat isi dorea el.</p>
+    <p>Am comparat specificatiile reale din fise, tipul de gatire, capacitatea, puterea si numarul de programe, si am semnalat unde cifrele insala, de la programele multe pe care nu le folosesti la capacitatea utila mai mica decat cea nominala la presiune. Nu testam aparatele in laborator si nu pretindem asta. Ne bazam pe date reale, mii de pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 249 la 945 de lei, iar pretul urmeaza tipul, capacitatea si brandul.</p>
+    <p><strong>Sub 300 de lei</strong> gasesti slow cookerul clasic Crock-Pot, aparatul de orez Xiaomi si chiar un multicooker cu presiune de la un brand mai putin cunoscut, AIRNOVA. Cea mai multa valoare pe cel mai putin bani, cu compromisuri la brand sau la functii.</p>
+    <p><strong>Intre 400 si 630 de lei</strong> e zona centrala: Tefal One Pot, Moulinex, Instant Pot Duo, Crock-Pot Express, plus multicookerele fara presiune Tefal. Aici e cel mai bun echilibru intre functii, calitate si service.</p>
+    <p><strong>Peste 900 de lei</strong> intri la combi-ul Instant Pot Pro Crisp, care adauga air fryer-ul la gatirea sub presiune. Merita cand functia in plus, rumenirea, chiar iti rezolva ceva, nu doar pentru a avea totul intr-un aparat.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-multicookere" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-multicookere" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

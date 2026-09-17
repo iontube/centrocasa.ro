@@ -1,256 +1,333 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Statie de calcat cu aburi",
-  excerpt: "Daca ma intrebi pe mine, cea mai buna statie de calcat cu aburi pentru uz casnic acum e Philips PerfectCare 7000 Series PSG7030/30. Are presiune buna, e rapida si nu iti arde hainele.",
-  image: "/images/articles/statie-de-calcat-cu-aburi.webp",
-  category: "Curatenie si Intretinere",
-  categorySlug: "curatenie-intretinere",
-  date: "2026-02-08T13:17:50.744Z",
-  modifiedDate: "2026-02-08T13:17:50.744Z",
-  author: "Elena Dragomir",
-  authorRole: "Consultant Amenajari",
-  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
-};
-
-const faq = [
-  { question: "care e diferenta intre statie de calcat cu aburi si fier de calcat", answer: "Principala diferenta e ca statia de calcat cu aburi are un rezervor de apa separat, conectat la fier printr-un furtun. Asta permite un volum mult mai mare de abur si o presiune mai mare, netezind cutele mai rapid. Fierul clasic are rezervorul integrat si produce mai putin abur." },
-  { question: "cat costa o statie de calcat cu aburi buna", answer: "O statie de calcat cu aburi buna, pentru uz casnic, costa in general intre 600 si 1200 lei. Modelele de top cu tehnologii avansate pot depasi 1300 lei, iar cele de buget incep de la 400-500 lei." },
-  { question: "merita sa cumpar o statie de calcat cu aburi", answer: "Merita daca calci frecvent, ai multe haine de calcat, vrei sa economisesti timp si sa obtii rezultate mai bune. Pentru utilizare ocazionala, un fier de calcat clasic poate fi suficient." },
-  { question: "ce statie de calcat cu aburi e cea mai buna pentru uz casnic", answer: "Philips PerfectCare 7000 Series PSG7030/30 este considerata una dintre cele mai bune, datorita tehnologiei OptimalTEMP, presiunii mari a aburului si eficientei. Modelele de la Tefal si Bosch sunt si ele optiuni solide." },
-  { question: "de ce se strica statiile de calcat cu aburi", answer: "Cel mai des se strica din cauza depunerilor de calcar, daca nu se foloseste apa distilata sau daca nu se face intretinerea periodica. Alte cauze pot fi folosirea abuziva sau defectiuni electrice." },
-  { question: "cum se intretine o statie de calcat cu aburi", answer: "Goleste rezervorul de apa dupa fiecare utilizare, foloseste apa distilata sau dedurizata, si efectueaza periodic ciclul de auto-curatare conform instructiunilor din manualul tau." },
-  { question: "unde gasesc oferte la statii de calcat cu aburi", answer: "Poti gasi oferte la statii de calcat cu aburi in marile magazine de electronice (eMAG, Flanco, Altex, Media Galaxy), pe site-urile brandurilor producatoare sau in supermarketuri care au sectiuni de electronice." },
-  { question: "ce presiune e buna la o statie de calcat cu aburi", answer: "Pentru uz casnic, o presiune de minim 4.5-5 bari este considerata buna. Pentru rezultate profesionale si tesaturi dificile, cauta modele cu 6-7 bari sau chiar mai mult." }
-];
-
-const toc = [
-  { title: "Statia de calcat cu aburi: Recomandarea mea numarul 1 si de ce", id: "statia-de-calcat-cu-aburi-recomandarea-mea-numarul-1-si-de-ce" },
-  { title: "Top 5 statii de calcat cu aburi: Bune, mai putin bune si preturi", id: "top-5-statii-de-calcat-cu-aburi-bune-mai-putin-bune-si-preturi" },
-  { title: "Cum sa alegi statia de calcat cu aburi potrivita pentru tine", id: "cum-sa-alegi-statia-de-calcat-cu-aburi-potrivita-pentru-tine" },
-  { title: "Statie de calcat vs. Fier de calcat clasic: Merita upgrade-ul?", id: "statie-de-calcat-vs-fier-de-calcat-clasic-merita-upgrade-ul" },
-  { title: "Sfaturi de la un veteran al cutelor: Ce sa NU faci cu statia ta de calcat", id: "sfaturi-de-la-un-veteran-al-cutelor-ce-sa-nu-faci-cu-statia-ta-de-calcat" },
-  { title: "Statia de calcat cu aburi: Ce cumperi in functie de buzunar", id: "statia-de-calcat-cu-aburi-ce-cumperi-in-functie-de-buzunar" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['statie-abur'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Accesibile, sub 700 lei ---
+  { g: 'acc', id: 'D3FY22MBM', badge: 'Cea mai vanduta accesibila', short: 'Tefal Essential', presiune: '5.2 bar', debit: '120 g/min', putere: '2200 W',
+    specs: ['cea mai vanduta ieftina, 317 pareri', '5.2 bar, debit 120 g/min, jet 280 g/min', 'talpa ceramica, 2200 W', 'sistem anticalcar inclus'],
+    pros: ['Cea mai vanduta statie accesibila din selectie, 317 pareri', 'Presiune buna pentru pret, 5.2 bar', 'Talpa ceramica, aluneca usor', 'Sistem anticalcar, important la apa dura'],
+    cons: ['Nota 4.36, buna dar nu maxima', 'Debit continuu mai mic, 120 g/min'],
+    verdict: 'Cea mai vanduta statie de calcat accesibila din selectie si cea mai simpla recomandare daca vrei sa treci de la fierul clasic la o statie fara sa dai multi bani. Tefal Express Essential are 5.2 bar presiune, un debit de 120 g/min si un jet de abur de 280 g/min, suficient ca sa treci mai usor prin cutele obisnuite, plus o talpa ceramica care aluneca lin pe tesaturi. Are 2200 W si un sistem anticalcar, important in Romania, unde apa e des dura si depunerile pot infunda orificiile. Cu 317 pareri e una dintre cele mai testate din tot articolul, iar nota 4.36 arata cumparatori multumiti la acest pret. Debitul continuu e mai mic decat la modelele scumpe, deci pentru munti de rufe grele exista variante mai puternice. O iei cand vrei cea mai populara statie ieftina, de la un brand de incredere, pentru calcatul obisnuit al unei familii.' },
+  { g: 'acc', id: 'DP8PMLBBM', badge: 'Cu boiler, accesibila', short: 'Heinner boiler', presiune: '7 bar', debit: 'jet 140 g/min', putere: '3000 W',
+    specs: ['statie cu boiler la pret accesibil', '7 bar, cea mai mare presiune din grup', '3000 W, talpa ceramica', 'nota 4.33 din 67 de pareri'],
+    pros: ['Presiune mare pentru pret, 7 bar', 'Are boiler, abur mai stabil si mai puternic', 'Putere mare, 3000 W', 'Talpa ceramica, aluneca usor'],
+    cons: ['Debit continuu nedeclarat clar', 'Brand mai putin premium decat Tefal sau Philips'],
+    verdict: 'Statia de ales daca vrei un boiler adevarat si presiune mare la un pret accesibil. Heinner HIS-D3007IX are 7 bar, cea mai mare presiune din grupul accesibil, si un boiler care produce abur mai stabil si mai puternic decat sistemele simple, un avantaj real la tesaturile groase sau la sesiunile lungi de calcat. Cu 3000 W si o talpa ceramica care aluneca bine, se descurca la rufele unei familii, iar jetul de 140 g/min ajuta la cutele incapatanate. Cu 67 de pareri si nota 4.33 e o alegere corecta la banii ei, chiar daca vine de la un brand mai putin premium decat Tefal sau Philips. O iei cand vrei tehnologia cu boiler si presiune de 7 bar fara sa platesti pretul unui model de brand mare, pentru calcat eficient acasa.' },
+  { g: 'acc', id: 'DJK18DMBM', badge: 'Philips popular', short: 'Philips Compact', presiune: '6.5 bar', debit: '120 g/min', putere: '2400 W',
+    specs: ['jet mare de abur, 400 g/min', '6.5 bar, debit 120 g/min', 'compacta si usoara, 2.95 kg', 'nota 4.35 din 153 de pareri'],
+    pros: ['Jet de abur mare, 400 g/min, cute mai usor de scos', 'Foarte testata, 153 de pareri', 'Compacta si usoara, 2.95 kg', 'Philips, brand de incredere'],
+    cons: ['Nota 4.35, buna dar nu maxima', 'Fara boiler clasic, sistem compact'],
+    verdict: 'O statie Philips compacta si foarte apreciata, pentru cine vrea un jet puternic la un pret accesibil. PerfectCare Compact are 6.5 bar, un debit continuu de 120 g/min si, mai ales, un jet de abur de 400 g/min, printre cele mai mari din grupul accesibil, deci scoate cutele incapatanate cu o singura apasare. Cantareste doar 2.95 kg, e usoara si compacta, usor de manevrat si de depozitat, iar Philips inseamna fiabilitate si piese usor de gasit. Cu 153 de pareri e una dintre cele mai testate din selectie, cu nota 4.35. Nu are un boiler clasic, ci un sistem compact, dar performanta ramane buna pentru calcatul obisnuit. O iei cand vrei o statie usoara si compacta, cu un jet de abur puternic, de la Philips, si nu ai nevoie de un boiler mare pentru sesiuni foarte lungi.' },
+  { g: 'acc', id: 'DQM4V6MBM', badge: 'Jet mare sub 600 lei', short: 'Tefal Vision', presiune: '6.9 bar', debit: '130 g/min', putere: '2800 W',
+    specs: ['jet de abur mare, 480 g/min', '6.9 bar, debit 130 g/min, 2800 W', 'putere mare pentru pretul ei', 'nota 4.26 din 107 pareri'],
+    pros: ['Jet de abur foarte mare, 480 g/min', 'Presiune buna, 6.9 bar, si putere mare, 2800 W', 'Sub 600 de lei pentru aceste performante', '107 pareri, bine testata'],
+    cons: ['Nota 4.26, cea mai modesta din grup', 'Fara boiler clasic'],
+    verdict: 'Cea mai puternica statie din grupul accesibil pentru banii ei, cu un jet de abur impresionant. Tefal Express Vision are 6.9 bar, un debit de 130 g/min si un jet de abur de 480 g/min, valori pe care de obicei le vezi la modele mai scumpe, deci trece rapid prin bumbac, denim si lenjerii, cu mai putine treceri. Are 2800 W, multa putere pentru un aparat sub 600 de lei, si e bine testata, cu 107 pareri. Nota de 4.26 e cea mai modesta din grup, asa ca merita sa citesti recenziile inainte, iar sistemul e compact, fara boiler clasic. O iei cand vrei cea mai multa putere si cel mai mare jet de abur la cel mai mic pret, pentru cutele grele, si nu te deranjeaza o nota ceva mai jos.' },
+  // --- Echilibrate, 700-1300 lei ---
+  { g: 'ech', id: 'DDXMVVMBM', badge: 'Cea mai vanduta din articol', short: 'Tefal Anti-Calc', presiune: '6.5 bar', debit: '120 g/min', putere: '2800 W',
+    specs: ['de departe cea mai vanduta, 326 pareri', '6.5 bar, jet mare de 450 g/min', 'talpa ceramica, 2800 W', 'sistem Anti-Calc pentru apa dura'],
+    pros: ['De departe cea mai vanduta din tot articolul, 326 pareri', 'Jet mare de abur, 450 g/min', 'Sistem Anti-Calc dedicat, pentru apa dura', 'Talpa ceramica, 2800 W'],
+    cons: ['Fara boiler clasic, sistem compact', 'Nota 4.43, foarte buna dar nu maxima'],
+    verdict: 'Cea mai vanduta statie de calcat din tot articolul si o alegere echilibrata excelenta, cu accent pe lupta cu calcarul. Tefal Express Anti-Calc are 6.5 bar, un jet de abur de 450 g/min si o talpa ceramica care aluneca lin, dar punctul ei forte e sistemul Anti-Calc dedicat, care colecteaza si elimina calcarul, un mare avantaj in Romania, unde apa dura scurteaza viata multor aparate. Cu 2800 W si 326 de pareri, cele mai multe din selectie, si nota 4.43, e clar preferata cumparatorilor. Nu are un boiler clasic, ci un sistem compact, dar performanta si mai ales rezistenta la calcar o fac o investitie sigura. O iei cand vrei cea mai populara si mai verificata statie din selectie, cu un sistem serios impotriva calcarului, pentru un calcat fara batai de cap ani la rand.' },
+  { g: 'ech', id: 'DV9Y22MBM', badge: 'Boiler, cel mai bine notat', short: 'Tefal ProExpress', presiune: '7.6 bar', debit: '140 g/min', putere: '2600 W',
+    specs: ['statie cu boiler, 7.6 bar', 'jet foarte mare, 550 g/min', 'debit continuu 140 g/min', 'nota 4.57, cea mai buna din grup'],
+    pros: ['Are boiler, abur stabil si puternic', 'Jet mare de abur, 550 g/min', 'Cea mai buna nota din grupul echilibrat, 4.57', 'Presiune mare, 7.6 bar'],
+    cons: ['Putere ceva mai mica, 2600 W', 'Boilerul cere putin timp de incalzire'],
+    verdict: 'Cea mai bine notata statie din grupul echilibrat si alegerea daca vrei un boiler adevarat. Tefal ProExpress Protect are 7.6 bar, un debit continuu de 140 g/min si un jet de abur de 550 g/min, iar boilerul produce un abur stabil si puternic, exact ce trebuie la sesiunile lungi si la tesaturile groase, unde cutele cedeaza mai repede. Cu nota 4.57 din 106 pareri e cea mai apreciata din grup, semn ca performanta convinge. Are 2600 W, ceva mai putin decat altele pe hartie, dar boilerul compenseaza prin aburul de calitate, iar acesta cere putin timp de incalzire la pornire. O iei cand vrei un boiler adevarat, cu presiune si jet mari, cel mai bine cotat din segmentul echilibrat, pentru un calcat eficient si placut, chiar si la volume mari.' },
+  { g: 'ech', id: 'D7BFC2MBM', badge: 'Philips cu talpa ceramica', short: 'Philips HI5919', presiune: '5.2 bar', debit: '100 g/min', putere: '2400 W',
+    specs: ['talpa ceramica, alunecare lina', '5.2 bar, debit 100 g/min', '2400 W, 3.2 kg', 'nota 4.41 din 99 de pareri'],
+    pros: ['Talpa ceramica de calitate, aluneca foarte bine', 'Philips, fiabilitate si piese usor de gasit', 'Bine testata, 99 de pareri', 'Nota buna, 4.41'],
+    cons: ['Presiune si debit mai mici decat rivalele', 'Pret spre limita de sus pentru specificatii'],
+    verdict: 'O statie Philips solida, pentru cine pune pret pe fiabilitate si pe o talpa buna. HI5919 are o talpa ceramica de calitate, care aluneca foarte lin pe tesaturi si nu agata, plus 2400 W si un sistem echilibrat, potrivit pentru calcatul obisnuit al unei familii. Philips inseamna fiabilitate dovedita si piese usor de gasit, iar cu 99 de pareri si nota 4.41 e bine cotata. Presiunea de 5.2 bar si debitul de 100 g/min sunt mai mici decat la rivalele din grup, iar pretul e spre limita de sus pentru aceste specificatii, deci o iei mai mult pentru brand si pentru talpa buna decat pentru cifre. O alegi cand vrei o statie Philips fiabila, cu o talpa ceramica excelenta, si conteaza mai mult calitatea generala si brandul decat presiunea maxima pe hartie.' },
+  { g: 'ech', id: 'DQMP7MYBM', badge: 'Braun, abur mult', short: 'Braun CareStyle 7', presiune: '7.5 bar', debit: '160 g/min', putere: '2700 W',
+    specs: ['debit mare continuu, 160 g/min', '7.5 bar, jet de 550 g/min', 'talpa din aluminiu, 2700 W', 'nota 4.62, printre cele mai bune'],
+    pros: ['Debit continuu mare, 160 g/min, calci rapid', 'Presiune mare, 7.5 bar, si jet de 550 g/min', 'Braun CareStyle, gama apreciata pentru calcat', 'Nota mare, 4.62'],
+    cons: ['Mai grea, 4.74 kg', 'Pret spre limita de sus a segmentului'],
+    verdict: 'Statia de ales in grupul echilibrat daca vrei mult abur constant, marca a gamei Braun CareStyle. IS7266VI are 7.5 bar, un debit continuu de 160 g/min, printre cele mai mari de aici, si un jet de 550 g/min, deci livreaza abur din belsug si calci rapid, cu putine treceri. Talpa din aluminiu incalzeste uniform, iar cu 2700 W si nota 4.62 din 95 de pareri e una dintre cele mai apreciate din segment. Gama CareStyle e recunoscuta pentru rezultate bune la calcat, cu forma ei distinctiva de statie. E mai grea, 4.74 kg, iar pretul e spre limita de sus a segmentului. O iei cand vrei debit mare de abur, presiune buna si calitatea gamei Braun CareStyle, pentru un calcat rapid si eficient, si nu te deranjeaza o greutate ceva mai mare.' },
+  // --- Premium, peste 1300 lei ---
+  { g: 'prem', id: 'DSL830BBM', badge: 'Cea mai vanduta premium', short: 'Philips Elite', presiune: '8 bar', debit: '165 g/min', putere: '2700 W',
+    specs: ['talpa Titanium, cea mai rezistenta', '8 bar, jet de 600 g/min', 'debit mare, 165 g/min, 312 pareri', 'PerfectCare Elite Advanced'],
+    pros: ['De departe cea mai vanduta premium, 312 pareri', 'Talpa Titanium, foarte rezistenta si alunecoasa', 'Presiune mare, 8 bar, si jet de 600 g/min', 'Debit continuu mare, 165 g/min'],
+    cons: ['Grea, 5.1 kg', 'Investitie serioasa'],
+    verdict: 'Cea mai vanduta statie premium din selectie si un varf de gama accesibil, cu 312 pareri, mai multe decat aproape orice model. Philips PerfectCare Elite Advanced are 8 bar, un debit continuu de 165 g/min si un jet de 600 g/min, deci trece prin orice tesatura cu usurinta, iar talpa din Titanium e printre cele mai rezistente si mai alunecoase, greu de zgariat si durabila in timp. Cu 2700 W si nota 4.48 din 312 pareri, e alegerea premium verificata de cei mai multi cumparatori. E grea, 5.1 kg, si e o investitie serioasa, dar oferi in schimb performanta, durabilitate si abur din belsug. O iei cand vrei cea mai populara statie premium, cu talpa Titanium rezistenta si presiune mare, pentru un calcat rapid si de calitate, ani la rand.' },
+  { g: 'prem', id: 'D5MP7MYBM', badge: 'Braun PRO, cel mai mult abur', short: 'Braun CS7 PRO', presiune: '8 bar', debit: '180 g/min', putere: '2700 W',
+    specs: ['debit foarte mare, 180 g/min', '8 bar, jet de 600 g/min', 'talpa aluminiu, 2700 W', 'nota 4.62 din 95 de pareri'],
+    pros: ['Unul dintre cele mai mari debite, 180 g/min', 'Presiune mare, 8 bar, jet de 600 g/min', 'Braun CareStyle 7 PRO, varf de gama', 'Nota mare, 4.62'],
+    cons: ['Investitie mare', 'Talpa din aluminiu, nu Titanium'],
+    verdict: 'In topul gamei Braun CareStyle 7, pentru cine vrea cel mai mult abur constant. IS7282BL are 8 bar, un debit continuu de 180 g/min, printre cele mai mari din selectie, si un jet de 600 g/min, deci livreaza abur fara oprire si calci foarte repede, chiar si teancuri mari de rufe grele. Cu 2700 W si nota 4.62 din 95 de pareri, mosteneste aprecierea gamei CareStyle, recunoscuta pentru rezultate bune. Talpa e din aluminiu, care incalzeste uniform, chiar daca nu e la fel de rezistenta ca una Titanium. E o investitie mare, justificata daca ai mult de calcat des. O iei cand vrei cel mai mare debit de abur din gama Braun, presiune de 8 bar si un calcat premium rapid, si esti dispus sa investesti in performanta.' },
+  { g: 'prem', id: 'DN0WBFYBM', badge: 'Cea mai bine notata', short: 'Tefal Pro Vision', presiune: '9 bar', debit: 'jet 750 g/min', putere: '3000 W',
+    specs: ['presiune maxima, 9 bar', 'jet de abur urias, 750 g/min', 'putere mare, 3000 W', 'nota 4.86, cea mai buna din selectie'],
+    pros: ['Presiune maxima, 9 bar', 'Cel mai mare jet de abur, 750 g/min', 'Nota cea mai buna din selectie, 4.86', 'Putere mare, 3000 W'],
+    cons: ['Inca putine pareri, 22', 'Investitie mare'],
+    verdict: 'Cea mai bine notata statie din tot articolul si o forta bruta la capitolul abur. Tefal Pro Express Vision are 9 bar, presiunea maxima din selectie, un jet de abur de 750 g/min, cel mai mare de aici, si 3000 W, deci pulverizeaza cutele cele mai incapatanate dintr-o singura trecere, chiar si la in, bumbac gros sau lenjerii. Cu nota 4.86, cea mai mare din selectie, chiar daca inca din 22 de pareri, primii cumparatori sunt entuziasmati. E o investitie mare si are inca putine recenzii, deci te bazezi si pe specificatii, care sunt insa de top. O iei cand vrei cea mai puternica statie din selectie, cu presiune de 9 bar si cel mai mare jet de abur, pentru cel mai rapid si mai eficient calcat posibil, si pretul nu e principala grija.' },
+  { g: 'prem', id: 'D0B4LXMBM', badge: 'Boiler de inalta presiune', short: 'Tefal boiler HP', presiune: '9 bar', debit: '180 g/min', putere: '3000 W',
+    specs: ['boiler de inalta presiune, 9 bar', 'debit mare, 180 g/min, jet de 750 g/min', 'talpa ceramica, 3000 W', '107 pareri'],
+    pros: ['Boiler de inalta presiune, 9 bar', 'Debit continuu mare, 180 g/min, jet de 750 g/min', 'Putere mare, 3000 W, talpa ceramica', 'Bine testata, 107 pareri'],
+    cons: ['Nota 4.07, cea mai modesta din grup', 'Cea mai scumpa si grea din selectie'],
+    verdict: 'Statia cu boiler de inalta presiune de ales daca vrei abur stabil si maxim pentru volume mari. Tefal Pro Express Vision cu boiler are 9 bar, un debit continuu de 180 g/min si un jet de 750 g/min, iar boilerul de inalta presiune livreaza un abur constant si puternic, ideal pentru cine calca des teancuri mari sau lucreaza cu tesaturi grele. Are 3000 W, o talpa ceramica alunecoasa si 107 pareri, deci e bine testata. Nota de 4.07 e cea mai modesta din grupul premium, asa ca citeste recenziile cu atentie, iar aparatul e cel mai scump si mai greu din selectie. O iei cand vrei un boiler de inalta presiune, cu cel mai stabil abur pentru sesiuni lungi si volume mari, si esti dispus la o investitie pe masura.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const ECH = PICKS.filter(x => x.g === 'ech');
+const PREM = PICKS.filter(x => x.g === 'prem');
+
+const hero = '/images/articles/statie-de-calcat-cu-aburi.webp';
+const figAcc = '/imagini/articole/statie-accesibile.webp';
+const figEch = '/imagini/articole/statie-echilibrate.webp';
+const figPrem = '/imagini/articole/statie-premium.webp';
+const published = '2026-07-19T12:17:01+03:00';
+
+const faq = [
+  { question: 'Statie de calcat sau fier de calcat clasic?', answer: 'Statia de calcat produce abur la presiune mult mai mare, printr-un rezervor sau boiler separat, deci aburul patrunde adanc in tesatura si cutele cedeaza din una-doua treceri, nu din zece. Calci mai repede, mai usor si cu rezultate mai bune, mai ales daca ai mult de calcat, familie mare, camasi sau lenjerii. Fierul clasic e mai ieftin, mai mic si mai usor de depozitat, potrivit daca ai putine haine de calcat si spatiu limitat. Daca insa petreci ore la calcat sau te enerveaza cutele care nu ies, o statie iti schimba complet experienta si merita investitia.' },
+  { question: 'Ce presiune imi trebuie la o statie de calcat?', answer: 'Presiunea, masurata in bari, arata forta cu care aburul e impins in tesatura, iar in practica lucreaza impreuna cu debitul de abur: presiune plus debit inseamna eficienta. Se recomanda minimum 5 bari; sub aceasta valoare aburul nu patrunde suficient. Modelele accesibile din selectie au 5-7 bari, potrivite pentru calcatul obisnuit, iar cele echilibrate si premium ajung la 7.5-9 bari, pentru tesaturi groase, in si sesiuni lungi. Cu cat presiunea si debitul sunt mai mari, cu atat calci mai repede, dar pentru o familie obisnuita o statie de 6-7 bari e mai mult decat suficienta.' },
+  { question: 'Ce inseamna debitul de abur si jetul de abur?', answer: 'Debitul de abur, in grame pe minut, arata cat abur livreaza statia constant in timpul calcatului: un debit mai mare inseamna ca treci mai repede prin haine, cu mai putine miscari, mai ales la bumbac, denim si lenjerii. Jetul de abur, tot in grame pe minut, e o eliberare puternica si scurta de abur, pe care o folosesti la cutele incapatanate sau la calcatul vertical, pe umeras. In selectie, debitul continuu variaza intre circa 100 si 180 g/min, iar jetul intre 200 si 750 g/min. Pentru eficienta buna, cauta un jet de cel putin 250 g/min si un debit constant cat mai mare.' },
+  { question: 'Ce este sistemul anticalcar si de ce conteaza?', answer: 'Sistemul anticalcar colecteaza si elimina calcarul din apa, ca sa nu se depuna in interiorul statiei. Conteaza foarte mult in Romania, unde apa de la robinet e des dura, adica bogata in minerale. Fara un sistem anticalcar, calcarul se aduna in timp, infunda orificiile de abur, reduce performanta si scurteaza viata aparatului. Multe modele, ca seria Anti-Calc de la Tefal, au un colector de calcar pe care il golesti periodic, o intretinere simpla care prelungeste mult durata de viata. Daca ai apa dura, un sistem anticalcar bun e printre cele mai importante caracteristici, mai important decat cativa bari in plus.' },
+  { question: 'Statie cu boiler sau fara boiler?', answer: 'O statie cu boiler incalzeste apa intr-un rezervor sub presiune si produce un abur foarte stabil si puternic, excelent pentru sesiuni lungi si rezultate premium, dar cere putin timp de incalzire la pornire. Un sistem fara boiler clasic, cu pompa sau generare continua, porneste de obicei mai repede si e practic pentru utilizarea frecventa. In selectie, modelele cu boiler, ca Tefal ProExpress sau Heinner, dau un abur mai constant la tesaturi grele, in timp ce sistemele compacte, ca multe Tefal Express, sunt mai rapide la pornit. Daca ai mult de calcat des, boilerul merita; daca vrei sa incepi imediat, un sistem compact e mai comod.' },
+  { question: 'Ce talpa e mai buna: ceramica, aluminiu sau titanium?', answer: 'Talpa e ceea ce aluneca pe haine, deci conteaza mult. Ceramica aluneca foarte lin si e placuta la folosit, cea mai raspandita la modelele accesibile si medii, dar poate fi mai sensibila la zgarieturi in timp. Aluminiul incalzeste rapid si uniform si e rezistent, folosit des de Braun. Titaniul, ca la Philips Elite din selectie, e cel mai rezistent si mai alunecos, greu de zgariat si durabil, dar il gasesti mai ales la modelele premium. Toate aluneca bine daca sunt intretinute; diferenta o fac durabilitatea si rezistenta la zgarieturi, unde titaniul e in frunte, urmat de aluminiu.' },
+  { question: 'Cat de des trebuie sa curat statia de calcar?', answer: 'Depinde de duritatea apei si de cat de des calci, dar in general e bine sa faci detartrarea sau sa golesti colectorul de calcar la fiecare cateva saptamani sau conform indicatiilor din manual. Multe statii au un indicator care te anunta cand e nevoie. Foloseste apa de la robinet daca producatorul o permite, sau amesteca-o cu apa distilata daca ai apa foarte dura, ca sa incetinesti depunerile. Nu ignora avertismentele de detartrare, pentru ca un aparat plin de calcar calca mai prost, scuipa depuneri pe haine si se poate strica. O intretinere simpla si regulata iti pastreaza statia eficienta ani buni.' },
+  { question: 'Cat costa o statie de calcat buna?', answer: 'In selectie, modelele accesibile pornesc de la circa 290 de lei, ca Tefal Express Essential, si ajung spre 640 de lei pentru variante cu boiler, ca Heinner. Segmentul echilibrat, cu Tefal, Philips si Braun, se aseaza intre 900 si 1300 de lei si aduce boilere, debite mari si sisteme anticalcar mai bune. Modelele premium, cu presiuni de 8-9 bari si talpi rezistente, trec de 1300 si urca spre 2400 de lei, ca Philips Elite sau statiile Tefal cu boiler de inalta presiune. Cel mai bun raport il gasesti alegand presiunea, debitul si sistemul anticalcar potrivite volumului tau de calcat, nu neaparat cel mai scump model.' },
+];
+
+const images = [hero, figAcc, figEch, figPrem, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Statie de calcat cu aburi - CentroCasa"
-  description="Daca ma intrebi pe mine, cea mai buna statie de calcat cu aburi pentru uz casnic acum e Philips PerfectCare 7000 Series PSG7030/30. Are presiune buna, e rapida si nu iti arde hainele."
-  image="/images/articles/statie-de-calcat-cu-aburi.webp"
+  title="Cele mai bune statii de calcat cu aburi in 2026: accesibile, echilibrate si premium"
+  description="Care sunt cele mai bune statii de calcat cu aburi in 2026: modele accesibile de la Tefal, Philips si Heinner, echilibrate cu boiler de la Tefal si Braun, si premium de la Philips si Tefal, comparate pe presiune, debit de abur si putere. Plus cum alegi, boiler vs fara si sistemul anticalcar."
+  image={hero}
   type="article"
-  publishedTime="2026-02-08T13:17:50.744Z"
-  modifiedTime="2026-02-08T13:17:50.744Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Elena Dragomir"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cele mai bune statii de calcat cu aburi' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Statie de calcat cu aburi</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune statii de calcat cu aburi</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/curatenie-intretinere/" class="article-category">Curatenie si Intretinere</a>
-        <span class="article-date">8 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Statie de calcat cu aburi</h1>
-    </header>
+    <h1>Cele mai bune statii de calcat cu aburi</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/statie-de-calcat-cu-aburi.webp" alt="Statie de calcat cu aburi" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune statii de calcat cu aburi: modele accesibile, echilibrate si premium" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="statia-de-calcat-cu-aburi-recomandarea-mea-numarul-1-si-de-ce">
-        <h2>Statia de calcat cu aburi: Recomandarea mea numarul 1 si de ce</h2>
-        <p>Bun, uite care-i treaba cu <strong>statia de calcat cu aburi</strong>. Daca vrei <a href="/cum-sa-cureti-eficient-casa/">eficient</a>a si vrei sa scapi de calcat in jumatate din timp, asta e solutia. Am testat destule modele incat sa pot spune cu mana pe inima ca Philips PerfectCare 7000 Series PSG7030/30 e o alegere solidă.</p>
-        <p>De ce? Simplu. Are o <a href="/masina-de-spalat-cu-presiune-pentru-acasa/">presiune</a> a aburului de pana la 7.2 bari, ceea ce inseamna ca aburul patrunde adanc in tesaturi si netezeste cutele dintr-o singura miscare. Nu mai trebuie sa insisti de zeci de ori pe aceeasi zona.</p><p>Ce-mi place mult la ea e tehnologia OptimalTEMP. Pe bune, asta-i game changer. Poti sa calci orice material, de la matase la blugi grosi, fara sa schimbi setarile. Si nu, nu-ti arde hainele. Am uitat o data fierul pe o camasa de matase vreo 2 minute, gandindu-ma ca-i gata, dar nimic. Nici urma de arsura. Asta inseamna ca economisesti timp si, mai ales, haine.</p><p>Rezervorul de apa e destul de mare, vreo 1.8 litri, deci poti calca o tona de rufe fara sa-l reumpli. Si se incalzeste in maxim 2 minute. Pentru cineva ca mine, care uraste sa stea sa astepte, asta e un plus imens. Plus ca e usoara, manevrabila, iar talpa gliseaza super usor pe orice material.</p><p>Acum, nu zic ca-i perfecta. E o investitie, nu e cea mai ieftina optiune de pe piata, dar daca ma intrebi pe mine, merita fiecare leu. Mai ales daca ai o familie mare sau pur si simplu vrei sa-ti usurezi treaba prin casa. E o <strong>statie de calcat cu aburi</strong> care-ti face viata mai simpla, punct.</p>
-      </section>
-
-      <section id="top-5-statii-de-calcat-cu-aburi-bune-mai-putin-bune-si-preturi">
-        <h2>Top 5 statii de calcat cu aburi: Bune, mai putin bune si preturi</h2>
-        <p>Bun, am zis de Philips, dar hai sa vedem si alte optiuni, ca nu toata lumea are acelasi buget sau aceleasi nevoi. Am scotocit piata si am gasit cateva modele care merita atentia, cu plusuri si minusuri, ca sa stii la ce sa te astepti.</p><p><strong>1. Philips PerfectCare 7000 Series PSG7030/30</strong></p><ul><li>Pret: ~ 1000-1300 lei</li><li>Plusuri: Tehnologie OptimalTEMP (nu arde hainele), presiune abur mare (7.2 bari), rezervor mare (1.8L), incalzire rapida, usoara.</li><li>Minusuri: Pretul e cam sus pentru unii, poate fi putin voluminoasa daca ai spatiu mic <a href="/cutii-de-depozitare-pentru-debara/" class="interlink">de depozitare</a>.</li></ul><p><strong>2. Tefal Pro Express Protect GV9220C0</strong></p><ul><li>Pret: ~ 800-1100 lei</li><li>Plusuri: Presiune abur si mai mare (de pana la 7.5 bari), sistem anti-calcar bun, 3 setari de abur, talpa ceramica ce aluneca bine.</li><li>Minusuri: Rezervorul e un pic mai mic (1.1L), se poate sa fie un pic mai grea decat Philips, pretul nu e chiar de neglijat.</li></ul><p><strong>3. Bosch Serie 8 Sensixx B88600AT</strong></p><ul><li>Pret: ~ 700-950 lei</li><li>Plusuri: Bun raport calitate-pret, abur continuu bun, sistem de curatare automata, talpa speciala pentru alunecare.</li><li>Minusuri: Presiunea aburului nu e la fel de mare ca la modelele de top (in jur de 5 bari), designul poate nu e pe gustul tuturor.</li></ul><p><strong>4. Rowenta Compact Power Station DG7570F0</strong></p><ul><li>Pret: ~ 500-700 lei</li><li>Plusuri: Pret accesibil, compacta, incalzire rapida, buna pentru suprafete mai mici sau utilizare ocazionala.</li><li>Minusuri: Presiunea aburului e mai mica (cam 4.5 bari), rezervorul e mic (0.7L), s-ar putea sa nu faca fata la cantitati mari de rufe sau la materiale foarte dificile.</li></ul><p><strong>5. Ariete Stirella 6240/01</strong></p><ul><li>Pret: ~ 400-600 lei</li><li>Plusuri: Foarte accesibila, design retro dragut, simpla in utilizare.</li><li>Minusuri: Performante modeste, abur slab, rezervor mic, s-ar putea sa nu fie cea mai durabila pe termen lung. Asta e mai mult pentru cine vrea sa incerce o <strong>statie de calcat cu aburi</strong> fara sa investeasca prea mult.</li></ul><p>Am incercat sa pun aici o plaja variata, de la cele premium pana la cele mai de buget. Fiecare are parti bune si mai putin bune, pana la urma.</p>
-      </section>
-
-      <section id="cum-sa-alegi-statia-de-calcat-cu-aburi-potrivita-pentru-tine">
-        <h2>Cum sa alegi statia de calcat cu aburi potrivita pentru tine</h2>
-        <p>Alegerea unei <strong>statie de calcat cu aburi</strong> nu e chiar asa complicata daca stii la ce sa te uiti. Nu te lua doar dupa design sau brand, ci mai degraba la ce nevoi ai tu.</p><p><strong>Presiunea aburului (in bari)</strong>: Asta-i cea mai importanta chestie. Cu cat presiunea e mai mare, cu atat aburul patrunde mai bine in tesaturi si cutele dispar mai repede. Pentru uz casnic, cauta minim 4.5-5 bari. Daca ai multe haine groase, denim, sau pur si simplu vrei sa calci cat mai rapid, mergi spre 6-7 bari si peste.</p><p><strong>Debit de abur (g/min)</strong>: Asta arata cat de mult abur iese. Un debit constant de peste 100 g/min e bun. Functia de jet de abur (steam boost) e utila pentru cutele insistente, cauta una care ofera minim 200-300 g/min la jet.</p><p><strong>Rezervorul de apa</strong>: Daca ai de calcat o familie intreaga, ai nevoie de un rezervor mare, minim 1.5 litri. Daca stai singur sau calci rar, si unul de 0.7-1 litru e suficient. Verifica si cat dureaza sa se reincalzeasca daca se termina apa in timpul sesiunii de calcat.</p><p><strong>Greutate si manevrabilitate</strong>: Cand tii fierul in mana minute in sir, conteaza sa nu fie prea greu. Verificati greutatea fierului in sine, nu a intregului ansamblu. Talpa fierului (ceramica, otel inoxidabil) conteaza si ea pentru alunecare.</p><p><strong>Sistem anti-calcar</strong>: Romania are apa calcaroasa, deci e un aspect important. Modelele cu sistem de curatare automata sau cu cartuse detasabile te scutesc de batai de cap. Altfel, va trebui sa folosesti apa distilata, mai ales in zonele cu apa dura.</p><p><strong>Functii suplimentare</strong>: Unele modele au functii de auto-curatare, oprire automata dupa o perioada de inactivitate (pentru siguranta), sau posibilitatea de a calca <a href="/aspirator-vertical-fara-fir/" class="interlink">vertical</a> (util pentru perdele sau haine pe umeras).</p><p><strong>Bugetul</strong>: Cum ziceam, preturile variaza mult. Fa-ti o lista cu ce ti se pare esential si apoi vezi ce se incadreaza in bugetul tau. Nu te arunca la cel mai scump model daca nu ai nevoie de toate functiile.</p>
-      </section>
-
-      <section id="statie-de-calcat-vs-fier-de-calcat-clasic-merita-upgrade-ul">
-        <h2>Statie de calcat vs. Fier de calcat clasic: Merita upgrade-ul?</h2>
-        <p>Asta e o intrebare pe care si-o pun multi. Sa renunti la fierul vechi si sa investesti intr-o <strong>statie de calcat cu aburi</strong>? Sincer, daca ma intrebi pe mine, raspunsul e un mare DA, dar cu niste conditii.</p><p><strong>Viteza si eficienta</strong>: Asta-i marele avantaj. O statie de calcat cu aburi, datorita presiunii si debitului mare de abur, calca mult mai repede. Cutele ies din prima. Unde cu un fier clasic insisti de 3-4 ori, cu statia abia atingi tesatura. Daca ai multe haine de calcat, sau vrei sa termini cat mai repede, merita investitia.</p><p><strong>Rezultate profesionale</strong>: Aburul patrunde mult mai adanc in tesaturi, uniformizand cutele si lasand hainele cu un aspect mult mai ingrijit, aproape ca de <a href="/robot-de-curatat-geamuri/">curatat</a>orie. Materialele delicate sunt si ele mult mai usor de calcat, riscul de a le arde sau de a le strica e mult mai mic.</p><p><strong>Confort in utilizare</strong>: Fierul in sine la o statie de calcat e mult mai usor decat unul clasic, pentru ca toata unitatea de abur e in baza. Asta inseamna mai putin efort pentru incheietura mainii, mai ales la sesiuni lungi de calcat.</p><p><strong>Minusuri</strong>: Ok, nu sunt doar avantaje. O <strong>statie de calcat cu aburi</strong> ocupa mai mult spatiu decat un fier clasic. Ai doua piese (fierul si baza cu rezervorul) si trebuie sa le depozitezi undeva. Pretul e, de asemenea, semnificativ mai mare decat la un fier de calcat obisnuit. Si, daca fierul clasic e suficient pentru tine, pentru ca nu calci decat ocazional o camasa sau doua, poate nu merita investitia.</p><p><strong>Cand e momentul</strong>: Daca ai o familie numeroasa, calci saptamanal cantitati mari de rufe, ai multe tesaturi delicate sau pur si simplu vrei sa-ti usurezi munca si sa ai rezultate mai bune, atunci da, upgrade-ul la o statie de calcat cu aburi este o idee excelenta. Daca insa calcatul e o corvoada rara si usoara pentru tine, un fier de calcat bun poate fi suficient.</p>
-      </section>
-
-      <section id="sfaturi-de-la-un-veteran-al-cutelor-ce-sa-nu-faci-cu-statia-ta-de-calcat">
-        <h2>Sfaturi de la un veteran al cutelor: Ce sa NU faci cu statia ta de calcat</h2>
-        <p>Ok, am stat mult cu fierul in mana, atat clasic, cat si cu statie de calcat. Si am invatat cateva chestii din greseli, atat ale mele, cat si ale prietenilor. Hai sa-ti zic ce sa eviti ca sa nu-ti strici aparatul sau hainele.</p><p><strong>Nu folosi apa de la robinet fara filtru sau apa distilata</strong>: Asta e gresala numarul 1 in Romania, unde apa e cam calcaroasa. Daca nu folosesti apa distilata sau dedurizata (sau daca statia ta nu are un sistem anti-calcar super bun), vei infunda duzele si vei ajunge sa ai pete albe pe haine. Si in timp, aparatul nu va mai functiona cum trebuie. Am avut un prieten care a patit-o si a trebuit sa schimbe fierul dupa 2 ani.</p><p><strong>Nu lasa apa in rezervor dupa fiecare utilizare</strong>: Nu conteaza ca ai statia aia de calcat cu aburi de 1000 de lei. Daca lasi apa acolo, se pot forma depuneri, mucegai, sau poate chiar rugina in anumite componente. Daca vrei sa te tina aparatul, goleste rezervorul dupa ce ai terminat de calcat.</p><p><strong>Nu calca pe temperaturi prea mari materiale delicate</strong>: Chiar si tehnologia aia 'nu arde hainele' are limitele ei. Daca pui pe maxim un material de matase, chiar si cu abur, risti sa-l lustruiesti sau sa-l deteriorezi. Citeste etichetele hainelor, n-ai nicio scuza.</p><p><strong>Nu trage de cablu</strong>: Fie ca e vorba de cablul de alimentare sau de cel al fierului, nu le trage de la priza sau din baza statiei. Prinde de mufa. Ai sa vezi ca se strica legaturile in timp si ramai cu cablul dezizolat sau cu o conexiune proasta.</p><p><strong>Nu neglija <a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">curatarea</a> periodica</strong>: Majoritatea statiilor de calcat au un buton de auto-curatare sau un sistem de eliminare a calcarului. Foloseste-l! Uite-te in manualul tau, vezi cat de des trebuie sa faci asta si respecta indicatiile. E mult mai usor sa previi decat sa repari.</p><p><strong>Nu pune fierul direct pe masa de calcat fara protectie</strong>: Daca ai o masa de calcat cu o husa mai veche sau un pic deteriorata, aburul fierbinte poate deteriora si mai tare suprafata. Foloseste un prosop vechi sau o bucata de material sub el cand nu e in uz, sau cand il lasi pe pauza.</p><p><strong>Nu exagera cu jetul de abur</strong>: E tentant sa apesi pe butonul de abur mereu, dar daca nu e nevoie, nu o face. Consumi apa mai repede si poti uda excesiv hainele, ceea ce inseamna ca va trebui sa le usuci mai mult timp dupa. Foloseste-l cand chiar ai nevoie de el, pentru cute dificile.</p>
-      </section>
-
-      <section id="statia-de-calcat-cu-aburi-ce-cumperi-in-functie-de-buzunar">
-        <h2>Statia de calcat cu aburi: Ce cumperi in functie de buzunar</h2>
-        <p>Hai sa fim sinceri, bugetul e mereu un factor decisiv. O <strong>statie de calcat cu aburi</strong> poate fi o investitie serioasa, dar poti gasi si optiuni mai accesibile. Uite o impartire pe categorii, ca sa-ti fie mai usor.</p><p><strong>Buget mic (pana in 500 lei)</strong></p><p>Aici vorbim de modele de baza, cum ar fi Ariete Stirella sau Rowenta mai vechi, poate la reduceri. Performantele sunt modeste: presiune abur mai mica (4-4.5 bari), rezervoare mai mici (0.7-1L), si s-ar putea sa nu faca fata la cantitati mari de rufe sau tesaturi groase. Sunt bune pentru cine calca rar sau doar cateva piese de imbracaminte.</p><p><strong>Buget mediu (500 - 900 lei)</strong></p><p>Aici gasesti modele echilibrate, cum ar fi Bosch Serie 8 sau modelele din gama Tefal sau Philips mai vechi. Presiune abur decenta (5-6 bari), rezervoare mai mari (1.1-1.5L), functii de auto-curatare. Sunt perfecte pentru majoritatea familiilor, fac fata la sarcini obisnuite si ofera un raport bun calitate-pret. O <strong>statie de calcat cu aburi</strong> din aceasta gama te va multumi pe deplin daca nu ai pretentii de profesionist.</p><p><strong>Buget mare (peste 900 lei)</strong></p><p>Intram in zona premium, unde Philips PerfectCare 7000 Series, Tefal Pro Express Protect si alte modele de top isi fac aparitia. Presiune abur peste 7 bari, tehnologii avansate (precum OptimalTEMP), rezervoare mari, design ergonomic, <a href="/convector-electric-pentru-incalzire/" class="interlink">incalzire</a> super rapida. Astea sunt pentru cei care vor cel mai bun rezultat, vor sa calce rapid si eficient, si sunt dispusi sa plateasca pentru asta.</p>
-        <p>Daca vrei o <strong>statie de calcat cu aburi</strong> care sa-ti faca viata mult mai usoara si sa dureze ani buni, asta e calea.</p><p>Pana la urma, cel mai important e sa alegi ce se potriveste nevoilor tale. Nu te lua dupa pretul cel mai mic daca stii ca nu va face fata, dar nici nu da banii pe functii de care nu ai nevoie.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre statie de calcat cu aburi si fier de calcat
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Principala diferenta e ca statia de calcat cu aburi are un rezervor de apa separat, conectat la fier printr-un furtun. Asta permite un volum mult mai mare de abur si o presiune mai mare, netezind cutele mai rapid. Fierul clasic are rezervorul integrat si produce mai putin abur.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa o statie de calcat cu aburi buna
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O statie de calcat cu aburi buna, pentru uz casnic, costa in general intre 600 si 1200 lei. Modelele de top cu tehnologii avansate pot depasi 1300 lei, iar cele de buget incep de la 400-500 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar o statie de calcat cu aburi
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Merita daca calci frecvent, ai multe haine de calcat, vrei sa economisesti timp si sa obtii rezultate mai bune. Pentru utilizare ocazionala, un fier de calcat clasic poate fi suficient.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce statie de calcat cu aburi e cea mai buna pentru uz casnic
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Philips PerfectCare 7000 Series PSG7030/30 este considerata una dintre cele mai bune, datorita tehnologiei OptimalTEMP, presiunii mari a aburului si eficientei. Modelele de la Tefal si Bosch sunt si ele optiuni solide.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                de ce se strica statiile de calcat cu aburi
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Cel mai des se strica din cauza depunerilor de calcar, daca nu se foloseste apa distilata sau daca nu se face intretinerea periodica. Alte cauze pot fi folosirea abuziva sau defectiuni electrice.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cum se intretine o statie de calcat cu aburi
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Goleste rezervorul de apa dupa fiecare utilizare, foloseste apa distilata sau dedurizata, si efectueaza periodic ciclul de auto-curatare conform instructiunilor din manualul tau.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc oferte la statii de calcat cu aburi
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti gasi oferte la statii de calcat cu aburi in marile magazine de electronice (eMAG, Flanco, Altex, Media Galaxy), pe site-urile brandurilor producatoare sau in supermarketuri care au sectiuni de electronice.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce presiune e buna la o statie de calcat cu aburi
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru uz casnic, o presiune de minim 4.5-5 bari este considerata buna. Pentru rezultate profesionale si tesaturi dificile, cauta modele cu 6-7 bari sau chiar mai mult.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cea mai vanduta statie de calcat din selectie e <strong>Tefal Express Anti-Calc</strong>, cu sistem serios impotriva calcarului, iar la buget mic, <strong>Tefal Express Essential</strong> aduce aburul sub presiune la sub 300 de lei. Cea mai bine notata e <strong>Tefal Pro Express Vision</strong>, cu 9 bar, iar cea mai populara premium, <strong>Philips PerfectCare Elite</strong>, are talpa Titanium.</p>
+      <p>Fata de un fier clasic, o statie de calcat produce <strong>abur la presiune mare</strong>, deci cutele cedeaza din una-doua treceri si calci mult mai repede. Cand alegi, conteaza <strong>presiunea</strong> in bari, <strong>debitul si jetul de abur</strong>, <strong>sistemul anticalcar</strong> si <strong>talpa</strong>. Mai jos gasesti direct recomandarile, pe trei segmente de pret, iar sub ele un ghid despre cum alegi.</p>
+      <p>Am pornit de la statiile de calcat in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe presiune, debit de abur, putere si sistem anticalcar, si le-am impartit in accesibile, echilibrate si premium, ca sa gasesti repede modelul potrivit bugetului si volumului tau de calcat. Inainte de calcat, vezi <a href="/masina-de-spalat-rufe-automata/">masinile de spalat rufe</a> si <a href="/uscator-de-rufe-cu-pompa-de-caldura/">uscatoarele cu pompa de caldura</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Accesibile, sub 700 de lei</a></li>
+        <li><a href="#ech">Echilibrate, 700-1300 de lei</a></li>
+        <li><a href="#prem">Premium, peste 1300 de lei</a></li>
+        <li><a href="#de-ce">De ce o statie de calcat</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#anticalc">Presiune, abur si anticalcar</a></li>
+        <li><a href="#intretinere">Cum o folosesti si o intretii</a></li>
+        <li><a href="#greseli">Greseli de evitat</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Presiune</th><th>Debit abur</th><th>Putere</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.presiune}</td>
+              <td>{x.debit}</td>
+              <td>{x.putere}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Accesibile, sub 700 de lei</h2>
+    <p>Aduc aburul sub presiune la cel mai mic pret. Au 5-7 bari si talpi ceramice, potrivite pentru calcatul obisnuit al unei familii, si sunt saltul ideal daca vii de la un fier clasic si vrei rezultate mai bune fara sa investesti mult.</p>
+    <div class="rd-grid">
+      {ACC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcc} alt="Statii de calcat accesibile: Tefal, Heinner, Philips" width="1200" height="675" loading="lazy" />
+
+    <h2 id="ech">Echilibrate, 700-1300 de lei</h2>
+    <p>Zona cu cel mai bun raport pret-performanta: boilere adevarate, presiuni de 6.5-7.6 bari, debite mari de abur si sisteme anticalcar mai bune. De aici alegi daca vrei o statie solida, de la un brand mare, fara sa treci in premium.</p>
+    <div class="rd-grid">
+      {ECH.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figEch} alt="Statii de calcat echilibrate: Tefal, Philips, Braun" width="1200" height="675" loading="lazy" />
+
+    <h2 id="prem">Premium, peste 1300 de lei</h2>
+    <p>Cele mai bune la ce conteaza: presiuni de 8-9 bari, debite mari de abur, talpi rezistente din titanium sau aluminiu si boilere de inalta presiune. Pentru cine calca des, mult, si vrea rezultate de top cu efort minim.</p>
+    <div class="rd-grid">
+      {PREM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPrem} alt="Statii de calcat premium: Philips, Braun, Tefal" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-statie-calcat').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate statiile de calcat la oferta</strong>
+        <span>Reducerile din acest moment la statii de calcat cu aburi, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o statie de calcat</h2>
+    <p>Un fier de calcat clasic scoate abur la presiune mica, deci trebuie sa treci de mai multe ori peste aceeasi cuta ca sa o netezesti. O statie de calcat schimba complet situatia: are un <strong>rezervor sau un boiler separat</strong> care produce abur la presiune mare, iar acesta patrunde adanc in tesatura si desface cutele din una-doua treceri.</p>
+    <p>Rezultatul e un calcat mult mai <strong>rapid si mai usor</strong>, cu haine mai bine intinse, mai ales la camasi, lenjerii, in si bumbac gros, materialele care de obicei dau cea mai mare bataie de cap. Daca ai o familie, calci des sau petreci ore la masa de calcat, o statie iti scurteaza timpul la jumatate si transforma o corvoada intr-o treaba suportabila. In plus, aburul din belsug permite si calcatul vertical, direct pe umeras, la sacouri, draperii sau rochii. E una dintre acele investitii care se simt imediat in viata de zi cu zi.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua statii de calcat:</p>
+    <ul>
+      <li><strong>Presiunea:</strong> in bari, arata forta aburului. Minimum 5 bari; 6-7 pentru o familie, 8-9 pentru tesaturi grele si volume mari.</li>
+      <li><strong>Debitul de abur:</strong> in grame pe minut, arata cat abur livreaza constant. Mai mult inseamna calcat mai rapid, cu mai putine treceri.</li>
+      <li><strong>Jetul de abur:</strong> eliberarea puternica pentru cutele incapatanate si calcatul vertical. Cauta cel putin 250 g/min.</li>
+      <li><strong>Sistemul anticalcar:</strong> esential la apa dura, foarte comuna in Romania. Previne infundarea si prelungeste viata aparatului.</li>
+      <li><strong>Talpa:</strong> ceramica aluneca lin, aluminiul incalzeste uniform, titaniul e cel mai rezistent. Toate merg bine, difera durabilitatea.</li>
+      <li><strong>Boiler sau sistem compact:</strong> boilerul da abur stabil pentru sesiuni lungi; sistemul compact porneste mai repede.</li>
+    </ul>
+
+    <h2 id="anticalc">Presiune, abur si anticalcar</h2>
+    <p>La o statie de calcat, cifrele care conteaza cel mai mult sunt <strong>presiunea si debitul de abur</strong>, si lucreaza impreuna. Presiunea, in bari, arata cu ce forta e impins aburul in tesatura, iar debitul, in grame pe minut, cat abur livreaza constant. Regula e simpla: presiune plus debit inseamna eficienta. Se recomanda minimum 5 bari, iar pentru un calcat cu adevarat rapid, un jet de abur de cel putin 250 g/min. Modelele din selectie merg de la 5.2 bari, la cele accesibile, pana la 9 bari, la cele premium, iar jetul urca pana la 750 g/min.</p>
+    <p>La fel de important, mai ales in Romania, e <strong>sistemul anticalcar</strong>. Apa de la robinet e des dura, bogata in minerale, iar in timp calcarul se depune in interiorul statiei, infunda orificiile de abur, scade performanta si poate strica aparatul. Un sistem anticalcar bun, ca seria Anti-Calc de la Tefal, colecteaza calcarul intr-un recipient pe care il golesti periodic, o intretinere simpla care prelungeste mult viata statiei. Daca ai apa dura, un anticalcar serios conteaza mai mult decat cativa bari in plus, pentru ca de el depinde cat de mult iti tine aparatul.</p>
+
+    <h2 id="intretinere">Cum o folosesti si o intretii</h2>
+    <p>Umple rezervorul cu apa curata, respectand ce recomanda producatorul: unele statii accepta apa de la robinet, altele cer un amestec cu apa distilata daca ai apa foarte dura. La pornire, <strong>lasa statia sa se incalzeasca</strong>, mai ales cele cu boiler, care au nevoie de un minut sau doua ca aburul sa ajunga la presiune. Regleaza temperatura si aburul dupa tipul de tesatura si foloseste jetul puternic la cutele grele sau la calcatul vertical, pe umeras.</p>
+    <p>Pentru durata de viata, cel mai important e <strong>sa lupti cu calcarul</strong>: goleste colectorul de calcar sau fa detartrarea la intervalele indicate, mai ales daca ai apa dura, si nu ignora avertismentele aparatului. Dupa folosire, lasa statia sa se raceasca, goleste apa daca manualul o cere si sterge talpa cand e rece, ca sa ramana alunecoasa. Depoziteaza-o intr-un loc uscat. Cu aceasta grija simpla, o statie de calcat isi pastreaza performanta si te serveste multi ani, fara sa scuipe calcar pe haine.</p>
+
+    <h2 id="greseli">Greseli de evitat</h2>
+    <p>Cateva greseli frecvente scad performanta sau strica statia. Le eviti usor daca le stii dinainte:</p>
+    <ul>
+      <li><strong>Ignori calcarul:</strong> la apa dura, calcarul infunda statia si o strica. Goleste colectorul si fa detartrarea la timp, e cea mai importanta intretinere.</li>
+      <li><strong>Te uiti doar la presiune:</strong> barii conteaza impreuna cu debitul de abur. O statie de 9 bari cu debit mic nu bate una de 7 bari cu debit mare.</li>
+      <li><strong>Folosesti apa nepotrivita:</strong> respecta indicatiile producatorului. Apa gresita grabeste depunerile de calcar sau lasa pete pe haine.</li>
+      <li><strong>Calci fara sa astepti incalzirea:</strong> mai ales la modelele cu boiler, lasa aburul sa ajunga la presiune, altfel rezultatul e slab.</li>
+      <li><strong>Alegi o statie prea mica pentru volumul tau:</strong> daca ai mult de calcat des, un model accesibil cu debit mic te va obosi. Alege dupa cat calci.</li>
+      <li><strong>Nu reglezi temperatura pe tesatura:</strong> foloseste setarea potrivita materialului, ca sa nu arzi hainele delicate si sa calci eficient bumbacul.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de presiune, tehnologie si brand:</p>
+    <p><strong>Accesibile, sub 700 de lei:</strong> de la circa 290 de lei, ca Tefal Express Essential, si pana spre 640 de lei pentru o statie cu boiler, ca Heinner. Saltul ideal de la un fier clasic.</p>
+    <p><strong>Echilibrate, 700-1300 de lei:</strong> Tefal, Philips si Braun, cu boilere, debite mari si sisteme anticalcar mai bune. Cel mai bun raport pret-performanta.</p>
+    <p><strong>Premium, peste 1300 de lei:</strong> de la Philips Elite si Braun CareStyle PRO spre 1600-1900 de lei, pana la statiile Tefal cu boiler de inalta presiune, care urca spre 2400, pentru presiuni de 8-9 bari, talpi rezistente si cel mai mult abur.</p>
+    <p>Pe langa pret, alege dupa <strong>cat de mult calci</strong>: pentru volume mici, un model accesibil de 6-7 bari e mai mult decat suficient; pentru teancuri mari si dese, un boiler cu presiune mare si sistem anticalcar bun iti scurteaza timpul si tine mai mult. Cel mai bun raport il gasesti potrivind statia cu nevoia reala, nu cu cel mai mare pret. Pentru curatenie cu abur in casa, vezi <a href="/aparat-de-curatat-cu-aburi/">aparatele de curatat cu aburi</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">ED</div>
       <div class="author-info">
-        <h4><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></h4>
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
         <p class="author-role">Consultant Amenajari</p>
-        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+        <p class="author-bio">Elena scrie despre curatenie si intretinerea casei. Cauta aparatele care chiar usureaza treaba, nu pe cele cu cele mai multe functii pe cutie.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="statie-de-calcat-cu-aburi"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="statie-de-calcat-cu-aburi"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="statie-de-calcat-cu-aburi" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="statie-de-calcat-cu-aburi" currentCategory="curatenie-intretinere" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

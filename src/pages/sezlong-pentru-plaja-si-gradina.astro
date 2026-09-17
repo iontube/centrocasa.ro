@@ -1,239 +1,313 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Sezlong pentru plaja si gradina",
-  excerpt: "Stau la soare. Ma relaxez. Ce poate fi mai frumos decat sa te bucuri de o zi senina, fie pe nisipul fierbinte al marii, fie in propria oaza de verdeata de acasa? Ei bine, pentru momentele astea de rasfat, ai nevoie de un prieten de nadejde: sezlongul. Si nu orice sezlong, ci unul care sa-ti ofere confort si sa reziste in timp. Azi vorbim despre sezlonguri pentru plaja si gradina, alegerea perfecta pentru toate anotimpurile de relaxare.",
-  image: "/images/articles/sezlong-pentru-plaja-si-gradina.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-01-21T15:49:47.526Z",
-  modifiedDate: "2026-02-01T15:49:47.842Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat de importanta este perna pentru un sezlong?", answer: "Perna este esentiala pentru confortul pe termen lung. O pernă de calitate transformă un sezlong simplu într-un spațiu de relaxare premium, oferind suport și o senzație plăcută la atingere. Fără pernă, chiar și cele mai bune materiale pot deveni incomode după o perioadă." },
-  { question: "Pot lasa sezlongul afara pe timp de iarna?", answer: "Depinde de material. Cele din plastic rezistent sau aluminiu cu textilen pot rezista, dar e recomandat să fie protejate cu o husă sau depozitate la adăpost pentru a preveni deteriorarea cauzată de îngheț și umezeală. Lemnul și materialele textile necesită cu siguranță protecție." },
-  { question: "Ce material e cel mai usor de curatat?", answer: "Plasticul și aluminiul cu textilen sunt, în general, cele mai ușor de curățat. O simplă ștergere cu o cârpă umedă și detergent neutru este de obicei suficientă. Materialele textile și lemnul necesită o curățare mai atentă și, uneori, tratamente specifice." },
-  { question: "Exista sezlonguri care se pot plia foarte mic?", answer: "Da, există modele pliabile, în special cele din metal cu țesătură textilă, care se pliază compact și sunt ușor de depozitat în spații mici, cum ar fi sub pat sau într-un debara. Acestea sunt ideale pentru cei cu spațiu limitat." },
-  { question: "Ce inseamna \"textilen\"?", answer: "Textilenul este un material sintetic, un amestec de poliester și PVC, cunoscut pentru rezistența sa la UV, apă și uzură. Este respirabil, se usucă rapid și este confortabil, nefiind lipicios pe vreme caldă, motiv pentru care este des folosit la mobilierul de exterior." },
-  { question: "Merita sa cumpar un sezlong mai scump?", answer: "De cele mai multe ori, da. Sezlongurile mai scumpe sunt, în general, fabricate din materiale de calitate superioară, sunt mai durabile, mai confortabile și au un design mai atent. O investiție inițială mai mare poate însemna ani de utilizare fără probleme, spre deosebire de înlocuirea frecventă a modelelor ieftine." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un sezlong pentru plaja si gradina?", id: "de-ce-ai-nevoie-de-un-sezlong-pentru-plaja-si-gradina" },
-  { title: "Top recomandari - Sezlonguri pentru plaja si gradina", id: "top-recomandari---sezlonguri-pentru-plaja-si-gradina" },
-  { title: "Cum alegi corect sezlongul potrivit", id: "cum-alegi-corect-sezlongul-potrivit" },
-  { title: "Avantaje si dezavantaje - O analiza sincera", id: "avantaje-si-dezavantaje---o-analiza-sincera" },
-  { title: "Sfaturi practice din experienta mea", id: "sfaturi-practice-din-experienta-mea" },
-  { title: "Parerea mea finala - Pentru cine recomand", id: "parerea-mea-finala---pentru-cine-recomand" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['sezlong-plaja'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Portabile, plaja ---
+  { g: 'plaja', id: 'DHYNB0MBM', badge: 'Cel mai vandut', short: 'Sersimo pliant', mat: 'Textilen', cap: '110 kg', reglaj: 'Pliabil',
+    specs: ['186 x 56 cm, pentru plaja si gradina', 'material textilen, se usuca repede', 'capacitate 110 kg', 'de departe cel mai vandut, 71 de pareri'],
+    pros: ['De departe cel mai vandut din selectie, 71 de pareri', 'Material textilen, rezistent si cu uscare rapida', 'Suprafata generoasa, 186 cm lungime', 'Pliabil, il duci si il depozitezi usor'],
+    cons: ['Pozitie de lounge, fara reglaj pe mai multe trepte', 'Textilenul cere adus la umbra cand nu-l folosesti mult'],
+    verdict: 'Cea mai sigura alegere pentru plaja si gradina, verificata de cei mai multi cumparatori. Sezlongul Sersimo are 186 pe 56 cm, deci suprafata generoasa pentru un adult, un material textilen care rezista bine la soare si se usuca repede daca se uda, si o capacitate de 110 kg. E de departe cel mai vandut din selectie, cu 71 de pareri si nota 4.56, semn ca lumea e multumita de raportul pret-calitate. Se plaza usor, deci il duci la plaja, in curte sau il depozitezi peste iarna fara bataie de cap. Sta in pozitia clasica de lounge, fara reglaj pe mai multe trepte de spatar. Il iei cand vrei cel mai testat sezlong, simplu si rezistent, la un pret bun, pentru relaxare acasa sau la mare.' },
+  { g: 'plaja', id: 'D3TRBFYBM', badge: 'Cel mai usor, cu husa', short: 'Kalla turistic', mat: 'Otel + textil', cap: '110 kg', reglaj: 'Pliabil, 2 kg',
+    specs: ['ultrausor, aproximativ 2 kg', 'cadru din otel vopsit electrostatic', 'material cu uscare rapida', 'set cu husa de transport, 110 kg'],
+    pros: ['Doar 2 kg, il duci oriunde ca pe un rucsac', 'Vine cu husa de transport inclusa', 'Cadru din otel vopsit electrostatic, anticoroziv', 'Material cu uscare rapida, bun la plaja'],
+    cons: ['Format turistic, mai mic decat un sezlong clasic', 'Confort de camping, nu de lounge amplu'],
+    verdict: 'Alegerea pentru cine cara sezlongul des, la plaja, la un festival sau in drumetii. Setul Kalla cantareste aproximativ 2 kg si vine cu husa de transport, deci il duci pe umar ca pe un rucsac si il scoti oriunde ai nevoie. Cadrul e din otel vopsit electrostatic, adica tratat anticoroziv, iar materialul se usuca repede, exact ce trebuie langa apa. Fiind un model turistic, e mai mic si mai simplu decat un sezlong clasic de gradina, cu un confort mai degraba de camping decat de lounge amplu. Are nota buna, 4.57. Il iei cand portabilitatea conteaza cel mai mult si vrei un scaun usor, ieftin si usor de carat, pe care il tii pliat intr-un colt sau in portbagaj.' },
+  { g: 'plaja', id: 'DYJFKNMBM', badge: 'Cel mai ieftin', short: 'Iso Trade portabil', mat: 'Metal + textil', cap: '', reglaj: 'Pliabil',
+    specs: ['portabil, 60 x 45 x 40 cm pliat', 'cadru metalic cu sezut textil', 'pret mic, sub 80 de lei', 'usor de transportat'],
+    pros: ['Cel mai mic pret din selectie', 'Metal cu textil, simplu si rezistent', 'Compact cand e pliat, se depoziteaza usor', 'Bun ca sezlong de rezerva sau pentru oaspeti'],
+    cons: ['Foarte simplu, fara reglaje sau extra', 'Nota 4, mai modesta'],
+    verdict: 'Pentru un buget minim, e cel mai ieftin sezlong portabil din selectie. Iso Trade e un scaun pliabil din metal cu sezut textil, compact cand e strans, la sub 80 de lei, deci il iei fara sa te gandesti prea mult. E simplu, fara reglaje sau accesorii, dar isi face treaba pentru relaxare in curte, pe balcon sau ca sezlong de rezerva pentru cand vin oaspeti si ai nevoie de inca un loc. Se depoziteaza usor, pliat intr-un colt. Are nota 4, mai modesta decat modelele scumpe, normal la acest pret. Il iei cand vrei un sezlong ieftin si portabil, fara pretentii, si nu te deranjeaza lipsa reglajelor sau a extra-urilor.' },
+  { g: 'plaja', id: 'D4FN7LYBM', badge: 'Cu 4 pozitii', short: 'Outsunny 4 pozitii', mat: 'Textilen', cap: '', reglaj: '4 pozitii',
+    specs: ['spatar reglabil in 4 pozitii', '187 x 58 x 36 cm', 'material textilen, gri deschis', 'de la Outsunny'],
+    pros: ['Spatar reglabil in 4 pozitii, de la stat drept la intins', 'Suprafata generoasa, 187 cm', 'Textilen rezistent la soare', 'De la Outsunny, brand cunoscut de mobilier exterior'],
+    cons: ['Mai scump decat modelele simple', 'Nota 4.33, buna fara sa fie in top'],
+    verdict: 'Alegerea daca vrei sa reglezi pozitia, nu doar sa stai intins fix. Sezlongul Outsunny are un spatar reglabil in 4 pozitii, deci treci de la a sta drept, la citit sau la o cafea, pana la complet intins pentru soare sau somn, pe o suprafata generoasa de 187 cm. E din material textilen rezistent la soare si vine de la Outsunny, un brand cunoscut de mobilier de exterior, cu design placut. E mai scump decat modelele simple si are o nota buna, 4.33, fara sa fie in varf. Il iei cand vrei flexibilitatea celor 4 pozitii si un sezlong solid de la un brand consacrat, pentru gradina sau terasa, si esti dispus sa platesti ceva mai mult decat pentru unul de baza.' },
+  // --- Gradina si terasa, confort ---
+  { g: 'gradina', id: 'DQ8L23MBM', badge: 'Cel mai bun raport', short: 'Lemn de fag masiv', mat: 'Lemn de fag', cap: '', reglaj: '3 pozitii',
+    specs: ['lemn de fag masiv, constructie solida', 'pliabil, spatar reglabil in 3 pozitii', 'panza premium, marimea L', 'nota 4.47 din 60 de pareri'],
+    pros: ['Lemn de fag masiv, aspect cald si natural', 'Constructie solida, stabila', 'Spatar reglabil in 3 pozitii, cu panza premium', 'Foarte bine vandut, 60 de pareri'],
+    cons: ['Lemnul cere tratare periodica pentru vreme', 'Mai greu decat un model din aluminiu'],
+    verdict: 'Cea mai buna alegere daca vrei un sezlong care arata bine in gradina, nu doar unul functional. Modelul din lemn de fag masiv are o constructie solida si stabila, cu panza premium marimea L si un spatar reglabil in 3 pozitii, de la stat la intins. Lemnul da un aspect cald si natural, care se aseaza frumos pe o terasa sau langa piscina, si e printre cele mai vandute din selectie, cu 60 de pareri si nota 4.47. In schimb, ca orice mobila de lemn de exterior, cere tratare periodica cu ulei sau lac ca sa reziste la ploaie si soare, si e mai greu decat un model din aluminiu. Il iei cand pui pret pe aspectul natural al lemnului si pe stabilitate, pentru o gradina sau o terasa, si nu te deranjeaza intretinerea.' },
+  { g: 'gradina', id: 'D6786XYBM', badge: 'Cu parasolar, nota maxima', short: 'SONGMICS cu parasolar', mat: 'Aluminiu + textilen', cap: '150 kg', reglaj: '4 pozitii + parasolar',
+    specs: ['parasolar si tetiera incluse', 'spatar reglabil in 4 pozitii', 'capacitate mare, 150 kg', '193 x 53 x 29 cm, nota 4.91'],
+    pros: ['Parasolar inclus, umbra chiar pe sezlong', 'Tetiera si spatar reglabil in 4 pozitii', 'Cea mai mare capacitate, 150 kg', 'Cea mai buna nota din selectie, 4.91'],
+    cons: ['Mai scump decat modelele simple', 'Parasolarul adauga la greutate si la plierea mai complexa'],
+    verdict: 'Cel mai confortabil sezlong din selectie, pentru cine vrea umbra si reglaje, nu doar un loc de stat. Modelul SONGMICS vine cu parasolar inclus, deci ai umbra direct deasupra capului fara sa cari o umbrela separata, plus tetiera si un spatar reglabil in 4 pozitii, pentru orice unghi de relaxare. Sustine 150 kg, cea mai mare capacitate din selectie, si are cea mai buna nota, 4.91, din partea cumparatorilor. E din aluminiu cu textilen, deci usor si rezistent. Costa mai mult decat modelele simple, iar parasolarul adauga la greutate si face plierea un pic mai complicata. Il iei cand vrei confort maxim, umbra la purtator si o capacitate mare, pentru zile lungi in gradina sau la piscina.' },
+  { g: 'gradina', id: 'DN1TYSMBM', badge: 'Nota maxima', short: 'BLUMAPI cu suport brate', mat: 'Lemn + textil', cap: '', reglaj: 'Pliabil, cu brate',
+    specs: ['structura din lemn, sezut textil', 'cu suport pentru brate', 'perfect pliabil', 'nota maxima, 5 din 5'],
+    pros: ['Suport pentru brate, mai comod si mai stabil', 'Structura de lemn, aspect cald', 'Perfect pliabil, se strange usor', 'Nota maxima, 5 din 5'],
+    cons: ['Putine pareri, 10', 'Lemnul cere ingrijire pentru exterior'],
+    verdict: 'Alegerea daca vrei confortul unor cotiere, pe care putine sezlonguri le au. Modelul BLUMAPI are o structura din lemn cu sezut textil si, in plus, suport pentru brate, adica te sprijini comod si te ridici mai usor, un detaliu care conteaza pe un sezlong pe care stai ore intregi. E perfect pliabil, deci se strange si se depoziteaza usor, iar lemnul ii da un aspect cald, potrivit intr-o gradina sau pe o terasa. A luat nota maxima, 5 din 5, chiar daca deocamdata din putine pareri, doar 10. Ca la orice mobila de lemn de exterior, are nevoie de putina ingrijire ca sa reziste la vreme. Il iei cand vrei un sezlong cu cotiere, comod si cu aspect natural, si nu conteaza ca are inca putine recenzii.' },
+  { g: 'gradina', id: 'D5B6ZD3BM', badge: 'De lux, cu suport pahare', short: 'AT Performance de lux', mat: 'Aluminiu + textilen', cap: '', reglaj: 'Reclinabil',
+    specs: ['scaun reclinabil, de lux', 'pliabil, pentru plaja si gradina', 'cu suport pentru pahare', 'design modern'],
+    pros: ['Reclinabil, gasesti usor pozitia comoda', 'Suport pentru pahare inclus', 'Design modern, de lux', 'Pliabil, pentru plaja si gradina deopotriva'],
+    cons: ['Cel mai scump din selectie', 'Putine pareri, 10'],
+    verdict: 'In gama de lux, pentru cine vrea un sezlong cu aspect si dotari premium. Modelul AT Performance e un scaun reclinabil, deci ajustezi spatarul pana gasesti pozitia perfecta, cu un design modern si un suport pentru pahare inclus, ca sa ai bautura la indemana fara sa te ridici. Se plaza, deci il folosesti si in gradina, si la plaja, si il depozitezi usor. E cel mai scump din selectie si are inca putine pareri, 10, cu o nota buna, 4.6. Il iei cand vrei cel mai aratos si mai bine dotat sezlong din selectie, cu suport de pahare si reglaj de spatar, si esti dispus sa platesti pentru confort si aspect, nu doar pentru functia de baza.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const PLAJA = PICKS.filter(x => x.g === 'plaja');
+const GRADINA = PICKS.filter(x => x.g === 'gradina');
+
+const hero = '/images/articles/sezlong-pentru-plaja-si-gradina.webp';
+const figPlaja = '/imagini/articole/sezlong-portabile.webp';
+const figGradina = '/imagini/articole/sezlong-gradina.webp';
+const published = '2026-07-18T19:22:08+03:00';
+
+const faq = [
+  { question: 'Ce material sa aleg pentru un sezlong care sta afara?', answer: 'Depinde de cat de mult il muti si cat de mult tii la aspect. Textilenul, folosit la multe modele din selectie, e rezistent la soare, se usuca repede si e usor de curatat, ideal pentru plaja. Aluminiul e usor si rezistent la coroziune, deci se manevreaza usor si nu ruginesc; otelul, ca la setul Kalla, e mai greu, dar sustine greutate mare si, vopsit electrostatic, rezista la vreme. Lemnul, ca la modelul de fag masiv, arata cald si natural si e foarte stabil, dar cere tratare periodica cu ulei sau lac ca sa nu crape. Pentru drumuri dese, alege aluminiu sau textilen usor; pentru aspect si o terasa, lemnul.' },
+  { question: 'Cate kilograme suporta un sezlong?', answer: 'Cele mai multe sezlonguri suporta in jur de 110 kg, cazul modelelor Sersimo si Kalla din selectie, suficient pentru un adult obisnuit. Modelele mai solide sau cu cadru mai robust ajung la 150 kg, ca sezlongul SONGMICS din selectie. Verifica mereu capacitatea maxima indicata de producator si nu o depasi, mai ales pe un scaun pliabil, pentru ca structura si articulatiile sunt cele care cedeaza primele la supraincarcare. Daca esti mai corpolent sau vrei un plus de siguranta, alege un model dat pentru 150 kg, cu cadru de aluminiu sau otel.' },
+  { question: 'E mai bun un sezlong pliabil cu mai multe pozitii?', answer: 'Da, daca vrei sa faci mai multe lucruri pe el, nu doar sa stai intins. Un spatar reglabil in 3-4 pozitii, ca la Outsunny, lemnul de fag sau SONGMICS din selectie, iti permite sa treci de la a sta drept, la citit sau la masa, pana la complet intins pentru soare sau somn, pe acelasi scaun. Un model cu o singura pozitie de lounge e mai simplu si adesea mai ieftin, bun daca il folosesti doar pentru relaxare. Plierea conteaza si ea: aproape toate modelele se pliaza pentru transport si depozitare, dar verifica sa se stranga usor si sa nu ocupe mult.' },
+  { question: 'Ce sezlong sa aleg special pentru plaja?', answer: 'Pentru plaja conteaza cel mai mult greutatea, portabilitatea si materialul care se usuca repede. Un model usor si compact, ca setul Kalla din selectie, care are doar 2 kg si vine cu husa de transport, il duci pe umar de la masina pana pe nisip fara efort. Cauta un material textilen sau sintetic cu uscare rapida, care nu retine apa si nisipul, si un cadru tratat anticoroziv, pentru ca aerul sarat si umezeala ataca metalul. Un sezlong greu, de gradina, e incomod de carat pe plaja; pastreaza-l pentru terasa si ia unul portabil pentru mare.' },
+  { question: 'Rezista sezlongul in ploaie si la soare?', answer: 'Modelele bune sunt facute din materiale rezistente la vreme si UV, iar partile metalice sunt de obicei tratate anticoroziv, deci suporta ploaia si soarele un sezon intreg. Cu toate acestea, nimic nu tine la nesfarsit daca il lasi permanent afara. Textilenul si materialele sintetice rezista bine, dar se decoloreaza in timp la soare direct; lemnul cere tratare periodica. Cel mai bine, strange sezlongul si tine-l la adapost cand nu-l folosesti mai mult timp sau iarna, si il vei pastra ca nou mult mai multi ani. O husa de protectie ajuta si ea.' },
+  { question: 'Merita un sezlong cu parasolar?', answer: 'Daca stai mult la soare, da. Un parasolar inclus, ca la modelul SONGMICS din selectie, iti da umbra direct deasupra capului, fara sa cari si sa fixezi o umbrela separata, si te fereste de arsita in orele de amiaza. E util mai ales daca gradina sau zona de piscina nu are umbra naturala. Dezavantajul e ca parasolarul adauga la greutate si face plierea ceva mai complicata, iar modelul costa mai mult. Daca ai deja umbra, de la un copac sau o umbrela mare, un sezlong simplu e suficient; daca nu, parasolarul integrat merita banii in plus.' },
+  { question: 'Sezlong din lemn sau din textilen si aluminiu?', answer: 'Tine de aspect si de cat esti dispus sa intretii. Lemnul, ca modelul de fag masiv din selectie, arata cald si natural, e stabil si greu, se aseaza frumos pe o terasa, dar cere tratare periodica cu ulei sau lac ca sa reziste la ploaie si soare. Un sezlong din textilen pe cadru de aluminiu e mai usor, nu rugineste, se curata usor si nu are nevoie de intretinere speciala, ideal daca il muti des sau il duci la plaja, dar are un aspect mai tehnic, mai putin natural. Pe scurt: lemn pentru aspect si o zona fixa de relaxare, aluminiu si textilen pentru usurinta si mutat des.' },
+  { question: 'Cat costa un sezlong bun?', answer: 'E o categorie accesibila. In selectie, un sezlong portabil simplu porneste de la sub 80 de lei, ca Iso Trade, iar cel mai vandut, Sersimo, e in jur de 180 de lei. Modelele din lemn de fag masiv sunt tot in zona de 175-180 de lei, un raport foarte bun pentru aspectul lor. Cele cu reglaje multiple, parasolar sau finisaj de lux, ca Outsunny, SONGMICS sau AT Performance, merg de la circa 275 la 375 de lei. Pe langa pret, gandeste-te la cat de des il folosesti si il cari: pentru plaja, conteaza greutatea; pentru terasa, aspectul si confortul.' },
+  { question: 'Se pliaza destul de mic pentru masina si depozitare?', answer: 'Aproape toate sezlongurile din selectie sunt pliabile, tocmai ca sa le transporti si sa le depozitezi usor, dar cat de compact devin difera. Modelele turistice, ca setul Kalla, se strang foarte mic, aproape ca o geanta, si vin cu husa, deci intra oriunde in portbagaj sau intr-o debara. Sezlongurile de gradina, mai ales cele din lemn sau cu parasolar, se pliaza si ele, dar raman mai voluminoase si mai grele. Daca il cari des cu masina sau il tii pe un balcon mic, verifica in descriere dimensiunea in stare pliata, nu doar cea deschisa, ca sa fii sigur ca incape unde ai nevoie.' },
+  { question: 'Pot lasa sezlongul afara tot sezonul?', answer: 'Se poate, daca e facut din materiale rezistente la vreme, dar nu e ideal. Textilenul si aluminiul suporta bine ploaia si soarele, iar partile metalice bune sunt tratate anticoroziv, insa expunerea permanenta tot le uzeaza: materialul se decoloreaza, iar articulatiile pot rugini in timp. Lemnul sufera cel mai mult daca il lasi neprotejat. Cel mai bine, strange sezlongul si tine-l la adapost cand nu-l folosesti mai multe zile, sau macar acopera-l cu o husa de protectie. Iar peste iarna, adu-l in garaj, in debara sau pe un balcon inchis: asa il pastrezi ca nou mult mai multi ani.' },
+  { question: 'Cum curat sezlongul de nisip, pete si mucegai?', answer: 'Cel mai simplu, scutura bine nisipul si praful dupa fiecare folosire, apoi sterge sezutul cu o carpa umeda. Pentru pete, foloseste apa calduta cu putin sapun neutru sau un detergent bland si o perie moale, freaca usor si clateste; evita substantele agresive, care pot decolora textilenul. Daca a aparut mucegai, de la depozitarea umeda, sterge cu o solutie slaba de apa cu otet sau un produs antimucegai pentru textile, apoi lasa sa se usuce complet la aer. Regula de aur impotriva mucegaiului e sa nu strangi niciodata sezlongul ud: lasa-l sa se usuce intai, mai ales dupa mare, unde apa sarata ataca si materialul, si metalul.' },
+  { question: 'Sezlong, scaun de gradina sau balansoar, ce sa aleg?', answer: 'Depinde de cum vrei sa stai. Un sezlong e pentru relaxare intinsa, la soare sau la umbra, cu spatarul lasat mult pe spate, ideal langa piscina, la plaja sau pentru o siesta. Un scaun de gradina te tine asezat drept, la o masa, pentru mancat sau lucru afara. Un balansoar sau leagan e tot pentru relaxare, dar cu miscarea de leganare, placuta pentru lenevit in doi. Daca vrei sa te intinzi si sa te bronzezi, alegi sezlongul; daca vrei un loc la masa, un scaun; daca vrei sa te legeni, un balansoar. Multe curti au din fiecare, in zone diferite.' },
+];
+
+const images = [hero, figPlaja, figGradina, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Sezlong pentru plaja si gradina - CentroCasa"
-  description="Stau la soare. Ma relaxez. Ce poate fi mai frumos decat sa te bucuri de o zi senina, fie pe nisipul fierbinte al marii, fie in propria oaza de verdeata de acasa? Ei bine, pentru momentele astea de rasfat, ai nevoie de un prieten de nadejde: sezlongul. Si nu orice sezlong, ci unul care sa-ti ofere confort si sa reziste in timp. Azi vorbim despre sezlonguri pentru plaja si gradina, alegerea perfecta pentru toate anotimpurile de relaxare."
-  image="/images/articles/sezlong-pentru-plaja-si-gradina.webp"
+  title="Cele mai bune sezlonguri pentru plaja si gradina in 2026: portabile, din lemn si cu parasolar"
+  description="Care sunt cele mai bune sezlonguri pentru plaja si gradina in 2026: modele portabile usoare, sezlonguri din lemn de fag si variante cu parasolar, tetiera si suport de pahare, comparate pe material, capacitate si reglaj. Plus cum alegi, ce material rezista si cum il intretii."
+  image={hero}
   type="article"
-  publishedTime="2026-01-21T15:49:47.526Z"
-  modifiedTime="2026-02-01T15:49:47.842Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune sezlonguri pentru plaja si gradina' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/mobilier-gradina/">Mobilier Gradina</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Sezlong pentru plaja si gradina</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune sezlonguri pentru plaja si gradina</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
-        <span class="article-date">31 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Sezlong pentru plaja si gradina</h1>
-    </header>
+    <h1>Cele mai bune sezlonguri pentru plaja si gradina</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/sezlong-pentru-plaja-si-gradina.webp" alt="Sezlong pentru plaja si gradina" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune sezlonguri pentru plaja si gradina: portabile, din lemn si cu parasolar" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-sezlong-pentru-plaja-si-gradina">
-        <h2>De ce ai nevoie de un sezlong pentru plaja si gradina?</h2>
-        <p>Parca si aud intrebarea: "Dar de ce as avea nevoie de un sezlong? Am un <a href="/balansoar-de-gradina-pentru-2-persoane/">balansoar</a>, am un scaun de terasa." Si eu am zis la fel la inceput. Dar apoi am realizat ca sezlongul e altceva. E o invitatie la lenevit. E o promisiune de confort maxim. E piesa centrala a oricarui spatiu de relaxare, fie el la mare, la munte sau chiar in curtea din spatele casei.</p><p>Gandidu-te la vara, la zilele lungi si calduroase, primul lucru la care ma gandesc e o bautura rece si o carte buna. Unde ma asez? Pe un scaun? Nu prea ma pot intinde. Pe o patura pe jos? Pai, nisipul sau iarba pot fi inconfortabile. Aici intervine sezlongul. E gandit special pentru a-ti oferi o pozitie ideala de stat la soare sau pur si simplu de a te odihni. Sezutul si spatarul sunt concepute ergonomic, adaptandu-se corpului tau.</p><p>Si nu e doar pentru plaja. Am incercat sa mut sezlongul meu din curte pe terasa, langa piscina mica pe care mi-am facut-o anul trecut, si a transformat complet atmosfera. Parca am sarit peste vreo doua statiuni. E perfect pentru a te bronza, a citi, a asculta muzica sau pur si simplu a te holba la cer. Pentru cei care au copii, e si un loc unde se pot odihni parintii in timp ce copiii se joaca in apropiere. E versatil, stiti?</p><p>Sa nu uitam de <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a>. Daca aveti o gradina mai mare, cu copaci, cu o priveliste frumoasa, un sezlong pozitionat strategic poate deveni coltul vostru de rai. Va puteti bucura de aerul curat, de ciripitul pasarilor, de mirosul florilor, totul intr-o pozitie de vis. E un upgrade major fata de o simpla banca de gradina. Oricine cauta un pic de confort si o metoda de a se deconecta de la stresul zilnic ar trebui sa se gandeasca serios la un sezlong.</p><p>Am observat ca sunt potrivite pentru o multime de oameni. De la tineri care vor sa prinda un bronz uniform, la seniori care au nevoie de confort si suport, pana la familii care cauta un loc de relaxare pentru toata lumea. Important e sa alegi modelul potrivit nevoilor tale. Exista modele pliabile, usor de transportat, si modele mai fixe, mai robuste, pentru terasa sau <a href="/umbrela-de-gradina-rezistenta-la-vant/">gradina</a>. Fiecare are rolul lui.</p><p>Parerea mea e ca un sezlong nu e un lux, ci o investitie in propria stare de bine. E un obiect de mobilier care iti transforma spatiul exterior intr-un refugiu. Si cu cat e mai comod, cu atat vei petrece mai mult timp afara, bucurandu-te de natura si de momentele de liniste. Nu mai sta pe ganduri, gandeste-te la cat de bine te-ai simti pe el.</p>
-      </section>
-
-      <section id="top-recomandari---sezlonguri-pentru-plaja-si-gradina">
-        <h2>Top recomandari - Sezlonguri pentru plaja si gradina</h2>
-        <p>Dupa ce am testat destule modele, pot sa va zic ca piata e plina de optiuni. Unele sunt mai mult pentru plaja, altele mai mult <a href="/set-masa-si-scaune-pentru-gradina/" class="interlink">pentru gradina</a>, dar exista si cateva care le bifeaza pe amandoua. Am ales cateva modele care mi s-au parut deosebit de interesante, cu preturi variate, sa acoperim cat mai multe gusturi si buzunare.</p><p>Incep cu <strong>Sezlong pliabil din lemn masiv, cu perna inclusa</strong>. L-am gasit pe emag la aproximativ <strong>650 RON</strong>. Avantajul major e ca arata foarte bine, lemnul masiv ii da o nota eleganta, iar perna adauga un plus de confort.</p>
-        <p>E destul de robust pentru a fi folosit si in gradina, dar si suficient de usor pentru a fi dus la plaja, desi nu e cel mai compact. Dezavantajul ar fi ca lemnul necesita intretinere, trebuie sa-l protejezi de umezeala excesiva. Si poate fi un pic mai greu de curatat decat plasticul.</p><p>Apoi, am gasit un model clasic, pe care il vedeti des pe plaje: <strong>Sezlong din plastic rezistent, reglabil pe mai multe pozitii</strong>. Un astfel de model, de la producatori mai cunoscuti, poate ajunge pe la <strong>300-400 RON</strong>. Sincer sa fiu, e o optiune buna pentru buget.</p>
-        <p>E usor de curatat, rezista la soare si la apa. Il poti lasa afara fara grija. Partea mai putin placuta e ca plasticul, dupa un timp, poate deveni casant daca e lasat permanent in soare.</p>
-        <p>Si confortul nu e la fel de mare ca la cele cu perne sau din materiale textile.</p><p>Un alt tip care mi-a placut mult e <strong>Sezlong din textilen cu cadru din aluminiu</strong>. Am vazut unul destul de aratos pe Dedeman, cam pe la <strong>550 RON</strong>. Textilenul e un material respirabil, nu te lipesti de el cand e cald, si se usuca repede.</p>
-        <p>Cadrul de aluminiu e usor si rezistent la rugina, ceea ce e un plus mare. E perfect <a href="/fotoliu-suspendat-pentru-gradina/" class="interlink">pentru gradina</a> sau terasa, si se poate folosi si la plaja daca nu te deranjeaza sa-l cari. Un mic minus ar fi ca, daca perna nu e inclusa, trebuie sa o cumperi separat, iar asta mai adauga la cost.</p>
-        <p>Si daca materialul textilen nu e de calitate, se poate deteriora in timp.</p><p>Am mai vazut si varianta <strong>Sezlong tip "scoica" din ratan sintetic</strong>, cu perna groasa. Acestea sunt mai scumpe, ajungand si la <strong>900-1200 RON</strong>, dar ofera un confort deosebit. Arata spectaculos in gradina sau pe terasa. Ratanul sintetic e rezistent la intemperii. Un dezavantaj e ca sunt mai voluminoase si mai greu de mutat, deci sunt mai mult pentru un spatiu fix. De asemenea, perna trebuie protejata de ploaie.</p><p>Nu in ultimul rand, pentru cei cu buget mai mic, dar care vor ceva practic: <strong>Sezlong pliabil din metal cu tesatura textilă</strong>. Gasisem unul pe Leroy Merlin pe la <strong>200-250 RON</strong>. E foarte usor, se pliaza mic, perfect pentru transport. E bun pentru plaja sau pentru o zi la picnic. Partea proasta e ca nu e cel mai confortabil pentru perioade lungi de stat, si durabilitatea nu e cea mai mare, mai ales daca il folosesti intens. E mai mult un sezlong de ocazie.</p><p>Deci, aveti de unde alege. De la cele mai simple si accesibile, la cele mai elegante si confortabile. E important sa va ganditi unde il veti folosi cel mai des si ce buget aveti. Fiecare are farmecul lui, dar si compromisurile lui.</p>
-      </section>
-
-      <section id="cum-alegi-corect-sezlongul-potrivit">
-        <h2>Cum alegi corect sezlongul potrivit</h2>
-        <p>Alegerea unui sezlong bun poate parea simpla, dar crede-ma, sunt multe detalii de luat in calcul. Nu vrei sa cumperi ceva ce vei regreta dupa prima vara. Primul lucru la care te gandesti e <strong>materialul</strong>.</p>
-        <p>Am vorbit deja despre plastic, lemn, textilen, ratan. Fiecare are avantajele si dezavantajele lui. Pentru plaja, unde umiditatea si nisipul sunt prezente, plasticul sau aluminiul cu textilen sunt optiuni bune.</p>
-        <p><a href="/gratar-pe-carbuni-pentru-gradina/" class="interlink">Pentru gradina</a>, unde vrei sa creezi o atmosfera mai cocheta, lemnul sau ratanul sintetic pot fi mai potrivite.</p><p>Apoi, vine <strong>confortul</strong>. Aici intra in joc pernele. Un sezlong cu perna inclusa e mereu un plus. Dar si pernele variaza. Unele sunt subtiri, altele sunt groase si moi. Verifica daca perna este detasabila, pentru a o putea spala sau depozita separat. Si daca nu vine cu perna, gandeste-te la costul unei perne potrivite. Unele sezlonguri au si tetiera integrata, ceea ce e grozav pentru gat.</p><p><strong>Reglajul spatarului</strong> e un aspect esential. Vrei sa te poti apleca usor, sa stai mai drept cand citesti, sa te intinzi complet cand vrei sa tragi un pui de somn. Cele cu mai multe pozitii sunt cele mai versatile. Verifica cat de usor se fac reglajele si daca se blocheaza bine in pozitia dorita. Am patit sa se lase spatarul brusc, nu e deloc placut.</p><p><strong>Dimensiunea si greutatea</strong> conteaza, mai ales daca planuiesti sa-l muti des. Un sezlong usor, pliabil, e ideal pentru plaja sau pentru a-l depozita in spatii mici. Daca il tii permanent in gradina, greutatea poate fi chiar un avantaj, oferind stabilitate. Masoara-l si inainte de a-l cumpara, sa te asiguri ca incape in locul dorit si ca ai loc sa te intinzi confortabil.</p><p><strong>Durabilitatea si rezistenta la intemperii</strong> sunt cruciale. Un sezlong bun ar trebui sa reziste la soare, ploaie, vant. Verifica specificatiile tehnice. Cauta materiale tratate UV, rezistente la coroziune. Daca alegi lemn, asigura-te ca e tratat corespunzator. Daca alegi metal, sa fie din otel inoxidabil sau aluminiu. Plasticul de calitate e si el o optiune buna.</p><p>Nu in ultimul rand, <strong>designul</strong>. Asta tine de gustul fiecaruia. Vrei ceva modern, clasic, rustic? Exista modele pentru toate stilurile. Gandeste-te la cum se va integra in peisajul tau, fie ca e vorba de terasa, balcon sau gradina. Culorile deschise pot fi mai racoroase vara, dar se murdaresc mai usor. Culorile inchise pot atrage mai mult caldura.</p><p>Am uitat sa mentionez si <strong>rotile</strong>. Unele sezlonguri au roti pe spate, ceea ce face mutarea lor mult mai usoara, mai ales pe suprafete plane. E un detaliu mic, dar care face o diferenta mare la utilizare. Si pretul, desigur, e un factor important, dar nu uita ca uneori "ieftin inseamna scump". Mai bine dai un pic mai mult pe ceva de calitate, care te tine ani de zile.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje---o-analiza-sincera">
-        <h2>Avantaje si dezavantaje - O analiza sincera</h2>
-        <p>Ca orice obiect de mobilier, si sezlongurile au partile lor bune si mai putin bune. Nu exista produsul perfect pentru toata lumea, dar putem analiza obiectiv ce ofera si ce nu.</p><p><strong>Avantajele</strong> sunt, in primul rand, legate de <strong>confort</strong>. Asta e scopul principal. A te intinde pe un sezlong, cu capul pe o perna moale, cu picioarele ridicate, e o senzatie de relaxare greu de egalat. Fie ca e vorba de plaja, unde nisipul te poate ustura, fie ca e vorba de iarba din gradina, sezlongul iti ofera o suprafata curata si confortabila.</p><p>Un alt avantaj major este <strong>versatilitatea</strong>. Un sezlong bun, mai ales cele pliabile, pot fi folosite in diverse locatii. Le poti lua la mare, la munte, la piscina, in parc. In gradina, poti crea un mic colt de relaxare, langa flori sau langa un copac. Le poti muta pe terasa, pe balcon, in functie de cum bate soarele sau de unde vrei sa te bucuri de priveliste.</p><p><strong>Estetica</strong> joaca si ea un rol. Un sezlong frumos poate ridica aspectul oricarei zone exterioare. Modelele din lemn sau ratan sintetic, cu perne asortate, pot transforma o terasa banala intr-un spatiu de vacanta. Sunt piese de mobilier care adauga valoare estetica.</p><p><strong>Sanatatea</strong> poate fi si ea un argument. Pozitia intinsa, cu spatele drept si picioarele ridicate, poate ajuta la o mai buna circulatie sangvina. Si, bineinteles, statul la soare (cu masura!) si relaxarea in aer liber sunt benefice pentru starea de spirit si sanatatea generala.</p><p>Acum, sa fim sinceri, vin si <strong>dezavantajele</strong>. <strong>Pretul</strong> poate fi unul. Modelele de calitate, durabile si confortabile, pot costa destul de mult. Daca bugetul e restrans, s-ar putea sa trebuiasca sa faci compromisuri la capitolul materiale sau confort.</p><p><strong>Intretinerea</strong> poate fi o corvoada. Lemnul necesita tratamente speciale, pernele trebuie spalate si depozitate corespunzator, materialele textile se pot decolora in soare. Daca nu ai timp sau rabdare, un sezlong din plastic, usor de curatat, ar putea fi o varianta mai buna.</p><p><strong>Spatiul de depozitare</strong> e o alta problema. Sezlongurile, mai ales cele fixe sau mai voluminoase, ocupa destul de mult loc. Daca locuiesti la bloc si ai un balcon mic, un sezlong pliabil, usor de depozitat, e mult mai practic. In sezonul rece, trebuie sa te gandesti unde le vei pune.</p><p><strong>Durabilitatea</strong> nu e mereu garantata. Modelele ieftine, din materiale de proasta calitate, se pot deteriora rapid, mai ales daca sunt expuse constant la soare si ploaie. Vei ajunge sa cumperi altul in scurt timp, ceea ce nu e eficient nici economic, nici ecologic.</p><p>Si, uneori, <strong>confortul</strong> poate fi subiectiv. Ce e confortabil pentru mine, poate nu e pentru tine. Unii prefera sezlongurile mai moi, cu perne groase, altii prefera suprafete mai tari, mai ferme. E greu de testat confortul online, de aceea e bine sa citesti parerile altor cumparatori.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea">
-        <h2>Sfaturi practice din experienta mea</h2>
-        <p>Am învățat multe din experiența mea cu sezlongurile, din greșeli și din succese. Vreau să vă împărtășesc câteva sfaturi care sper să vă ajute să faceți cea mai bună alegere.</p><p>Un prim sfat: <strong>Nu subestimați importanța pernelor!</strong> Chiar dacă alegeți un sezlong din lemn sau ratan, o pernă de calitate face diferența între a sta pe ceva tare și a te afunda într-un nor. Căutați perne cu umplutură densă, rezistentă la apă și cu husă detașabilă, ușor de curățat. Am văzut și perne care după prima vară arătau ca după război, decolorate și turtite. Așa că investiți într-o pernă bună.</p><p><strong>Protecția solară</strong> este esențială, nu doar pentru pielea voastră, ci și pentru sezlong. Dacă aveți un sezlong din lemn, tratați-l cu ulei de tec sau lacuri speciale <a href="/scaune-pliabile-pentru-exterior/" class="interlink">pentru exterior</a>, cel puțin o dată pe an. Pentru cele din plastic, chiar dacă par rezistente, o prelată sau depozitarea la umbră pe timpul iernii le va prelungi viața considerabil. Am văzut sezlonguri din plastic care au crăpat de la soare, după doar doi ani.</p><p><strong>Curățarea regulată</strong> previne deteriorarea. Nu lăsați mizeria, frunzele sau alte resturi să se acumuleze. Praful și murdăria pot zgâria suprafața și pot deteriora materialele în timp. O cârpă umedă și puțin săpun neutru sunt de obicei suficiente pentru majoritatea materialelor. Pentru pete mai dificile, verificați instrucțiunile producătorului.</p><p><strong>Testați-l înainte de a-l cumpăra, dacă aveți ocazia!</strong> Starea pe el, reglarea spătarului, senzația la atingere. Dacă cumpărați online, citiți cu atenție descrierea produsului și recenziile altor clienți. Priviți pozele din mai multe unghiuri și, dacă aveți dubii, întrebați vânzătorul. Nu vă lăsați păcălit doar de un preț mic.</p><p><strong>Gândiți-vă la depozitare!</strong> Dacă nu aveți spațiu în casă sau în garaj, un sezlong pliabil este soluția. Cele care se pliază compact pot fi depozitate sub pat, în debara sau chiar pe balcon, în spatele altor obiecte. Dacă aveți un sezlong mai mare, poate merită să investiți într-o husă de protecție de calitate pentru sezonul rece, ca să-l lăsați afară, dar protejat.</p><p><strong>Nu uitați de accesorii!</strong> O măsuță mică pe care să pui cartea și băutura, o umbrelă pentru protecție solară, o etajeră pentru reviste. Aceste mici detalii pot transforma experiența pe sezlong dintr-una plăcută într-una perfectă. Am văzut și suporturi de pahar integrate pe sezlonguri, e o chestie mică, dar foarte utilă.</p><p>Și cel mai important sfat, din punctul meu de vedere: <strong>Alegeți un sezlong care vă face cu ochiul!</strong> Să vă placă vizual, să vă inspire relaxare. Dacă un sezlong arată bine și vă face să vă simțiți bine, veți petrece mai mult timp pe el și veți savura mai mult momentele de liniște.</p>
-      </section>
-
-      <section id="parerea-mea-finala---pentru-cine-recomand">
-        <h2>Parerea mea finala - Pentru cine recomand</h2>
-        <p>După atâtea discuții despre sezlonguri, cred că am ajuns la concluzia că e un obiect de mobilier esențial pentru oricine își dorește să se bucure din plin de spațiul exterior. Fie că aveți o vilă cu grădină mare, un apartament la bloc cu un balcon mic, sau pur și simplu mergeți des la plajă, un sezlong bun vă va îmbunătăți calitatea vieții.</p><p>Recomand cu căldură un sezlong din <strong>textilen cu cadru de aluminiu</strong> celor care caută un echilibru între confort, durabilitate și un preț rezonabil. Acestea sunt perfecte pentru utilizare mixtă, plajă și gradină, sunt ușor de întreținut și rezistă bine la intemperii. Un astfel de model, cum am văzut pe la 500-600 RON, este o investiție sigură.</p><p>Pentru cei care pun preț pe estetică și vor să creeze o atmosferă deosebită în grădină sau pe terasă, un sezlong din <strong>ratan sintetic</strong>, cu perne groase, este o alegere de lux. Acestea sunt mai scumpe, peste 900 RON, dar oferă un confort maxim și un aspect spectaculos. Sunt ideale pentru cei care au un spațiu fix dedicat relaxării.</p><p>Dacă bugetul este mai restrâns, dar totuși doriți ceva practic și ușor de transportat, un sezlong <strong>pliabil din metal cu tesătură textilă</strong>, pe la 200-250 RON, este o soluție temporară bună. Nu vă așteptați la confort de 5 stele, dar pentru o zi la plajă sau un picnic, își face treaba. Totuși, dacă îl folosiți des, s-ar putea să fie nevoie să-l înlocuiți mai repede.</p><p>Pentru iubitorii de natură și cei care apreciază un aspect clasic, un sezlong din <strong>lemn masiv, cu perna inclusă</strong>, poate fi alegerea perfectă. Acestea arată superb în grădină, dar necesită puțină atenție la întreținere. Prețurile încep de pe la 650 RON și pot urca, în funcție de tipul de lemn și finisaj.</p><p>În final, recomandarea mea generală este să vă gândiți bine la <strong>locul unde veți folosi cel mai des sezlongul</strong>. Dacă e pentru plajă, prioritizați greutatea și rezistența la apă. Dacă e pentru grădină, puneți accent pe confort și estetică. Nu uitați de durabilitate și de cât de ușor se întreține produsul.</p><p>Personal, eu am mers pe varianta textilen cu aluminiu, pentru că mi se pare cea mai echilibrată. Îl folosesc și pe terasă, și îl mai duc și la mare ocazional. E un bun "all-rounder". Dar cel mai important e să găsiți acel sezlong care vă face să zâmbiți și să vă simțiți ca în vacanță, chiar și când sunteți acasă.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de importanta este perna pentru un sezlong?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Perna este esentiala pentru confortul pe termen lung. O pernă de calitate transformă un sezlong simplu într-un spațiu de relaxare premium, oferind suport și o senzație plăcută la atingere. Fără pernă, chiar și cele mai bune materiale pot deveni incomode după o perioadă.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot lasa sezlongul afara pe timp de iarna?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde de material. Cele din plastic rezistent sau aluminiu cu textilen pot rezista, dar e recomandat să fie protejate cu o husă sau depozitate la adăpost pentru a preveni deteriorarea cauzată de îngheț și umezeală. Lemnul și materialele textile necesită cu siguranță protecție.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce material e cel mai usor de curatat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Plasticul și aluminiul cu textilen sunt, în general, cele mai ușor de curățat. O simplă ștergere cu o cârpă umedă și detergent neutru este de obicei suficientă. Materialele textile și lemnul necesită o curățare mai atentă și, uneori, tratamente specifice.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Exista sezlonguri care se pot plia foarte mic?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, există modele pliabile, în special cele din metal cu țesătură textilă, care se pliază compact și sunt ușor de depozitat în spații mici, cum ar fi sub pat sau într-un debara. Acestea sunt ideale pentru cei cu spațiu limitat.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna "textilen"?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Textilenul este un material sintetic, un amestec de poliester și PVC, cunoscut pentru rezistența sa la UV, apă și uzură. Este respirabil, se usucă rapid și este confortabil, nefiind lipicios pe vreme caldă, motiv pentru care este des folosit la mobilierul de exterior.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar un sezlong mai scump?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                De cele mai multe ori, da. Sezlongurile mai scumpe sunt, în general, fabricate din materiale de calitate superioară, sunt mai durabile, mai confortabile și au un design mai atent. O investiție inițială mai mare poate însemna ani de utilizare fără probleme, spre deosebire de înlocuirea frecventă a modelelor ieftine.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru cei mai multi, cel mai bun sezlong e <strong>Sersimo</strong>, de departe cel mai vandut, textilen si rezistent, la un pret bun. Daca il cari des la plaja, <strong>setul Kalla</strong> are doar 2 kg si vine cu husa, iar pentru gradina, <strong>sezlongul din lemn de fag</strong> arata cald si e foarte bine cotat. Vrei confort maxim, cu umbra? <strong>SONGMICS cu parasolar</strong> are tetiera, 4 pozitii si nota aproape perfecta.</p>
+      <p>Mai jos gasesti direct recomandarile, impartite in sezlonguri <strong>portabile, pentru plaja</strong>, usoare si de carat, si modele <strong>pentru gradina si terasa</strong>, cu mai mult confort si aspect. Dupa produse, un ghid despre ce material sa alegi, ce capacitate si reglaje conteaza si cum il intretii.</p>
+      <p>Am pornit de la sezlongurile in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe material, capacitate, reglaj si greutate, si le-am grupat pe cele portabile pentru plaja si cele de gradina, cu mai mult confort. Pentru relaxare in doi, vezi si <a href="/balansoar-de-gradina-pentru-2-persoane/">balansoarele de gradina</a> si <a href="/hamac-cu-suport-pentru-curte/">hamacele cu suport</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#plaja">Portabile, pentru plaja</a></li>
+        <li><a href="#gradina">Pentru gradina si terasa</a></li>
+        <li><a href="#plaja-gradina">Pentru plaja sau pentru gradina</a></li>
+        <li><a href="#material">Ce material sa alegi</a></li>
+        <li><a href="#reglaj">Reglajul, capacitatea si greutatea</a></li>
+        <li><a href="#extra">Extra: parasolar, tetiera, suport pahare</a></li>
+        <li><a href="#intretinere">Cum il intretii si il depozitezi</a></li>
+        <li><a href="#greseli">Greseli de evitat</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Material</th><th>Capacitate</th><th>Reglaj</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.mat}</td>
+              <td>{x.cap || '—'}</td>
+              <td>{x.reglaj}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="plaja">Portabile, pentru plaja</h2>
+    <p>Usoare, pliabile si usor de carat: pentru plaja, drumetii sau ca sezlong de rezerva in curte. De la cel mai vandut model textilen la unul de doar 2 kg cu husa si la cel mai ieftin din selectie.</p>
+    <div class="rd-grid">
+      {PLAJA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPlaja} alt="Sezlonguri portabile pentru plaja: Sersimo, Kalla, Iso Trade, Outsunny" width="1200" height="675" loading="lazy" />
+
+    <h2 id="gradina">Pentru gradina si terasa</h2>
+    <p>Mai solide si mai confortabile, pentru o zona fixa de relaxare: lemn de fag cu aspect cald, un model cu parasolar si tetiera, unul cu cotiere si o varianta de lux, reclinabila, cu suport de pahare.</p>
+    <div class="rd-grid">
+      {GRADINA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figGradina} alt="Sezlonguri de gradina si terasa: lemn, cu parasolar, cu cotiere si de lux" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-sezlong').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate sezlongurile la oferta</strong>
+        <span>Reducerile din acest moment la sezlonguri de plaja si gradina, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="plaja-gradina">Pentru plaja sau pentru gradina</h2>
+    <p>Desi titlul le pune impreuna, un sezlong bun de plaja si unul bun de gradina nu sunt acelasi lucru, iar alegerea depinde de unde il folosesti cel mai des.</p>
+    <p>Pentru <strong>plaja si drumuri</strong>, conteaza greutatea, plierea compacta si pretul: vrei un model usor, de 2-4 kg, cu husa de transport si material cu uscare rapida, pe care il duci pe umar de la masina pana pe nisip si il arunci in portbagaj fara griji. Un sezlong scump si greu de gradina e un chin de carat pe plaja.</p>
+    <p>Pentru <strong>gradina si terasa</strong>, unde sezlongul sta pe loc tot sezonul, conteaza mai mult confortul, stabilitatea si aspectul: un cadru solid, un spatar reglabil, poate un parasolar sau cotiere, si un material sau un lemn care arata bine langa casa. Aici greutatea nu mai e o problema, pentru ca nu-l muti des.</p>
+    <p>Daca ai nevoie de amandoua, solutia buna e sa iei un model <strong>usor si ieftin pentru plaja</strong>, ca setul Kalla, si sa pastrezi pe terasa unul <strong>mai solid si mai confortabil</strong>, ca lemnul de fag sau modelul cu parasolar. Nu incerca sa acoperi ambele nevoi cu un singur sezlong de compromis.</p>
+
+    <h2 id="material">Ce material sa alegi</h2>
+    <p>Materialul decide cat de usor cari sezlongul, cat rezista afara si cum arata. Cele patru optiuni comune au fiecare punctele lor:</p>
+    <ul>
+      <li><strong>Textilen:</strong> materialul de panza tehnica folosit la multe modele. Rezista la soare, se usuca repede si se curata usor, ideal pentru plaja. Se poate decolora in timp la soare direct.</li>
+      <li><strong>Aluminiu:</strong> usor si rezistent la coroziune, deci se manevreaza usor si nu rugineste. Cea mai buna alegere de cadru daca muti sezlongul des.</li>
+      <li><strong>Otel:</strong> mai greu, dar sustine greutate mare; vopsit electrostatic, ca la setul Kalla, rezista bine la vreme.</li>
+      <li><strong>Lemn:</strong> cald, natural si stabil, arata cel mai bine pe o terasa, dar cere tratare periodica cu ulei sau lac ca sa nu crape si sa nu putrezeasca.</li>
+    </ul>
+    <p>Pe scurt: pentru drumuri dese si plaja, alege <strong>aluminiu sau textilen usor</strong>; pentru o zona fixa de relaxare, unde conteaza aspectul, <strong>lemnul</strong> merita intretinerea in plus.</p>
+
+    <h2 id="reglaj">Reglajul, capacitatea si greutatea</h2>
+    <p>Trei detalii practice fac diferenta intre doua sezlonguri care arata la fel:</p>
+    <ul>
+      <li><strong>Reglajul spatarului:</strong> un model cu 3-4 pozitii, ca Outsunny, lemnul de fag sau SONGMICS, iti permite sa treci de la stat drept, la citit, pana la complet intins. Unul cu o singura pozitie de lounge e mai simplu si adesea mai ieftin.</li>
+      <li><strong>Capacitatea:</strong> majoritatea suporta 110 kg, suficient pentru un adult; modelele mai robuste, ca SONGMICS, ajung la 150 kg. Nu depasi limita, pentru ca articulatiile cedeaza primele la supraincarcare.</li>
+      <li><strong>Greutatea si portabilitatea:</strong> pentru plaja conteaza enorm. Un model de 2 kg cu husa, ca setul Kalla, il duci pe umar; unul de gradina, din lemn, e mai greu si mai bine sa ramana pe terasa.</li>
+    </ul>
+
+    <h2 id="extra">Extra: parasolar, tetiera, suport pahare</h2>
+    <p>Dincolo de baza, cateva dotari chiar schimba experienta:</p>
+    <p>Un <strong>parasolar</strong> inclus, ca la SONGMICS, iti da umbra direct deasupra capului, fara sa cari o umbrela separata, foarte util in orele de amiaza sau daca zona nu are umbra naturala. O <strong>tetiera</strong> sau o perna la ceafa aduce un plus de confort pentru statul lung, la fel ca un <strong>suport pentru brate</strong>, ca la modelul BLUMAPI, care te ajuta si sa te ridici mai usor. Iar un <strong>suport pentru pahare</strong>, ca la modelul de lux AT Performance, tine bautura la indemana fara sa te ridici. Nu sunt obligatorii, dar daca petreci ore intregi pe sezlong, in gradina sau la piscina, fac diferenta intre bine si foarte confortabil.</p>
+
+    <h2 id="intretinere">Cum il intretii si il depozitezi</h2>
+    <p>Un sezlong ingrijit tine multe sezoane; unul lasat mereu afara se degradeaza intr-un an. Regulile sunt simple. Dupa folosire, <strong>scutura nisipul si praful</strong> si sterge sezutul, mai ales daca s-a udat cu apa sarata la mare, care ataca metalul. La modelele din lemn, aplica <strong>ulei sau lac o data pe sezon</strong>, ca sa reziste la ploaie si soare.</p>
+    <p>Cel mai important, <strong>nu-l lasa permanent afara</strong>. Fiind pliabile, aproape toate sezlongurile se strang si se depoziteaza usor intr-un garaj, pe un balcon sau intr-o debara peste iarna sau cand ploua mult. O husa de protectie ajuta daca il tii afara. Verifica din cand in cand articulatiile si suruburile de la modelele reglabile si strange-le daca s-au slabit. Asa eviti rugina, decolorarea si scartaitul, si sezlongul ramane sigur si placut ani buni.</p>
+
+    <h2 id="greseli">Greseli de evitat</h2>
+    <p>Cateva greseli frecvente te lasa cu un sezlong nepotrivit sau stricat repede. Le eviti usor daca le stii dinainte:</p>
+    <ul>
+      <li><strong>Ignori capacitatea maxima:</strong> pe un scaun pliabil, articulatiile cedeaza primele la supraincarcare. Alege un model dat pentru greutatea ta, cu rezerva, mai ales daca esti mai corpolent.</li>
+      <li><strong>Il lasi permanent afara:</strong> chiar si materialele rezistente se decoloreaza si ruginesc daca stau tot timpul in ploaie si soare. Strange-l la adapost cand nu-l folosesti mult.</li>
+      <li><strong>Iei un model greu pentru plaja:</strong> un sezlong solid de gradina e un chin de carat pe nisip. Pentru mare, alege unul usor, cu husa.</li>
+      <li><strong>Nu verifici cat de mic se pliaza:</strong> daca il duci in masina sau il tii pe balcon, conteaza dimensiunea pliata, nu doar cea deschisa. Verific-o inainte.</li>
+      <li><strong>Cumperi lemn fara sa vrei sa-l intretii:</strong> lemnul arata superb, dar cere tratare periodica. Daca nu ai timp de asta, mergi pe aluminiu si textilen.</li>
+      <li><strong>Te iei doar dupa pret:</strong> un material textil ieftin si subtire se intinde, se rupe si se decoloreaza repede. Uita-te la numarul de pareri si la nota, nu doar la cel mai mic pret.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>E o categorie accesibila, cu preturi pentru orice buget:</p>
+    <p><strong>Portabile simple:</strong> de la sub 80 de lei pentru un model de baza, ca Iso Trade, sau in jur de 120 de lei pentru unul ultrausor cu husa, ca setul Kalla.</p>
+    <p><strong>Cel mai vandut si din lemn:</strong> in jur de 175-182 de lei, cazul modelului Sersimo si al celui din lemn de fag masiv, un raport foarte bun pentru ce ofera.</p>
+    <p><strong>Cu reglaje, parasolar sau de lux:</strong> in general 275-375 de lei, pentru Outsunny cu 4 pozitii, SONGMICS cu parasolar si tetiera sau AT Performance reclinabil cu suport de pahare.</p>
+    <p>Alege in functie de cum il folosesti: pentru plaja, conteaza greutatea si pretul mic; pentru o terasa, unde sta tot sezonul, merita un model mai solid, mai confortabil si mai aratos. Iar pentru umbra deasupra sezlongului, vezi o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela de gradina rezistenta la vant</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in design interior si amenajari exterioare, cu accent pe mobilierul de gradina si zonele de relaxare de pe terase si in curti. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="sezlong-pentru-plaja-si-gradina"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="sezlong-pentru-plaja-si-gradina"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="sezlong-pentru-plaja-si-gradina" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="sezlong-pentru-plaja-si-gradina" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

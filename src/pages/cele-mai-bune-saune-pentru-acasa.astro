@@ -1,0 +1,289 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['saune'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Portabile ---
+  { g: 'portabila', id: 'DV7KRY2BM', badge: 'Cea mai buna portabila',
+    specs: ['sauna portabila cu aburi', 'generator de abur', 'se strange, ocupa putin', 'temperatura reglabila'],
+    pros: ['inSPORTline, brand cunoscut de fitness', 'Cort cu generator de abur, se pune oriunde', 'Se strange si se depoziteaza usor', 'Temperatura reglabila'],
+    cons: ['Doar pentru o persoana, in sezut', 'Nu are ritualul unei saune cu cabina'],
+    verdict: 'Cel mai simplu si mai ieftin mod de a avea o sauna acasa, fara sa construiesti o cabina. Klementina II e o sauna portabila tip cort, cu un generator care fierbe apa si umple cortul cu abur cald, in care stai asezat, cu capul afara. Aburul deschide porii, ajuta la relaxare si la circulatie, exact ca intr-o sauna umeda. Fiind de la inSPORTline, un brand cunoscut de fitness, e o alegere sigura in categorie. Se strange si se depoziteaza intr-un dulap cand nu o folosesti, deci nu ocupa loc permanent. Nu ai ritualul si spatiul unei saune cu cabina, dar ai beneficiile aburului la un pret mic. O iei cand vrei sa incerci sauna acasa, ieftin si fara montaj.' },
+  { g: 'portabila', id: 'D47YMW3BM', badge: 'Cea mai ieftina',
+    specs: ['sauna portabila', 'cel mai mic pret', 'temperatura reglabila', 'pentru acasa'],
+    pros: ['Cel mai mic pret din top, sub 1000 de lei', 'Portabila, se pune oriunde ai o priza', 'Temperatura reglabila', 'Se strange dupa folosire'],
+    cons: ['Constructie mai simpla', 'Pentru o persoana', 'Fara brand cunoscut'],
+    verdict: 'Cea mai ieftina sauna de acasa din selectie, la sub 1000 de lei. E o sauna portabila cu aburi, cu temperatura reglabila, in care stai asezat in timp ce aburul umple cortul in jurul tau. O pui oriunde ai o priza si spatiu, in baie, dormitor sau debara, si o strangi dupa folosire. Constructia e mai simpla decat la modelele de brand si e gandita pentru o persoana, iar numele producatorului nu spune multe. Ramane insa o intrare accesibila in beneficiile aburului. O iei cand vrei cel mai mic pret si doar sa incerci sauna acasa, fara pretentii de brand sau finisaj.' },
+  { g: 'portabila', id: 'DJVYLD2BM', badge: 'Patura de sauna, infrarosu',
+    specs: ['patura de sauna infrarosu', 'te infasori in ea', 'ocupa cel mai putin loc', 'caldura blanda'],
+    pros: ['Ocupa cel mai putin loc dintre toate', 'Infrarosu, caldura blanda direct pe corp', 'Te infasori in ea pe pat sau pe jos', 'Se pliaza si intra intr-un sertar'],
+    cons: ['Doar corpul, capul si mainile raman afara', 'Alta experienta decat o sauna cu abur'],
+    verdict: 'Cea mai compacta forma de sauna din selectie, pentru cine nu are loc nici macar de un cort. Patura electrica de sauna foloseste infrarosu, adica incalzeste bland direct corpul, si te infasori in ea intinsa pe pat sau pe jos, ca intr-un sac. Ocupa cel mai putin loc dintre toate, se pliaza si intra intr-un sertar. Fiind o patura, incalzeste corpul, dar capul si mainile raman afara, deci e alta experienta decat sederea intr-un cort cu abur. Pentru transpiratie, relaxare musculara si un pic de caldura seara, isi face treaba. O iei cand vrei ceva minim, usor de depozitat, si preferi caldura blanda a infrarosului.' },
+  // --- Infrarosu (cabina) ---
+  { g: 'infrarosu', id: 'DTDJ4RYBM', badge: 'Cabina cu infrarosu',
+    specs: ['cabina cu infrarosu', 'caldura blanda 40-60°C', '1-2 persoane', 'consum mic la operare'],
+    pros: ['Infrarosu, caldura blanda, buna zilnic', 'Consuma si costa mai putin la operare decat cu abur', 'Cabina de interior, pentru 1-2 persoane', 'Se incalzeste repede'],
+    cons: ['Investitie mare, peste 15000 de lei', 'Cere spatiu permanent in casa'],
+    verdict: 'O cabina adevarata cu infrarosu, pentru cine vrea sauna acasa in fiecare zi, la o caldura blanda. Infrarosul incalzeste direct corpul cu raze, nu aerul, deci temperatura ramane joasa, intre 40 si 60 de grade, mai usor de suportat si mai potrivita pentru folosire zilnica decat caldura intensa a unei saune finlandeze. Se incalzeste repede si costa mai putin la operare decat una cu abur. E o cabina de interior, pentru una-doua persoane. Fiind o cabina permanenta, e o investitie mare, peste 15000 de lei, si cere un spatiu dedicat in casa. O iei cand vrei o sauna proprie, folosita des, cu caldura blanda si consum mai mic.' },
+  { g: 'infrarosu', id: 'DR47XK2BM', badge: 'Infrasauna de brand',
+    specs: ['infrasauna Belatrix', 'cabina din lemn Hemlock', 'infrarosu, 2 persoane', 'brand consacrat'],
+    pros: ['Belatrix, brand consacrat de saune', 'Cabina din lemn Hemlock, aspect placut', 'Infrarosu, caldura blanda pentru doi', 'Finisaj de calitate'],
+    cons: ['Investitie mare', 'Montaj si spatiu dedicat'],
+    verdict: 'Alegerea daca vrei o infrasauna de la un brand consacrat, cu finisaj de calitate. Belatrix face saune de ani buni, iar modelul Braga are o cabina din lemn de Hemlock, o esenta placuta la aspect si la atingere, cu infrarosu care incalzeste bland doi oameni. Fata de cabinele fara nume, aici platesti pentru constructie, finisaj si increderea in brand. E o investitie mare si cere, ca orice cabina, un spatiu dedicat si montaj. Nu are inca pareri online, normal la o categorie de nisa si scumpa, dar reputatia brandului si materialul o recomanda. O iei cand vrei o infrasauna de calitate, de brand, pentru doua persoane, si ai bugetul si locul pentru ea.' },
+  // --- Finlandeza / traditionala ---
+  { g: 'finlandeza', id: 'D6FYW2MBM', badge: 'Cea mai accesibila finlandeza',
+    specs: ['sauna finlandeza mica', 'lemn de brad', '1 persoana', 'caldura intensa, ritual clasic'],
+    pros: ['Singura cu pareri, nota maxima', 'Sauna finlandeza adevarata, cu caldura intensa', 'Lemn de brad, mirosul si ritualul clasic', 'Cea mai accesibila cabina finlandeza din top'],
+    cons: ['Doar o persoana', 'Caldura mare, nu pentru toata lumea'],
+    verdict: 'Cea mai accesibila sauna finlandeza din selectie si singura care are pareri, cu nota maxima de la cumparatori. Sanotechnik Ruby e o cabina mica din lemn de brad, pentru o persoana, cu tot ritualul saunei finlandeze traditionale: caldura intensa, 70-100 de grade, aer uscat si mirosul cald al lemnului. Fata de infrarosu, aici e vorba de caldura mare si de intreaga experienta, nu doar de transpiratie. Fiind pentru o persoana, e potrivita pentru un apartament sau o casa cu spatiu limitat, la un pret mult sub cabinele mari. Caldura mare nu e pentru toata lumea. O iei cand vrei o sauna finlandeza adevarata acasa, cu ritualul ei, fara sa cumperi o cabina uriasa.' },
+  { g: 'finlandeza', id: 'DBC774MBM', badge: 'Finlandeza mare, pentru familie',
+    specs: ['sauna traditionala', 'pentru 3 persoane', 'caldura 70-100°C', 'aburul si ritualul clasic'],
+    pros: ['Pentru 3 persoane, o folositi impreuna', 'Sauna traditionala cu caldura intensa', 'Ritualul complet finlandez', 'Cabina spatioasa'],
+    cons: ['Cea mai scumpa si mai mare din top', 'Cere un spatiu generos si montaj'],
+    verdict: 'Alegerea daca vrei o sauna finlandeza pentru toata familia, nu doar pentru o persoana. Dharani S3 e o cabina traditionala pentru trei oameni, cu caldura intensa, aer uscat si tot ritualul finlandez, in care intrati impreuna. E cea mai spatioasa si mai completa sauna din selectie, gandita pentru cine vrea o experienta reala de sauna acasa, ca la centrele spa. Pe masura, e si cea mai scumpa si mai mare, deci cere un spatiu generos, un subsol, o mansarda sau o camera dedicata, plus montaj. Nu are inca pareri, ca mai toate cabinele scumpe de nisa. O iei cand vrei o sauna finlandeza pentru familie, ai spatiul si vrei experienta completa.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const PORTABILA = PICKS.filter(x => x.g === 'portabila');
+const INFRAROSU = PICKS.filter(x => x.g === 'infrarosu');
+const FINLANDEZA = PICKS.filter(x => x.g === 'finlandeza');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/saune.webp';
+const figPortabile = '/imagini/articole/saune-portabile.webp';
+const figTip = '/imagini/articole/saune-tip.webp';
+const figCabine = '/imagini/articole/saune-cabine.webp';
+const published = '2026-07-18T08:46:08+03:00';
+
+const faq = [
+  { question: 'Sauna cu infrarosu sau finlandeza?', answer: 'Sauna finlandeza traditionala incalzeste aerul la 70-100 de grade, cu caldura intensa si intregul ritual: aburul, mirosul lemnului, transpiratia puternica. Cea cu infrarosu foloseste raze care incalzesc direct corpul, la o temperatura mai joasa, 40-60 de grade, deci e mai blanda, mai usor de suportat zilnic si mai ieftina de operat. Alege finlandeza pentru ritual si caldura intensa, infrarosu pentru caldura blanda si folosire deasa.' },
+  { question: 'Merita o sauna portabila?', answer: 'Da, daca vrei sa incerci sauna acasa fara sa investesti intr-o cabina scumpa. O sauna portabila tip cort, cu generator de abur, se pune oriunde ai o priza, se strange dupa folosire si costa de cateva ori mai putin decat o cabina. Nu are ritualul si spatiul unei saune adevarate, dar iti da beneficiile aburului: transpiratie, relaxare, circulatie. E cel mai bun punct de intrare, mai ales intr-un apartament.' },
+  { question: 'Cat spatiu si ce montaj cere o cabina de sauna?', answer: 'O cabina, cu infrarosu sau finlandeza, cere un spatiu permanent dedicat: un colt de baie mare, un subsol, o mansarda sau o camera de serviciu. Cabinele de interior vin la pachet si se asambleaza, dar cele mari si cele finlandeze cer atentie la ventilatie si la alimentarea electrica. Masoara locul si verifica inaltimea si priza necesare inainte sa comanzi; o sauna portabila, in schimb, nu cere montaj.' },
+  { question: 'De ce au saunele atat de putine pareri?', answer: 'Pentru ca sunt o cumparatura de nisa si scumpa, mai ales cabinele, pe care putini oameni le cumpara online. De aceea, la saune, aproape niciun model nu are pareri, iar cand exista, sunt putine. Cand alegi, uita-te la tip, la material, la capacitate si la brand, nu la numarul de note, pentru ca astea spun cel mai mult despre ce primesti. Modelele portabile, mai ieftine, incep sa adune si cateva pareri.' },
+  { question: 'Cat consuma o sauna acasa?', answer: 'Depinde de tip si marime. Saunele cu infrarosu consuma mai putin, pentru ca lucreaza la temperaturi mai joase si incalzesc direct corpul, nu tot aerul. Cele finlandeze, cu caldura intensa, si cele cu abur consuma mai mult, pentru ca trebuie sa incalzeasca aerul sau sa fiarba apa. Saunele portabile, fiind mici, consuma rezonabil. Daca folosesti sauna des, infrarosul e cel mai ieftin de operat pe termen lung.' },
+  { question: 'Cat de des si cat timp stai la sauna?', answer: 'Pentru cei mai multi, doua-trei sedinte pe saptamana sunt suficiente, iar o sedinta tine in general 15-20 de minute, urmata de racire si hidratare. Nu sta mai mult decat suporti confortabil si bea apa inainte si dupa. Daca ai probleme de sanatate, mai ales cardiace sau de tensiune, intreaba medicul inainte. Sauna e pentru relaxare si recuperare, nu o forta si nu o folosi pe stomacul gol sau dupa alcool.' },
+  { question: 'Ce lemn e bun pentru o cabina de sauna?', answer: 'La saunele cu cabina conteaza esenta lemnului, pentru ca sta in caldura si umezeala. Bradul e cel mai des folosit, ieftin si placut la miros, potrivit pentru saunele finlandeze accesibile. Hemlock, o esenta mai fina, e des intalnit la cabinele cu infrarosu, pentru ca nu emana rasina la caldura si arata mai bine. Cedrul e varful de gama, cu un miros aromat si rezistenta mare la umezeala. Toate se comporta bine daca sauna e ventilata si intretinuta.' },
+  { question: 'Pot pune o sauna intr-un apartament?', answer: 'Da, dar depinde de tip. O sauna portabila cu aburi sau o patura de sauna se pun fara probleme in orice apartament, doar cu o priza, si se strang dupa folosire. O cabina cu infrarosu de o persoana incape intr-un apartament mai mare, daca ai un colt liber, si consuma rezonabil. O sauna finlandeza mare, in schimb, cere spatiu si o alimentare electrica pe masura, deci e mai potrivita pentru o casa. Pentru apartament, mergi pe portabila sau pe o cabina mica cu infrarosu.' },
+];
+
+const images = [hero, figPortabile, figTip, figCabine, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune saune pentru acasa in 2026: portabile, cu infrarosu si finlandeze"
+  description="Ce sauna sa iti iei acasa in 2026: saune portabile cu aburi, cabine cu infrarosu si saune finlandeze, comparate pe tip, caldura si spatiu. Plus infrarosu vs finlandeza si cat consuma."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Radu Popescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Amenajari si Instalatii', url: '/amenajari-instalatii/' }, { name: 'Cele mai bune saune pentru acasa' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/amenajari-instalatii/">Amenajari si Instalatii</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune saune pentru acasa</span>
+    </nav>
+
+    <h1>Cele mai bune saune pentru acasa in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/radu-popescu/">Radu Popescu</a>, Consultant Amenajari · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune saune pentru acasa: portabile, cu infrarosu si finlandeze" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Daca vrei sa incerci sauna acasa ieftin, o <strong>sauna portabila cu aburi</strong> se pune oriunde si costa cel mai putin. Pentru folosire zilnica, la caldura blanda, o <strong>cabina cu infrarosu</strong> e alegerea, iar pentru ritualul complet, cu caldura intensa, o <strong>sauna finlandeza</strong> ca Sanotechnik Ruby, singura cu pareri bune. Iar cea mai compacta forma e o <strong>patura de sauna</strong> cu infrarosu.</p>
+      <p>La saune, prima intrebare e ce tip vrei: portabila, cu infrarosu sau finlandeza. De asta depinde cat platesti, cat spatiu cere si ce fel de caldura primesti. Un lucru de stiut: saunele sunt o cumparatura de nisa, deci aproape niciun model nu are pareri online, asa ca ne-am uitat mai ales la tip, material si constructie.</p>
+      <p>Am pornit de la saunele vandute pe eMAG, le-am verificat tipul, capacitatea si modul de folosire si le-am grupat pe portabile, cu infrarosu si finlandeze. Pentru baie, vezi si <a href="/cele-mai-bune-cabine-de-dus/">cabinele de dus</a>, iar pentru curte, <a href="/cele-mai-bune-piscine-supraterane/">piscinele supraterane</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tipuri">Trei feluri de saune</a></li>
+        <li><a href="#beneficii">La ce e buna o sauna</a></li>
+        <li><a href="#portabile">Saune portabile (cort cu aburi)</a></li>
+        <li><a href="#infrarosu">Saune cu infrarosu (cabina)</a></li>
+        <li><a href="#finlandeza">Saune finlandeze</a></li>
+        <li><a href="#comparatie">Infrarosu sau finlandeza</a></li>
+        <li><a href="#verifici">Ce sa verifici inainte sa cumperi</a></li>
+        <li><a href="#cat-costa">Cat costa o sauna</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tipuri">Trei feluri de saune pentru acasa</h2>
+    <p>Sub numele de sauna gasesti trei lucruri destul de diferite, la preturi de la cateva sute la zeci de mii de lei:</p>
+    <ul>
+      <li><strong>Portabila (cort cu aburi):</strong> un cort cu generator de abur, in care stai asezat. Ieftina, se strange, se pune oriunde. Cel mai simplu inceput.</li>
+      <li><strong>Cu infrarosu (cabina):</strong> o cabina in care razele infrarosii incalzesc direct corpul, la caldura blanda. Cabina permanenta, buna pentru folosire zilnica.</li>
+      <li><strong>Finlandeza (traditionala):</strong> o cabina din lemn cu caldura intensa, care incalzeste aerul. Ritualul clasic, dar cere spatiu si buget.</li>
+    </ul>
+    <p>Alege intai tipul, dupa cat vrei sa investesti, cat spatiu ai si ce fel de caldura preferi. Mai jos le luam pe rand.</p>
+
+    <h2 id="beneficii">La ce e buna o sauna acasa</h2>
+    <p>Dincolo de placere, sauna are cateva efecte reale, motiv pentru care tot mai multi si-o pun acasa:</p>
+    <ul>
+      <li><strong>Relaxare si somn:</strong> caldura relaxeaza muschii si sistemul nervos, iar multi dorm mai bine dupa o sedinta seara.</li>
+      <li><strong>Recuperare musculara:</strong> dupa sport sau o zi grea, caldura ajuta muschii sa se destinda si sange sa circule mai bine.</li>
+      <li><strong>Circulatie si transpiratie:</strong> corpul transpira, porii se deschid, iar circulatia se accelereaza, o senzatie de curatare si de reset.</li>
+      <li><strong>Confort iarna:</strong> o sursa de caldura placuta in sezonul rece, fara sa mai mergi la un centru spa.</li>
+    </ul>
+    <p>Efectele sunt asemanatoare la toate tipurile, doar ca infrarosul le da la o caldura mai blanda, iar sauna finlandeza la una intensa. Nu e un tratament medical: daca ai probleme de sanatate, mai ales de inima sau de tensiune, intreaba medicul inainte sa incepi.</p>
+
+    <h2 id="portabile">Saune portabile (cort cu aburi)</h2>
+    <p>Cel mai accesibil fel de sauna: un cort cu generator de abur care se pune oriunde ai o priza si se strange dupa folosire. Ideal pentru apartament sau ca prim pas.</p>
+    <div class="rd-grid">
+      {PORTABILA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPortabile} alt="Saune portabile cu aburi si patura de sauna infrarosu" width="1200" height="675" loading="lazy" />
+
+    <h2 id="infrarosu">Saune cu infrarosu (cabina)</h2>
+    <p>Cabine adevarate, in care razele infrarosii incalzesc bland corpul, la 40-60 de grade. Se incalzesc repede, costa mai putin la operare si sunt bune pentru folosire zilnica, dar sunt o investitie si cer spatiu.</p>
+    <div class="rd-grid">
+      {INFRAROSU.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figTip} alt="Sauna cu infrarosu sau finlandeza: caldura blanda ori ritual" width="1200" height="675" loading="lazy" />
+
+    <h2 id="finlandeza">Saune finlandeze (traditionale)</h2>
+    <p>Ritualul clasic: o cabina din lemn cu caldura intensa, 70-100 de grade, care incalzeste aerul. Experienta completa de sauna, dar cere cel mai mult spatiu si buget.</p>
+    <div class="rd-grid">
+      {FINLANDEZA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figCabine} alt="Cabine de sauna pentru acasa: Belatrix, Sanotechnik si Dharani" width="1200" height="675" loading="lazy" />
+
+    <h2 id="comparatie">Infrarosu sau finlandeza: care e diferenta</h2>
+    <p>E decizia mare daca mergi pe o cabina. Cele doua incalzesc complet diferit:</p>
+    <p><strong>Sauna finlandeza</strong> incalzeste aerul din cabina la 70-100 de grade, o caldura intensa, uscata, cu tot ritualul: mirosul lemnului, transpiratia puternica, senzatia clasica de sauna. E experienta completa, dar caldura mare nu e pentru toata lumea si consuma mai mult.</p>
+    <p><strong>Sauna cu infrarosu</strong> nu incalzeste aerul, ci corpul direct, cu raze, la o temperatura mult mai joasa, 40-60 de grade. Razele patrund mai adanc in tesuturi, deci relaxarea musculara e buna, iar caldura blanda o face potrivita pentru folosire zilnica si mai usor de suportat. Se incalzeste repede si costa mai putin la operare.</p>
+    <p>Pe scurt: alege finlandeza daca vrei ritualul si caldura intensa, si infrarosu daca vrei caldura blanda, folosire deasa si consum mai mic.</p>
+
+    <h2 id="verifici">Ce sa verifici inainte sa cumperi</h2>
+    <p>Cateva lucruri care conteaza mai mult decat notele, la o categorie unde parerile lipsesc:</p>
+    <ul>
+      <li><strong>Spatiul:</strong> masoara locul, mai ales inaltimea, pentru o cabina. O portabila se strange, dar o cabina sta permanent.</li>
+      <li><strong>Capacitatea:</strong> pentru o persoana ajunge o cabina mica sau o portabila; pentru familie, cauta doua-trei locuri.</li>
+      <li><strong>Materialul:</strong> la cabine, lemnul conteaza, esente ca bradul sau Hemlock sunt placute la aspect si la miros.</li>
+      <li><strong>Alimentarea:</strong> cabinele mari si cele finlandeze cer o priza pe masura si ventilatie; verifica cerintele electrice.</li>
+      <li><strong>Brandul:</strong> in lipsa parerilor, un brand consacrat de saune, ca Belatrix sau Sanotechnik, e un reper de incredere.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa o sauna acasa</h2>
+    <p>Preturile variaza enorm intre tipuri, deci merita sa stii de la inceput la ce sa te astepti:</p>
+    <p><strong>Saune portabile:</strong> sunt cele mai ieftine, de la sub 1000 de lei pentru un cort cu aburi, pana in 2000-3500 de lei la modelele de brand, mai bine facute. Aici intra si patura de sauna cu infrarosu. E cel mai mic prag de intrare si nu cere montaj.</p>
+    <p><strong>Cabine cu infrarosu:</strong> o cabina adevarata de interior porneste in general de la 5000-6000 de lei la variantele mici si urca spre 15000-20000 de lei la cele de brand, pentru doua persoane, din lemn de calitate.</p>
+    <p><strong>Saune finlandeze:</strong> o cabina mica, de o persoana, poate incepe pe la 6000 de lei, ca Sanotechnik Ruby, dar cele mari, pentru familie, ajung la 20000 de lei si peste, plus montajul si cerintele electrice.</p>
+    <p>Pe langa pretul saunei, pune la buget si consumul de curent, mai ales la cabinele finlandeze si cele cu abur, si eventual montajul, la cabinele mari. O sauna portabila, in schimb, o folosesti imediat, doar cu o priza. Diferenta de pret dintre o portabila si o cabina e mare, dar la fel e si diferenta de experienta si de durabilitate: portabila e pentru a incerca si a folosi ocazional, iar cabina, pentru cine stie ca vrea sauna acasa pe termen lung si o va folosi des.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-saune')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate saunele la oferta</strong>
+        <span>Reducerile din acest moment la saune portabile si cabine, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">RP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/radu-popescu/" class="author-name-link">Radu Popescu</a></p>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Radu are peste 9 ani in amenajari si dotari pentru casa, de la usi si cabine de dus la saune si panouri solare, si explica pe intelesul tuturor ce conteaza la montaj, materiale si eficienta.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-saune-pentru-acasa" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-saune-pentru-acasa" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

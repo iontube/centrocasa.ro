@@ -1,621 +1,305 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
 import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Foarfeca electrica pentru gard viu",
-  excerpt: "Daca ai un gard viu sau arbusti ornamentali, o foarfeca electrica pentru gard viu este unealta de care ai nevoie pentru a mentine forma si sanatatea acestora cu efort minim. Aceste unelte elimina munca fizica greoaie asociata cu foarfecele manuale, permitandu-ti sa finalizezi treaba rapid si eficient, indiferent de lungimea sau grosimea crengilor.",
-  image: "/images/articles/foarfeca-electrica-pentru-gard-viu.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-03-11T07:52:54.983Z",
-  modifiedDate: "2026-03-11T07:52:54.983Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "Cat costa o foarfeca electrica pentru gard viu?", answer: "Preturile variaza intre 150 lei pentru modelele entry-level cu fir si peste 700 lei pentru cele pe acumulator, cu baterii incluse si performante ridicate. Modelele de mijloc, cu un bun raport calitate-pret, se incadreaza in intervalul 300-500 lei." },
-  { question: "Care este diferenta dintre o foarfeca electrica si una pe acumulator?", answer: "Foarfecele electrice cu fir ofera putere constanta si sunt, de obicei, mai ieftine, dar necesita acces la priza. Cele pe acumulator ofera libertate de miscare totala, fiind ideale pentru gradini mari, dar au o autonomie limitata de bateria reincarcabila." },
-  { question: "Ce diametru maxim de creanga poate taia o foarfeca electrica?", answer: "Majoritatea modelelor electrice cu fir pot taia crengi de pana la 18-24mm. Unele modele, precum Black+Decker GT5500 cu functia 'Saw Blade', pot aborda crengi usor mai groase. Modelele cu acumulator au, de obicei, o capacitate de taiere similara sau usor inferioara." },
-  { question: "Merita sa cumpar o foarfeca electrica cu lama lunga?", answer: "O lama lunga (50-55cm) este eficienta pentru garduri vii mari, permitand acoperirea rapida a suprafetelor. Totusi, poate fi mai greu de manevrat in spatii inguste sau pentru detalii fine. Pentru garduri mici, o lama mai scurta poate fi mai potrivita." },
-  { question: "Ce inseamna puterea motorului (W) pentru o foarfeca electrica?", answer: "Puterea motorului indica forta unealtei. Un motor mai puternic (ex: 600W) va face fata mai usor crengilor groase si dense, asigurand o taiere mai rapida si fara efort. Modelele cu putere mai mica (ex: 450W) sunt potrivite pentru crengi subtiri si intretinere usoara." }
-];
-
-const toc = [
-  { title: "Bosch UniversalHedgeCut 55", id: "bosch-universalhedgecut-55" },
-  { title: "Makita UH5570", id: "makita-uh5570" },
-  { title: "Einhell GC-EH 5550", id: "einhell-gc-eh-5550" },
-  { title: "Black+Decker GT5500", id: "blackdecker-gt5500" },
-  { title: "Worx WG204E", id: "worx-wg204e" },
-  { title: "Gardena EasyCut 450/50", id: "gardena-easycut-45050" },
-  { title: "Comparatie", id: "comparatie" },
-  { title: "Cum alegi cea mai buna foarfeca electrica pentru gard viu?", id: "ghid" },
-  { title: "Intrebari Frecvente", id: "faq" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['foarfeca-gard-viu'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Cu fir, accesibile ---
+  { g: 'fir', id: 'D3TGX4BBM', badge: 'Cea mai vanduta', short: 'Steinhaus PRO-HTR600', tip: 'Cu fir', lama: '51 cm', taiere: 'max 20 mm',
+    specs: ['600 W, lama de 51 cm', 'taie crengi de pana la 20 mm grosime', 'cu fir, alimentare la priza', '186 pareri, nota 4.79'],
+    pros: ['Cea mai vanduta din selectie, 186 de pareri', 'Lama lunga de 51 cm, avansezi repede', 'Taie crengi groase, pana la 20 mm', 'Pret accesibil pentru o foarfeca cu fir'],
+    cons: ['Cablul te limiteaza la lungimea prelungitorului', 'Fara libertatea unei variante pe acumulator'],
+    verdict: 'Cu 186 de pareri, de departe cele mai multe din selectie, Steinhaus PRO-HTR600 e alegerea pe care a facut-o cea mai multa lume, si se intelege de ce. Are 600 W si o lama lunga de 51 cm, cu care avansezi repede pe gardul viu, si taie crengi de pana la 20 mm grosime, mai groase decat multe rivale. Fiind cu fir, are putere constanta, nu se descarca la mijlocul lucrului, la un pret accesibil. In schimb, cablul te tine legat de priza si de lungimea prelungitorului, deci ai grija pe unde il porti. O iei cand vrei cea mai populara si mai verificata foarfeca de gard viu din selectie, cu lama lunga si putere buna, la un pret bland, pentru un gard viu la care ajungi cu prelungitorul.' },
+  { g: 'fir', id: 'D8P9NVMBM', badge: 'Cea mai accesibila', short: 'Lehmann Brodsworth', tip: 'Cu fir', lama: '45 cm', taiere: '16 mm',
+    specs: ['lama de 45 cm, distanta dinti 16 mm', 'cu fir, alimentare la priza', 'vine cu ochelari de protectie inclusi', '17 pareri, nota 4.41'],
+    pros: ['Cel mai mic pret din selectie', 'Lama de 45 cm, buna pentru garduri obisnuite', 'Vine cu ochelari de protectie inclusi', 'Simpla, usor de folosit'],
+    cons: ['Brand mai putin cunoscut', 'Nota mai modesta, 4.41'],
+    verdict: 'Daca vrei sa cheltui cat mai putin si totusi sa scapi de foarfeca manuala, Lehmann Brodsworth e cea mai ieftina intrare din selectie. Are o lama de 45 cm, potrivita pentru garduri vii obisnuite, distanta intre dinti de 16 mm, si vine cu ochelari de protectie inclusi, un plus placut la acest pret. E cu fir, deci cu putere constanta la priza. Brandul e mai putin cunoscut, iar nota, 4.41 din 17 pareri, e mai modesta decat a celor de top, semn ca faci un compromis de finisaj pentru pretul mic. O iei cand bugetul e prioritatea numarul unu si vrei o foarfeca simpla, cu fir, pentru un gard viu mic, fara sa dai multi bani.' },
+  { g: 'fir', id: 'D8PZQMBBM', badge: 'Einhell, lama de 51 cm', short: 'Einhell GH-EH 4245', tip: 'Cu fir', lama: '51 cm', taiere: '16 mm',
+    specs: ['420 W, lama de 51 cm', '3200 curse pe minut, dinti la 16 mm', 'cu fir, de la Einhell', '14 pareri, nota 4.64'],
+    pros: ['Lama lunga de 51 cm, avansezi repede', 'De la Einhell, brand cunoscut in unelte de gradina', '3200 curse pe minut, taiere rapida', 'Nota buna, 4.64'],
+    cons: ['Cu fir, legata de priza', 'Inca putine pareri, 14'],
+    verdict: 'De la un brand cu nume in uneltele de gradina, Einhell GH-EH 4245 e o foarfeca cu fir echilibrata, buna pentru cine vrea o marca de incredere fara sa plateasca premium. Are 420 W, o lama lunga de 51 cm, ca sa avansezi repede pe gard, si 3200 de curse pe minut pentru o taiere fina, cu dinti la 16 mm. Cu 14 pareri si nota 4.64, e bine cotata, chiar daca are inca putine recenzii. Fiind cu fir, e legata de priza si de prelungitor. O iei cand vrei o foarfeca de gard viu de la Einhell, cu lama lunga si taiere rapida, la un pret rezonabil, pentru un gard viu de dimensiune obisnuita.' },
+  // --- Cele mai bune si fara fir ---
+  { g: 'top', id: 'D0Y2LKMBM', badge: 'Cea mai bine notata, 4.93', short: 'Bosch EasyHedgeCut 45', tip: 'Cu fir', lama: '45 cm', taiere: '3400 curse/min',
+    specs: ['Bosch, 420 W, lama de 45 cm', '3400 curse pe minut, taiere fina', 'cu fir, usoara si manevrabila', '40 pareri, nota 4.93, cea mai mare la modelele mari'],
+    pros: ['Cea mai mare nota dintre foarfecile mari, 4.93', 'De la Bosch, calitate si siguranta', '3400 curse pe minut, taiere curata', 'Usoara si bine echilibrata, obosesti mai greu'],
+    cons: ['Cu fir, legata de priza', 'Lama de 45 cm, nu cea mai lunga'],
+    verdict: 'Cand cauti cel mai bine notat model dintre foarfecile mari, Bosch EasyHedgeCut 45 iese in fata cu o nota de 4.93, printre cele mai mari din toata selectia. E de la Bosch, cu tot ce inseamna asta ca siguranta si calitate a taierii, are 420 W si 3400 de curse pe minut, care dau o taiere fina si curata, si o lama de 45 cm. E usoara si bine echilibrata, deci o tii in maini mai mult fara sa te oboseasca, un lucru care conteaza pe un gard mare. E cu fir, deci legata de priza, iar lama nu e cea mai lunga. O iei cand vrei cea mai apreciata foarfeca de gard viu din selectie, de la Bosch, cu taiere fina si manevrare usoara, si nu te deranjeaza cablul.' },
+  { g: 'top', id: 'DYQ0DZBBM', badge: 'Premium, brand japonez', short: 'Makita UH4861', tip: 'Cu fir', lama: '48 cm', taiere: '16 mm',
+    specs: ['Makita, 400 W, lama de 48 cm', 'distanta dinti 16 mm, taiere robusta', 'cu fir, construita pentru durabilitate', 'nota 5 din 5, brand profesional'],
+    pros: ['De la Makita, brand japonez profesional', 'Lama de 48 cm, taiere robusta', 'Construita pentru durabilitate si folosire intensa', 'Nota maxima, 5 din 5'],
+    cons: ['Cel mai scump din selectie', 'Doar 5 pareri deocamdata'],
+    verdict: 'Pentru cine pune calitatea si durabilitatea pe primul loc, Makita UH4861 vine cu reputatia unui brand japonez profesional, folosit si de gradinari care lucreaza zi de zi. Are 400 W si o lama de 48 cm, cu dinti la 16 mm, construita solid pentru folosire intensa si ani multi de lucru, nu doar pentru cateva tunsori pe sezon. A luat nota maxima, 5 din 5, chiar daca din doar 5 pareri deocamdata. E cu fir si e cel mai scump model din selectie, un pret pe care il dai pentru calitatea Makita. O iei cand vrei o foarfeca premium, durabila, de la un brand profesional, pentru un gard viu la care tii si pe care il ingrijesti multi ani, si esti dispus la investitie.' },
+  { g: 'top', id: 'DTY2LKMBM', badge: 'Fara fir, pe acumulator', short: 'Bosch EasyHedgeCut 18V', tip: 'Pe acumulator', lama: '45 cm', taiere: '2400 curse/min',
+    specs: ['Bosch, acumulator 18 V, fara fir', 'lama de 45 cm, 2400 curse pe minut', 'include acumulator 2.0 Ah si incarcator', '15 pareri, nota 4.87'],
+    pros: ['Fara fir, te misti liber prin gradina', 'De la Bosch, cu acumulator 18 V inclus', 'Nota mare, 4.87', 'Vine complet: acumulator si incarcator'],
+    cons: ['Autonomie limitata de acumulator', 'Mai scumpa decat variantele cu fir similare'],
+    verdict: 'Daca te-ai saturat sa tragi cablul dupa tine si sa cauti prize, Bosch EasyHedgeCut 18V e singura din selectie care iti da libertate totala de miscare. Merge pe un acumulator de 18 V, inclus in pachet impreuna cu incarcatorul, deci o scoti din cutie si o folosesti, si ajungi cu ea oriunde in gradina, chiar si acolo unde nu ai priza aproape, fara grija cablului. Are o lama de 45 cm si 2400 de curse pe minut, cu nota 4.87 din 15 pareri, foarte bine cotata. Autonomia e insa limitata de acumulator, deci pentru garduri foarte lungi poti avea nevoie de o pauza de incarcare, si costa mai mult decat o foarfeca cu fir similara. O iei cand vrei libertatea de a lucra fara cablu, de la Bosch, si nu ai un gard atat de lung incat sa te limiteze acumulatorul.' },
+  // --- Compacte de mana ---
+  { g: 'mana', id: 'DML93KMBM', badge: 'Cea mai vanduta mica', short: 'Texas HTG360Li', tip: 'De mana', lama: 'compacta', taiere: 'iarba si arbusti',
+    specs: ['acumulator Li-Ion 3.6 V, 2 in 1', 'taie iarba si arbusti mici', 'maner reglabil pe inaltime, incarcare USB', '75 pareri, nota 4.57'],
+    pros: ['Cea mai vanduta dintre cele mici, 75 de pareri', '2 in 1: cap pentru iarba si cap pentru arbusti', 'Maner reglabil pe inaltime, se incarca prin USB', 'Foarte accesibila'],
+    cons: ['Doar pentru forme mici, buxus si arbusti', 'Acumulator mic, 3.6 V'],
+    verdict: 'Pentru tuns fin, forme si arbusti mici, nu ai nevoie de o foarfeca mare, iar Texas HTG360Li e cea mai vanduta unealta compacta din selectie. E un dispozitiv 2 in 1: schimbi capul si taie fie iarba pe margini, fie arbusti mici si buxus, cu un maner care se regleaza pe inaltime si un acumulator ce se incarca prin cablu USB, comod. Cu 75 de pareri si nota 4.57, e apreciata pentru cat de practica si accesibila e. Nu inlocuieste o foarfeca mare de gard viu: e pentru forme mici si detalii, cu un acumulator de doar 3.6 V. O iei cand vrei o unealta mica si ieftina pentru tuns buxusul, formele si marginile, ca accesoriu pe langa o foarfeca mare sau pentru o gradina cu forme mici.' },
+  { g: 'mana', id: 'D5CW5RMBM', badge: 'Mini, de mana, nota 4.88', short: 'Shall 7.2V', tip: 'De mana', lama: 'mica', taiere: 'buxus si forme',
+    specs: ['acumulator 7.2 V, foarte compacta', 'pentru tuns fin, buxus si forme', 'usoara, se tine intr-o mana', '24 pareri, nota 4.88'],
+    pros: ['Foarte compacta, se tine intr-o mana', 'Nota mare, 4.88', 'Perfecta pentru buxus, forme si detalii', 'Usoara, nu oboseste incheietura'],
+    cons: ['Doar pentru tuns fin, nu pentru gard mare', 'Acumulator mic'],
+    verdict: 'Cand ai de tuns un buxus, forme sau margini si vrei ceva usor si precis, mini-foarfeca Shall de 7.2 V isi face treaba cu o nota de 4.88, una dintre cele mai mari din selectie. E foarte compacta, o tii intr-o singura mana si o manevrezi usor in jurul formelor si al ghivecelor, unde o foarfeca mare ar fi greoaie, iar greutatea mica nu-ti oboseste incheietura. Cu 24 de pareri si nota aproape maxima, cei care au cumparat-o sunt multumiti. E strict pentru tuns fin, nu pentru un gard viu inalt si lung, si are un acumulator mic. O iei cand vrei o unealta mica, precisa si bine notata pentru buxus, forme si detalii, pe langa uneltele mari de gradina.' },
+  { g: 'mana', id: 'D13X9W3BM', badge: 'Compacta, acumulator 21 V', short: 'Mesterino NT20', tip: 'De mana', lama: '45 cm', taiere: '180 W',
+    specs: ['acumulator 21 V, 2 Ah, 180 W', 'lama de 45 cm, mai lunga pentru o compacta', 'fara fir, manevrabila', '5 pareri, nota 4.8'],
+    pros: ['Acumulator mai puternic, 21 V', 'Lama de 45 cm, mai lunga decat alte compacte', 'Fara fir, usor de manevrat', 'Nota buna, 4.8'],
+    cons: ['Doar 5 pareri deocamdata', 'Brand mai putin cunoscut'],
+    verdict: 'La granita dintre uneltele mici si cele mari, Mesterino NT20BHT01 ofera un acumulator mai puternic, de 21 V, si o lama de 45 cm, mai lunga decat la mini-foarfecile de mana, ceea ce o face utila si pentru garduri vii mici, nu doar pentru forme. Are 180 W, merge fara fir, deci te misti liber, si e usor de manevrat. Cu doar 5 pareri, chiar daca nota 4.8, e inca putin testata, iar brandul e mai putin cunoscut, asa ca te bazezi mai mult pe specificatii. O iei cand vrei o foarfeca compacta fara fir, cu un acumulator mai puternic si o lama ceva mai lunga, la mijloc intre mini-uneltele de forme si foarfecile mari de gard viu.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const FIR = PICKS.filter(x => x.g === 'fir');
+const TOP = PICKS.filter(x => x.g === 'top');
+const MANA = PICKS.filter(x => x.g === 'mana');
+
+const hero = '/images/articles/foarfeca-electrica-pentru-gard-viu.webp';
+const figFir = '/imagini/articole/foarfeca-fir.webp';
+const figTop = '/imagini/articole/foarfeca-premium.webp';
+const figMana = '/imagini/articole/foarfeca-mana.webp';
+const published = '2026-07-19T18:05:41+03:00';
+
+const faq = [
+  { question: 'Cu fir sau pe acumulator, ce e mai bun pentru gardul viu?', answer: 'Depinde de cat de lung e gardul si cat de departe ajungi cu priza. O foarfeca cu fir are putere constanta si nu se descarca niciodata, deci taie la fel de bine si dupa o ora de lucru, e mai usoara pentru ca nu cara un acumulator, si costa in general mai putin; in schimb, esti legat de cablu si de un prelungitor, trebuie sa ai grija sa nu-l tai si nu ajungi in colturi indepartate din gradina. O foarfeca pe acumulator iti da libertate totala de miscare, ajungi oriunde fara cablu, dar are autonomie limitata, la garduri foarte lungi poti avea nevoie de o pauza de incarcare sau de un al doilea acumulator, e ceva mai grea si mai scumpa. Pe scurt: pentru un gard mare la care ajungi cu prelungitorul, cu fir e mai practic si mai ieftin; pentru libertate si garduri raspandite prin gradina, alege pe acumulator.' },
+  { question: 'Ce lungime de lama imi trebuie?', answer: 'Lama, masurata in centimetri, determina cat de repede avansezi si ce garduri poti tunde. O lama lunga, de 48-51 cm, ca la Steinhaus, Einhell sau Makita din selectie, acopera o suprafata mare la fiecare trecere, deci termini mai repede un gard viu lung si tai mai drept partile late. O lama de 45 cm, ca la Bosch, e un bun compromis, usor de manevrat si potrivita pentru garduri obisnuite. Uneltele compacte, de mana, au lame mici si sunt pentru buxus, forme si detalii, nu pentru garduri mari. Alege lama lunga daca ai mult de tuns si suprafete late, si una medie sau compacta daca ai un gard mic sau lucrezi mai ales forme si margini.' },
+  { question: 'Ce grosime de crengi taie o foarfeca de gard viu?', answer: 'Conteaza distanta dintre dinti, care spune ce grosime de creanga intra intre lame si poate fi taiata. Modelele din selectie au distante intre dinti de 15-20 mm: una de 20 mm, ca Steinhaus, taie crengi mai groase, pana la 2 cm, potrivita pentru garduri mai lemnoase sau lasate mai mult netunse, iar una de 16 mm face fata crengilor obisnuite ale unui gard tuns regulat. Pentru intretinerea normala, cand tunzi de cateva ori pe sezon si crengile sunt subtiri, 15-16 mm ajung. Daca gardul e batran, des si cu ramuri groase, cauta o distanta mai mare intre dinti. Retine ca o foarfeca de gard viu e pentru crengi verzi si subtiri, nu pentru ramuri groase si uscate, pentru care ai nevoie de un fierastrau.' },
+  { question: 'Cat de des trebuie tuns un gard viu?', answer: 'Depinde de specie si de cat de ingrijit vrei sa arate, dar regula generala e de doua ori pe an pentru majoritatea gardurilor: o data primavara, spre sfarsitul primaverii, si o data la sfarsitul verii, ca sa intre in iarna cu o forma buna. Gardurile cu crestere rapida, ca ligustrul, cer si o a treia tunsoare vara pentru a ramane compacte si dese. Tunsul regulat nu doar ca tine gardul frumos, ci il si indeasa: taind varfurile, stimulezi ramurile laterale sa creasca, asa ca gardul devine mai plin si mai des in timp. Evita sa tunzi in plin soare si arsita sau in perioada de cuibarit a pasarilor, primavara tarziu, si nu taia prea adanc in lemnul batran dintr-o data. Un gard tuns constant, de doua-trei ori pe an, ramane sanatos, des si cu o forma clara.' },
+  { question: 'Cum folosesc in siguranta o foarfeca de gard viu?', answer: 'O foarfeca electrica are lame ascutite in miscare rapida, asa ca siguranta e importanta. Poarta intotdeauna ochelari de protectie, unele modele ii includ, ca sa te aperi de aschii si bucati de creanga, si manusi, iar la garduri mari o casca de protectie a auzului nu strica. Tine unealta cu ambele maini pe manere si ai grija ca a doua mana si picioarele sa fie mereu departe de lama. La modelele cu fir, poarta cablul peste umar si ai grija sa fie mereu in spatele tau, ca sa nu-l tai din greseala, si foloseste o priza cu protectie. Nu tunde pe scara instabila si nu te intinde peste masura, e mai sigur sa muti scara. Opreste si scoate din priza sau scoate acumulatorul inainte de a curata sau debloca lama. Cu aceste reguli simple, tunsul gardului e o treaba sigura si placuta.' },
+  { question: 'Cum intretin foarfeca ca sa dureze?', answer: 'Cheia e sa ai grija de lama, care e inima uneltei. Dupa fiecare folosire, curata lama de resturi de frunze si de seva, care altfel se intaresc si o ingreuneaza, si sterge-o cu o carpa. Din cand in cand, mai ales daca ai taiat mult, aplica putin ulei special de lama sau un spray de intretinere, care unge, protejeaza de rugina si face taierea mai lina. Ascute lama periodic sau du-o la ascutit daca observi ca rupe crengile in loc sa le taie curat. La modelele pe acumulator, nu lasa acumulatorul complet descarcat perioade lungi si depoziteaza-l intr-un loc uscat, la temperatura camerei. Pastreaza unealta la adapost, nu in ploaie sau umezeala. Cu aceasta grija simpla, o foarfeca de gard viu buna taie curat si rezista multi ani.' },
+  { question: 'Cat costa o foarfeca electrica de gard viu?', answer: 'In selectie, foarfecile cu fir pornesc de la circa 120 de lei pentru un model accesibil, ca Lehmann Brodsworth, si stau in zona 180-230 de lei pentru cele mai vandute cu lama lunga, ca Steinhaus si Einhell. Modelele de la Bosch cu fir sunt in jur de 300 de lei, cea pe acumulator, fara fir, in jur de 450 de lei, iar cele premium, ca Makita, ajung spre 670 de lei. Uneltele compacte, de mana, pentru buxus si forme, costa intre circa 120 si 190 de lei. Cel mai bun raport il gasesti alegand dupa nevoie: o foarfeca cu fir cu lama lunga pentru un gard obisnuit, una pe acumulator daca vrei libertate de miscare, si o unealta mica doar pentru forme si detalii.' },
+];
+
+const images = [hero, figFir, figTop, figMana, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Foarfeca electrica pentru gard viu - CentroCasa"
-  description="Daca ai un gard viu sau arbusti ornamentali, o foarfeca electrica pentru gard viu este unealta de care ai nevoie pentru a mentine forma si sanatatea acestora cu efort minim. Aceste unelte elimina munca fizica greoaie asociata cu foarfecele manuale, permitandu-ti sa finalizezi treaba rapid si eficient, indiferent de lungimea sau grosimea crengilor."
-  image="/images/articles/foarfeca-electrica-pentru-gard-viu.webp"
+  title="Cea mai buna foarfeca electrica pentru gard viu in 2026: cu fir, pe acumulator si de mana"
+  description="Care e cea mai buna foarfeca electrica pentru gard viu in 2026: modele cu fir accesibile de la Steinhaus, Einhell si Lehmann, cele mai bine notate si fara fir de la Bosch si Makita, si unelte compacte de mana pentru buxus si forme. Comparate pe lama, grosime de taiere si tip de alimentare, plus cu fir vs acumulator si cum tunzi gardul."
+  image={hero}
   type="article"
-  publishedTime="2026-03-11T07:52:54.983Z"
-  modifiedTime="2026-03-11T07:52:54.983Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cea mai buna foarfeca electrica pentru gard viu' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      Gradinarit si Unelte
-      <span class="breadcrumb-separator">/</span>
-      <span>Foarfeca electrica pentru gard viu</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cea mai buna foarfeca electrica pentru gard viu</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        Gradinarit si Unelte
-        <span class="article-date">11 martie 2026</span>
-      </div>
-      <h1 class="article-title">Foarfeca electrica pentru gard viu</h1>
-    </header>
+    <h1>Cea mai buna foarfeca electrica pentru gard viu</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Specialist Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/foarfeca-electrica-pentru-gard-viu.webp" alt="Foarfeca electrica pentru gard viu" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cea mai buna foarfeca electrica pentru gard viu: cu fir, pe acumulator si de mana" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list" id="toc-desktop-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
-        ))}
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      <section id="intro">
-        <p>Daca ai un gard viu sau arbusti ornamentali, o <strong>foarfeca electrica pentru gard viu</strong> este unealta de care ai nevoie pentru a mentine forma si sanatatea acestora cu efort minim. Aceste unelte elimina munca fizica greoaie asociata cu foarfecele manuale, permitandu-ti sa finalizezi treaba rapid si eficient, indiferent de lungimea sau grosimea crengilor. Alegerea corecta depinde de suprafata gradinii tale, tipul de vegetatie si bugetul disponibil, dar raspunsul direct este ca o <strong>foarfeca electrica pentru gard viu</strong> de calitate va transforma o sarcina anevoioasa intr-una placuta.</p><p>Ce face o <strong>foarfeca electrica pentru gard viu</strong> potrivita pentru tine? Raspunsul se gaseste in combinatia dintre puterea motorului, lungimea lamei, greutatea uneltei si autonomia bateriei (daca este cazul). Modelele mai puternice pot taia crengi mai groase, lamele mai lungi acopera suprafete mai mari rapid, iar o greutate redusa inseamna mai putin oboseala pe durata utilizarii. Pentru a te ajuta sa navighezi prin optiunile disponibile, am analizat cele mai populare modele de pe piata, luand in considerare performanta, fiabilitatea si raportul calitate-pret, pentru a-ti oferi un ghid complet inainte de a face achizitia.</p>
-      </section>
-
-
-          <article class="product-review" id="bosch-universalhedgecut-55">
-            <div class="product-review__header">
-              <span class="section-tag">Alegerea Noastra</span>
-              <h3>Bosch UniversalHedgeCut 55</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Foarfeca electrica pentru gard viu
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>600 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Lama de 55 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Sistem 'Quick-Cut', maner ergonomic, protectie lama
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic ABS, otel securizat
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Cand vine vorba de ingrijirea gradinii, unealta potrivita face toata diferenta, iar modelul Bosch UniversalHedgeCut 55 se pozitioneaza ca un aliat de nadejde pentru oricine cauta eficienta si precizie. Cu o putere de 600W, aceasta <strong>foarfeca electrica pentru gard viu</strong> este capabila sa taie crengi cu un diametru de pana la 20mm, fara efort vizibil. Lungimea lamei de 55cm este ideala pentru majoritatea gardurilor vii de dimensiuni medii spre mari, permitand acoperirea rapida a suprafetelor extinse. Sistemul 'Quick-Cut' integrat asigura o taiere continua, prevenind blocarea lamei in crengile mai groase, o caracteristica ce economiseste timp si frustrare. Greutatea de 3.6 kg este bine echilibrata, iar manerul ergonomic, cu functia 'Multi-Grip', permite o manevrare confortabila din diverse pozitii, reducand oboseala chiar si in sesiuni prelungite de lucru. Constructia robusta, specifica brandului Bosch, promite o durabilitate pe masura performantei.</p><p>Ce diferentiaza acest model de altele similare? Sistemul de siguranta integrat, care impiedica pornirea accidentala, si protectia lamei, esentiala pentru depozitare si transport in siguranta, sunt standarde inalte. De asemenea, nivelul de zgomot este relativ redus pentru o unealta electrica de aceasta putere, un plus pentru confortul utilizatorului si al vecinilor. Comparativ cu modelele pe acumulator, UniversalHedgeCut 55 ofera putere constanta, fara grija autonomiei bateriei, fiind perfect pentru cei care au acces facil la o sursa de curent in gradina. Daca gradina ta include garduri vii mai dense sau arbusti care necesita tundere regulata, aceasta unealta se va dovedi un investitie inteligenta.</p><p>Pentru cine este potrivita aceasta <strong>foarfeca electrica pentru gard viu</strong>? Este ideala pentru proprietarii de case cu gradini de dimensiuni medii si mari, care apreciaza fiabilitatea si performanta constanta. Utilizatorii care au avut experiente frustrante cu unelte mai slabe sau cu cele pe acumulator cu autonomie limitata vor gasi in acest model o solutie eficienta. Pretul sau, situat in segmentul mediu spre superior, reflecta calitatea germana si durabilitatea pe termen lung. Recomandarea noastra este clara: daca cauti o unealta puternica, fiabila si confortabila pentru intretinerea gardului viu, Bosch UniversalHedgeCut 55 este o alegere pe care nu o vei regreta.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Putere mare (600W) pentru taiere eficienta</li>
-              <li>Lama lunga (55cm) acopera suprafete mari rapid</li>
-              <li>Sistem 'Quick-Cut' previne blocarea lamei</li>
-              <li>Maner ergonomic si functii multiple de prindere pentru confort</li>
-              <li>Constructie robusta si durabila specifica Bosch</li>
-              <li>Functionare constanta, fara grija bateriei</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Necesita sursa de curent (cablu)</li>
-              <li>Poate fi mai grea decat modelele pe acumulator pentru utilizatori mai slabi</li>
-              <li>Diametrul maxim de taiere (20mm) poate fi insuficient pentru crengi foarte groase</li>
-              <li>Pretul poate fi un factor pentru unii cumparatori</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="makita-uh5570">
-            <div class="product-review__header">
-              <span class="section-tag">Raport Calitate-Pret</span>
-              <h3>Makita UH5570</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Foarfeca electrica pentru gard viu
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>550 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Lama de 55 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Maner rotativ, sistem anti-vibratii, frana electrica
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Aluminiu, otel inoxidabil
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Ingrijirea unui gard viu poate fi o provocare, dar cu Makita UH5570, sarcina devine mult mai gestionabila. Acest model se distinge prin puterea sa de 550W, suficienta pentru a face fata crengilor de pana la 18mm grosime, un standard bun pentru majoritatea utilizatorilor casnici. Lama de 55cm este, de asemenea, potrivita pentru suprafete medii, permitand o finisare rapida si uniforma. Unul dintre punctele forte ale acestei <strong>foarfeca electrica pentru gard viu</strong> este sistemul anti-vibratii, care reduce semnificativ socurile transmise utilizatorului, permitand sesiuni de lucru mai lungi si mai confortabile. Manerul rotativ, o caracteristica practică, permite ajustarea unghiului de taiere in functie de pozitia gardului viu, oferind o flexibilitate sporita in utilizare.</p><p>Cum se compara cu alte optiuni din aceeasi categorie? Makita UH5570 impresioneaza prin atentia la detalii. Frana electrica integrata asigura oprirea lamei in fractiuni de secunda dupa eliberarea butonului de pornire, sporind siguranta. Greutatea de 2.9 kg este, de asemenea, un avantaj, facand-o mai usor de manevrat decat alte modele mai puternice. Pentru cine cauta o unealta fiabila, cu un brand recunoscut pentru calitate in scule electrice, acest model ofera un echilibru excelent intre performanta, confort si pret. Este o alegere solida pentru cei care doresc o unealta electrica cu fir, dar cu caracteristici premium.</p><p>Este Makita UH5570 potrivita pentru gradina ta? Daca ai un gard viu de dimensiuni medii, cu crengi nu foarte groase, si apreciezi confortul in utilizare datorita sistemului anti-vibratii si manerului rotativ, atunci da. Este o optiune excelenta pentru proprietarii de case care doresc o unealta performanta, dar nu neaparat cea mai puternica de pe piata. Raportul calitate-pret este unul dintre cele mai bune, plasandu-l ca o optiune de top pentru bugetul mediu. Recomandarea noastra este sa alegi acest model daca prioritizezi confortul si manevrabilitatea, fara a compromite calitatea taierii.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Sistem anti-vibratii pentru confort sporit</li>
-              <li>Maner rotativ pentru flexibilitate in utilizare</li>
-              <li>Frana electrica pentru siguranta suplimentara</li>
-              <li>Greutate redusa (2.9 kg) comparativ cu alte modele</li>
-              <li>Brand recunoscut pentru fiabilitate</li>
-              <li>Constructie solida</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Puterea (550W) este mai mica decat la modelele de top</li>
-              <li>Diametrul maxim de taiere (18mm) este limitat</li>
-              <li>Necesita alimentare la priza</li>
-              <li>Pretul, desi bun, este peste optiunile entry-level</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="einhell-gc-eh-5550">
-            <div class="product-review__header">
-              <span class="section-tag">Pentru Buget Mic</span>
-              <h3>Einhell GC-EH 5550</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Foarfeca electrica pentru gard viu
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>550 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Lama de 50 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Maner auxiliar, comutator de siguranta, protectie la suprasarcina
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic, otel
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Pentru cei care cauta o solutie eficienta si accesibila pentru ingrijirea gardului viu, Einhell GC-EH 5550 se prezinta ca o optiune demna de luat in considerare. Cu o putere de 550W si o lama de 50cm, aceasta <strong>foarfeca electrica pentru gard viu</strong> este potrivita pentru sarcini moderate, cum ar fi tunderea gardurilor vii mici si medii sau a arbustilor decorativi. Diametrul maxim de taiere admis este de 24mm, un avantaj notabil pentru aceasta categorie de pret, permitand abordarea unor crengi usor mai groase decat la alte modele similare. Sistemul de comutare in doi pasi, ce include un maner auxiliar, ofera un control bun asupra uneltei, iar greutatea de aproximativ 3 kg permite o utilizare fara eforturi exagerate.</p><p>Ce face ca acest model sa fie o alegere buna pentru un buget restrans? Einhell este cunoscut pentru oferirea de unelte functionale la preturi competitive. GC-EH 5550 nu face exceptie, oferind caracteristici esentiale pentru o utilizare sigura si eficienta. Protectia la suprasarcina este un element important, prevenind deteriorarea motorului in cazul blocarii lamei. Comparativ cu modelele mult mai scumpe, poate nu ofera finisajele premium sau tehnologiile avansate de reducere a vibratiilor, insa isi face treaba cu brio pentru nevoile de baza ale unui gradinar amator. Este o unealta electrica cu fir, deci autonomia nu este o problema, atata timp cat gradina are acces la electricitate.</p><p>Merita sa investesti in Einhell GC-EH 5550? Daca ai un buget limitat si ai nevoie de o <strong>foarfeca electrica pentru gard viu</strong> pentru a mentine ordinea in gradina, fara a tunde crengi foarte groase sau a lucra pe suprafete extrem de mari, raspunsul este da. Este o optiune excelenta pentru incepatori sau pentru cei care folosesc unealta ocazional. Recomandarea noastra este sa alegi acest model daca prioritizezi costul redus si functionalitatea de baza, fiind o introducere buna in lumea uneltelor electrice pentru gradina.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Pret foarte accesibil</li>
-              <li>Diametru de taiere bun (24mm) pentru clasa sa</li>
-              <li>Usoara si manevrabila</li>
-              <li>Comutator de siguranta si protectie la suprasarcina</li>
-              <li>Brand cu reputatie pentru raportul calitate-pret</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Puterea motorului (550W) este standard, nu impresionanta</li>
-              <li>Poate fi mai putin rezistenta la utilizare intensiva pe termen lung</li>
-              <li>Fara functii suplimentare de confort (ex: anti-vibratii)</li>
-              <li>Necesita conectare la priza</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="blackdecker-gt5500">
-            <div class="product-review__header">
-              <span class="section-tag">Best Buy 2026</span>
-              <h3>Black+Decker GT5500</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Foarfeca electrica pentru gard viu
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>550 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Lama de 50 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Sistem 'Saw Blade' pentru crengi groase, maner ergonomic, protectie lama
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic ranforsat, otel
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Cand vine vorba de mentenanta gradinii, versatilitatea este cheia, iar Black+Decker GT5500 integreaza aceasta calitate prin sistemul sau 'Saw Blade'. Aceasta <strong>foarfeca electrica pentru gard viu</strong>, cu o putere de 550W si o lama de 50cm, este proiectata pentru a face fata nu doar tunderilor uzuale, ci si crengilor mai groase, datorita functiei suplimentare de taiere. Diametrul maxim de taiere este de 22mm, dar functia 'Saw Blade' permite abordarea unor diametre usor mai mari, oferind un plus de flexibilitate. Greutatea de 2.7 kg o face una dintre cele mai usoare optiuni, ceea ce contribuie la reducerea oboselii in timpul utilizarii.</p><p>Ce o recomanda in mod special? Sistemul 'Saw Blade' este un diferentiator important, permitand utilizatorului sa taie crengi care ar fi, in mod normal, prea groase pentru o foarfeca electrica standard. Aceasta caracteristica o face potrivita pentru o gama mai larga de sarcini in gradina, de la finisarea gardului viu la eliminarea unor ramuri mai lemnoase. Manerul ergonomic si designul echilibrat asigura o priza buna si o manevrabilitate sporita. Pentru cei care cauta o unealta electrica cu fir, GT5500 ofera un echilibru bun intre putere, versatilitate si greutate, la un pret competitiv. Este o alegere practica pentru proprietarii de case care doresc o unealta capabila sa gestioneze diverse tipuri de tunderi.</p><p>Este Black+Decker GT5500 o investitie buna pentru gradina ta? Daca gradina ta are atat garduri vii ce necesita tundere regulata, cat si arbusti cu crengi mai groase ocazional, atunci acest model este o optiune excelenta. Versatilitatea oferita de sistemul 'Saw Blade' este un avantaj major. Recomandarea noastra este clara: daca cauti o <strong>foarfeca electrica pentru gard viu</strong> usoara, cu o functie utila pentru crengi mai groase si un pret corect, Black+Decker GT5500 se impune ca o alegere inspirata.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Sistem 'Saw Blade' pentru crengi mai groase</li>
-              <li>Foarte usoara (2.7 kg)</li>
-              <li>Maner ergonomic pentru confort</li>
-              <li>Pret competitiv pentru versatilitatea oferita</li>
-              <li>Brand cu experienta in unelte de gradina</li>
-              <li>Lama de 50cm eficienta pentru majoritatea lucrarilor</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Diametrul maxim de taiere standard (22mm) este mediu</li>
-              <li>Necesita alimentare electrica prin cablu</li>
-              <li>Durabilitatea pe termen lung in conditii de utilizare intensiva poate fi o intrebare</li>
-              <li>Nu are functii avansate precum controlul vibratiilor</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="worx-wg204e">
-            <div class="product-review__header">
-              <span class="section-tag">Premium</span>
-              <h3>Worx WG204E</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Foarfeca electrica pentru gard viu (pe acumulator)
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>Baterie 20V (inclusa)
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Lama de 55 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Acumulator compatibil cu alte unelte Worx, lama cu dubla actiune, maner soft grip
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic, otel
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Libertatea de miscare este esentiala in gradina, iar Worx WG204E o ofera prin functionarea pe acumulator. Aceasta <strong>foarfeca electrica pentru gard viu</strong> vine cu o baterie de 20V si o lama de 55cm, ideala pentru a lucra fara constrangerile unui cablu. Lama cu dubla actiune asigura o taiere curata si eficienta, reducand vibratiile si efortul necesar. Capacitatea bateriei (de obicei 2.0Ah sau 4.0Ah, in functie de pachet) permite o autonomie de pana la 45-60 minute de lucru continuu, suficienta pentru majoritatea gradinilor de dimensiuni medii. Greutatea de 2.5 kg (fara acumulator) este un avantaj major, facand-o extrem de manevrabila si confortabila pentru utilizare prelungita.</p><p>Cum se diferentiaza acest model? Principalul avantaj este sistemul de acumulatori. Bateria de 20V este compatibila cu o gama larga de alte unelte Worx, ceea ce inseamna ca, daca detii deja alte produse din aceasta platforma, costul initial poate fi redus. Aceasta mobilitate este un beneficiu imens fata de uneltele cu fir, eliminand riscul de a taia accidental cablul sau de a fi limitat de lungimea acestuia. Comparativ cu foarfecele electrice cu fir, WG204E ofera o libertate de operare superioara, fara a sacrifica prea mult din puterea necesara unei taieri eficiente (diametrul maxim de taiere este de 18mm). Finisajul si calitatea materialelor sugereaza o durabilitate buna.</p><p>Merita sa investesti intr-o foarfeca pe acumulator ca Worx WG204E? Daca gradina ta nu dispune de prize electrice accesibile usor sau pur si simplu preferi flexibilitatea oferita de uneltele fara fir, atunci raspunsul este un mare da. Este potrivita pentru cei care doresc o unealta performanta, usoara si convenabila. Recomandarea noastra se indreapta catre acest model pentru utilizatorii care cauta libertatea de miscare si integrarea intr-un ecosistem de unelte pe acumulator, fiind o optiune premium in segmentul sau.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Functionare pe acumulator pentru libertate maxima de miscare</li>
-              <li>Foarte usoara si manevrabila</li>
-              <li>Lama cu dubla actiune pentru taiere curata</li>
-              <li>Acumulator compatibil cu alte unelte Worx</li>
-              <li>Autonomie decenta pentru sarcini medii</li>
-              <li>Ideal pentru gradini fara acces facil la prize</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Autonomia limitata de capacitatea bateriei (necesita incarcare)</li>
-              <li>Puterea poate fi insuficienta pentru crengi foarte groase</li>
-              <li>Pretul initial poate fi mai mare, incluzand acumulator si incarcator</li>
-              <li>Necesitatea de a incarca bateria</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="gardena-easycut-45050">
-            <div class="product-review__header">
-              <span class="section-tag">Alegerea Noastra</span>
-              <h3>Gardena EasyCut 450/50</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Foarfeca electrica pentru gard viu
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>450 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Lama de 50 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Maner ergonomic, protectie impotriva blocarii, sistem de taiere curat
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic, otel
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Pentru utilizatorii care cauta o unealta fiabila si usor de folosit pentru ingrijirea gardului viu, modelul Gardena EasyCut 450/50 reprezinta o optiune excelenta. Cu o putere de 450W, aceasta <strong>foarfeca electrica pentru gard viu</strong> este proiectata pentru sarcini de intretinere, taiind fara probleme crengi cu un diametru de pana la 18mm. Lama de 50cm este dimensionata optim pentru garduri vii de dimensiuni mici si medii, permitand o manevrare agila si precisa. Designul ergonomic al manerului si greutatea redusa (aproximativ 2.4 kg) fac din aceasta unealta una dintre cele mai confortabile de utilizat, chiar si pentru perioade mai lungi.</p><p>Ce o recomanda in mod special? Brandul Gardena este sinonim cu calitatea si durabilitatea in domeniul uneltelor de gradina. EasyCut 450/50 beneficiaza de acest renume, oferind o constructie solida si o performanta constanta. Sistemul de protectie impotriva blocarii lamei este o caracteristica utila, prevenind deteriorarea uneltei in cazul intalnirii unor crengi prea groase. Spre deosebire de modelele mai puternice, acest model este mai silentios si consuma mai putina energie, fiind o optiune prietenoasa atat cu utilizatorul, cat si cu mediul. Pentru cei care nu au nevoie de o putere excesiva, ci cauta o unealta fiabila pentru sarcini de baza, Gardena EasyCut 450/50 este o alegere potrivita.</p><p>Este Gardena EasyCut 450/50 potrivita pentru nevoile tale? Daca ai un gard viu de dimensiuni mici spre medii, care necesita tundere regulata pentru mentinerea formei, si preferi o unealta usoara, fiabila si usor de manevrat, atunci acest model este ideal. Este o optiune excelenta pentru gradinarii amatori care pun pret pe confort si pe o marca de incredere. Recomandarea noastra este sa alegi acest model daca prioritizezi greutatea redusa, usurinta in utilizare si fiabilitatea unui brand consacrat, pentru sarcini de intretinere.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Foarte usoara (2.4 kg) si manevrabila</li>
-              <li>Maner ergonomic pentru confort sporit</li>
-              <li>Brand de incredere (Gardena) cu reputatie pentru calitate</li>
-              <li>Sistem de protectie impotriva blocarii lamei</li>
-              <li>Consum redus de energie si nivel de zgomot scazut</li>
-              <li>Ideala pentru sarcini de intretinere uzuale</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Puterea (450W) este limitata, potrivita doar pentru crengi subtiri</li>
-              <li>Diametrul maxim de taiere (18mm) este printre cele mai mici</li>
-              <li>Necesita alimentare la priza</li>
-              <li>Poate fi considerata prea putin performanta pentru garduri vii dense sau lemnoase</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-
-          <section id="comparatie">
-            <h2>Comparatie</h2>
-            <p>Pentru a te ajuta sa vizualizezi rapid diferentele dintre modelele prezentate, am creat un tabel comparativ. Acesta evidentiaza caracteristicile cheie ale fiecarei foarfece electrice pentru gard viu, facilitand alegerea celei mai potrivite pentru nevoile tale specifice.</p>
-            <div class="comparison-outer">
-              <div class="comparison-hint">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                Gliseaza pentru a vedea tot tabelul
-              </div>
-              <div class="comparison-wrap">
-                <table class="comparison-table">
-                  <thead>
-                    <tr>
-                      <th>Produs</th>
-                      <th>Tip</th>
-                      <th>Putere</th>
-                      <th>Suprafata</th>
-                      <th>Functii</th>
-                      <th>PotrivitPentru</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-              <tr>
-                <td><strong>Bosch UniversalHedgeCut 55</strong></td>
-                <td>Electrica cu fir</td>
-                <td>600W</td>
-                <td>55cm</td>
-                <td>Quick-Cut, Maner Multi-Grip</td>
-                <td>Utilizatori exigenti</td>
-              </tr>
-
-              <tr>
-                <td><strong>Makita UH5570</strong></td>
-                <td>Electrica cu fir</td>
-                <td>550W</td>
-                <td>55cm</td>
-                <td>Anti-vibratii, Maner rotativ</td>
-                <td>Confort sporit</td>
-              </tr>
-
-              <tr>
-                <td><strong>Einhell GC-EH 5550</strong></td>
-                <td>Electrica cu fir</td>
-                <td>550W</td>
-                <td>50cm</td>
-                <td>Protectie suprasarcina</td>
-                <td>Buget mic</td>
-              </tr>
-
-              <tr>
-                <td><strong>Black+Decker GT5500</strong></td>
-                <td>Electrica cu fir</td>
-                <td>550W</td>
-                <td>50cm</td>
-                <td>Sistem 'Saw Blade'</td>
-                <td>Versatilitate</td>
-              </tr>
-
-              <tr>
-                <td><strong>Worx WG204E</strong></td>
-                <td>Pe acumulator (20V)</td>
-                <td>Baterie 20V</td>
-                <td>55cm</td>
-                <td>Acumulator 20V, Lama dubla</td>
-                <td>Libertate miscare</td>
-              </tr>
-
-              <tr>
-                <td><strong>Gardena EasyCut 450/50</strong></td>
-                <td>Electrica cu fir</td>
-                <td>450W</td>
-                <td>50cm</td>
-                <td>Protectie blocare, Usoara</td>
-                <td>Intretinere usoara</td>
-              </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-
-          <section id="ghid">
-            <h2>Cum alegi cea mai buna foarfeca electrica pentru gard viu?</h2>
-            <div class="guide">
-              <p>Cum alegi cea mai buna <strong>foarfeca electrica pentru gard viu</strong>?</p><p>Primul criteriu de luat in calcul este tipul de alimentare. Ai nevoie de o unealta cu fir sau preferi libertatea oferita de acumulator? Modelele cu fir, precum Bosch UniversalHedgeCut 55 sau Makita UH5570, ofera putere constanta si sunt, de obicei, mai accesibile ca pret, dar te limiteaza la distantele fata de priza. Cele pe acumulator, cum ar fi Worx WG204E, ofera mobilitate totala, fiind ideale pentru gradini mari sau zone fara acces facil la electricitate, insa autonomia bateriei si costul initial pot fi factori de decizie.</p><h4>Cat de puternica trebuie sa fie?</h4><p>Puterea motorului (masurata in W) si lungimea lamei (in cm) determina capacitatea foarfecei de a taia crengi mai groase si de a acoperi suprafete mari. Pentru garduri vii dese sau cu crengi lemnoase, cauta modele de peste 550W si cu lame de 50-55cm, cum ar fi Bosch UniversalHedgeCut 55 sau Makita UH5570. Pentru intretinere usoara sau garduri mai subtiri, modele precum Gardena EasyCut 450/50 (450W, 50cm) sunt suficiente.</p><h4>Ce functii suplimentare sunt utile?</h4><p>Pe langa puterea si lungimea lamei, ia in considerare functii care imbunatatesc confortul si siguranta. Sistemele anti-vibratii (Makita UH5570), manerele ergonomice (toate modelele) si manerele rotative (Makita UH5570) reduc oboseala. Functiile de siguranta, precum protectia la suprasarcina (Einhell GC-EH 5550) sau protectia impotriva blocarii lamei (Gardena EasyCut 450/50), sunt esentiale. Pentru versatilitate, sistemul 'Saw Blade' de la Black+Decker GT5500 este un plus.</p><h4>Care este bugetul tau?</h4><p>Preturile pentru o <strong>foarfeca electrica pentru gard viu</strong> variaza considerabil. Modelele entry-level, cum ar fi Einhell GC-EH 5550, pot fi gasite pentru sub 200 lei, fiind potrivite pentru utilizare ocazionala. Modelele de mijloc, cu un echilibru bun intre performanta si pret (Makita UH5570, Black+Decker GT5500, Gardena EasyCut 450/50), se situeaza intre 300 si 500 lei. Modelele premium, cu functii avansate sau pe acumulator (Bosch UniversalHedgeCut 55, Worx WG204E), pot depasi 600-800 lei, dar ofera o experienta de utilizare superioara si o durabilitate crescuta. Daca ai nevoie de unelte pentru diverse activitati in gradina, investitia intr-un sistem pe acumulator (precum Worx) poate fi mai avantajoasa pe termen lung.</p>
-            </div>
-          </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat costa o foarfeca electrica pentru gard viu?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Preturile variaza intre 150 lei pentru modelele entry-level cu fir si peste 700 lei pentru cele pe acumulator, cu baterii incluse si performante ridicate. Modelele de mijloc, cu un bun raport calitate-pret, se incadreaza in intervalul 300-500 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Care este diferenta dintre o foarfeca electrica si una pe acumulator?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Foarfecele electrice cu fir ofera putere constanta si sunt, de obicei, mai ieftine, dar necesita acces la priza. Cele pe acumulator ofera libertate de miscare totala, fiind ideale pentru gradini mari, dar au o autonomie limitata de bateria reincarcabila.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce diametru maxim de creanga poate taia o foarfeca electrica?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea modelelor electrice cu fir pot taia crengi de pana la 18-24mm. Unele modele, precum Black+Decker GT5500 cu functia 'Saw Blade', pot aborda crengi usor mai groase. Modelele cu acumulator au, de obicei, o capacitate de taiere similara sau usor inferioara.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar o foarfeca electrica cu lama lunga?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O lama lunga (50-55cm) este eficienta pentru garduri vii mari, permitand acoperirea rapida a suprafetelor. Totusi, poate fi mai greu de manevrat in spatii inguste sau pentru detalii fine. Pentru garduri mici, o lama mai scurta poate fi mai potrivita.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna puterea motorului (W) pentru o foarfeca electrica?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Puterea motorului indica forta unealtei. Un motor mai puternic (ex: 600W) va face fata mai usor crengilor groase si dense, asigurand o taiere mai rapida si fara efort. Modelele cu putere mai mica (ex: 450W) sunt potrivite pentru crengi subtiri si intretinere usoara.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cea mai vanduta foarfeca de gard viu din selectie e <strong>Steinhaus PRO-HTR600</strong>, cu 186 de pareri, iar cea mai bine notata dintre cele mari, <strong>Bosch EasyHedgeCut 45</strong>, cu 4.93. Pentru libertate fara cablu, <strong>Bosch EasyHedgeCut 18V</strong>, pe acumulator, e singura fara fir din selectie.</p>
+      <p>La o foarfeca de gard viu conteaza cel mai mult <strong>tipul de alimentare</strong>, cu fir sau pe acumulator, <strong>lungimea lamei</strong>, cat de repede avansezi, si <strong>grosimea de taiere</strong>, ce crengi rup dintii. Mai jos gasesti direct recomandarile, grupate pe cu fir accesibile, cele mai bune si fara fir, si compacte de mana, iar sub ele un ghid despre cum alegi si cum tunzi gardul.</p>
+      <p>Le-am ales pe cele mai testate si mai bine notate din fiecare zona, de la modele cu fir ieftine la premium si la unelte mici pentru buxus. Am notat clar la fiecare care e cu fir si care pe acumulator, cu lama si grosime de taiere, ca sa gasesti repede foarfeca potrivita gardului tau. Pentru crengi si lemne, vezi si <a href="/tocator-de-crengi-pentru-curte/">tocatoarele de crengi</a> si <a href="/fierastrau-electric-pentru-lemne/">fierastraiele electrice</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#fir">Cu fir, accesibile</a></li>
+        <li><a href="#top">Cele mai bune si fara fir</a></li>
+        <li><a href="#mana">Compacte de mana, pentru buxus</a></li>
+        <li><a href="#de-ce">De ce o foarfeca electrica</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#cum-tunzi">Cum tunzi corect gardul viu</a></li>
+        <li><a href="#intretinere">Siguranta si intretinerea</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Alimentare</th><th>Lama</th><th>Nota</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.lama}</td>
+              <td>{x.p.rating} ({x.p.reviews})</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="fir">Cu fir, accesibile</h2>
+    <p>Foarfecile la priza, cu putere constanta care nu se descarca niciodata. Sunt mai usoare si mai ieftine, ideale pentru un gard viu la care ajungi cu prelungitorul. Aici stau cele mai vandute modele, cu lama lunga, la preturi bland.</p>
+    <div class="rd-grid">
+      {FIR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figFir} alt="Foarfeci de gard viu cu fir: Steinhaus, Lehmann si Einhell" width="1200" height="675" loading="lazy" />
+
+    <h2 id="top">Cele mai bune si fara fir</h2>
+    <p>Un pas mai sus: cea mai bine notata din selectie, o premium durabila de la un brand profesional, si singura pe acumulator, care iti da libertate totala de miscare, fara cablu. Pentru cine vrea calitate mai buna sau scapa de grija prizei.</p>
+    <div class="rd-grid">
+      {TOP.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figTop} alt="Cele mai bune foarfeci de gard viu: Bosch EasyHedgeCut, Makita si Bosch pe acumulator" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mana">Compacte de mana, pentru buxus</h2>
+    <p>Unelte mici si usoare, pentru tuns fin: buxus, forme, arbusti mici si margini. Nu inlocuiesc o foarfeca mare de gard viu, dar sunt precise si comode acolo unde una mare ar fi greoaie. Un accesoriu bun pe langa uneltele mari.</p>
+    <div class="rd-grid">
+      {MANA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMana} alt="Unelte compacte de mana pentru buxus: Texas, Shall si Mesterino" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-foarfeca').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate foarfecile de gard viu la oferta</strong>
+        <span>Reducerile din acest moment la foarfeci electrice de gard viu, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o foarfeca electrica</h2>
+    <p>Cine a tuns vreodata un gard viu cu foarfeca manuala stie cat de obositoare si de lenta e treaba: zeci de minute de strans si desfacut manerele, cu bratele si palmele care obosesc repede, pentru un rezultat adesea neuniform. O <strong>foarfeca electrica schimba complet lucrurile</strong>: lama in miscare taie continuu, tu doar o plimbi de-a lungul gardului, iar ce ar dura o ora manual se face in cateva minute, cu mult mai putin efort.</p>
+    <p>Pe langa timpul si efortul economisite, o foarfeca electrica <strong>taie mai uniform si mai drept</strong>, pentru ca avansezi constant cu o lama lunga, in loc sa tai bucata cu bucata. Rezultatul e un gard cu o linie curata si o forma clara, greu de obtinut manual. Iar tunsul devenind rapid si comod, il faci mai des si la timp, ceea ce tine gardul sanatos, des si frumos. Pentru orice gradina cu mai mult de cativa metri de gard viu, o foarfeca electrica nu e un lux, ci unealta care face diferenta intre o corvoada si o treaba de cateva minute.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua foarfeci:</p>
+    <ul>
+      <li><strong>Tipul de alimentare:</strong> cu fir, putere constanta si pret mic, dar legata de priza; pe acumulator, libertate de miscare, dar autonomie limitata.</li>
+      <li><strong>Lungimea lamei:</strong> 48-51 cm pentru garduri lungi, avansezi repede; 45 cm bun compromis; lame mici doar pentru forme.</li>
+      <li><strong>Grosimea de taiere:</strong> distanta dintre dinti, 15-16 mm pentru crengi obisnuite, 20 mm pentru garduri mai lemnoase.</li>
+      <li><strong>Greutatea si echilibrul:</strong> o foarfeca usoara si bine echilibrata o tii mai mult in maini fara sa te oboseasca, conteaza pe un gard mare.</li>
+      <li><strong>Curse pe minut:</strong> mai multe curse inseamna o taiere mai fina si mai curata.</li>
+      <li><strong>Dotarile de siguranta:</strong> protectie la maini, oprire rapida a lamei, iar unele includ ochelari de protectie.</li>
+    </ul>
+
+    <h2 id="cum-tunzi">Cum tunzi corect gardul viu</h2>
+    <p>Un gard viu tuns bine nu e doar o chestiune de estetica, ci si de sanatate a plantei. Prima regula: <strong>tunde de doua-trei ori pe an</strong>, primavara tarziu si la sfarsitul verii, iar la speciile cu crestere rapida si o data in plus. Tunsul regulat indeasa gardul, pentru ca taind varfurile stimulezi ramurile laterale sa creasca, asa ca in timp devine mai plin si mai des.</p>
+    <p>Ca tehnica, <strong>tunde partile laterale de jos in sus</strong>, cu o miscare larga si constanta, si lasa gardul usor mai lat la baza decat la varf, in forma de trapez, ca lumina sa ajunga si la ramurile de jos si sa nu se desfrunzeasca. Partea de sus o tunzi la final, drept, folosind o sfoara intinsa ca reper daca vrei o linie perfecta. Nu taia adanc in lemnul batran dintr-o data, ci scurteaza treptat, si evita tunsul in arsita sau in perioada de cuibarit a pasarilor. Dupa tuns, aduna crengile cazute de la baza, ca sa nu putrezeasca peste radacini. Cu aceste reguli simple si o foarfeca buna, gardul ramane sanatos, des si cu o forma clara.</p>
+
+    <h2 id="intretinere">Siguranta si intretinerea</h2>
+    <p>O foarfeca electrica are lame ascutite in miscare rapida, asa ca <strong>siguranta e pe primul loc</strong>. Poarta ochelari de protectie, unele modele ii includ, si manusi, tine unealta cu ambele maini pe manere si pastreaza a doua mana si picioarele departe de lama. La modelele cu fir, poarta cablul peste umar, mereu in spatele tau, ca sa nu-l tai, si foloseste o priza cu protectie; la cele pe acumulator, scoate acumulatorul inainte de a curata sau debloca lama. Nu tunde de pe o scara instabila si nu te intinde peste masura.</p>
+    <p>Cat despre <strong>intretinere</strong>, ai grija in primul rand de lama. Dupa fiecare folosire, curata resturile de frunze si seva, care altfel se intaresc, si sterge lama; periodic, aplica un ulei sau spray special de lama, care unge, protejeaza de rugina si face taierea mai lina. Ascute lama sau du-o la ascutit daca observi ca rupe crengile in loc sa le taie curat. La modelele pe acumulator, nu lasa acumulatorul descarcat mult timp si tine-l la loc uscat. Depoziteaza unealta la adapost, ferita de umezeala. Cu aceasta grija de baza, o foarfeca buna taie curat si rezista multi ani.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tipul de alimentare, lama si brand:</p>
+    <p><strong>Cu fir, accesibile:</strong> de la circa 120 de lei, ca Lehmann Brodsworth, si in zona 180-230 de lei pentru cele mai vandute cu lama lunga, ca Steinhaus si Einhell.</p>
+    <p><strong>Cele mai bune si fara fir:</strong> Bosch cu fir in jur de 300 de lei, cea pe acumulator, fara fir, in jur de 450 de lei, iar premium Makita spre 670 de lei.</p>
+    <p><strong>Compacte de mana:</strong> intre circa 120 si 190 de lei, pentru buxus, forme si detalii.</p>
+    <p>Alege dupa <strong>nevoie</strong>: o foarfeca cu fir cu lama lunga pentru un gard obisnuit la care ajungi cu prelungitorul, una pe acumulator daca vrei libertate de miscare sau ai gardul raspandit prin gradina, si o unealta mica doar daca lucrezi mai ales forme si buxus. O foarfeca potrivita gardului tau transforma tunsul dintr-o corvoada intr-o treaba de cateva minute, sezon de sezon. Pentru gazon, vezi si <a href="/masina-de-tuns-gazonul-electrica/">masinile electrice de tuns gazonul</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
-        <p class="author-role">Expert Gradinarit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
+        <p class="author-role">Specialist Gradinarit</p>
+        <p class="author-bio">Andrei se ocupa de gradini si spatii verzi de peste 12 ani si a testat zeci de unelte electrice de gradina, de la foarfeci si trimmere la fierastraie si masini de tuns. Stie ce conteaza in folosirea reala, dincolo de cifrele de pe cutie.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="foarfeca-electrica-pentru-gard-viu"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <!-- Prev/Next Navigation -->
-    <PrevNextNav
-      currentSlug="foarfeca-electrica-pentru-gard-viu"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="foarfeca-electrica-pentru-gard-viu" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="foarfeca-electrica-pentru-gard-viu" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
-
-  <script>
-    document.querySelectorAll('.comparison-outer').forEach(outer => {
-      const wrap = outer.querySelector('.comparison-wrap');
-      if (!wrap) return;
-      function checkScroll() {
-        const canScroll = wrap.scrollWidth > wrap.clientWidth;
-        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
-        outer.classList.toggle('can-scroll', canScroll && !atEnd);
-      }
-      checkScroll();
-      wrap.addEventListener('scroll', checkScroll, { passive: true });
-      window.addEventListener('resize', checkScroll, { passive: true });
-    });
-
-    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
-    if (tocLinks.length > 0) {
-      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
-      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              tocLinks.forEach(a => a.classList.remove('active'));
-              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
-              match?.classList.add('active');
-            }
-          }
-        },
-        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
-      );
-      sections.forEach(s => observer.observe(s));
-    }
-  </script>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

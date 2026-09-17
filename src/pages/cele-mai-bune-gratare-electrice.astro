@@ -1,0 +1,293 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['gratare-electrice'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Cu senzor automat (OptiGrill-style) ---
+  { g: 'senzor', id: 'D0TB0XYBM', rol: 'Cel mai vandut, cu senzor de grosime', short: 'Tefal OptiGrill+', tip: 'Contact, senzor', putere: '2000 W', placi: 'Detasabile', pret: '680 lei',
+    specs: ['2000 W, gratar de contact care gateste ambele fete odata', 'senzor care detecteaza grosimea carnii si regleaza singur', '6 programe: burger, pui, sandwich, carnati, carne rosie, peste', 'placi detasabile, compatibile masina de spalat vase'],
+    pros: ['329 de pareri, cel mai testat gratar din articol', 'Senzor automat: nu mai ghicesti daca e gata', 'Indicator de culoare, de la in sange la bine facut', 'Placi detasabile la masina de spalat vase'],
+    cons: ['Suprafata standard, stransa pentru mai multi', 'Programele automate te lasa mai putin sa reglezi manual'],
+    verdict: 'Cu 329 de pareri, e cel mai cumparat gratar din articol, iar motivul e o singura functie care schimba tot: senzorul. OptiGrill masoara grosimea bucatii de carne cand inchizi capacul si ajusteaza singur temperatura si timpul, apoi un indicator de culoare iti arata cand e in sange, mediu sau bine facut. Practic, nu mai tai in friptura sa vezi daca e gata si nu mai arzi bucatile subtiri. Are 6 programe pentru cele mai frecvente preparate si placi detasabile pe care le bagi in masina de spalat vase, partea cea mai enervanta la orice gratar. Fiind de contact, gateste ambele fete simultan, deci mai repede. Suprafata standard e potrivita pentru 2-4 portii; pentru mai multi, exista varianta XL. Il iei cand vrei carne gatita la punct fix, fara sa stai cu ochii pe ea.' },
+  { g: 'senzor', id: 'DPTB0XYBM', rol: 'Acelasi senzor, suprafata XL', short: 'Tefal OptiGrill+ XL', tip: 'Contact, senzor', putere: '2000 W', placi: 'Detasabile', pret: '820 lei',
+    specs: ['2000 W, suprafata XL, pentru mai multe portii odata', '9 programe automate cu senzor de grosime', 'placi detasabile, non-aderente', 'tava de scurgere a grasimii detasabila'],
+    pros: ['Suprafata XL, gatesti pentru toata familia odata', '9 programe si acelasi senzor automat', 'Placi detasabile, usor de curatat', '281 de pareri, bine cotat'],
+    cons: ['Ocupa mai mult loc pe blat', 'Mai scump decat versiunea standard'],
+    verdict: 'Daca OptiGrill-ul standard te-a convins, dar gatesti pentru mai multi, XL rezolva singura lui limita: suprafata. Are aceeasi minte, senzorul care citeste grosimea si regleaza gatitul, plus indicatorul de culoare, dar pe o placa mai mare, pe care incap mai multe fripturi sau sandwichuri odata, fara sa lucrezi in serii. Cele 9 programe acopera mai multe preparate decat versiunea de baza, iar placile si tava de grasime se detaseaza pentru curatare. Reversul e ca ocupa vizibil mai mult loc pe blat si costa cu 140 de lei mai mult. Il iei cand esti o familie mai mare sau primesti des oaspeti, si vrei senzorul OptiGrill, dar cu spatiu de gatit pe masura.' },
+  { g: 'senzor', id: 'DGD456BBM', rol: 'Cele mai multe programe automate', short: 'Tefal OptiGrill Elite', tip: 'Contact, senzor', putere: '2000 W', placi: 'Detasabile', pret: '612 lei',
+    specs: ['2000 W, 12 programe automate, cele mai multe din gama', 'senzor de grosime si termostat ajustabil', 'placi detasabile', 'mod manual pentru control total'],
+    pros: ['12 programe, cea mai completa gama de presetari', 'Are si mod manual, cu termostat reglabil', 'Senzor automat si placi detasabile', 'Mai ieftin decat versiunea XL'],
+    cons: ['Suprafata standard, nu XL', '197 de pareri, sub liderii de vanzari'],
+    verdict: 'Elite este varianta pentru cine vrea si automatizarea, si controlul. Are 12 programe automate, cele mai multe din gama OptiGrill, deci gasesti o presetare pentru aproape orice, de la legume la peste, dar adauga si un mod manual cu termostat reglabil, in care setezi tu temperatura, util cand gatesti ceva ce nu are program dedicat. Senzorul de grosime si placile detasabile sunt prezente, ca la restul gamei. Suprafata e cea standard, nu XL, deci pentru familie mare tot XL-ul e mai bun, dar la 612 lei e mai accesibil si iti da mai multa flexibilitate decat modelul de baza. Il iei cand vrei cele mai multe programe plus optiunea de a regla manual, la suprafata normala.' },
+  { g: 'senzor', id: 'DJPLCGYBM', rol: 'Alternativa cu senzor, de la Braun', short: 'Braun MultiGrill', tip: 'Contact, senzor', putere: '2000 W', placi: 'Detasabile', pret: '650 lei',
+    specs: ['2000 W, gratar de contact cu 3 moduri de gatire', 'placi striate si netede, incalzire rapida', 'mentinere la cald, sistem anti-alunecare', 'placi detasabile, compatibile masina de spalat vase'],
+    pros: ['Nota 4.82, printre cele mai mari din articol', 'Placi striate si netede, gratar si plancha in unul', 'Mentinere la cald dupa gatit', 'Placi detasabile la masina de spalat vase'],
+    cons: ['67 de pareri, mai putin testat decat Tefal', 'Interfata diferita de OptiGrill, alta logica'],
+    verdict: 'Pentru cine nu vrea neaparat un Tefal, Braun MultiGrill e alternativa serioasa din articol, cu nota 4.82. Vine cu doua seturi de placi, striate pentru urme de gratar si netede pentru plancha, deci acopera si gratar, si suprafata plana intr-un singur aparat. Are incalzire rapida, functie de mentinere la cald dupa ce ai terminat si un sistem anti-alunecare care il tine fix. Placile se detaseaza si merg in masina de spalat vase. Cu 67 de pareri e mai putin testat decat OptiGrill-urile, iar logica de folosire e diferita, cu propriile moduri, nu cu senzorul Tefal. Il iei cand vrei un gratar de contact bine notat, cu placi duble pentru gratar si plancha, si preferi brandul Braun.' },
+  // --- B. Contact clasice, cu termostat ---
+  { g: 'clasic', id: 'DTDV12BBM', rol: 'Contact clasic, se deschide complet', short: 'Tefal Super Grill', tip: 'Contact + plat', putere: '2000 W', placi: 'Detasabile', pret: '631 lei',
+    specs: ['2000 W, se deschide la 180 de grade, dubland suprafata', '4 nivele de temperatura si timer', 'placi detasabile, compatibile masina de spalat vase', 'sistem de depozitare a cablului'],
+    pros: ['Se deschide plat la 180 de grade, ca o suprafata dubla', '256 de pareri, foarte bine cotat', 'Timer si 4 nivele de temperatura', 'Placi detasabile la masina de spalat vase'],
+    cons: ['Fara senzor automat, reglezi manual', 'Nu are programe pentru tipuri de carne'],
+    verdict: 'Super Grill combina doua moduri intr-un aparat, si asta il face flexibil. Folosit inchis, e gratar de contact clasic, gateste ambele fete odata. Deschis la 180 de grade, cele doua placi devin o suprafata plana dubla, pe care incap de doua ori mai multe alimente, ca pe o plancha mare. Nu are senzorul OptiGrill, deci reglezi manual din cele 4 nivele de temperatura si folosesti timerul, dar pentru cine stie ce vrea, controlul direct e chiar un avantaj. Placile se detaseaza pentru masina de spalat vase. Cu 256 de pareri si nota 4.76, e o alegere de incredere, mai ieftina decat un OptiGrill. Il iei cand vrei si gratar de contact, si suprafata plana mare, si nu tii neaparat la senzorul automat.' },
+  { g: 'clasic', id: 'D823V6BBM', rol: 'Cel mai accesibil cu putere mare', short: 'Daewoo DG2500B', tip: 'Contact', putere: '2400 W', placi: 'Fixe', pret: '279 lei',
+    specs: ['2400 W, cea mai mare putere dintre cele accesibile', 'placi antiaderente, suprafata generoasa', 'gratar de contact simplu', 'pret mic'],
+    pros: ['2400 W la doar 279 de lei, incalzire rapida', 'Placi antiaderente, curatare usoara', 'Suprafata generoasa de gatit', '89 de pareri, bine cotat'],
+    cons: ['Placi fixe, nu se detaseaza pentru masina de vase', 'Fara senzor sau programe'],
+    verdict: 'Nu toata lumea vrea senzori si programe; unii vor doar un gratar bun si ieftin, iar Daewoo raspunde exact la asta. La 2400 W are cea mai mare putere dintre modelele accesibile, deci se incalzeste repede si rumeneste ferm, pe o suprafata generoasa cu placi antiaderente. E un gratar de contact simplu: inchizi, gatesti ambele fete, gata. Compromisul principal e ca placile sunt fixe, nu se detaseaza, deci il cureti stergand cu o carpa umeda, nu bagand placile in masina de vase. Nu are senzor sau programe, dar la 279 de lei nici nu le astepti. Il iei cand vrei un gratar cu putere mare, la cel mai mic pret, si nu te deranjeaza sa reglezi si sa cureti manual.' },
+  { g: 'clasic', id: 'D7V84VMBM', rol: 'Cel mai ieftin din articol', short: 'Heinner SunsetGrill', tip: 'Contact', putere: '2000 W', placi: 'Fixe', pret: '202 lei',
+    specs: ['2000 W, gratar de contact compact', 'placi fixe cu invelis antiaderent', 'termostat reglabil', 'pretul cel mai mic din selectie'],
+    pros: ['Sub 205 lei, cel mai accesibil gratar util', 'Compact, incape usor la depozitare', 'Termostat reglabil', 'Simplu de folosit'],
+    cons: ['Placi fixe, curatare doar manuala', '71 de pareri, aparat de baza'],
+    verdict: 'Cel mai ieftin gratar din articol care merita cumparat, si e cinstit sa il privesti ca minimul functional. La 2000 W si sub 205 lei, SunsetGrill face treaba de baza a unui gratar de contact: rumeneste carne, legume sau un sandwich cald, cu ambele fete deodata. Are termostat reglabil, deci alegi intensitatea, si e compact, incape usor intr-un dulap. Placile sunt fixe, deci curatarea se face manual, cu o carpa, iar dotarile se opresc aici, fara senzori sau programe. Pentru cine gateste rar la gratar sau vrea sa incerce fara sa investeasca, e o intrare corecta. Il iei cand cauti cel mai mic pret pentru un gratar functional si nu ai pretentii de dotari.' },
+  { g: 'clasic', id: 'DBH91LBBM', rol: 'Clasicul cu scurgerea grasimii', short: 'George Foreman', tip: 'Contact', putere: '2400 W', placi: 'Fixe', pret: '620 lei',
+    specs: ['2400 W, gratar cu picioare, suprafata mare', 'placi inclinate care scurg grasimea intr-o tavita', 'de la George Foreman, brandul care a popularizat conceptul', 'suprafata pentru mai multe portii'],
+    pros: ['Placi inclinate, grasimea se scurge in tavita', 'Suprafata mare cu picioare stabile', 'Brand recunoscut pentru gratarele de contact', '2400 W, putere buna'],
+    cons: ['Doar 36 de pareri, cel mai putin testat', 'Placi fixe, curatare manuala'],
+    verdict: 'George Foreman e brandul care a facut populare gratarele de contact, iar semnatura lui e chiar aici: placile sunt usor inclinate, asa ca grasimea topita din carne se scurge intr-o tavita in fata, in loc sa balteasca sub friptura. Rezultatul e mancare cu ceva mai putina grasime, argumentul original al conceptului. Modelul cu picioare are o suprafata mare, buna pentru mai multe portii, si 2400 W pentru rumenire fermă. Onest, cu 36 de pareri e cel mai putin testat din articol, iar placile fixe se curata manual. Il iei cand vrei clasicul cu scurgerea grasimii de la brandul care l-a inventat, si pui pret pe suprafata mare, nu pe numarul de recenzii.' },
+  // --- C. Plancha si multifunctionale ---
+  { g: 'plancha', id: 'DZW967BBM', rol: 'Plancha cu suprafata mare, de masa', short: 'Tefal Malaga', tip: 'Plancha', putere: '2000 W', placi: 'Detasabile', pret: '370 lei',
+    specs: ['2000 W, plancha cu suprafata neteda XL, pentru 6-8 persoane', 'placa plana deschisa, o pui pe masa', 'termostat reglabil, mentinere la cald', 'baza antiaderenta, piese detasabile'],
+    pros: ['Suprafata neteda XL, pentru 6-8 persoane', 'Placa deschisa, gatesti la masa cu toata lumea', 'Termostat reglabil si mentinere la cald', 'Nota 4.76, foarte bine cotat'],
+    cons: ['Gateste o singura fata, intorci alimentele', 'Ocupa mult loc, e mare'],
+    verdict: 'Plancha e alt fel de gratar electric, si Malaga arata la ce e buna. In loc de doua placi care se inchid, ai o singura suprafata plana, mare, deschisa, pe care o pui in mijlocul mesei si gatesti in fata tuturor, ca la un gratar de restaurant. Suprafata XL ajunge pentru 6-8 persoane, deci e aparatul pentru mese cu prieteni sau familie mare, unde fiecare isi pune ce vrea. Are termostat reglabil, mentinere la cald si baza antiaderenta. Diferenta fata de un gratar de contact: gateste o singura fata, deci intorci alimentele ca la tigaie. Nota de 4.76 il recomanda. Il iei cand gatesti social, la masa, pentru multi, si vrei o suprafata mare deschisa, nu un aparat care se inchide.' },
+  { g: 'plancha', id: 'DPXPDZBBM', rol: 'Plancha cu doua zone de temperatura', short: 'Tefal Plancha', tip: 'Plancha', putere: '2000 W', placi: 'Detasabile', pret: '350 lei',
+    specs: ['2000 W, doua zone cu temperaturi reglabile separat', 'o parte striata, una neteda', 'capac din sticla termorezistenta', 'placi detasabile, tava de scurgere'],
+    pros: ['Doua zone: gatesti la temperaturi diferite simultan', 'O parte striata pentru urme, una neteda pentru plancha', 'Capac de sticla, poti acoperi ca sa se faca uniform', 'Placi detasabile'],
+    cons: ['Nota 4.17, cea mai mica din articol', 'Tot o singura fata, intorci alimentele'],
+    verdict: 'Ce aduce nou aici sunt cele doua zone independente: poti seta o parte a placii mai fierbinte si alta mai potolita, deci rumenesti carnea intr-o zona in timp ce tii legumele la foc mic in cealalta, fara sa le muti. In plus, o parte e striata, pentru urme de gratar, si una neteda, ca o plancha, iar capacul de sticla iti lasa sa acoperi mancarea ca sa se faca uniform si mai repede. Placile se detaseaza pentru curatare. Nota de 4.17 e cea mai mica din articol, semn ca unii utilizatori au avut asteptari mai mari, asa ca e bine sa stii. Ramane o placa deschisa, deci intorci alimentele. O iei cand vrei doua zone de temperatura si combinatia striata plus neteda, la un pret bun.' },
+  { g: 'plancha', id: 'D2DQBWMBM', rol: 'Patru aparate in unul, cu placi schimbabile', short: 'Tefal OptiGrill 4 in 1', tip: 'Multifunctional', putere: '2100 W', placi: 'Detasabile', pret: '900 lei',
+    specs: ['2100 W, 9 programe automate cu senzor', 'placi interschimbabile: gratar, plancha, gaufre si altele', 'indicator luminos de gatire', 'placi detasabile, compatibile masina de spalat vase'],
+    pros: ['Patru functii intr-un aparat, cu placi schimbabile', 'Are senzorul si programele OptiGrill', 'Placi detasabile la masina de spalat vase', 'Nota 4.85, foarte bine cotat'],
+    cons: ['Pret ridicat, plus placi de depozitat', '48 de pareri, mai putin testat'],
+    verdict: 'Pentru cine vrea sa nu aleaga, 4 in 1 pune mai multe aparate intr-unul singur, prin placi interschimbabile: gratar de contact, plancha plana, aparat de gaufre si altele, toate pe acelasi corp cu senzorul si programele OptiGrill. Practic ai un dulap de bucatarie intr-un aparat, iar placile detasabile se spala la masina de vase. Nota de 4.85 arata ca cei care l-au luat sunt foarte multumiti. Reversul e dublu: pretul de 900 de lei, cel mai mare dintre gratarele obisnuite din articol, si nevoia de a depozita undeva seturile de placi pe care nu le folosesti. Il iei cand vrei un singur aparat care sa faca tot, de la fripturi la gaufre, si ai loc pentru placile suplimentare.' },
+  { g: 'plancha', id: 'DT1BB7YBM', rol: 'Gratar si afumator, varf de gama', short: 'Ninja Woodfire', tip: 'Gratar + afumator', putere: '2400 W', placi: 'Detasabile', pret: '2100 lei',
+    specs: ['2400 W, gratar, afumator si air fryer in unul', '7 functii, foloseste peleti pentru aroma de fum', 'nota 4.86, cea mai mare din articol', 'se poate folosi si pe balcon sau terasa'],
+    pros: ['Face si afumare reala, cu aroma de lemn, electric', 'Sapte functii: gratar, afumat, air fry, coacere', 'Nota 4.86, cea mai mare din selectie', 'Se poate folosi si afara, pe terasa'],
+    cons: ['Cel mai scump din articol, de departe', 'Mai mare si mai complex decat un gratar simplu'],
+    verdict: 'Ninja Woodfire e alta liga si merita privit ca atare: nu doar gratar electric, ci si afumator adevarat. Foloseste peleti de lemn care ard controlat si dau aroma de fum, ceva ce niciun alt aparat din articol nu face, plus functii de air fry, coacere si deshidratare, sapte in total. E gandit sa mearga si pe balcon sau terasa, nu doar in bucatarie, deci se apropie de un gratar de curte, dar la priza. Nota de 4.86 e cea mai mare din articol. Reversul e evident: pretul de 2100 de lei, cel mai mare de departe, si complexitatea unui aparat cu mult mai multe optiuni decat un gratar de contact. Il iei cand vrei aroma reala de afumat si un aparat care face aproape tot, si bugetul nu e obstacolul.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const SENZOR = PICKS.filter(x => x.g === 'senzor');
+const CLASIC = PICKS.filter(x => x.g === 'clasic');
+const PLANCHA = PICKS.filter(x => x.g === 'plancha');
+
+const hero = '/imagini/articole/cele-mai-bune-gratare-electrice.webp';
+const figSenzor = '/imagini/articole/gratare-senzor.webp';
+const figClasic = '/imagini/articole/gratare-clasice.webp';
+const figPlancha = '/imagini/articole/gratare-plancha.webp';
+const published = '2026-07-21T17:17:18+03:00';
+
+const faq = [
+  { question: 'Gratar de contact sau plancha?', answer: 'Sunt doua forme diferite. Un gratar de contact are doua placi care se inchid peste mancare si o gatesc pe ambele fete deodata, deci mai repede, iar grasimea se scurge prin canale; e ideal pentru fripturi, sandwichuri calde si portii de 2-4 persoane. O plancha e o placa plana, deschisa, pe care o pui pe masa si gatesti in fata tuturor, intorcand alimentele ca la tigaie; e mai buna pentru mese sociale si cantitati mari. Pe scurt: pentru rapiditate si o friptura buna zilnic, ia contact; pentru gatit la masa cu multi oameni, ia plancha. Unele modele, ca Braun sau Tefal Super Grill, le combina pe amandoua.' },
+  { question: 'Cum functioneaza senzorul de la OptiGrill?', answer: 'E ce diferentiaza gratarele Tefal OptiGrill de restul. Cand inchizi capacul peste carne, un senzor masoara grosimea si numarul de bucati de pe placa, apoi ajusteaza automat temperatura si timpul, ca sa le gateasca uniform. In timpul gatitului, un indicator de culoare iti arata stadiul: se coloreaza treptat de la galben, pentru carne in sange, la portocaliu pentru mediu si rosu pentru bine facut. Practic, alegi doar programul, burger, pui, peste, si urmaresti culoarea, fara sa tai in friptura sa vezi daca e gata. E util mai ales pentru cine nu are experienta cu gratitul si vrea rezultat constant.' },
+  { question: 'Chiar gatesti mai sanatos pe un gratar electric?', answer: 'La capitolul grasime, da. Gratarele de contact, mai ales cele cu placi inclinate ca George Foreman, lasa grasimea topita din carne sa se scurga intr-o tavita, in loc sa ramana sub friptura cum se intampla in tigaie. Rezultatul e mancare cu mai putina grasime, argumentul original al conceptului. In plus, gatesti fara sa adaugi ulei, pentru ca placile sunt antiaderente. Nu inseamna ca orice pui pe el devine sanatos, dar fata de prajitul in tigaie, o friptura la gratarul de contact are clar mai putina grasime. E unul dintre motivele reale pentru care lumea le cumpara.' },
+  { question: 'Ce putere imi trebuie la un gratar electric?', answer: 'Majoritatea gratarelor bune au intre 2000 si 2400 W, iar in intervalul asta puterea conteaza mai putin decat par: influenteaza cat de repede se incalzeste si cat de bine tine temperatura cand pui carne rece pe placa. Sub 2000 W, un gratar se poate racori vizibil cand asezi mai multe bucati odata, deci rumeneste inegal. Peste 2000 W ai o rezerva confortabila. Nu urmari cel mai mare numar cu orice pret; un aparat de 2000 W de la un brand bun, cu placa care tine caldura, gateste mai bine decat unul de 2400 W prost facut. Puterea e un criteriu, nu singurul.' },
+  { question: 'Placi detasabile sau fixe?', answer: 'E o diferenta care se simte la fiecare curatare. Placile detasabile se scot din aparat si multe se spala la masina de vase, ceea ce face curatarea usoara si completa; le gasesti la OptiGrill, Braun, Tefal Super Grill. Placile fixe raman prinse in aparat, deci le cureti stergand cu o carpa umeda dupa ce s-au racit, mai greu de facut impecabil si imposibil la masina de vase; sunt tipice modelelor ieftine, ca Heinner sau Daewoo. Daca folosesti gratarul des si urasti spalatul, placile detasabile merita diferenta de pret. Daca gatesti rar, cele fixe sunt un compromis acceptabil.' },
+  { question: 'Un gratar electric face fum in casa?', answer: 'Mai putin decat un gratar pe carbuni, dar nu deloc. Gratarele de contact, care se inchid, fac cel mai putin fum, pentru ca mancarea e prinsa intre placi si grasimea se scurge repede, fara sa cada pe o rezistenta incinsa. Planchele deschise fac mai mult, pentru ca grasimea sare pe suprafata fierbinte. In ambele cazuri, cheia e sa nu lasi grasimea sa se acumuleze si sa se arda, si sa gatesti langa hota pornita sau cu geamul deschis. Pentru fum minim in casa, un gratar de contact e alegerea; daca vrei plancha, foloseste-o langa ventilatie buna.' },
+  { question: 'Ce diferenta e intre placa striata si cea neteda?', answer: 'Tine de ce gatesti si de aspect. Placa striata are nervuri in relief, care lasa acele urme de gratar pe carne si permit grasimii sa se scurga printre ele; e clasica pentru fripturi si da senzatia de gratar adevarat. Placa neteda e plana, ca o tigaie mare, si e mai buna pentru alimente mici sau delicate care ar cadea printre nervuri, oua, clatite, legume marunte, sau pentru cine vrea o suprafata de tip plancha. Multe gratare bune, ca Braun sau Tefal Plancha, vin cu ambele tipuri, ca sa alegi in functie de preparat. Daca ai un singur tip, striata e mai versatila pentru carne.' },
+  { question: 'Cum curat un gratar electric?', answer: 'Cel mai usor imediat dupa folosire, cat placa e inca calduta, nu incinsa. La modelele cu placi detasabile, scoti placile si le speli cu apa calda si detergent sau le bagi la masina de vase, daca sunt compatibile. La cele cu placi fixe, deconectezi aparatul de la priza, il lasi sa se raceasca putin si stergi placile cu o carpa umeda; pentru resturile prinse, o perie moale sau un burete, niciodata obiecte metalice care zgarie stratul antiaderent. Goleste tavita de grasime dupa fiecare folosire. Nu baga niciodata corpul aparatului, cu rezistenta si cablul, in apa; doar placile detasabile si tavita se spala cu apa.' },
+];
+
+const images = [hero, figSenzor, figClasic, figPlancha, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune gratare electrice in ${SEO_YEAR}: de contact, cu senzor sau plancha`}
+  description="12 gratare electrice comparate pe tip: de contact cu senzor, clasice si plancha, de la 202 la 2100 de lei. Cand alegi contact si cand plancha deschisa."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune gratare electrice' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune gratare electrice</span>
+    </nav>
+
+    <h1>Cele mai bune gratare electrice</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune gratare electrice: de contact cu senzor, clasice si plancha deschisa" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Un gratar electric muta gratarul in bucatarie: friptura rumenita fara curte, fara mult fum si indiferent de anotimp. Cum o rumeneste tine insa de forma aparatului. Un gratar de <strong>contact</strong> se inchide peste carne si o gateste pe ambele fete odata, rapid. O <strong>plancha</strong> e o placa plana deschisa, pe care gatesti la masa, intorcand alimentele. Asta e prima alegere.</p>
+      <p>Cel mai vandut din articol, <strong>Tefal OptiGrill+</strong>, e un gratar de contact cu un truc care il face special: un senzor masoara grosimea carnii si o gateste la punctul cerut, aratand prin culoare cand e in sange, mediu sau bine facut. Daca gatesti pentru multi, la masa, o plancha mare ca <strong>Tefal Malaga</strong> e mai potrivita. Iar la buget, <strong>Heinner SunsetGrill</strong> face treaba de baza sub 205 lei.</p>
+      <p>Sunt, deci, cateva feluri de gratar electric sub acelasi nume: de contact cu senzor automat, de contact clasic cu termostat si plancha sau multifunctional. Fac lucruri diferite, pentru situatii diferite, iar alegerea gresita a tipului te lasa nemultumit. De aceea le-am grupat dupa tip, nu dupa pret.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#senzor">Cu senzor automat de gatire</a></li>
+        <li><a href="#clasic">Contact clasice, cu termostat</a></li>
+        <li><a href="#plancha">Plancha si multifunctionale</a></li>
+        <li><a href="#contact-plancha">Contact sau plancha: cum alegi</a></li>
+        <li><a href="#senzor-explicat">Senzorul automat: la ce foloseste</a></li>
+        <li><a href="#placi">Placi detasabile, striate sau netede</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Putere</th><th>Placi</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.putere}</td>
+              <td>{x.placi}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="senzor">Cu senzor automat de gatire</h2>
+    <p>Gratarele de contact cu senzor, popularizate de gama Tefal OptiGrill, sunt cele mai cerute pentru un motiv: masoara singure grosimea carnii si o gatesc la punctul dorit, cu un indicator de culoare care arata cand e in sange, mediu sau bine facut. Pentru cine nu vrea sa ghiceasca sau sa taie in friptura, sunt cea mai comoda alegere.</p>
+    {SENZOR.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figSenzor} alt="Gratare electrice de contact cu senzor automat, Tefal OptiGrill si Braun MultiGrill" width="1600" height="900" loading="lazy" />
+
+    <h2 id="clasic">Contact clasice, cu termostat</h2>
+    <p>Fara senzor, dar cu tot ce trebuie: aceste gratare de contact le reglezi manual, dintr-un termostat sau cateva nivele de temperatura. Sunt mai simple si adesea mai ieftine, iar pentru cine stie ce vrea, controlul direct e chiar un avantaj. Aici stau si cele mai accesibile modele din articol.</p>
+    {CLASIC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figClasic} alt="Gratare electrice de contact clasice cu termostat, Tefal Super Grill, Daewoo si Heinner" width="1600" height="900" loading="lazy" />
+
+    <h2 id="plancha">Plancha si multifunctionale</h2>
+    <p>Placa plana deschisa schimba felul in care gatesti: o pui pe masa si toata lumea isi pune ce vrea, ca la un gratar de restaurant. Aici intra planchele mari pentru mese sociale, modelele cu doua zone de temperatura si aparatele multifunctionale, care combina gratar, plancha si mai mult, pana la un gratar cu afumator.</p>
+    {PLANCHA.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPlancha} alt="Plancha si gratare electrice multifunctionale, Tefal Malaga si Ninja Woodfire" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-gratare').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate gratarele electrice la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="contact-plancha">Contact sau plancha: cum alegi</h2>
+    <p>E prima decizie si tine de cum si pentru cati gatesti, nu de pret.</p>
+    <p>Un gratar de <strong>contact</strong> are doua placi care se inchid peste mancare. Gateste ambele fete deodata, deci mai repede, iar grasimea se scurge prin canalele placii. E ideal pentru fripturi, piept de pui, sandwichuri calde si portii pentru 2-4 persoane. Face si cel mai putin fum, pentru ca mancarea e inchisa intre placi.</p>
+    <p>O <strong>plancha</strong> e o placa plana, deschisa, pe care o asezi pe masa si gatesti in fata tuturor. Gateste o singura fata, deci intorci alimentele ca la tigaie, dar are suprafata mare si e sociala: fiecare isi pune ce vrea, cand vrea. E alegerea pentru mese cu multi oameni.</p>
+    <p>Pe scurt:</p>
+    <ul>
+      <li>Gatesti <strong>zilnic, pentru 2-4 persoane</strong>, vrei rapiditate si putin fum: ia <strong>contact</strong>.</li>
+      <li>Gatesti <strong>social, la masa, pentru multi</strong>: ia <strong>plancha</strong> mare.</li>
+      <li>Vrei si una, si alta: unele modele, ca Braun sau Tefal Super Grill, se deschid plat sau au placi duble.</li>
+    </ul>
+
+    <h2 id="senzor-explicat">Senzorul automat: la ce foloseste</h2>
+    <p>E functia care justifica diferenta de pret la gratarele Tefal OptiGrill, si merita inteleasa inainte sa platesti pentru ea.</p>
+    <p>Cand inchizi capacul peste carne, un senzor <strong>masoara grosimea si numarul de bucati</strong> si ajusteaza singur temperatura si timpul, ca sa le gateasca uniform. Nu conteaza daca pui o friptura groasa sau doua felii subtiri, aparatul se adapteaza.</p>
+    <p>In timpul gatitului, un <strong>indicator de culoare</strong> arata stadiul: se coloreaza treptat, galben pentru carne in sange, portocaliu pentru mediu, rosu pentru bine facut. Alegi programul, pui carnea si urmaresti culoarea, fara sa tai in friptura ca sa vezi daca e gata.</p>
+    <p>Cui foloseste cel mai mult: celor fara experienta la gratit, care vor rezultat constant fara sa invete din greseli, si celor care gatesc des si vor sa nu mai stea cu ochii pe placa. Cine gateste rar sau prefera sa controleze totul manual poate economisi luand un model clasic cu termostat.</p>
+
+    <h2 id="placi">Placi detasabile, striate sau netede</h2>
+    <p>Doua lucruri despre placi care conteaza la folosire mai mult decat par.</p>
+    <p><strong>Detasabile sau fixe.</strong> Placile detasabile se scot si multe se spala la masina de vase, deci curatarea e usoara si completa. Cele fixe raman in aparat si le stergi cu o carpa, mai greu de facut impecabil. Daca folosesti gratarul des, placile detasabile merita diferenta de pret; le gasesti la OptiGrill, Braun si Tefal Super Grill, in timp ce modelele ieftine, Heinner si Daewoo, au placi fixe.</p>
+    <p><strong>Striate sau netede.</strong> Placa striata are nervuri care lasa urme de gratar si scurg grasimea; e clasica pentru fripturi. Placa neteda e plana, ca o tigaie mare, buna pentru alimente mici sau delicate care ar cadea printre nervuri, oua, clatite, legume marunte, si tipica pentru plancha. Multe modele bune vin cu ambele; daca alegi unul singur, striata e mai versatila pentru carne.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Iei plancha, dar gatesti singur zilnic.</strong> O placa mare deschisa e pentru mese sociale. Pentru o friptura rapida, un gratar de contact e mai practic si face mai putin fum.</li>
+      <li><strong>Platesti senzorul degeaba.</strong> Daca stii sa gatesti la gratar si preferi controlul manual, un model clasic cu termostat face aceeasi treaba mai ieftin.</li>
+      <li><strong>Ignori tipul de placi.</strong> Placile fixe se curata greu. Daca folosesti des gratarul, cele detasabile la masina de vase merita diferenta.</li>
+      <li><strong>Alegi doar dupa putere.</strong> Intre 2000 si 2400 W diferenta e mica. Un aparat de 2000 W bine facut bate unul de 2400 W prost facut.</li>
+      <li><strong>Uiti de spatiu.</strong> Un OptiGrill XL, o plancha mare sau un Ninja Woodfire ocupa serios pe blat si la depozitare. Masoara inainte.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la gratarele electrice in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca aceleasi aparate apar listate de mai multe ori, in variante si coduri diferite, la preturi apropiate. Gama OptiGrill, de exemplu, apare in multe versiuni.</p>
+    <p><strong>Le-am grupat dupa tip, nu dupa pret</strong>, pentru ca tipul, contact cu senzor, contact clasic sau plancha, e decizia care conteaza. Un cumparator care alege tipul gresit ramane nemultumit oricat ar fi platit, fiindca aparatul face bine altceva decat isi dorea el.</p>
+    <p>Am comparat specificatiile reale din fise, tipul de gratar, puterea, tipul de placi si dotarile, si am semnalat unde pretul urca pentru o functie anume, cum e senzorul automat, pe care nu toata lumea o foloseste. Nu testam aparatele in laborator si nu pretindem asta. Ne bazam pe date reale, mii de pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare. Un gratar electric acopera partea de rumenit si fripturi, si se completeaza cu <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o friteuza cu aer cald</a> pentru cartofi si crocant, si cu <a href="/cele-mai-bune-multicookere/">un multicooker</a> pentru tocane si gatit lent.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 202 la 2100 de lei, cu diferente mari intre tipuri.</p>
+    <p><strong>Sub 300 de lei</strong> stau gratarele de contact accesibile, cu placi fixe: Heinner SunsetGrill si Daewoo. Fac treaba de baza, se regleaza si se curata manual.</p>
+    <p><strong>Intre 350 si 900 de lei</strong> e grosul selectiei: gratarele OptiGrill cu senzor, alternativa Braun, Tefal Super Grill, planchele Malaga si Plancha si multifunctionalul 4 in 1. Aici gasesti cel mai bun echilibru intre dotari, calitate si pret, in functie de tipul ales.</p>
+    <p><strong>La 2100 de lei</strong>, Ninja Woodfire e categoria lui: gratar plus afumator cu peleti, pentru cine vrea aroma reala de fum si un aparat care face aproape tot. Il alegi cand functia in plus chiar conteaza pentru tine, nu doar pentru a avea varful de gama.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-gratare-electrice" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-gratare-electrice" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

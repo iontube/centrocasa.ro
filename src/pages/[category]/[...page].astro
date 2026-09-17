@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import keywordsData from '../../../keywords.json';
-import { visibleArticles } from '../../lib/articles.mjs';
+import { visibleArticles, slugify } from '../../lib/articles.mjs';
 import { categories } from '../../lib/categories.mjs';
 
 export async function getStaticPaths() {
@@ -12,22 +12,24 @@ export async function getStaticPaths() {
   for (const category of categories) {
     const categoryArticles = visibleArticles(keywordsData.completed)
       .filter(item => item.categorySlug === category.slug)
-      .map(item => ({
-        title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-        slug: item.keyword.toLowerCase()
-          .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-          .replace(/ș/g, 's').replace(/ț/g, 't')
-          .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        excerpt: item.excerpt || '',
-        image: item.image || `/images/articles/${item.keyword.toLowerCase()
-          .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-          .replace(/ș/g, 's').replace(/ț/g, 't')
-          .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
-        category: item.category,
-        categorySlug: item.categorySlug,
-        date: item.date || new Date().toISOString()
-      }))
+      .map(item => {
+        const slug = item.slug || slugify(item.keyword);
+        return {
+          title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+          slug,
+          excerpt: item.excerpt || '',
+          image: item.image || `/images/articles/${slug}.webp`,
+          category: item.category,
+          categorySlug: item.categorySlug,
+          date: item.date || new Date().toISOString()
+        };
+      })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    // O categorie fara articole ar produce o pagina goala. Nu o generam deloc: nici pagina,
+    // nici link in nav. Cand primeste primul articol apare direct indexabila, fara sa fi fost
+    // vazuta vreodata de Google ca noindex sau ca pagina goala.
+    if (!categoryArticles.length) continue;
 
     const totalPages = Math.max(1, Math.ceil(categoryArticles.length / ARTICLES_PER_PAGE));
 

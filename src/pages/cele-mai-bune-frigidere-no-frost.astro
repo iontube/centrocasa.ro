@@ -1,0 +1,313 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['frigidere-no-frost'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Combine No Frost, pentru familie (348-406 l) ---
+  { g: 'familie', id: 'D2S36DMBM', rol: 'Cel mai vandut din grupa', short: 'Beko 375 l', cap: '375 l', tip: 'Combina', clasa: 'F', pret: '3570 lei',
+    specs: ['375 litri: 277 frigider + 98 congelator jos', 'NeoFrost Dual Cooling, doua circuite separate', 'clasa F, 275 kWh pe an, 38 dB', 'autonomie 14.5 ore, HarvestFresh, congelare rapida'],
+    pros: ['29 de pareri, cel mai verificat din grupa familie', 'Dual Cooling: doua circuite, fara transfer de miros frigider-congelator', 'Latime 66 cm si autonomie mare, 14.5 ore', 'Sertar HarvestFresh cu umiditate pentru legume'],
+    cons: ['Clasa F si 275 kWh, nu cel mai econom', 'Argintiul aduna amprente'],
+    verdict: 'Beko RDNT401E30ZXBN e alegerea sigura la capitolul combina de familie, si nu doar pentru ca are cele mai multe pareri din grupa. Atuul lui real e NeoFrost Dual Cooling: frigiderul si congelatorul au circuite de racire separate, deci umezeala si mirosurile nu trec dintr-un compartiment in altul, iar pestele din congelator nu iti parfumeaza laptele de deasupra. Cei 375 de litri, 277 la frigider si 98 la congelator, acopera confortabil o familie de trei-patru persoane, iar autonomia de 14.5 ore la o pana e peste medie. Sertarul HarvestFresh cu control de umiditate tine legumele proaspete mai mult, exact zona unde un No Frost, altfel, le-ar usca. Il iei ca frigider principal fara batai de cap, acceptand ca la consum sta la clasa F, nu in fruntea listei.' },
+  { g: 'familie', id: 'D2PQQ3YBM', rol: 'Intra in nisa standard de 60 cm', short: 'Samsung 348 l', cap: '348 l', tip: 'Combina', clasa: 'E', pret: '3570 lei',
+    specs: ['348 litri: 268 frigider + 80 congelator', 'latime de doar 60 cm, cel mai ingust combina', 'clasa E, 226 kWh pe an, compresor Digital Inverter', 'WiFi SmartThings, All Around Cooling'],
+    pros: ['60 cm latime, intra in orice nisa standard de bucatarie', 'Clasa E si 226 kWh, cel mai econom combina din articol', 'Compresor Digital Inverter, silentios si durabil', 'Control din telefon prin WiFi SmartThings'],
+    cons: ['Congelator de doar 80 de litri, cel mai mic din grupa', 'Nota 4.58, buna, nu de varf'],
+    verdict: 'Cand bucataria are un loc fix de 60 de centimetri intre mobilier, multe combine, late de 66-70 cm, pur si simplu nu incap, iar Samsung RT35 rezolva exact asta: 60 cm latime, cel mai ingust din articol. In plus, e si cel mai econom combina de aici, clasa E si 226 kWh, ajutat de compresorul Digital Inverter care isi regleaza turatia in loc sa porneasca si sa se opreasca brusc. Cei 348 de litri sunt bine impartiti pentru un frigider, cu mentiunea ca partea de congelator, 80 de litri, e cea mai mica din grupa, deci daca ingheti mult, nu el e alegerea. All Around Cooling sufla aer pe fiecare raft pentru o temperatura uniforma, iar WiFi-ul lasa sa il controlezi din telefon. Il iei cand latimea e o constrangere reala si vrei consum mic.' },
+  { g: 'familie', id: 'DK5GQ3MBM', rol: 'Cel mai mult frigider din grupa', short: 'Beko 406 l', cap: '406 l', tip: 'Combina', clasa: 'F', pret: '3628 lei',
+    specs: ['406 litri: 313 frigider + 93 congelator', 'compresor ProSmart Inverter, autonomie 15 ore', 'clasa F, 304 kWh pe an, 39 dB', 'inaltime 185 cm, EverFresh+'],
+    pros: ['313 litri doar la frigider, cel mai spatios din grupa', 'Compresor ProSmart Inverter, mai eficient si durabil', 'Autonomie mare la pana de curent, 15 ore', 'EverFresh+ pentru legume proaspete mai mult timp'],
+    cons: ['Clasa F si 304 kWh, cel mai mare consum din grupa familie', 'Inalt de 185 cm, verifica loc deasupra'],
+    verdict: 'Daca partea de frigider conteaza mai mult decat congelatorul, Beko RDNE455 iti da cei mai multi litri de racire din grupa familie: 313 dintr-un total de 406, cu doar 93 pentru congelatorul de jos. E frigiderul pentru cine tine multe proaspete, gateste des si cumpara pentru toata saptamana, dar are un congelator modest. Compresorul ProSmart Inverter si autonomia de 15 ore sunt argumente solide, la fel sertarul EverFresh+ pentru legume. Compromisul e consumul: fiind mai inalt, mai incapator si la clasa F, ajunge la 304 kWh pe an, cel mai mult din grupa. La 185 cm inaltime, masoara si spatiul de deasupra, nu doar latimea. Il iei cand vrei maximum de frigider intr-o combina si nu ingheti cantitati mari.' },
+  { g: 'familie', id: 'DYPQQ3YBM', rol: 'Cel mai ieftin, cu WiFi', short: 'Samsung 393 l', cap: '393 l', tip: 'Combina', clasa: 'E', pret: '3300 lei',
+    specs: ['393 litri: 295 frigider + 98 congelator', 'clasa E, 245 kWh pe an, Digital Inverter', 'WiFi SmartThings, All Around Cooling', 'latime 70 cm, inaltime 171.5 cm'],
+    pros: ['Cel mai mic pret din grupa familie, sub 3300 de lei', '393 litri bine echilibrati, 295 frigider si 98 congelator', 'Clasa E cu compresor Digital Inverter', 'Control WiFi si racire uniforma All Around'],
+    cons: ['Nota 4.22, cea mai mica din articol pe cateva pareri', 'Doar 9 pareri, mai putin verificat'],
+    verdict: 'Samsung RT38 e varianta cu cel mai bun pret din grupa familie: 393 de litri, clasa E si compresor Digital Inverter, la sub 3300 de lei, adica mai ieftin decat combine mai mici de la aceeasi grupa. Impartirea e echilibrata, 295 de litri la frigider si 98 la congelator, potrivita pentru o familie care vrea si spatiu de racire, si un congelator decent, fara sa incline balanta intr-o parte. Are aceleasi dotari ca fratele lui de 348 de litri, All Around Cooling pentru temperatura uniforma si WiFi SmartThings, dar cu 45 de litri in plus. Nota de 4.22 pe 9 pareri e cea mai mica din articol, asa ca o iau ca semnal de urmarit, nu ca verdict. Il iei cand vrei cel mai mult volum Samsung pentru cei mai putini bani si nu te sperie numarul mic de recenzii.' },
+  // --- B. Combine No Frost, mari (461-585 l) ---
+  { g: 'mare', id: 'DV5641MBM', rol: 'Cel mai bine notat si cel mai ieftin mare', short: 'Beko 477 l', cap: '477 l', tip: 'Combina', clasa: 'E', pret: '3229 lei',
+    specs: ['477 litri: 354 frigider + 123 congelator', 'clasa E, 274 kWh pe an, 38 dB', 'HarvestFresh, AeroFlow, autonomie 15 ore', 'usa reversibila, clasa climatica SN-T'],
+    pros: ['Nota 4.91 pe 35 de pareri, cel mai apreciat din tot articolul', 'Sub 3230 de lei pentru 477 de litri, cel mai bun raport in gama mare', 'Congelator generos de 123 de litri', 'Clasa climatica SN-T, tolereaza si spatii mai reci'],
+    cons: ['Adancime 74.6 cm, iese in afara unui blat standard', 'Inalt de 186.5 cm'],
+    verdict: 'Cand cauti mult spatiu fara sa platesti mult, Beko B5RDNE504 e raspunsul rar in care numarul mare de litri si nota mare merg impreuna: 477 de litri la sub 3230 de lei, cu 4.91 pe 35 de pareri, cel mai bine cotat din tot articolul. Impartirea e cea pe care o vrei intr-un frigider mare de familie, 354 de litri la racire si 123 la congelator, adica un congelator care chiar duce ceva, nu unul simbolic. Are AeroFlow pentru aer uniform, HarvestFresh pentru legume si o autonomie buna de 15 ore. Clasa climatica SN-T il face mai flexibil la amplasare, iar usa reversibila ajuta in colturi. Singurul lucru de masurat inainte e adancimea de 74.6 cm, care depaseste blatul standard de 60. Il iei cand vrei cel mai mult volum pe leu, de la un aparat cu note reale in spate.' },
+  { g: 'mare', id: 'DQX1CVYBM', rol: 'Cel mai silentios, compresor Linear', short: 'LG 461 l', cap: '461 l', tip: 'Combina', clasa: 'E', pret: '2900 lei',
+    specs: ['461 litri: 361 frigider + 100 congelator', 'compresor Linear Inverter, doar 35 dB', 'clasa E, 250 kWh pe an, Door Cooling', 'WiFi ThinQ, clasa climatica T'],
+    pros: ['35 dB, cel mai silentios din articol', 'Compresor Linear Inverter, garantie lunga si consum mic', 'Cel mai mic pret la peste 460 de litri, sub 2900 de lei', 'Door Cooling sufla aer rece si pe rafturile din usa'],
+    cons: ['Clasa climatica T, nu il tii intr-un spatiu rece', 'Culoare bej, mai putin obisnuita'],
+    verdict: 'LG GTBV44 e cea mai buna afacere in gama mare: 461 de litri la sub 2900 de lei, mai ieftin decat multe combine de 400, plus cel mai silentios aparat din articol, 35 de decibeli. Cheia e compresorul Linear Inverter al celor de la LG, cunoscut pentru zgomotul mic, consumul redus si garantia lunga pe care brandul o da pe el, un argument real de durabilitate. Cei 461 de litri, 361 la frigider si 100 la congelator, acopera lejer o familie, iar Door Cooling sufla aer rece si pe rafturile din usa, unde de obicei e mai cald. Un detaliu de amplasare: clasa climatica e T, gandita pentru caldura, deci nu il tii intr-o incapere care se raceste tare iarna. Il iei cand vrei liniste, eficienta si cel mai bun pret la volum mare.' },
+  { g: 'mare', id: 'DDPR4BYBM', rol: 'Cu dozator de apa', short: 'Samsung 462 l', cap: '462 l', tip: 'Combina', clasa: 'E', pret: '5300 lei',
+    specs: ['462 litri: 354 frigider + 108 congelator', 'dozator de apa incorporat in usa', 'clasa E, 257 kWh pe an, Space Max', 'WiFi, filtru anti-miros, Power Cool'],
+    pros: ['Singurul cu dozator de apa fara racord la retea', 'Space Max: pereti mai subtiri, mai mult volum interior', 'Filtru contra mirosurilor si Power Cool pentru racire rapida', '21 de pareri, bine verificat'],
+    cons: ['Peste 5300 de lei, cel mai scump combina din articol', 'Dozatorul cu rezervor cere reumplere manuala'],
+    verdict: 'Samsung RT47 aduce un lucru pe care nimeni altcineva din articol nu il are: un dozator de apa rece direct in usa, fara sa fie nevoie de racordare la instalatia de apa, pentru ca merge cu rezervor. E confortul de a lua un pahar de apa rece fara sa deschizi usa, util mai ales vara si intr-o casa cu copii. Dincolo de asta, tehnologia Space Max subtiaza peretii izolanti, asa ca la acelasi gabarit exterior primesti mai mult spatiu inauntru, 462 de litri utili. Are filtru contra mirosurilor, Power Cool pentru racire rapida si WiFi. Pretul e insa cel mai mare dintre combine, peste 5300 de lei, iar dozatorul cu rezervor cere sa il reumpli manual. Il iei cand vrei dozator de apa si finisaj premium, si bugetul permite.' },
+  { g: 'mare', id: 'DCS45FYBM', rol: '509 litri cu dozator si Linear', short: 'LG 509 l', cap: '509 l', tip: 'Combina', clasa: 'E', pret: '3800 lei',
+    specs: ['509 litri: 379 frigider + 130 congelator', 'Total No Frost, compresor Linear Inverter', 'dozator de apa, Door Cooling, blocare copii', 'latime 78 cm, clasa E, 280 kWh'],
+    pros: ['509 litri, congelator mare de 130 de litri', 'Dozator de apa plus compresor Linear Inverter', 'Blocare acces copii, utila in familii', 'Finisaj negru, arata bine'],
+    cons: ['43 dB, cel mai zgomotos din articol', 'Latime 78 cm, cere spatiu generos'],
+    verdict: 'LG GTF744 combina volumul mare cu dozatorul de apa la un pret mult mai bun decat Samsung-ul cu dozator: 509 litri si dozator sub 3800 de lei. Are compresorul Linear Inverter al celor de la LG, congelator generos de 130 de litri si Door Cooling pentru rafturile din usa, plus blocare de acces pentru copii, un plus concret in casele cu cei mici. Finisajul negru il face sa arate mai scump decat este. Doua rezerve oneste: e cel mai zgomotos din articol, 43 de decibeli, ceva mai prezent decat restul, si e lat de 78 de centimetri, deci ai nevoie de spatiu peste media unui frigider. Il iei cand vrei volum mare si dozator de apa fara sa treci de 4000 de lei, si ai loc pentru el.' },
+  { g: 'mare', id: 'DBCZBHYBM', rol: 'Cel mai mare, 585 litri', short: 'Samsung 585 l', cap: '585 l', tip: 'Combina', clasa: 'E', pret: '4500 lei',
+    specs: ['585 litri: 424 frigider + 161 congelator', 'Twin Cooling Plus, doua circuite separate', 'clasa E, 306 kWh pe an, WiFi SmartThings', 'latime 83.6 cm'],
+    pros: ['585 litri, cel mai mare volum din articol', 'Congelator urias de 161 de litri', 'Twin Cooling Plus, doua circuite fara transfer de miros', 'WiFi SmartThings pentru control din telefon'],
+    cons: ['Latime 83.6 cm, cere spatiu mult', 'Consum de 306 kWh, cel mai mare din articol'],
+    verdict: 'Cand ai o familie mare sau gatesti pentru multi, Samsung RT58 iti da cel mai mare volum din articol: 585 de litri, cu un congelator de 161 de litri, aproape cat un congelator separat mic. Twin Cooling Plus inseamna, ca la Beko Dual Cooling, doua circuite de racire independente pentru frigider si congelator, deci fara transfer de miros si cu umiditate potrivita in fiecare compartiment, iar poti chiar comuta modul unora dintre zone. E un aparat pe masura nevoilor mari, cu WiFi SmartThings pentru control din telefon. Costul acestei generozitati e dublu: are nevoie de 83.6 cm latime, mult mai mult decat un frigider obisnuit, si consuma cel mai mult din articol, 306 kWh. Il iei cand volumul e prioritatea si ai unde sa il asezi.' },
+  // --- C. Frigidere No Frost cu o usa, fara congelator (362-365 l) ---
+  { g: 'ousa', id: 'D0DBCDYBM', rol: 'Larder de la un brand mare', short: 'Beko 365 l', cap: '365 l', tip: 'O usa', clasa: 'E', pret: '2800 lei',
+    specs: ['365 litri, totul frigider, fara congelator', 'clasa E cu doar 143 kWh pe an', '35 dB, AeroFlow, clasa climatica SN-T', 'usa reversibila, latime 59.7 cm'],
+    pros: ['365 de litri numai de racire, tot spatiul pentru proaspete', 'Consum mic, 143 kWh, jumatate fata de o combina', '35 dB, foarte silentios, plus clasa climatica SN-T', 'Latime sub 60 cm, intra in nisa standard'],
+    cons: ['Nu are congelator, ai nevoie de unul separat', 'Fara functii speciale de pastrare'],
+    verdict: 'Beko B1RMLNE444 e un frigider cu o singura usa, adica fara compartiment de congelator: toti cei 365 de litri sunt spatiu de racire. Are sens intr-un scenariu clar: ai deja, sau iti iei, un <a href="/cele-mai-bune-congelatoare/">congelator separat</a>, si atunci nu vrei sa irosesti spatiu pe un congelator mic si prost folosit intr-o combina. Beneficiul concret se vede la consum: 143 kWh pe an, aproape jumatate fata de o combina de aceeasi inaltime, tocmai pentru ca nu tine un compartiment la minus 18 grade. E foarte silentios, 35 dB, are AeroFlow pentru aer uniform si clasa climatica SN-T, iar latimea sub 60 cm il face usor de asezat. Il iei cand vrei mult frigider si congelezi separat.' },
+  { g: 'ousa', id: 'DC70HHYBM', rol: 'Cel mai ieftin din articol', short: 'Tesla 362 l', cap: '362 l', tip: 'O usa', clasa: 'E', pret: '1867 lei',
+    specs: ['362 litri, totul frigider, fara congelator', 'clasa E, doar 118 kWh pe an, cel mai mic consum', 'Total No Frost, clasa climatica larga SN-N-ST-T', 'super racire, usa reversibila, display LED'],
+    pros: ['Cel mai mic pret din tot articolul, sub 1900 de lei', 'Cel mai mic consum din articol, 118 kWh pe an', 'Clasa climatica SN-N-ST-T, cea mai toleranta la amplasare', 'Total No Frost si display pentru control usor'],
+    cons: ['Fara congelator, iti trebuie unul separat', 'Doar 3 pareri, putin verificat'],
+    verdict: 'Tesla RS3600FM e cel mai ieftin aparat din tot articolul, sub 1900 de lei, si totusi un frigider serios de 362 de litri, cu o singura usa. Logica e aceeasi ca la Beko de alaturi: fara congelator, tot spatiul merge pe racire, iar consumul scade dramatic, aici la 118 kWh pe an, cel mai mic din articol. E combinatia potrivita pentru cine are un <a href="/cele-mai-bune-congelatoare/">congelator separat</a> si vrea un frigider mare, ieftin si econom. Clasa climatica SN-N-ST-T e cea mai larga din articol, deci il pui aproape oriunde fara griji, iar Total No Frost inseamna zero gheata si zero decongelare. Punctul slab e ca are doar 3 pareri, deci istoricul lui e inca subtire. Il iei cand vrei cel mai mult frigider pentru cei mai putini bani si congelezi in alta parte.' },
+  { g: 'ousa', id: 'DVGD183BM', rol: 'Acelasi format, alt brand', short: 'Heinner 362 l', cap: '362 l', tip: 'O usa', clasa: 'E', pret: '2175 lei',
+    specs: ['362 litri, totul frigider, fara congelator', 'clasa E, 118 kWh pe an, No Frost', 'control electronic cu display', 'latime 59.5 cm, inaltime 185 cm'],
+    pros: ['365 de litri de racire, acelasi consum mic de 118 kWh', 'Control electronic cu display, setare precisa', 'Latime sub 60 cm, intra in nisa standard', 'Alternativa la Tesla, daca preferi Heinner'],
+    cons: ['Mai scump decat Tesla, la specificatii aproape identice', 'Doar 2 pareri'],
+    verdict: 'Heinner HF-M362NF e practic acelasi tip de frigider cu o usa ca Tesla, cu specificatii aproape identice: 362 de litri numai racire, clasa E, 118 kWh pe an, No Frost si aceleasi dimensiuni. Are un control electronic cu display pentru reglaj precis al temperaturii si aceeasi logica de folosire, mult frigider si congelator separat, cu consum injumatatit fata de o combina. Diferenta fata de Tesla e in principal pretul, ceva mai mare la fapte tehnice foarte apropiate, si brandul: Heinner e o marca romaneasca bine cunoscuta, cu retea de service, ceea ce pentru unii cumparatori conteaza. Are si el putine pareri, doar 2. Il iei daca vrei un larder econom si preferi Heinner in locul Teslei, acceptand diferenta mica de pret.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const FAMILIE = PICKS.filter(x => x.g === 'familie');
+const MARE = PICKS.filter(x => x.g === 'mare');
+const OUSA = PICKS.filter(x => x.g === 'ousa');
+
+const hero = '/imagini/articole/cele-mai-bune-frigidere-no-frost.webp';
+const figFamilie = '/imagini/articole/frigidere-nf-familie.webp';
+const figMare = '/imagini/articole/frigidere-nf-mari.webp';
+const figOusa = '/imagini/articole/frigidere-nf-o-usa.webp';
+const published = '2026-07-22T18:08:46+03:00';
+
+const faq = [
+  { question: 'Ce inseamna No Frost la un frigider?', answer: 'No Frost e un sistem in care un ventilator circula aer rece si usuca umezeala inainte ca ea sa inghete pe pereti sau in congelator. Practic, nu se mai formeaza gheata, deci nu decongelezi niciodata frigiderul manual, spre deosebire de modelele vechi, statice, unde stratul de gheata trebuia topit periodic. Toate cele 12 frigidere din acest articol sunt No Frost. Efectul mai putin stiut e ca aerul care circula poate usca alimentele lasate neacoperite, motiv pentru care producatorii adauga sertare cu umiditate controlata, HarvestFresh la Beko sau Optimal Fresh la Samsung, pentru legume si fructe.' },
+  { question: 'Combina sau frigider cu o usa?', answer: 'Depinde daca ai nevoie de congelator in acelasi corp. O combina are frigider sus si congelator jos, doua compartimente intr-un aparat, si e alegerea clasica pentru majoritatea. Un frigider cu o usa nu are deloc congelator: toti litrii sunt spatiu de racire. Are sens in doua situatii: fie ai deja un congelator separat si nu vrei sa irosesti spatiu pe unul mic intr-o combina, fie pur si simplu nu congelezi si vrei maximum de frigider. Bonusul modelelor cu o usa e consumul: fara compartiment la minus 18 grade, ajung la circa 118-143 kWh pe an, aproape jumatate fata de o combina de aceeasi inaltime.' },
+  { question: 'Ce este Dual Cooling sau Twin Cooling?', answer: 'E o tehnologie prin care frigiderul si congelatorul au circuite de racire separate, in loc de unul singur impartit intre ele. Beko o numeste NeoFrost Dual Cooling, Samsung o numeste Twin Cooling Plus, dar ideea e aceeasi. Avantajele sunt concrete: mirosurile nu trec dintr-un compartiment in altul, deci pestele din congelator nu iti parfumeaza laptele, iar umiditatea se regleaza separat, mai mare in frigider ca sa nu se usuce legumele si mai mica in congelator ca sa nu se formeze gheata. La un frigider No Frost, unde aerul circula si tinde sa usuce, sistemul cu doua circuite face o diferenta reala pentru prospetimea alimentelor.' },
+  { question: 'De cati litri am nevoie?', answer: 'Un reper des folosit e in jur de 100 de litri pentru primul membru al gospodariei plus circa 50 pentru fiecare in plus, ajustat dupa cat de des cumperi si gatesti. La o combina, uita-te separat la cei doi litri: volumul de frigider si cel de congelator. Un cuplu se descurca cu 300-350 de litri, o familie de 3-4 cu 380-480, iar o familie mare sau cine gateste pentru multi cu peste 500. La modelele cu o usa, fara congelator, toti litrii sunt racire, deci un 362 de litri cu o usa iti da mult mai mult spatiu de frigider decat o combina de aceeasi marime. Regula generala: mai bine putin mai mare, pentru ca un frigider aglomerat raceste mai greu si mai neuniform.' },
+  { question: 'Merita un frigider cu compresor Inverter?', answer: 'Da, in general merita. Un compresor obisnuit porneste la putere maxima si se opreste cand s-a atins temperatura, in cicluri, ceea ce inseamna consum si zgomot in salturi. Un compresor Inverter isi regleaza turatia continuu, mentine temperatura mai stabila, consuma mai putin si e mai silentios. In articol, LG il numeste Linear Inverter, Samsung Digital Inverter, Beko ProSmart Inverter. In plus, producatorii dau de obicei o garantie mai lunga pe compresorul Inverter, un semn ca se bazeaza pe durabilitatea lui. Diferenta o simti mai ales daca frigiderul sta intr-o bucatarie deschisa spre living, unde zgomotul conteaza.' },
+  { question: 'Ce inseamna clasa E sau F si de ce nu sunt clase A?', answer: 'Din martie 2021 eticheta energetica a fost rescrisa de la A la G, iar vechile A+, A++ si A+++ au disparut. Scara a fost inasprita intentionat, cu clasele A si B lasate goale la inceput, pentru aparatele viitoare. Asa se face ca un frigider care pe eticheta veche ar fi fost A+ apare acum ca F, iar unul A++ ca E. De aceea aproape toate frigiderele de azi, inclusiv cele bune, sunt E sau F, si o clasa F nu inseamna un aparat prost. Ce conteaza este cifra reala de consum in kWh pe an, scrisa pe eticheta: compar-o intre modele de capacitate similara, nu litera in sine.' },
+  { question: 'Cat de lat trebuie sa fie spatiul pentru frigider?', answer: 'Masoara latimea, adancimea si inaltimea locului inainte sa cumperi, plus cativa centimetri in plus pentru aerisire in spate si lateral. Frigiderele obisnuite au 60 de centimetri latime si intra intr-o nisa standard de bucatarie; in articol, Samsung de 348 de litri si cele cu o usa au fix 60 cm sau sub. Modelele mari trec insa de atat: cele de 460-509 litri au 70-78 cm, iar cel de 585 de litri are 83.6 cm, deci au nevoie de spatiu peste media unei nise. Nu uita nici adancimea: combinele mari ajung la 71-79 cm si ies in afara unui blat de 60, un detaliu pe care multi il descopera abia la livrare.' },
+  { question: 'Frigiderul No Frost usuca mancarea?', answer: 'Poate, daca alimentele sunt lasate neacoperite, pentru ca aerul care circula ca sa impiedice gheata trage si din umezeala mancarii. De aceea nu tii branza sau feliile de mezel descoperite intr-un No Frost, ci in caserole sau folie. Producatorii contracareaza fenomenul cu sertare speciale de legume si fructe, cu umiditate controlata, HarvestFresh, EverFresh+, Optimal Fresh, care mentin un mediu mai umed exact pentru produsele sensibile. In practica, cu alimentele ambalate corect si legumele in sertarul dedicat, uscarea nu e o problema, iar avantajul de a nu decongela niciodata depaseste cu mult acest mic dezavantaj.' },
+];
+
+const images = [hero, figFamilie, figMare, figOusa, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune frigidere No Frost in ${SEO_YEAR}: cand iei combina si cand unul cu o usa`}
+  description="12 frigidere No Frost comparate, de la combine de 348 litri la 585 litri si modele cu o usa. Cand iei combina si cand unul fara congelator."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune frigidere No Frost' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune frigidere No Frost</span>
+    </nav>
+
+    <h1>Cele mai bune frigidere No Frost</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune frigidere No Frost, de la combine de familie la modele cu o usa fara congelator" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Frigiderul cel mai apreciat din selectie, cu 35 de pareri si nota 4.91, e <strong>Beko B5RDNE504LXBR</strong>: o combina de 477 de litri No Frost la 3229 de lei, printre cele mai ieftine mari din articol. Daca vrei si mai silentios si mai ieftin, <strong>LG GTBV44</strong> de 461 de litri costa sub 2900 de lei si merge la doar 35 de decibeli. Iar daca ai deja un congelator separat si vrei maximum de frigider, <strong>Tesla RS3600FM</strong>, un model cu o usa de 362 de litri, e cel mai ieftin din tot articolul, sub 1900 de lei.</p>
+      <p>Odata ce No Frost a devenit standard, intrebarea nu mai e daca il iei fara gheata, ci <strong>cati litri</strong> si mai ales <strong>combina sau frigider cu o usa</strong>. O combina are frigider sus si congelator jos; un model cu o usa nu are congelator deloc, deci tot spatiul e racire, iar consumul scade aproape la jumatate. E cea mai importanta alegere, si de ea depinde totul.</p>
+      <p>Am impartit cele 12 modele in trei grupe: combine de familie pana la 406 litri, combine mari de la 460 la 585 de litri si frigidere cu o usa, fara congelator. Sunt toate combine cu doua usi sau modele cu o usa, nu <a href="/frigider-side-by-side-pentru-familie/">frigidere side by side</a>, care sunt o categorie separata, cu doua usi alaturate si volum si mai mare.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#familie">Combine No Frost, pentru familie (348-406 l)</a></li>
+        <li><a href="#mare">Combine No Frost, mari (461-585 l)</a></li>
+        <li><a href="#ousa">Frigidere cu o usa, fara congelator (362-365 l)</a></li>
+        <li><a href="#combina-usa">Combina sau frigider cu o usa</a></li>
+        <li><a href="#litri">De cati litri ai nevoie</a></li>
+        <li><a href="#dual">Dual Cooling si No Frost: de ce conteaza</a></li>
+        <li><a href="#inverter">Compresorul Inverter si dozatorul de apa</a></li>
+        <li><a href="#dimensiuni">Dimensiuni: nu uita sa masori</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Tip</th><th>Clasa</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.tip}</td>
+              <td>{x.clasa}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="familie">Combine No Frost, pentru familie (348-406 l)</h2>
+    <p>Combina, frigider sus si congelator jos, e alegerea clasica, iar zona de 348-406 litri acopera nevoile unei familii obisnuite de 3-4 persoane. Toate de aici sunt No Frost, deci fara decongelare, si toate au compresor Inverter. Le diferentiaza latimea, impartirea intre frigider si congelator si consumul, asa ca le-am asezat de la cel mai verificat la cel mai accesibil.</p>
+    {FAMILIE.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figFamilie} alt="Combine No Frost pentru familie, Beko 375 l, Samsung 348 l si Beko 406 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mare">Combine No Frost, mari (461-585 l)</h2>
+    <p>Peste 460 de litri intram in gama pentru familii mari sau pentru cine gateste mult si cumpara pe stoc. Aici apar functii in plus, dozator de apa, Door Cooling, compresoare Linear, si volume de congelator care se apropie de un congelator separat. Pretul urca, dar la fel si confortul si spatiul. Doua dintre ele au dozator de apa cu rezervor.</p>
+    {MARE.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMare} alt="Combine No Frost mari, Beko 477 l, Samsung 462 l cu dozator si Samsung 585 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="ousa">Frigidere cu o usa, fara congelator (362-365 l)</h2>
+    <p>Astea sunt frigiderele fara compartiment de congelator: tot volumul e spatiu de racire. Le iei cand ai deja un congelator separat sau cand pur si simplu nu congelezi si vrei maximum de frigider. Bonusul e consumul mic, in jur de 118-143 kWh pe an, aproape jumatate fata de o combina, pentru ca nu tin nimic la minus 18 grade.</p>
+    {OUSA.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figOusa} alt="Frigidere No Frost cu o usa, fara congelator, Beko 365 l, Tesla 362 l si Heinner 362 l" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-frigidere-no-frost').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate frigiderele No Frost la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="combina-usa">Combina sau frigider cu o usa</h2>
+    <p>Asta e prima decizie, si desparte selectia in doua. Depinde de un singur lucru: ai nevoie de congelator in acelasi corp sau nu.</p>
+    <p>O <strong>combina</strong> are frigider sus si congelator jos, doua compartimente intr-un aparat. E alegerea potrivita pentru majoritatea gospodariilor, care vor si sa raceasca, si sa congeleze, cu un singur electrocasnic si intr-un singur loc.</p>
+    <p>Un <strong>frigider cu o usa</strong> nu are congelator deloc: toti litrii sunt spatiu de racire. Are sens in doua situatii concrete:</p>
+    <ul>
+      <li><strong>Ai deja un congelator separat.</strong> Daca tii unul in camara sau in garaj, un congelator mic si aglomerat intr-o combina e spatiu irosit. Un frigider cu o usa iti da in schimb 360 de litri numai de racire.</li>
+      <li><strong>Nu congelezi aproape deloc.</strong> Unele gospodarii cumpara proaspat si gatesc zilnic; pentru ele, un compartiment de congelator sta gol si consuma degeaba.</li>
+    </ul>
+    <p>Avantajul modelelor cu o usa e consumul: <strong>fara compartiment la minus 18 grade, ajung la 118-143 kWh pe an</strong>, aproape jumatate fata de o combina de aceeasi inaltime. Combinatia frigider cu o usa plus <a href="/cele-mai-bune-congelatoare/">congelator separat</a> iti da mai mult spatiu total si control mai bun pe fiecare zona, dar ocupa doua locuri, nu unul.</p>
+
+    <h2 id="litri">De cati litri ai nevoie</h2>
+    <p>Capacitatea e al doilea filtru, iar la o combina trebuie sa te uiti la doi litri separat: cat e frigiderul si cat congelatorul. Un reper des folosit e in jur de 100 de litri pentru prima persoana plus circa 50 pentru fiecare in plus, ajustat dupa cat cumperi si gatesti.</p>
+    <ul>
+      <li><strong>300-350 de litri.</strong> Un cuplu sau o gospodarie mica. In articol, Samsung de 348 de litri, ingust de 60 cm, e reprezentativ.</li>
+      <li><strong>380-480 de litri.</strong> Zona de familie, 3-4 persoane. Cea mai cautata, cu cel mai bun raport, unde sta Beko de 477 de litri.</li>
+      <li><strong>Peste 500 de litri.</strong> Familii mari sau cine gateste pentru multi. Aici e Samsung de 585, cu un congelator cat un aparat separat.</li>
+    </ul>
+    <p>La modelele cu o usa socoteala e alta: neavand congelator, toti litrii sunt racire, deci un 362 de litri cu o usa iti da mai mult spatiu de frigider decat o combina de aceeasi marime. Si aici, regula ramane: mai bine putin mai mare, pentru ca un frigider aglomerat raceste mai neuniform si obliga compresorul sa lucreze mai mult.</p>
+
+    <h2 id="dual">Dual Cooling si No Frost: de ce conteaza</h2>
+    <p>Toate frigiderele din articol sunt No Frost, adica un ventilator circula aer rece si usuca umezeala inainte sa inghete. Beneficiul e clar, zero gheata si zero decongelare, dar are un revers pe care merita sa il stii: <strong>aerul care circula tinde sa usuce alimentele lasate descoperite</strong>. De aceea nu tii branza sau mezelul neacoperite intr-un No Frost, ci in caserole sau folie.</p>
+    <p>Ca sa contracareze asta, producatorii adauga doua lucruri. Primul sunt <strong>sertarele cu umiditate controlata</strong> pentru legume si fructe, numite HarvestFresh sau EverFresh+ la Beko si Optimal Fresh la Samsung, care mentin un mediu mai umed exact pentru produsele sensibile.</p>
+    <p>Al doilea, la modelele mai bune, e sistemul cu <strong>doua circuite de racire separate</strong>, NeoFrost Dual Cooling la Beko, Twin Cooling Plus la Samsung. In loc de un singur circuit impartit intre frigider si congelator, fiecare compartiment are al lui. Rezultatul: mirosurile nu trec dintr-o parte in alta, deci pestele din congelator nu iti parfumeaza laptele, iar umiditatea e reglata separat, mai mare in frigider si mai mica in congelator. La un No Frost, care altfel usuca, doua circuite fac o diferenta reala pentru prospetime.</p>
+
+    <h2 id="inverter">Compresorul Inverter si dozatorul de apa</h2>
+    <p>Doua dotari despre care merita sa stii ce fac, pentru ca apar in denumiri si urca pretul.</p>
+    <p><strong>Compresorul Inverter</strong> e practic standard la frigiderele bune de azi, si pe buna dreptate. Un compresor obisnuit porneste la maxim si se opreste in cicluri, cu consum si zgomot in salturi. Unul Inverter isi regleaza turatia continuu, tine temperatura mai stabila, consuma mai putin si e mai silentios. LG il numeste Linear Inverter, Samsung Digital Inverter, Beko ProSmart Inverter, iar producatorii dau de obicei o garantie mai lunga pe el, semn ca mizeaza pe durabilitate. LG de 461 de litri, cu Linear Inverter, e cel mai silentios din articol, 35 dB.</p>
+    <p><strong>Dozatorul de apa</strong> apare la doua modele, Samsung de 462 si LG de 509 litri, si merge cu rezervor, deci fara racord la instalatia de apa. Iti ia un pahar de apa rece fara sa deschizi usa, comod vara si cu copii in casa, dar il reumpli manual. E un confort real, nu o necesitate; daca nu il folosesti des, nu merita diferenta de pret.</p>
+
+    <h2 id="dimensiuni">Dimensiuni: nu uita sa masori</h2>
+    <p>E greseala care strica cea mai buna alegere: cumperi frigiderul potrivit ca volum, dar nu incape unde trebuie. Masoara locul, latime, adancime si inaltime, plus cativa centimetri de aerisire in spate, inainte de comanda.</p>
+    <ul>
+      <li><strong>Latimea.</strong> Frigiderele obisnuite au 60 cm si intra intr-o nisa standard. Din articol, Samsung de 348 de litri si toate cele cu o usa au 60 cm sau sub. Modelele mari trec de atat: 70 cm la cele de 460-477, 78 cm la LG de 509 si 83.6 cm la Samsung de 585.</li>
+      <li><strong>Adancimea.</strong> Combinele mari ajung la 71-79 cm si ies in afara unui blat de bucatarie standard de 60 cm, un lucru pe care multi il descopera abia la livrare.</li>
+      <li><strong>Inaltimea.</strong> Cele mari trec de 185 cm, deci verifica sa ai loc si deasupra, mai ales sub un dulap suspendat.</li>
+      <li><strong>Sensul usii.</strong> Intr-un colt, o usa care se deschide gresit e enervanta. Cauta mentiunea usa reversibila, prezenta la mai multe modele din selectie.</li>
+    </ul>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Iei o combina cand ai deja congelator.</strong> Congelatorul mic dintr-o combina, pe langa unul separat, e spatiu si energie irosite. Un frigider cu o usa e mai potrivit si mai econom.</li>
+      <li><strong>Te uiti doar la volumul total.</strong> La o combina conteaza cum e impartit: 313 litri de frigider si 93 de congelator inseamna altceva decat 268 si 80. Verifica ambele cifre.</li>
+      <li><strong>Crezi ca o clasa F e slaba.</strong> Dupa eticheta din 2021, F echivaleaza cu vechiul A+. Compara consumul in kWh pe an, nu litera.</li>
+      <li><strong>Uiti sa masori adancimea.</strong> Combinele mari au 71-79 cm si ies in afara blatului de 60. Masoara inainte, nu dupa livrare.</li>
+      <li><strong>Tii mancarea descoperita intr-un No Frost.</strong> Aerul care circula o usuca. Foloseste caserole si sertarul de legume cu umiditate.</li>
+      <li><strong>Platesti pentru dozator de apa pe care nu il folosesti.</strong> E un confort real doar daca chiar iei apa des; altfel, diferenta de pret nu se justifica.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la frigiderele No Frost in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca acelasi frigider apare listat de mai multe ori, in variante de culoare cu coduri diferite si acelasi pret.</p>
+    <p>Am filtrat categoriile care au articolul lor separat, ca sa nu amestecam lucrurile: <strong>frigiderele side by side</strong>, cu doua usi alaturate, tin de <a href="/frigider-side-by-side-pentru-familie/">articolul dedicat</a>; frigiderele incorporabile si mini-barurile la fel. Au ramas combinele cu doua usi si modelele cu o usa, adica exact ce cauta cineva cand scrie frigider No Frost.</p>
+    <p><strong>Le-am grupat dupa tip si capacitate</strong>, pentru ca decizia combina sau o usa, urmata de cati litri, e cea care restrange alegerea. Am comparat specificatiile reale din fise, volumul de frigider si de congelator separat, consumul in kWh, tipul de compresor, sistemul de racire si dimensiunile, si am semnalat unde un pret mai mare aduce ceva concret, ca dozatorul de apa, si unde nu.</p>
+    <p>Nu testam frigiderele in laborator si nu pretindem asta. Ne bazam pe date reale, pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare. Daca alegi un frigider cu o usa, perechea lui logica e <a href="/cele-mai-bune-congelatoare/">un congelator separat</a>; iar daca vrei volum si mai mare intr-un singur corp, alternativa e <a href="/frigider-side-by-side-pentru-familie/">un frigider side by side</a>.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 1867 la 5300 de lei, iar pretul urmeaza tipul, capacitatea si dotarile.</p>
+    <p><strong>Sub 2800 de lei</strong> stau frigiderele cu o usa, fara congelator: Tesla de 362 de litri, cel mai ieftin din articol la 1867 de lei, si Heinner de 362, plus LG de 461 de litri, o combina mare cu un pret surprinzator de mic. Zona pentru cine congeleaza separat sau vrea volum mare ieftin.</p>
+    <p><strong>Intre 2800 si 3800 de lei</strong> e grosul pietei: combinele de familie Beko si Samsung de 348-406 litri, plus modele mari cu raport foarte bun, ca Beko de 477 de litri la 3229, cel mai apreciat din articol. Aici gasesti echilibrul intre volum, dotari si pret.</p>
+    <p><strong>Peste 3800 de lei</strong> intri la volume foarte mari si dotari premium: LG de 509 litri cu dozator, Samsung de 585 de litri, cel mai mare, si Samsung de 462 cu dozator de apa, cel mai scump la 5300 de lei. Platesti pentru spatiu peste medie si functii de confort, ca dozatorul.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-frigidere-no-frost" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-frigidere-no-frost" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/generate-sitemaps.js",
+    "build": "node scripts/gen-responsive.mjs && node scripts/gen-popular.mjs && astro build && node scripts/generate-sitemaps.js",
     "preview": "astro preview",
     "generate": "node scripts/generate-batch.js"
   },

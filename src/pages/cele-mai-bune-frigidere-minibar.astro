@@ -1,0 +1,302 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['frigidere-minibar'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Clasice, cel mai bun raport (420-590 lei) ---
+  { g: 'clasic', id: 'DPP0MGMBM', rol: 'Cel mai notat clasic', short: 'STARCREST 46 l', cap: '46 l', tip: 'Clasic', clasa: 'E', pret: '500 lei',
+    specs: ['46 litri intr-un corp de 49.5 cm inaltime', 'clasa E, doar 80 kWh pe an', 'termostat mecanic reglabil, picioare ajustabile', 'racire statica, 41 dB'],
+    pros: ['58 de pareri cu nota 4.86, cel mai verificat clasic', 'Sub 500 de lei, raport foarte bun', 'Consum mic, 80 kWh pe an', 'Compact, intra sub un birou sau pe un raft'],
+    cons: ['Fara congelator, doar racire', 'Termostat mecanic simplu, fara afisaj'],
+    verdict: 'STARCREST SMB-46WHE e minibarul la care ajunge multa lume, si cifrele arata de ce: 58 de pareri cu nota 4.86, sub 500 de lei, pentru 46 de litri de racire intr-un corp de nici 50 de centimetri inaltime. E aparatul simplu si corect, fara pretentii: il pui langa birou, in dormitor sau intr-o camera de oaspeti, il reglezi din termostatul mecanic si tine bauturile si cateva alimente reci, cu un consum mic de 80 kWh pe an. Nu are congelator si nici afisaj, dar la pretul si scopul asta nici nu ai nevoie. Il iei cand vrei cel mai sigur minibar clasic, cu multe pareri in spate si pret bun.' },
+  { g: 'clasic', id: 'DS20FVYBM', rol: 'Heinner, echilibrat', short: 'Heinner 41 l', cap: '41 l', tip: 'Clasic', clasa: 'E', pret: '548 lei',
+    specs: ['41 litri, inaltime 51 cm', 'clasa E, cel mai mic consum, 79 kWh', 'termostat mecanic reglabil', 'racire statica, 39 dB'],
+    pros: ['Cel mai mic consum din articol, 79 kWh pe an', 'Brand cunoscut, cu service in Romania', '39 dB, mai silentios decat media', 'Vine si in negru sau argintiu'],
+    cons: ['41 de litri, putin mai mic decat cele de 46', 'Fara congelator'],
+    verdict: 'Heinner HMB-HM41E++ e varianta de la un brand cunoscut a minibarului clasic, si aduce doua lucruri concrete peste media grupei. Primul e consumul, cel mai mic din articol la 79 kWh pe an, un detaliu care conteaza la un aparat ce merge nonstop. Al doilea e zgomotul, 39 de decibeli, ceva mai discret, ceea ce ajuta daca il tii in dormitor. Cei 41 de litri sunt cu putin sub cele de 46, dar diferenta e mica in practica. Vine in alb, negru sau argintiu, deci il potrivesti cu incaperea, iar in spate ai numele si service-ul Heinner. Il iei cand vrei un minibar econom si silentios de la un brand de incredere.' },
+  { g: 'clasic', id: 'DM7760MBM', rol: 'Usa reversibila, nota mare', short: 'VIVAX 43 l', cap: '43 l', tip: 'Clasic', clasa: 'F', pret: '589 lei',
+    specs: ['circa 43 litri, usa reversibila', 'clasa F, 100 kWh pe an', 'termostat reglabil, racire statica', 'inaltime 49.2 cm, 41 dB'],
+    pros: ['Nota 4.86, printre cele mai mari din articol', 'Usa reversibila, o pui pe stanga sau pe dreapta', 'Brand cunoscut, cu service', 'Design curat, alb'],
+    cons: ['Clasa F si 100 kWh, mai mult decat STARCREST sau Heinner', 'Doar 7 pareri'],
+    verdict: 'VIVAX MF-45E e un minibar clasic care iese in fata prin nota, 4.86 pe 7 pareri, si prin usa reversibila, care iti lasa sa alegi partea pe care se deschide, util intr-un colt sau langa un perete. Cu circa 43 de litri intr-un corp compact, face aceeasi treaba ca restul grupei clasice, racire pentru bauturi si cateva alimente, de la un brand cu retea de service. Unde pierde putin teren e la consum: clasa F si 100 kWh pe an, mai mult decat STARCREST sau Heinner care stau pe la 79-80. Diferenta nu e mare in lei, dar exista. Il iei cand vrei un minibar bine notat, cu usa reversibila, si nu te deranjeaza consumul putin mai mare.' },
+  { g: 'clasic', id: 'DJF0DSYBM', rol: 'Cel mai ieftin, cu mini-congelator', short: 'Samus 41 l', cap: '41 l', tip: 'Clasic', clasa: 'E', pret: '425 lei',
+    specs: ['41 litri, cu un mic congelator de 4 litri', 'clasa E, 79 kWh pe an', 'usa reversibila, picioruse reglabile', 'racire statica, 39 dB'],
+    pros: ['Cel mai ieftin din articol, sub 430 de lei', 'Are un mic congelator de 4 litri', 'Consum mic, 79 kWh, si 39 dB', 'Usa reversibila'],
+    cons: ['Nota 4.25, cea mai mica din grupa clasica', 'Congelatorul de 4 litri e simbolic'],
+    verdict: 'Samus SW064E e cea mai ieftina cale de a avea un minibar, sub 430 de lei, si vine chiar cu un mic plus fata de restul grupei: o caseta de congelator de 4 litri, cat pentru cateva cuburi de gheata sau o punga mica. Cu 41 de litri, consum mic de 79 kWh, 39 de decibeli si usa reversibila, bifeaza tot ce trebuie la un minibar de baza, la cel mai mic pret. Nota, 4.25, e cea mai modesta din grupa clasica, semn ca la pretul asta finisajele si consecventa nu sunt de varf, dar pentru un aparat secundar, de birou sau de camera de oaspeti, isi face treaba. Il iei cand bugetul e prima grija si vrei si un strop de congelator.' },
+  { g: 'clasic', id: 'DC1FB0BBM', rol: 'Cel mai silentios, racire cu ventilator', short: 'MF46W 46 l', cap: '46 l', tip: 'Clasic', clasa: 'F', pret: '522 lei',
+    specs: ['46 litri, cu congelator de 5 litri', 'racire dinamica, cu ventilator, nu statica', 'doar 35 dB, cel mai silentios din articol', 'clasa F, 118 kWh, usa reversibila'],
+    pros: ['35 dB, cel mai silentios, ideal in dormitor', 'Racire dinamica, temperatura mai uniforma', 'Are congelator de 5 litri', 'Usa reversibila'],
+    cons: ['Clasa F si 118 kWh, printre cele mai mari din grupa', 'Model fara brand cunoscut'],
+    verdict: 'MF46W e minibarul de luat in seama daca il pui intr-un dormitor, pentru ca e cel mai silentios din articol, 35 de decibeli, sub restul care stau pe la 39-41. Motivul e si diferenta lui tehnica: foloseste racire dinamica, cu ventilator, in loc de cea statica a celorlalte, ceea ce distribuie frigul mai uniform in interior. Are 46 de litri, un congelator de 5 litri si usa reversibila. Pretul acestui confort e consumul: clasa F si 118 kWh pe an, printre cele mai mari din grupa clasica, si un brand necunoscut in spate. Il iei cand linistea conteaza cel mai mult, in dormitor sau intr-un birou tacut, si accepti un consum ceva mai mare.' },
+  // --- B. Cu design, pentru camera de zi ---
+  { g: 'design', id: 'DWNKMDYBM', rol: 'Cel mai vandut, design retro', short: 'STARCREST Vintage', cap: '46 l', tip: 'Design', clasa: 'E', pret: '540 lei',
+    specs: ['46 litri, design vintage cu maner cromat', 'clasa E, 80 kWh pe an', 'racire statica, 39 dB', 'finisaj negru, inaltime 52 cm'],
+    pros: ['64 de pareri, cel mai vandut din tot articolul', 'Design retro, arata bine la vedere', 'Consum mic, 80 kWh, si 39 dB', 'Manerul cromat il face un obiect de decor'],
+    cons: ['Fara congelator', 'Termostat mecanic simplu'],
+    verdict: 'STARCREST SRMB-47BK e cel mai vandut minibar din articol, cu 64 de pareri, si nu doar pentru pret, ci pentru cum arata: are un design vintage, cu linii rotunjite si maner cromat, gandit sa stea la vedere, nu ascuns. Il pui in camera de zi, langa un fotoliu sau intr-un birou cu personalitate, si devine mai degraba un obiect de decor decat un simplu frigider. Dincolo de look, e un minibar solid: 46 de litri, consum mic de 80 kWh, 39 de decibeli, aceeasi baza tehnica buna ca modelul clasic STARCREST. Nu are congelator si merge pe termostat mecanic. Il iei cand vrei un minibar care sa si arate bine, nu doar sa raceasca.' },
+  { g: 'design', id: 'DB4T57YBM', rol: 'Usa de sticla, look modern', short: 'STARCREST sticla', cap: '46 l', tip: 'Design', clasa: 'E', pret: '540 lei',
+    specs: ['46 litri, usa cu panou de sticla neagra', 'clasa E, 80 kWh pe an', 'racire statica, 41 dB', 'design modern, inaltime 48.8 cm'],
+    pros: ['40 de pareri cu nota 4.72, bine cotat', 'Usa de sticla, aspect modern si curat', 'Consum mic, 80 kWh pe an', 'Compact, doar 48.8 cm inaltime'],
+    cons: ['Fara congelator', 'Sticla se vede cu amprente'],
+    verdict: 'STARCREST SMB-47GLS-BK e varianta moderna a minibarului de design: in loc de manerul retro, are o usa cu panou de sticla neagra, cu un aspect curat, minimalist, care se potriveste intr-un birou modern sau o camera de zi cu mobilier simplu. Cu 40 de pareri si nota 4.72, e bine verificat, si sub el are aceeasi baza buna STARCREST: 46 de litri, 80 kWh pe an, corp compact de doar 48.8 cm. E cel mai scund din grupa de design, deci intra usor pe un raft sau sub un blat. Sticla arata bine, dar se vede cu amprente, un compromis al finisajului lucios. Il iei cand vrei un minibar cu aspect modern si curat, nu retro.' },
+  { g: 'design', id: 'D6P73VMBM', rol: 'Rosu, pentru un accent de culoare', short: 'VORTEX rosu', cap: '47 l', tip: 'Design', clasa: 'F', pret: '500 lei',
+    specs: ['47 litri, finisaj rosu lucios', 'clasa F, 100 kWh pe an', 'racire statica, 41 dB', 'inaltime 48.5 cm'],
+    pros: ['Culoare rosie, un accent puternic in incapere', 'Sub 500 de lei', '47 de litri, printre cele mai incapatoare din grupa', 'Compact, 48.5 cm inaltime'],
+    cons: ['Clasa F si 100 kWh', 'Doar 3 pareri', 'Fara congelator'],
+    verdict: 'VORTEX VM5SRD04M e alegerea pentru cine vrea ca minibarul sa se vada, in sensul bun: e rosu lucios, un accent de culoare puternic intr-o camera de zi, un birou creativ sau o bucatarie unde vrei o nota vesela. Cu 47 de litri, e printre cele mai incapatoare din grupa de design, la un pret sub 500 de lei. Partea mai putin stralucita e la cifre: clasa F si 100 kWh pe an, plus doar 3 pareri, deci mai putin verificat decat modelele STARCREST. Nu are congelator. Il iei cand culoarea si aspectul conteaza cel mai mult si vrei un minibar care sa iasa in evidenta, nu sa se ascunda.' },
+  // --- C. Mai mari sau cu note de top ---
+  { g: 'premium', id: 'D6XTJT2BM', rol: 'Cel mai mare accesibil, No Frost', short: 'Heinner 66 l', cap: '66 l', tip: 'Mai mare', clasa: 'E', pret: '577 lei',
+    specs: ['66 litri, cel mai mare din grupa accesibila', 'singurul cu racire No Frost, fara gheata', 'clasa E, 99 kWh pe an', 'inaltime 63 cm, 41 dB'],
+    pros: ['66 de litri, cu 20 mai mult decat un minibar obisnuit', 'Singurul No Frost din articol, nu se formeaza gheata', 'Sub 580 de lei pentru volumul si tehnologia oferite', 'Brand cunoscut, cu service'],
+    cons: ['Mai inalt, 63 cm, ocupa mai mult loc', 'Doar 5 pareri'],
+    verdict: 'Heinner HMB-M66E++ iese din tiparul minibarului mic prin doua lucruri. Primul: are 66 de litri, cu vreo 20 mai mult decat cele obisnuite de 41-47, deci incap mai multe sticle, alimente sau chiar o masa usoara, potrivit pentru un birou mai folosit sau o camera de oaspeti. Al doilea, si mai neasteptat la pretul asta: e singurul din articol cu racire No Frost, adica nu se formeaza gheata pe pereti si nu il decongelezi manual, un avantaj real fata de toate celelalte, care sunt statice. Consuma 99 kWh, rezonabil pentru marime, si costa sub 580 de lei. E mai inalt, 63 cm, si are doar 5 pareri. Il iei cand vrei cel mai mult volum la buget mic, fara batai de cap cu gheata.' },
+  { g: 'premium', id: 'DVMHTFYBM', rol: 'Cea mai mare nota', short: 'TCL 45 l', cap: '45 l', tip: 'Mai mare', clasa: 'E', pret: '932 lei',
+    specs: ['45 litri, maner retras, incastrabil', 'clasa E, 80 kWh pe an', 'clasa climatica SN-N-ST-T, cea mai larga', 'racire statica, 40 dB'],
+    pros: ['Nota 4.92, cea mai mare din articol', 'Maner retras, aspect curat, se aseaza langa mobilier', 'Clasa climatica SN-N-ST-T, merge aproape oriunde', 'Consum mic, 80 kWh pe an'],
+    cons: ['Peste 900 de lei, scump pentru un minibar de 45 litri', 'Fara congelator'],
+    verdict: 'TCL RF045DWE0 e minibarul cu cea mai mare nota din articol, 4.92 pe 12 pareri, si arata de ce merita luat in seama chiar la un pret mai mare. Are un maner retras in usa, deci un aspect curat care se aseaza frumos langa mobilier, si o clasa climatica SN-N-ST-T, cea mai larga din selectie, ceea ce inseamna ca functioneaza corect si intr-o incapere mai rece, si intr-una calda, spre deosebire de multe minibaruri. Consuma putin, 80 kWh pe an, de la un brand global cunoscut. Rezerva e pretul: peste 900 de lei pentru 45 de litri, de aproape doua ori cat un STARCREST clasic. Il iei cand vrei cel mai bine cotat si mai flexibil minibar si esti dispus sa platesti pentru calitate si finisaj.' },
+  { g: 'premium', id: 'DJZ996YBM', rol: 'Brand romanesc, usi reversibile', short: 'Arctic 46 l', cap: '46 l', tip: 'Mai mare', clasa: 'E', pret: '880 lei',
+    specs: ['46 litri, usi reversibile', 'clasa E, 80 kWh pe an', 'clasa climatica N-ST', 'racire statica, 39 dB, finisaj argintiu'],
+    pros: ['Brand romanesc consacrat, cu service extins', 'Usi reversibile, flexibil la amplasare', 'Consum mic, 80 kWh, si 39 dB', 'Finisaj argintiu, discret'],
+    cons: ['Peste 880 de lei, scump fata de STARCREST', 'Doar 4 pareri', 'Fara congelator'],
+    verdict: 'Arctic AT4746M4S e minibarul pentru cine pune pret pe un brand romanesc cu traditie si retea larga de service. Are 46 de litri, usi reversibile pentru amplasare flexibila, consum mic de 80 kWh, 39 de decibeli si un finisaj argintiu discret, care se potriveste in mai multe incaperi. Tehnic, sta bine, iar increderea in Arctic e argumentul lui principal fata de marcile mai putin cunoscute. Punctele slabe sunt pretul, peste 880 de lei, mult peste un STARCREST care face aceeasi treaba de baza, si numarul mic de pareri, doar 4. Il iei cand vrei siguranta unui brand romanesc cu service aproape si nu te deranjeaza sa platesti in plus pentru asta.' },
+  { g: 'premium', id: 'DG4HK1BBM', rol: 'Cel mai mare volum', short: 'Crown 68 l', cap: '68 l', tip: 'Mai mare', clasa: 'F', pret: '1225 lei',
+    specs: ['68 litri, cel mai mare din articol', 'clasa F, 149 kWh pe an', 'clasa climatica ST-T, doar pentru incaperi calde', 'racire statica, 41 dB, finisaj negru'],
+    pros: ['68 de litri, cel mai mult spatiu din articol', '12 pareri, verificat rezonabil', 'Finisaj negru, aspect solid'],
+    cons: ['Nota 3.92, cea mai mica din articol', 'Clasa climatica ST-T, nu merge in incaperi sub 18 grade', 'Consum mare, 149 kWh, si cel mai scump, peste 1200 de lei'],
+    verdict: 'Crown CM-68B e cel mai incapator din articol, cu 68 de litri, deci alegerea daca vrei maximum de spatiu intr-un aparat inca mic. Dincolo de volum insa, e modelul la care trebuie sa fii cel mai atent. Are nota cea mai mica din selectie, 3.92, un consum mare pentru marime, 149 kWh pe an, si e cel mai scump, peste 1200 de lei. Mai important, are clasa climatica ST-T, ceea ce inseamna ca e proiectat sa functioneze corect doar in incaperi calde, de la 18 grade in sus; intr-un spatiu care se raceste, nu e o alegere buna. Il iei doar daca ai nevoie clara de cei 68 de litri si il tii intr-o incapere mereu calda, altfel modelele mai mici si mai ieftine sunt mai potrivite.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const CLASIC = PICKS.filter(x => x.g === 'clasic');
+const DESIGN = PICKS.filter(x => x.g === 'design');
+const PREMIUM = PICKS.filter(x => x.g === 'premium');
+
+const hero = '/imagini/articole/cele-mai-bune-frigidere-minibar.webp';
+const figClasic = '/imagini/articole/minibar-clasice.webp';
+const figDesign = '/imagini/articole/minibar-design.webp';
+const figPremium = '/imagini/articole/minibar-mari.webp';
+const published = '2026-07-22T19:00:06+03:00';
+
+const faq = [
+  { question: 'La ce foloseste un frigider minibar?', answer: 'E un frigider mic, de sine statator, pentru locurile unde un frigider mare nu are ce cauta: langa birou, in dormitor, in camera de zi pentru bauturi, intr-o camera de oaspeti, la receptie, intr-o garsoniera sau ca al doilea frigider dedicat racoritoarelor si berii. Capacitatea tipica e de 41-68 de litri, cat pentru sticle, doze si cateva alimente. Nu inlocuieste frigiderul principal al bucatariei, ci acopera o nevoie de racire secundara, la indemana, intr-un corp compact care incape aproape oriunde.' },
+  { question: 'Cati litri are un minibar si cat incape?', answer: 'Majoritatea minibarurilor au intre 41 si 47 de litri, iar cateva urca la 66-68. Orientativ, intr-un minibar de 46 de litri incap in jur de 50-60 de doze de 330 ml, sau un amestec de cateva sticle mari de doi litri, doze si cateva alimente. Daca il vrei doar pentru bauturi la birou, 41-46 de litri ajung. Daca il folosesti mai serios, intr-o camera de oaspeti sau ca al doilea frigider pentru alimente, un model de 66-68 de litri, ca Heinner sau Crown din articol, iti da spatiul in plus.' },
+  { question: 'Minibarurile fac zgomot? Pot pune unul in dormitor?', answer: 'Da, poti, dar zgomotul conteaza intr-un dormitor, pentru ca minibarul are un compresor care porneste si se opreste periodic. In articol, nivelul merge de la 35 la 41 de decibeli. Diferenta pare mica pe hartie, dar noaptea, intr-o camera linistita, se simte. Cel mai silentios din selectie e MF46W, cu 35 de decibeli si racire cu ventilator, urmat de modelele de 39 dB, ca Heinner, Samus sau Arctic. Daca il pui langa pat, alege unul dintre cele silentioase; pentru un birou sau o camera de zi, orice model e in regula.' },
+  { question: 'Ce inseamna clasa climatica si de ce conteaza la un minibar?', answer: 'Clasa climatica spune intre ce temperaturi ambientale functioneaza corect aparatul, si e usor de trecut cu vederea la un minibar. Clasa SN merge de la 10 grade, N de la 16, ST de la 18, T de la 18 in sus. Daca tii minibarul intr-o incapere care se raceste, un balcon inchis, un garaj, o casa de vacanta nefolosita iarna, verifica clasa. Crown CM-68B din articol, de exemplu, are clasa ST-T, deci e gandit doar pentru incaperi calde, de la 18 grade, si nu ar functiona bine intr-un spatiu rece. TCL, cu SN-N-ST-T, e cel mai tolerant din selectie.' },
+  { question: 'Minibarurile au congelator?', answer: 'De regula nu, sau doar unul simbolic. Majoritatea sunt frigidere pure, cu tot volumul dedicat racirii, pentru ca scopul lor e sa tina bauturi si alimente reci, nu congelate. Cateva modele au o caseta mica de congelator, de 4-5 litri, cat pentru cateva cuburi de gheata sau o punga mica, cum sunt Samus SW064E si MF46W din articol. Daca ai nevoie de congelare reala, un minibar nu e solutia; pentru asta exista congelatoare mici dedicate. Verifica specificatia daca vrei macar o caseta de gheata.' },
+  { question: 'Racire statica sau dinamica la un minibar?', answer: 'Cele mai multe minibaruri au racire statica, adica frigul vine de la un perete rece si se distribuie natural, ceea ce e simplu, ieftin si silentios, dar temperatura poate fi usor neuniforma, mai rece jos, mai calda sus. Racirea dinamica, cu un mic ventilator, distribuie aerul mai uniform in interior, deci alimentele stau la o temperatura mai constanta indiferent de raft. In articol, MF46W foloseste racire dinamica. Pentru un minibar de bauturi, statica e perfect suficienta; dinamica ajuta daca tii si alimente si vrei temperatura egala peste tot.' },
+  { question: 'Minibar de sine statator sau frigider incorporabil mic?', answer: 'Depinde daca vrei sa se vada sau nu. Un minibar e un aparat de sine statator, il asezi unde vrei si il muti usor, iar unele modele sunt chiar facute sa se vada, cu design retro sau colorat. Un frigider mic incorporabil se monteaza ascuns intr-un corp de mobilier, in spatele unei usi de mobila, pentru un aspect uniform. Daca vrei racire flexibila, la birou, in dormitor sau in camera de zi, si nu te deranjeaza sa se vada, ia un minibar. Daca renovezi bucataria si vrei fronturi continue, uita-te la <a href="/cele-mai-bune-frigidere-incorporabile/">frigiderele incorporabile</a>.' },
+  { question: 'Cat costa un frigider minibar?', answer: 'In selectia noastra, preturile pornesc de la circa 425 de lei pentru cel mai ieftin model si ajung la peste 1200 pentru cel mai mare. Grosul pietei, minibarurile clasice si cele cu design, sta intre 500 si 590 de lei, un interval in care gasesti modele bine notate, cu multe pareri, ca STARCREST. Peste 850 de lei intri la branduri premium, ca TCL sau Arctic, sau la volume mai mari. Pentru un minibar obisnuit de bauturi, nu e nevoie sa treci de 600 de lei; sumele mai mari se justifica doar pentru un brand anume, o nota de top sau spatiu in plus.' },
+];
+
+const images = [hero, figClasic, figDesign, figPremium, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune frigidere minibar in ${SEO_YEAR}: pentru birou, dormitor sau camera de zi`}
+  description="12 frigidere minibar comparate pe capacitate, zgomot, design si consum, de la 41 la 68 litri. Pentru birou, dormitor sau camera de zi, de la 425 de lei."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune frigidere minibar' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune frigidere minibar</span>
+    </nav>
+
+    <h1>Cele mai bune frigidere minibar</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune frigidere minibar, de la modele clasice la cele cu design retro sau colorat" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Un minibar rezolva o nevoie simpla: racire la indemana acolo unde un frigider mare nu are ce cauta, langa birou, in dormitor, in camera de zi pentru bauturi sau intr-o garsoniera. Cel mai vandut din selectie, cu 64 de pareri, e <strong>STARCREST Vintage</strong>, un minibar retro de 46 de litri la 540 de lei. Daca vrei doar cel mai bun raport, <strong>STARCREST alb</strong> de 46 de litri costa 500 si are 58 de pareri cu nota 4.86. Iar cel mai ieftin, <strong>Samus</strong> de 41 de litri, porneste de la 425 de lei.</p>
+      <p>La un minibar, alegerea se face pe cateva lucruri simple: <strong>cati litri</strong> iti trebuie, <strong>unde il pui</strong> si, daca il tii in dormitor, <strong>cat de silentios</strong> e. Volumul obisnuit e de 41-47 de litri, cat pentru bauturi si cateva alimente, iar cateva modele urca la 66-68. Aproape toate sunt frigidere pure, fara congelator, cu unele exceptii care au o caseta mica de gheata.</p>
+      <p>Le-am grupat dupa <strong>cum le folosesti</strong>: clasice, cu cel mai bun raport, pentru birou sau camera de oaspeti; cu design, pentru cand minibarul sta la vedere in camera de zi; si mai mari sau cu note de top, pentru cine vrea spatiu sau un brand anume. Daca il vrei ascuns in mobilier, nu de sine statator, uita-te mai degraba la <a href="/cele-mai-bune-frigidere-incorporabile/">frigiderele incorporabile</a>.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#clasic">Clasice, cel mai bun raport (420-590 lei)</a></li>
+        <li><a href="#design">Cu design, pentru camera de zi</a></li>
+        <li><a href="#premium">Mai mari sau cu note de top</a></li>
+        <li><a href="#folosire">La ce foloseste si unde il pui</a></li>
+        <li><a href="#capacitate">De cati litri ai nevoie</a></li>
+        <li><a href="#zgomot">Zgomotul: conteaza in dormitor</a></li>
+        <li><a href="#climatica">Clasa climatica si racirea</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Tip</th><th>Clasa</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.tip}</td>
+              <td>{x.clasa}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="clasic">Clasice, cel mai bun raport (420-590 lei)</h2>
+    <p>Astea sunt minibarurile simple si corecte, pentru un birou, o camera de oaspeti sau ca al doilea frigider de bauturi. Toate au 41-46 de litri, racire statica si termostat mecanic, iar preturile stau sub 600 de lei. Diferentele le fac consumul, zgomotul si numarul de pareri, asa ca le-am asezat de la cel mai verificat la cel mai ieftin.</p>
+    {CLASIC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figClasic} alt="Minibaruri clasice, STARCREST 46 l, Heinner 41 l si Samus 41 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="design">Cu design, pentru camera de zi</h2>
+    <p>Cand minibarul nu sta ascuns sub un birou, ci la vedere intr-o camera de zi, aspectul conteaza la fel de mult ca racirea. Modelele de aici sunt gandite sa se vada: retro cu maner cromat, cu usa de sticla sau colorate. Tehnic seamana cu cele clasice, dar arata altfel.</p>
+    {DESIGN.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figDesign} alt="Minibaruri cu design, STARCREST vintage, STARCREST cu usa de sticla si VORTEX rosu" width="1600" height="900" loading="lazy" />
+
+    <h2 id="premium">Mai mari sau cu note de top</h2>
+    <p>Ultima grupa e pentru cine vrea ceva peste minibarul obisnuit: mai multi litri, un brand anume sau cea mai buna nota. Aici intra si singurul No Frost din articol, si cel mai mare model, si cele mai bine cotate. Preturile urca, iar la unele merita citit atent ce primesti pentru banii in plus.</p>
+    {PREMIUM.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPremium} alt="Minibaruri mai mari, Heinner 66 l No Frost, TCL 45 l si Crown 68 l" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-frigidere-minibar').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate minibarurile la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="folosire">La ce foloseste si unde il pui</h2>
+    <p>Un minibar nu inlocuieste frigiderul din bucatarie, ci acopera o nevoie de racire secundara, acolo unde un aparat mare nu incape sau nu are rost. Cateva situatii tipice:</p>
+    <ul>
+      <li><strong>Langa birou sau in camera de lucru.</strong> Bauturi si gustari la indemana, fara drumuri la bucatarie.</li>
+      <li><strong>In dormitor.</strong> Apa, racoritoare, poate un pahar de vin, la un pas de pat. Aici conteaza mult sa fie silentios.</li>
+      <li><strong>In camera de zi.</strong> Ca minibar de bauturi langa canapea sau bar, adesea un model cu design, care sta bine la vedere.</li>
+      <li><strong>Camera de oaspeti, garsoniera, casa de vacanta.</strong> Un frigider suficient pentru un spatiu mic, fara sa aduci unul mare.</li>
+      <li><strong>Ca al doilea frigider.</strong> Dedicat berii, racoritoarelor sau bauturilor pentru petreceri, ca sa nu aglomerezi frigiderul principal.</li>
+    </ul>
+    <p>Locul unde il pui iti spune si ce sa cauti: in dormitor, zgomotul mic; in camera de zi, designul; intr-un spatiu care se raceste iarna, clasa climatica potrivita, despre care revenim mai jos.</p>
+
+    <h2 id="capacitate">De cati litri ai nevoie</h2>
+    <p>Capacitatea minibarurilor e mica prin definitie, dar exista diferente care conteaza in functie de ce tii in el.</p>
+    <ul>
+      <li><strong>41-47 de litri.</strong> Standardul, si ce iei pentru bauturi si cateva alimente. Intr-un model de 46 de litri incap orientativ 50-60 de doze de 330 ml, sau un amestec de sticle mari, doze si gustari. Suficient pentru birou, dormitor sau bauturi.</li>
+      <li><strong>66-68 de litri.</strong> Pentru cine vrea spatiu in plus, intr-o camera de oaspeti folosita des sau ca al doilea frigider serios. Heinner de 66 si Crown de 68 de litri din articol acopera zona asta.</li>
+    </ul>
+    <p>Atentie ca litrii mai multi vin cu un corp mai mare si mai inalt: un minibar de 46 de litri are in jur de 49-52 cm inaltime, pe cand cel de 66-68 urca la 59-63. Masoara locul unde il pui, mai ales daca il vrei sub un blat sau pe un raft.</p>
+
+    <h2 id="zgomot">Zgomotul: conteaza in dormitor</h2>
+    <p>La un frigider mare, din bucatarie, zgomotul trece adesea neobservat. La un minibar pus langa pat sau intr-un birou tacut, se aude, pentru ca are un compresor care porneste si se opreste periodic ca sa mentina temperatura.</p>
+    <p>In articol, nivelul de zgomot merge de la 35 la 41 de decibeli. Pare o diferenta mica, dar noaptea, intr-o camera linistita, cei cativa decibeli in plus se simt. Cel mai silentios din selectie e <strong>MF46W, cu 35 de decibeli</strong>, care foloseste racire cu ventilator; urmeaza modelele de 39 dB, ca Heinner, Samus si Arctic.</p>
+    <p>Regula practica: daca minibarul merge in dormitor, alege unul dintre cele silentioase, de 35-39 dB. Daca il tii intr-un birou activ, o camera de zi sau o bucatarie, orice model din articol e in regula, pentru ca zgomotul se pierde in fundalul zilei.</p>
+
+    <h2 id="climatica">Clasa climatica si racirea</h2>
+    <p>Doua detalii tehnice pe care putina lume le verifica la un minibar, dar care pot conta.</p>
+    <p><strong>Clasa climatica</strong> spune intre ce temperaturi ambientale functioneaza aparatul corect. SN merge de la 10 grade, N de la 16, ST si T de la 18 in sus. Daca tii minibarul intr-un spatiu care se raceste iarna, un balcon inchis, o casa de vacanta, verifica clasa. Crown din articol, de exemplu, are clasa ST-T, deci e gandit doar pentru incaperi calde; TCL, cu SN-N-ST-T, e cel mai tolerant si merge aproape oriunde.</p>
+    <p><strong>Racirea</strong> e de doua feluri. Cea statica, la majoritatea, e simpla si silentioasa, dar temperatura poate fi usor neuniforma, mai rece jos. Cea dinamica, cu un mic ventilator, ca la MF46W, distribuie frigul mai uniform. Pentru bauturi, statica ajunge; dinamica ajuta daca tii si alimente si vrei temperatura egala peste tot. Iar Heinner de 66 de litri merge chiar No Frost, deci nu formeaza gheata deloc, singurul din articol.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Astepti congelator adevarat.</strong> Minibarurile sunt frigidere pure sau au cel mult o caseta de 4-5 litri. Pentru congelare reala, alege alt tip de aparat.</li>
+      <li><strong>Il pui in dormitor fara sa te uiti la zgomot.</strong> Un model de 41 dB langa pat se aude noaptea. Pentru dormitor, cauta 35-39 dB.</li>
+      <li><strong>Ignori clasa climatica.</strong> Un minibar de clasa ST-T nu functioneaza bine intr-un balcon rece sau o casa neincalzita iarna. Verifica daca il tii intr-un spatiu care se raceste.</li>
+      <li><strong>Platesti pentru brand fara sa ai nevoie.</strong> Un STARCREST de 500 de lei cu 58 de pareri face aceeasi treaba de baza ca un model premium de peste 880. Diferenta o justifica un brand anume sau spatiul in plus, nu racirea.</li>
+      <li><strong>Iei prea mic pentru cat folosesti.</strong> Daca il vrei ca al doilea frigider serios, 41 de litri se umplu repede. Uita-te la modelele de 66-68.</li>
+      <li><strong>Uiti sa masori locul.</strong> Modelele mai mari urca la 59-63 cm inaltime si nu mai incap sub orice blat. Masoara inainte.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la minibarurile in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca acelasi produs apare adesea in mai multe culori, cu coduri diferite si acelasi pret.</p>
+    <p><strong>Le-am grupat dupa cum le folosesti</strong>, nu doar dupa pret: clasice pentru birou si camera de oaspeti, cu design pentru camera de zi si mai mari sau premium pentru cine vrea spatiu ori un brand anume. E impartirea care ajuta cel mai mult, pentru ca la un minibar decizia porneste de la unde il pui.</p>
+    <p>Am comparat specificatiile reale din fise, capacitate, consum, nivel de zgomot, clasa climatica, tip de racire si prezenta unei casete de congelator, si am semnalat unde un pret mai mare nu aduce mare lucru in plus, ca la modelele premium fata de STARCREST, si unde un aparat are o limita reala, ca minibarul de clasa climatica ST-T, bun doar pentru incaperi calde. Nu testam aparatele in laborator si nu pretindem asta: ne bazam pe pareri, specificatii de la producator si documentare. Un minibar de sine statator e alternativa deschisa la un <a href="/cele-mai-bune-frigidere-incorporabile/">frigider mic incorporabil</a>, ascuns in mobilier.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 425 la 1225 de lei, iar pretul urmeaza brandul, marimea si designul mai mult decat racirea in sine.</p>
+    <p><strong>Sub 550 de lei</strong> sta grosul pietei: minibarurile clasice si cele cu design de la STARCREST, plus Samus si VORTEX. Aici gasesti modele bine notate, cu multe pareri, care fac exact ce trebuie. Pentru un minibar obisnuit, e zona in care alegi.</p>
+    <p><strong>Intre 550 si 600 de lei</strong> intra Heinner de 41 si de 66 de litri, VIVAX si MF46W: branduri cunoscute, plus un No Frost sau un model silentios, la un pret inca rezonabil.</p>
+    <p><strong>Peste 850 de lei</strong> ajungi la premium si volume mari: Arctic, TCL cu cea mai mare nota si Crown de 68 de litri. Platesti pentru un brand anume, un finisaj mai bun sau spatiu in plus. Merita doar daca ai un motiv clar; altfel, un clasic de sub 550 face aceeasi treaba.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-frigidere-minibar" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-frigidere-minibar" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

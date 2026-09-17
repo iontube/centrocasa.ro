@@ -1,294 +1,305 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Copertina retractabila pentru terasa",
-  excerpt: "Daca vrei o copertina retractabila pentru terasa de calitate, care sa te tina ani buni, eu zic sa te uiti la modelele cu brat de otel si tesatura acrilica de peste 300g/m². Nu te zgarci la motorizare, mai ales daca terasa e mare, si verifica atent garantia. O copertina retractabila buna, bine aleasa, iti poate schimba complet experienta de outdoor. Stai sa-ti zic cum sta treaba.",
-  image: "/images/articles/copertina-retractabila-pentru-terasa.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-03-02T07:54:47.410Z",
-  modifiedDate: "2026-03-02T07:54:47.410Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "cat costa o copertina retractabila pentru terasa", answer: "Pretul unei copertine retractabile pentru terasa variaza mult, de la circa 1200 lei pentru modele manuale mici, la peste 9000 lei pentru cele de lux, cu brat dublu si senzori. Modelele medii, motorizate, cu dimensiuni standard, se gasesc in general intre 2000 si 4500 lei." },
-  { question: "care e diferenta intre copertina cu brat simplu si brat dublu", answer: "O copertina retractabila cu brat dublu ofera stabilitate superioara, fiind ideala pentru terase mari sau zone expuse la vant. Bratul dublu adauga un set suplimentar de brate care intind tesatura mai bine si previn vibratiile, in timp ce bratul simplu e suficient pentru terase medii si protejate de vant." },
-  { question: "merita sa cumpar o copertina retractabila cu caseta", answer: "Da, merita daca vrei protectie maxima pentru tesatura si mecanism atunci cand copertina e retractata. Caseta protejeaza impotriva prafului, ploii si razelor UV, prelungind durata de viata a copertinei, dar vine cu un cost suplimentar." },
-  { question: "ce tesatura e mai buna pentru copertina retractabila", answer: "Tesatura acrilica de peste 300g/m², tratata UV, este cea mai recomandata pentru o copertina retractabila. Ea ofera rezistenta buna la decolorare, intemperii si uzura, spre deosebire de poliesterul de densitate mica." },
-  { question: "de ce se strica motorul la copertina retractabila", answer: "Motorul unei copertine retractabile se poate strica din cauza suprasolicitarii (vant puternic, blocaje), a umiditatii excesive, a lipsei de intretinere sau a defectelor de fabricatie. Alegerea unui motor de calitate si respectarea instructiunilor de utilizare sunt esentiale." },
-  { question: "cum sa intretin copertina retractabila pentru terasa", answer: "Pentru a intretine o copertina retractabila, curata periodic tesatura cu apa si sapun neutru, verifica si lubrifiaza bratele si mecanismele, si asigura-te ca este complet uscata inainte de a o retracta. Evita deschiderea fortata in conditii de vant puternic." },
-  { question: "unde gasesc copertina retractabila pentru terasa de calitate", answer: "Poti gasi copertine retractabile pentru terasa de calitate in magazine specializate de mobilier de exterior, showroom-uri de constructii sau online pe site-urile producatorilor sau distribuitorilor autorizati. Verifica recenziile si garantia oferita." },
-  { question: "care e garantia pentru o copertina retractabila buna", answer: "O copertina retractabila de calitate ar trebui sa aiba o garantie de minim 2-3 ani pentru structura si motor. Producatorii de top pot oferi chiar si 5 ani garantie pe anumite componente, ceea ce indica o calitate superioara a produsului." }
-];
-
-const toc = [
-  { title: "Ce copertina retractabila pentru terasa sa alegi ca sa nu regreti?", id: "ce-copertina-retractabila-pentru-terasa-sa-alegi-ca-sa-nu-regreti" },
-  { title: "Top 5 copertine retractabile pentru terasa: avantaje si dezavantaje pe bune", id: "top-5-copertine-retractabile-pentru-terasa-avantaje-si-dezavantaje-pe-bune" },
-  { title: "Cum sa alegi copertina retractabila pentru terasa potrivita: ghidul prietenului tău", id: "cum-sa-alegi-copertina-retractabila-pentru-terasa-potrivita-ghidul-prietenului-tau" },
-  { title: "Copertina retractabila cu brat simplu vs. brat dublu: Care e diferenta?", id: "copertina-retractabila-cu-brat-simplu-vs-brat-dublu-care-e-diferenta" },
-  { title: "Greseli frecvente cand cumperi o copertina retractabila pentru terasa si cum sa le eviti", id: "greseli-frecvente-cand-cumperi-o-copertina-retractabila-pentru-terasa-si-cum-sa-le-eviti" },
-  { title: "Copertina retractabila pentru terasa: Recomandari pe categorii de buget", id: "copertina-retractabila-pentru-terasa-recomandari-pe-categorii-de-buget" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['copertina'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Mici, de fereastra si balcon ---
+  { g: 'mici', id: 'DGLYN2MBM', badge: 'Cea mai mica si ieftina', short: 'Compacta albastra', dim: '100 cm', material: 'Poliester', actionare: 'Manuala',
+    specs: ['cea mai mica si mai ieftina din selectie', 'latime compacta, 100 cm', 'panza din poliester, cadru din otel', 'pentru o fereastra sau un balcon mic'],
+    pros: ['Cea mai accesibila copertina din selectie', 'Compacta, 100 cm, pentru spatii mici', 'Panza din poliester, cadru din otel', 'Usor de montat pe o fereastra sau balcon'],
+    cons: ['Mica, doar pentru ferestre si balcoane', 'Actionare manuala'],
+    verdict: 'Cea mai mica si mai accesibila copertina din selectie, pentru o fereastra sau un balcon mic. Acest model vidaXL are o latime compacta de 100 cm si o panza din poliester pe un cadru din otel, deci umbreste o fereastra sau un colt de balcon, ferind incaperea de soarele puternic si racorind-o vara. E cea mai ieftina din selectie, o solutie simpla pentru cine vrea umbra pe un spatiu mic fara sa dea multi bani. Fiind mica, e potrivita doar pentru ferestre si balcoane, nu pentru o terasa, iar actionarea e manuala. Ca la toate produsele din aceasta selectie, e un model relativ nou, cu putine pareri, deci te bazezi pe specificatii. O iei cand vrei cea mai ieftina copertina, compacta, pentru a umbri o fereastra sau un balcon mic, si nu ai nevoie de o suprafata mare sau de motor.' },
+  { g: 'mici', id: 'DS1YN2MBM', badge: 'Compacta, maro', short: 'Compacta maro', dim: '100 cm', material: 'Poliester', actionare: 'Manuala',
+    specs: ['latime compacta, 100 cm', 'nuanta maro inchis, discreta', 'panza din poliester, cadru din otel', 'pentru fereastra sau balcon'],
+    pros: ['Compacta, 100 cm, pentru spatii mici', 'Nuanta maro inchis, discreta si eleganta', 'Panza din poliester rezistenta', 'Pret accesibil'],
+    cons: ['Mica, doar pentru ferestre si balcoane', 'Actionare manuala'],
+    verdict: 'O copertina compacta in nuanta maro inchis, pentru cine vrea o culoare mai discreta pe fereastra sau balcon. Acest model vidaXL are aceeasi latime de 100 cm si panza din poliester pe cadru din otel ca varianta albastra, dar intr-o nuanta maro inchis, care se integreaza mai discret pe o fatada in tonuri neutre sau calde. Umbreste o fereastra sau un colt de balcon, ferind de soare si racorind spatiul. E o optiune accesibila, potrivita pentru spatii mici, cu actionare manuala. Fiind un produs nou, are inca putine pareri. O iei cand vrei o copertina mica pentru fereastra sau balcon, intr-o nuanta maro discreta care se asorteaza usor cu fatada, la un pret accesibil, si nu ai nevoie de o suprafata mare.' },
+  { g: 'mici', id: 'DV1YN2MBM', badge: 'Compacta, rosie', short: 'Compacta rosie', dim: '100 cm', material: 'Poliester', actionare: 'Manuala',
+    specs: ['latime compacta, 100 cm', 'nuanta rosie, aspect vioi', 'panza din poliester, cadru din otel', 'pentru fereastra sau balcon'],
+    pros: ['Compacta, 100 cm, pentru spatii mici', 'Nuanta rosie, aspect vioi si cald', 'Panza din poliester pe cadru din otel', 'Usor de montat'],
+    cons: ['Mica, doar pentru ferestre si balcoane', 'Actionare manuala'],
+    verdict: 'Varianta compacta in rosu, pentru cine vrea un accent de culoare pe fereastra sau balcon. Acest model vidaXL are 100 cm latime si panza din poliester pe cadru din otel, ca celelalte doua din grup, dar intr-o nuanta rosie, vie si calda, care da personalitate unei fatade. Umbreste un spatiu mic, ferind incaperea de soare. E o optiune accesibila pentru ferestre si balcoane, cu actionare manuala. Ca la toate produsele din selectie, e un model nou, cu putine pareri. O iei cand vrei o copertina mica pentru fereastra sau balcon, intr-o nuanta rosie care sa aduca un accent de culoare pe fatada, la un pret accesibil, si nu ai nevoie de o copertina mare de terasa.' },
+  // --- De terasa, automate ---
+  { g: 'terasa', id: 'DV596XMBM', badge: 'Terasa, cea mai accesibila', short: 'Antracit 250 cm', dim: '250 cm', material: 'Poliester', actionare: 'Automata',
+    specs: ['proiectie 250 cm, latime 300 cm', 'nuanta antracit, moderna', 'panza din poliester, usoara, 19.8 kg', 'actionare automata cu motor'],
+    pros: ['Cea mai accesibila copertina de terasa din selectie', 'Proiectie buna, 250 cm, umbreste o masa', 'Nuanta antracit, moderna si eleganta', 'Usoara, 19.8 kg, si actionare automata'],
+    cons: ['Panza din poliester, mai putin robusta ca textilul gros', 'Produs nou, putine pareri'],
+    verdict: 'Cea mai accesibila copertina de terasa din selectie si o alegere buna pentru a umbri o masa cu scaune. Acest model vidaXL are o proiectie de 250 cm si o latime de 300 cm, deci acopera un colt de terasa cu o masa, si o nuanta antracit moderna, care se potriveste pe fatade contemporane. Panza din poliester o face usoara, doar 19.8 kg, iar actionarea automata, cu motor, iti permite sa o intinzi si sa o strangi la o apasare de buton. E cea mai ieftina copertina de terasa de aici, un bun punct de plecare. Panza din poliester e ceva mai putin robusta decat textilul gros, iar produsul e nou, cu putine pareri. O iei cand vrei cea mai accesibila copertina de terasa automata, cu proiectie buna si aspect modern, pentru a umbri o masa, si nu insisti pe cel mai rezistent material.' },
+  { g: 'terasa', id: 'D2J6WB3BM', badge: 'Cadru din aluminiu', short: 'Visiniu 250 cm', dim: '250 cm', material: 'Aluminiu', actionare: 'Automata',
+    specs: ['proiectie 250 cm, latime 300 cm', 'cadru din aluminiu, robust', 'nuanta visiniu, calda', 'actionare automata'],
+    pros: ['Cadru din aluminiu, robust si rezistent la rugina', 'Proiectie buna, 250 cm', 'Nuanta visiniu, calda si distincta', 'Actionare automata cu motor'],
+    cons: ['Mai grea, 37 kg, montaj mai serios', 'Produs nou, fara pareri inca'],
+    verdict: 'O copertina de terasa cu cadru robust din aluminiu, pentru cine pune pret pe rezistenta structurii. Acest model vidaXL are o proiectie de 250 cm si o latime de 300 cm, cu un cadru din aluminiu care nu rugineste si e mai solid decat structurile usoare, plus o nuanta visiniu calda, care iese din tiparul nuantelor neutre. Actionarea automata, cu motor, o intinde si o strange comod. Fiind cu cadru de aluminiu, e mai grea, aproape 37 kg, deci montajul e ceva mai serios si de obicei se face in doi. E un produs nou, fara pareri inca, deci te bazezi pe specificatii. O iei cand vrei o copertina de terasa cu un cadru robust din aluminiu, proiectie buna si o nuanta calda, si nu te deranjeaza greutatea mai mare la montaj, in schimbul unei structuri mai solide.' },
+  { g: 'terasa', id: 'D2KC6HMBM', badge: 'Lata, de 450 cm', short: 'Crem 450 cm', dim: '300 cm', material: 'Textil', actionare: 'Automata',
+    specs: ['latime mare, 450 cm, proiectie 300 cm', 'nuanta crem, luminoasa', 'panza din textil', 'actionare automata'],
+    pros: ['Lata, 450 cm, acopera o terasa generoasa', 'Proiectie mare, 300 cm', 'Nuanta crem, luminoasa si neutra', 'Actionare automata cu motor'],
+    cons: ['Nota 3, dintr-o singura parere', 'Necesita un perete lat pentru montaj'],
+    verdict: 'O copertina lata, pentru o terasa generoasa care are nevoie de multa umbra. Acest model vidaXL are o latime de 450 cm si o proiectie de 300 cm, deci acopera o zona mare, cu o masa lunga si mai multe scaune, potrivit pentru o terasa spatioasa sau o familie mare. Nuanta crem e luminoasa si neutra, se asorteaza usor cu orice fatada, iar panza din textil si actionarea automata completeaza pachetul. Are nevoie de un perete suficient de lat pentru montaj, iar nota, 3 dintr-o singura parere, e prea putin ca sa spuna ceva, deci te bazezi pe specificatii. O iei cand ai o terasa mare si vrei o copertina lata, de 450 cm, cu proiectie generoasa, intr-o nuanta crem neutra, si ai un perete suficient de lat pe care sa o montezi.' },
+  { g: 'terasa', id: 'D9R96XMBM', badge: 'Cea mai mare proiectie', short: 'Antracit 350 cm', dim: '350 cm', material: 'Poliester', actionare: 'Automata',
+    specs: ['proiectie 350 cm, cea mai mare din selectie', 'latime 450 cm, acopera mult', 'nuanta antracit, moderna', 'actionare automata'],
+    pros: ['Cea mai mare proiectie din selectie, 350 cm', 'Lata, 450 cm, umbra pentru o terasa mare', 'Nuanta antracit, moderna', 'Actionare automata cu motor'],
+    cons: ['Mare si grea, montaj serios', 'Produs nou, fara pareri inca'],
+    verdict: 'Copertina cu cea mai mare proiectie din selectie, pentru cine vrea umbra adanca pe o terasa mare. Acest model vidaXL are o proiectie de 350 cm, cea mai mare de aici, si o latime de 450 cm, deci creeaza o zona de umbra generoasa, care iese mult de la perete si acopera confortabil o masa cu scaune, chiar si la orele cand soarele bate piezis. Nuanta antracit ii da un aspect modern, iar actionarea automata o face comoda de folosit. Fiind mare, e si grea, cu un montaj serios, de obicei in doi si cu prinderi solide in perete. E un produs nou, fara pareri inca. O iei cand ai o terasa mare si vrei cea mai adanca umbra din selectie, cu proiectie de 350 cm si latime generoasa, si esti pregatit pentru un montaj mai pretentios al unei copertine de dimensiuni mari.' },
+  // --- Cu stor, LED si senzor de vant ---
+  { g: 'dotari', id: 'DPC90JMBM', badge: 'Cu stor frontal', short: 'Cu stor', dim: '3 x 2.5 m', material: 'Aluminiu', actionare: 'Automata',
+    specs: ['copertina cu stor frontal reglabil', 'protectie in plus fata de soarele piezis', 'cadru din aluminiu, 3 x 2.5 m', 'actionare automata'],
+    pros: ['Are un stor frontal, coboara pentru umbra in plus', 'Te apara si de soarele piezis, de dimineata si seara', 'Cadru din aluminiu, robust', 'Actionare automata'],
+    cons: ['Produs nou, fara pareri inca', 'Storul cere reglaj separat'],
+    verdict: 'Copertina de ales daca vrei protectie si de soarele care bate piezis, nu doar de sus. Acest model vidaXL are, pe langa panza principala, un stor frontal reglabil, un panou care coboara din marginea copertinei, deci te apara si de soarele de dimineata sau de seara, care intra pe sub o copertina obisnuita, si iti da mai multa intimitate. Are un cadru din aluminiu robust, dimensiunea de 3 x 2.5 m si actionare automata. E o solutie mai completa decat o copertina simpla, potrivita pentru o terasa expusa la soare din lateral. Storul cere un reglaj separat, iar produsul e nou, fara pareri inca. O iei cand vrei o copertina cu stor frontal, pentru protectie si de soarele piezis, nu doar de cel de sus, si preferi o solutie mai completa pentru o terasa expusa lateral.' },
+  { g: 'dotari', id: 'DBCV6XMBM', badge: 'Cu LED si senzor de vant', short: 'Cu LED + senzor', dim: '350 cm', material: 'Textil', actionare: 'Manuala',
+    specs: ['cu iluminare LED integrata', 'senzor de vant pentru protectie', 'antracit, 450 x 350 cm, textil', 'se strange singura pe vant puternic'],
+    pros: ['Iluminare LED, folosesti terasa si seara', 'Senzor de vant, se strange singura la vant puternic', 'Mare, 350 cm proiectie, textil', 'Protejeaza copertina de deteriorare'],
+    cons: ['Nota 3, dintr-o singura parere', 'Pret ridicat'],
+    verdict: 'O copertina mare cu doua dotari care conteaza: lumina si protectie la vant. Acest model vidaXL are iluminare LED integrata, deci folosesti terasa si seara, dupa lasarea intunericului, fara sa mai adaugi un corp de iluminat separat, si un senzor de vant, care strange automat copertina cand vantul devine prea puternic, protejand-o de deteriorare, una dintre cele mai frecvente cauze de stricare a copertinelor. E mare, cu proiectie de 350 cm si panza din textil, in nuanta antracit. Nota, 3 dintr-o singura parere, e prea putin ca sa conteze, deci te bazezi pe dotari si specificatii, iar pretul e ridicat. O iei cand vrei o copertina mare cu iluminare LED pentru serile pe terasa si un senzor de vant care sa o protejeze automat, si esti dispus la un pret mai mare pentru aceste dotari.' },
+  { g: 'dotari', id: 'D9T90JMBM', badge: 'Cea mai completa, 5 m', short: 'Completa 5 m', dim: '5 x 3 m', material: 'Textil', actionare: 'Automata',
+    specs: ['cea mai mare si mai completa, 5 x 3 m', 'cu stor, LED si senzor de vant', 'antracit, panza din textil', 'actionare automata'],
+    pros: ['Cea mai mare din selectie, 5 metri latime', 'Are tot: stor, LED si senzor de vant', 'Actionare automata, textil rezistent', 'Pentru o terasa mare, complet echipata'],
+    cons: ['Cea mai scumpa din selectie', 'Montaj serios, pentru un perete foarte lat'],
+    verdict: 'Cea mai mare si mai completa copertina din selectie, pentru o terasa generoasa pe care vrei totul. Acest model vidaXL are 5 metri latime si 3 metri proiectie, cea mai mare suprafata de umbra de aici, si combina toate dotarile: un stor frontal pentru soarele piezis, iluminare LED pentru serile pe terasa si un senzor de vant care o strange singura la vant puternic, protejand-o. Panza e din textil, in nuanta antracit, si actionarea e automata. E, practic, o copertina complet echipata, pentru cine vrea cea mai buna experienta pe o terasa mare. E cea mai scumpa din selectie si cere un perete foarte lat si un montaj serios. O iei cand ai o terasa mare si vrei cea mai completa copertina din selectie, cu stor, LED si senzor de vant, si esti dispus la investitia si montajul unei copertine de 5 metri.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MICI = PICKS.filter(x => x.g === 'mici');
+const TERASA = PICKS.filter(x => x.g === 'terasa');
+const DOTARI = PICKS.filter(x => x.g === 'dotari');
+
+const hero = '/images/articles/copertina-retractabila-pentru-terasa.webp';
+const figMici = '/imagini/articole/copertina-mici.webp';
+const figTerasa = '/imagini/articole/copertina-terasa.webp';
+const figDotari = '/imagini/articole/copertina-dotari.webp';
+const published = '2026-07-19T15:15:03+03:00';
+
+const faq = [
+  { question: 'Ce inseamna proiectia unei copertine?', answer: 'Proiectia e cat de mult iese copertina de la perete spre exterior, adica cat de adanca e umbra pe care o creeaza, si se masoara in centimetri. E la fel de importanta ca latimea: o copertina lata, dar cu proiectie mica, umbreste doar o fasie langa perete, in timp ce una cu proiectie mare acopera si o masa asezata mai departe. Modelele din selectie au proiectii intre 250 si 350 cm; pentru o masa cu scaune, o proiectie de 250-300 cm e in general suficienta, iar 350 cm iti da umbra si la orele cand soarele bate piezis. Cand alegi, gandeste-te cat de departe de perete vrei umbra, nu doar cat de lat e peretele.' },
+  { question: 'Copertina cu actionare manuala sau cu motor?', answer: 'Cea manuala se intinde si se strange cu o manivela, pe care o rotesti, o solutie mai ieftina si care nu depinde de curent, dar cere ceva efort de fiecare data. Cea automata, cu motor, se deschide si se inchide la o apasare de buton sau de pe o telecomanda, mult mai comod, mai ales la copertinele mari, unde manivela ar cere multe rotiri. Majoritatea modelelor de terasa din selectie sunt automate. Dezavantajul motorului e ca depinde de o sursa de curent si costa mai mult. Daca ai o copertina mare si o folosesti des, motorul merita; pentru una mica sau daca vrei sa economisesti, actionarea manuala face treaba, doar cu ceva efort in plus.' },
+  { question: 'La ce foloseste senzorul de vant?', answer: 'Vantul puternic e cel mai mare dusman al unei copertine intinse: o poate indoi, rupe sau smulge de pe perete. Senzorul de vant rezolva exact aceasta problema: cand detecteaza ca vantul a depasit un anumit prag, strange automat copertina, fara sa fii tu acasa sau sa apuci sa reactionezi, protejand-o de deteriorare. E o dotare foarte utila, mai ales daca stai intr-o zona expusa la vant sau daca lasi copertina intinsa cand pleci de acasa. Modelele mari din selectie, ca cel cu LED si senzor, au aceasta functie. Fara senzor, trebuie sa strangi tu copertina de fiecare data cand se anunta vant, altfel risti sa o strici.' },
+  { question: 'Ce material de panza sa aleg?', answer: 'Panza copertinei suporta soarele, ploaia si praful, asa ca materialul conteaza pentru durabilitate. Poliesterul e cel mai raspandit si mai usor, rezistent la soare si la apa, o alegere buna si accesibila, folosit la multe modele din selectie. Textilul mai gros, tot din fibre sintetice tratate, e mai robust si mai durabil in timp, potrivit pentru copertinele mari care stau mult intinse. Indiferent de material, cauta o panza tratata sa reziste la razele UV si la apa, ca sa nu se decoloreze si sa nu lase apa sa treaca. Culoarea conteaza si ea: nuantele inchise, ca antracitul, absorb mai mult caldura, iar cele deschise, ca cremul, reflecta lumina si raman mai racoroase.' },
+  { question: 'Cum montez o copertina retractabila?', answer: 'Copertina se prinde pe perete, deasupra terasei sau a ferestrei, cu console solide fixate in zid, si e important ca peretele sa fie rezistent, din caramida sau beton, nu din materiale usoare, pentru ca structura si panza intinsa creeaza o forta considerabila, mai ales pe vant. Copertinele mari si grele, ca cele de 350 cm proiectie sau de 5 metri latime, se monteaza de obicei in doi si cer prinderi robuste, iar pentru cele cu motor ai nevoie si de o sursa de curent in apropiere. La modelele mici, de fereastra, montajul e mai simplu. Daca nu esti sigur pe montaj, mai ales la o copertina mare si scumpa, merita sa apelezi la un specialist, pentru ca o prindere gresita se poate desprinde si strica atat copertina, cat si peretele.' },
+  { question: 'Cum intretin o copertina de terasa?', answer: 'Cel mai important e sa nu o lasi intinsa pe vreme rea. Strange-o cand se anunta vant puternic, furtuna sau ploaie abundenta, mai ales daca nu are senzor de vant, pentru ca acestea sunt principalele cauze de deteriorare. Cand o strangi, lasa panza sa se usuce complet intai, ca sa nu mucegaiasca sau sa capete miros in caseta. Curata periodic panza de praf, frunze si pete, cu apa si o solutie blanda, fara detergenti agresivi care ii pot afecta tratamentul, si verifica din cand in cand consolele si suruburile de prindere, strangandu-le daca s-au slabit. Iarna, cel mai bine e sa o tii stransa. Cu aceasta grija, o copertina rezista multe veri si isi pastreaza panza si mecanismul in stare buna.' },
+  { question: 'Cat costa o copertina retractabila?', answer: 'Preturile depind mult de dimensiune si dotari. In selectie, copertinele mici, de fereastra sau balcon, de 100 cm, pornesc de la circa 185 de lei. Cele de terasa, automate, cu proiectii de 250-350 cm, sunt in general intre 1700 si 2700 de lei, in functie de dimensiune, material si cadru. Modelele complet echipate, cu stor frontal, iluminare LED si senzor de vant, sau cele foarte mari, de pana la 5 metri, trec de 3000 si urca spre 3600 de lei. Cel mai bun raport il gasesti alegand dimensiunea potrivita terasei, adica latimea peretelui si proiectia de care ai nevoie, si doar dotarile pe care chiar le folosesti, ca senzorul de vant intr-o zona expusa sau LED-ul daca stai mult afara seara.' },
+];
+
+const images = [hero, figMici, figTerasa, figDotari, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Copertina retractabila pentru terasa - CentroCasa"
-  description="Daca vrei o copertina retractabila pentru terasa de calitate, care sa te tina ani buni, eu zic sa te uiti la modelele cu brat de otel si tesatura acrilica de peste 300g/m². Nu te zgarci la motorizare, mai ales daca terasa e mare, si verifica atent garantia. O copertina retractabila buna, bine aleasa, iti poate schimba complet experienta de outdoor. Stai sa-ti zic cum sta treaba."
-  image="/images/articles/copertina-retractabila-pentru-terasa.webp"
+  title="Cele mai bune copertine retractabile pentru terasa in 2026: mici, de terasa si cu senzor"
+  description="Care sunt cele mai bune copertine retractabile pentru terasa in 2026: modele mici de fereastra si balcon, copertine de terasa automate cu proiectii de 250-350 cm, si variante cu stor, LED si senzor de vant, comparate pe dimensiune, material si actionare. Plus cum alegi proiectia, materialul si montajul."
+  image={hero}
   type="article"
-  publishedTime="2026-03-02T07:54:47.410Z"
-  modifiedTime="2026-03-02T07:54:47.410Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune copertine retractabile pentru terasa' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/mobilier-gradina/">Mobilier Gradina</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Copertina retractabila pentru terasa</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune copertine retractabile pentru terasa</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
-        <span class="article-date">2 martie 2026</span>
-      </div>
-      <h1 class="article-title">Copertina retractabila pentru terasa</h1>
-    </header>
+    <h1>Cele mai bune copertine retractabile pentru terasa</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/copertina-retractabila-pentru-terasa.webp" alt="Copertina retractabila pentru terasa" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune copertine retractabile pentru terasa: mici, de terasa si cu senzor de vant" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="ce-copertina-retractabila-pentru-terasa-sa-alegi-ca-sa-nu-regreti">
-        <h2>Ce copertina retractabila pentru terasa sa alegi ca sa nu regreti?</h2>
-        <p>Bon, sa fim directi. Cauti o <strong>copertina retractabila <a href="/pergola-din-lemn-pentru-terasa/" class="interlink">pentru terasa</a></strong>, nu un bibelou. Vrei umbra, vrei sa poti inchide terasa cand ploua sau bate soarele prea tare, si vrei sa arate si bine.</p>
-        <p>Daca ma intrebi pe mine, prima chestie la care te uiti e structura. Bratele alea retractabile trebuie sa fie solide. Eu prefer otelul, chiar daca e un pic mai greu sau mai scump decat aluminiul.</p>
-        <p>Am vazut prea multe copertine cu brate indoite de la primul vant mai serios. Deci, <strong>structura din otel</strong>, punct.</p>
-        <p>Apoi, materialul. Tesatura aia e practic fata copertinei tale. Cauta ceva acrilic, tratat UV, sa nu se decoloreze in doi ani. Si sa fie dens. Asta inseamna ca rezista mai bine la soare, la ploaie usoara si nu se rupe usor. Minim 300g/m², zic eu. Daca gasesti peste 350g/m², si mai bine.</p>
-        <p>Motorizarea e si ea importanta. Daca ai o copertina mica, de 2-3 metri, poate merge si cu manivela. Dar la terase mai mari, peste 4 metri, motorul e sfant. Nu te chinui sa o rulezi manual. Si nu uita sa verifici telecomanda, daca vine cu una. Unele sunt mai sensibile, altele mai lente. Am avut o experienta cu una care facea figuri la fiecare al doilea click.</p>
-        <p>Garantia e un alt punct cheie. O <strong>copertina retractabila</strong> de calitate vine cu garantie de minim 2-3 ani pe structura si motor. Daca producatorul iti ofera mai mult, e un semn bun. Inseamna ca are incredere in produsul lui. Si asta e important, ca nu cumperi chestia asta de flori. E o investitie.</p>
-        <p>Deci, pe scurt: <strong>brat de otel</strong>, tesatura acrilica densa (peste 300g/m²), motorizare pe masura terasei si garantie serioasa. Asta e baza. Restul e stil si accesorii.</p>
-      </section>
-
-      <section id="top-5-copertine-retractabile-pentru-terasa-avantaje-si-dezavantaje-pe-bune">
-        <h2>Top 5 copertine retractabile pentru terasa: avantaje si dezavantaje pe bune</h2>
-        <p>Hai sa vedem cateva variante concrete, ca sa ai de unde alege. Nu zic ca sunt singurele bune, dar sunt modele pe care le-am vazut, le-am pipait sau mi-au fost recomandate de prieteni care chiar se pricep.</p>
-        <ul><li><strong>Model 1: Copertina retractabila cu brat telescopic de la BrandX (pret estimat: 2500-4000 lei)</strong><br><em>Avantaje:</em> Bratele astea telescopice sunt super flexibile, iti permit sa ajustezi deschiderea mai fin. Structura e solida, din otel vopsit electrostatic, rezista bine la rugina. Tesatura e acrilica, 320g/m², cu protectie UV destul de buna. Vine cu motorizare inclusa si telecomanda. E o optiune de mijloc, destul de populara.<br><em>Dezavantaje:</em> Bratele telescopice pot fi un pic mai greu de reglat la inceput, trebuie sa prinzi mecanismul. Daca o lasi mereu deschisa la maximum si bate vantul, se simte o usoara vibratie. Motorul, desi bun, nu e cel mai silentios de pe piata.</li><li><strong>Model 2: Copertina retractabila cu brat simplu, motorizata, de la BrandY (pret estimat: 1800-3000 lei)</strong><br><em>Avantaje:</em> E mai accesibila ca pret. Structura e solida, din aluminiu, mai usoara dar tot destul de rezistenta pentru dimensiuni medii. Tesatura e un poliester dens, tratat anti-UV, 280g/m². Motorizarea cu telecomanda e standard. E o alegere buna daca bugetul e mai limitat.<br><em>Dezavantaje:</em> Tesatura de poliester, desi buna, nu e la fel de <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">rezistenta la</a> decolorare pe termen lung ca acrilicul de calitate superioara. Bratele din aluminiu, desi rezistente, nu fac fata la vanturi puternice la fel de bine ca otelul. Nu are protectie suplimentara pentru ploaie, e doar pentru soare si vant usor.</li><li><strong>Model 3: Copertina retractabila de lux cu brat dublu si senzori de vant de la BrandZ (pret estimat: 5000-9000 lei)</strong><br><em>Avantaje:</em> Aici vorbim de alt nivel. Bratele duble din otel masiv ofera o stabilitate IMPECABILA, chiar si la vanturi moderate. Tesatura e acrilica premium, 350g/m², impermeabila pe bune, nu doar rezistenta la stropi. Are senzori de vant si soare care actioneaza automat copertina. Motorul e ultra-silentios si rapid. Arata si fantastic. E o investitie pe termen foarte lung.<br><em>Dezavantaje:</em> Pretul e pe masura. E grea, deci montajul trebuie facut de profesionisti. Senzorii de vant, desi utili, pot fi uneori prea sensibili si inchid copertina cand nu e neaparat nevoie, daca bate un curent de aer mai puternic.</li><li><strong>Model 4: Copertina retractabila manuala, compacta, de la BrandA (pret estimat: 1200-2000 lei)</strong><br><em>Avantaje:</em> Cea mai accesibila varianta. Perfecta pentru balcoane sau terase mici (pana in 3 metri latime). Structura e destul de OK, din otel. Tesatura e un poliester decent, 260g/m². Functioneaza cu manivela, deci nu depinzi de curent.<br><em>Dezavantaje:</em> Manivela poate fi incomoda la utilizare frecventa, mai ales daca ai nevoie sa o strangi si sa o desfaci des. Tesatura nu e de top, se poate decolora mai repede. Nu e recomandata pentru vanturi puternice, se poate deteriora usor.</li><li><strong>Model 5: Copertina retractabila cu caseta de la BrandB (pret estimat: 3500-6000 lei)</strong><br><em>Avantaje:</em> Caseta asta protejeaza complet tesatura si bratele cand copertina e stransa. Ofera o protectie excelenta impotriva prafului, ploii si a factorilor de mediu. Arata foarte elegant pe perete. Structura e de obicei din aluminiu de buna calitate, iar tesatura e acrilica premium. Motorizare inclusa.<br><em>Dezavantaje:</em> E mai scumpa decat modelele fara caseta. Montajul poate fi un pic mai complicat din cauza greutatii si a sistemului de prindere. Daca vrei doar umbra ocazionala, s-ar putea sa fie o investitie prea mare.</li></ul>
-        <p>Cam astea sunt cateva directii. Alege in functie de cat de mare e terasa ta, cat de des o folosesti si, bineinteles, cat vrei sa cheltui.</p>
-      </section>
-
-      <section id="cum-sa-alegi-copertina-retractabila-pentru-terasa-potrivita-ghidul-prietenului-tau">
-        <h2>Cum sa alegi copertina retractabila pentru terasa potrivita: ghidul prietenului tău</h2>
-        <p>Ok, ai vazut cateva modele, dar cum te hotarasti? Stai putin, ca iti zic eu pe ce sa te uiti ca sa nu dai cu piciorul banilor.</p>
-        <p><strong>1. Dimensiunea conteaza, frate.</strong> Masoara terasa aia cum trebuie. Nu doar lungimea, ci si cat vrei sa se extinda copertina. Majoritatea modelelor au specificata latimea maxima si deschiderea maxima. Nu lua una prea mare ca o sa stea mereu prea intinsa si o sa se lase, nici prea mica sa nu-ti acopere zona dorita. Gandeste-te la spatiul pe care vrei sa-l umbresti. E pentru o masa cu scaune? Sau pentru toata zona de relaxare?</p>
-        <p><strong>2. Structura si materialul: Forta si rezistenta.</strong> Am zis de otel vs aluminiu. Otelul e mai greu, dar mai <a href="/pavilion-de-gradina-rezistent-la-apa/" class="interlink">rezistent la</a> indoire. Aluminiul e mai usor, mai rezistent la rugina, dar se poate indoi mai usor la vanturi puternice. Asta depinde si de cat de expusa e terasa ta. Daca stai intr-o zona cu vanturi frecvente, mergi pe otel. Daca e mai ferita, aluminiul e OK.</p>
-        <p>Tesatura: Aici nu te juca. Cauta acrilic, 300g/m² minim. Daca scrie "poliester", verifica densitatea. Unele poliestere sunt bune, altele sunt ca o hartie. Tratamentul UV e esential. Altfel, in doi ani o sa ai o copertina decolorata, ca o batrana obosita.</p>
-        <p><strong>3. Motorizare sau manivela?</strong> Daca terasa are peste 4 metri latime, sau daca nu ai chef sa depui efort, ia una motorizata. E mult mai comod. Verifica ce fel de motor are, cat de silentios e, daca vine cu telecomanda sau buton pe perete. Unele au si senzori de vant, ploaie, soare. Sunt super utile, dar cresc si pretul.</p>
-        <p>Manivela e OK pentru terase mici, sub 3 metri, unde nu o folosesti zilnic. Dar sincer, si acolo, daca bugetul permite, motorizarea face diferenta.</p>
-        <p><strong>4. Montajul: Nu subestima asta!</strong> O <strong>copertina retractabila</strong>, mai ales una mare si grea, trebuie montata corect. Daca peretele nu e solid, daca prinderile nu sunt bine facute, o sa ai probleme. Cel mai bine e sa apelezi la o firma specializata. Da, te costa, dar e mai sigur. Daca o montezi singur, citeste manualul de la A la Z si ai grija la fiecare surub.</p>
-        <p><strong>5. Garantie si service: Ce se intampla daca?</strong> Verifica ce garantie iti ofera producatorul. 2 ani e minimul decent. Daca ofera 5 ani pe structura, e un mare plus. Si intreaba daca au service in Romania, daca poti gasi piese de schimb, daca au pe cine sa sune daca se strica ceva. Nu cumpara de la firme fantoma.</p>
-        <p>Cam asta e. Nu te grabi. Cauta, compara, intreaba. Mai bine dai un ban pe una buna, decat doi pe una ieftina care te lasa balta.</p>
-      </section>
-
-      <section id="copertina-retractabila-cu-brat-simplu-vs-brat-dublu-care-e-diferenta">
-        <h2>Copertina retractabila cu brat simplu vs. brat dublu: Care e diferenta?</h2>
-        <p>Asta e o intrebare pe care o primesc des. Si e importanta. Hai sa vedem care-i faza cu bratele alea.</p>
-        <p><strong>Copertina cu brat simplu:</strong> Asta e varianta standard, cea mai comuna. Are doua brate principale care se extind din perete. Sunt mai usoare, mai simple ca mecanism si, evident, mai ieftine.</p>
-        <p>Sunt perfecte pentru terase medii, pana la vreo 5-6 metri latime, unde vantul nu e o problema majora. Tesatura e prinsa direct de aceste brate. Stabilitatea e buna, dar nu extraordinara la vanturi mai puternice.</p>
-        <p>Daca bate un vanticel, se cam simte vibratia in brate. Am vazut modele unde tesatura incepea sa se rupa in punctele de prindere pe brate, dupa cativa ani de utilizare intensa.</p>
-        <p><strong>Copertina cu brat dublu:</strong> Aici vorbim de alta clasa. Pe langa cele doua brate principale, mai exista un al doilea set de brate, montat intre ele, care ofera un suport suplimentar. Asta inseamna o stabilitate mult mai mare.</p>
-        <p>Tesatura e prinsa de bratele din fata, iar cele din spate ofera tensiune si rigiditate. Rezista mult mai bine la vanturi puternice, chiar si la modele mai mari, de 7-8 metri latime. Sunt ideale pentru terase expuse, unde vrei siguranta maxima.</p>
-        <p>Dezavantajul principal e pretul, sunt semnificativ mai scumpe. Si greutatea lor e mai mare, deci montajul trebuie facut cu multa grija.</p>
-        <p><strong>Ce sa alegi?</strong> Daca ai o terasa mica spre medie (pana in 4 metri) si nu e intr-o zona foarte expusa la vant, un brat simplu de calitate buna e suficient. Daca ai o <a href="/parasolar-pentru-terasa-mare/" class="interlink">terasa mare</a>, sau daca vrei liniste sufleteasca pe timp de vant, merita sa investesti intr-una cu brat dublu. E ca diferenta dintre o masina normala si una 4x4: ambele te duc unde vrei, dar una te duce si pe teren accidentat.</p>
-        <p>Nu uita si de caseta. Modelele cu caseta, fie ca au brat simplu sau dublu, ofera protectie suplimentara pentru tesatura si mecanism cand copertina e stransa. Asta prelungeste viata copertinei, dar creste si pretul.</p>
-      </section>
-
-      <section id="greseli-frecvente-cand-cumperi-o-copertina-retractabila-pentru-terasa-si-cum-sa-le-eviti">
-        <h2>Greseli frecvente cand cumperi o copertina retractabila pentru terasa si cum sa le eviti</h2>
-        <p>Stai sa vezi ce prostii fac unii, si ca sa nu ajungi si tu in situatia aia, iti zic direct.</p>
-        <p><strong>1. Alegi cea mai ieftina varianta.</strong> Asta e clasica. Vezi o copertina la 800 de lei si te gandesti 'ce afacere!'.</p>
-        <p>Na, asta e. Si apoi te trezesti ca dupa un an tesatura s-a decolorat, bratele au inceput sa rugineasca si motorul face zgomot ca o moara stricata. O <strong>copertina retractabila</strong> e o investitie.</p>
-        <p>Una ieftina, de obicei, inseamna materiale proaste si manopera indoielnica. Mai bine platesti un pic mai mult pe una de calitate, care te tine 5-10 ani, decat sa cumperi una la doi ani.</p>
-        <p><strong>2. Ignori dimensiunea si deschiderea.</strong> Unii se gandesc doar la latimea terasei si uita sa masoare cat vrei sa se extinda copertina. Sau, invers, iau una care se extinde prea mult si ajunge sa stea intinsa la maximum mereu, ceea ce nu e bine pentru structura. Gandeste-te la spatiul de umbra de care ai nevoie. Si verifica daca nu cumva o sa loveasca in ceva (o usa de balcon, o scara, etc.) cand se deschide.</p>
-        <p><strong>3. Nu verifici rezistenta la vant.</strong> Asta e critica. Multi cumpara copertine fara sa se gandeasca la vant. Daca stai intr-o zona mai batuta de vant, ai nevoie de o structura mai solida (brat dublu, otel) si o tesatura rezistenta. Daca iei una de rezistenta mica si vine o rafala, s-ar putea sa ai surprize neplacute. Si apoi dai vina pe producator, desi tu ai gresit cand ai ales.</p>
-        <p><strong>4. Montaj facut de mantuiala.</strong> Am zis si mai sus, dar repet. O copertina grelita, cu prinderi slabe, poate fi periculoasa. Nu te baza pe dibluri obisnuite daca peretele nu e din beton masiv. Foloseste suruburi si ancore dedicate, potrivite pentru materialul peretelui. Daca nu esti sigur, plateste un profesionist. E mai ieftin decat sa repari o tencuiala cazuta sau o terasa stricata.</p>
-        <p><strong>5. Uiti de intretinere.</strong> Nu te astepta ca o <strong>copertina retractabila</strong> sa functioneze perfect daca o lasi de izbeliste. Curata tesatura periodic, mai ales daca a stat mult timp stransa si a prins mucegai. Verifica bratele, lubrifiaza mecanismele daca e cazul. O intretinere minima ii prelungeste viata considerabil. Nu o lasa deschisa cand pleci in concediu si e anuntat vant puternic, chiar daca are senzori.</p>
-        <p>Deci, fii atent la aceste puncte si o sa te alegi cu o copertina care te va bucura ani buni.</p>
-      </section>
-
-      <section id="copertina-retractabila-pentru-terasa-recomandari-pe-categorii-de-buget">
-        <h2>Copertina retractabila pentru terasa: Recomandari pe categorii de buget</h2>
-        <p>Hai sa simplificam si mai mult treaba. Pentru ca stiu ca bugetul e un factor decisiv, am impartit recomandarile in trei categorii.</p>
-        <p><strong>Buget Mic (sub 2000 lei):</strong><br>Aici vorbim de modele compacte, de obicei cu manivela, pentru terase si balcoane mai mici (pana in 3-4 metri). Cauta modele de la producatori consacrati care ofera totusi preturi accesibile. De exemplu, cauta <strong>copertina retractabila manuala BrandA</strong> sau modele similare de la branduri care au reprezentare in Romania.</p>
-        <p>Avantajul principal e pretul. Dezavantajul e ca tesatura nu va fi de top, <a href="/umbrela-de-gradina-rezistenta-la-vant/">rezistenta</a> la vant va fi mica, si mecanismul manual poate fi obositor. E o solutie decenta pentru umbra ocazionala, dar nu te astepta la performante de lux.</p>
-        <p>Verifica neaparat garantia, chiar si la modelele astea.</p>
-        <p><strong>Buget Mediu (2000 - 4500 lei):</strong><br>Aceasta e zona cea mai populara si, daca ma intrebi pe mine, cea mai echilibrata. Aici gasesti modele motorizate, cu structura solida (fie otel, fie aluminiu de calitate), tesatura acrilica decenta (peste 300g/m²) si o deschidere rezonabila (pana la 5-6 metri). Cauta modele precum <strong>copertina retractabila BrandX cu brat telescopic</strong> sau optiuni similare de la BrandY.</p>
-        <p>Avantajele sunt confortul motorizarii, o <a href="/pavilion-de-gradina-rezistent-la-apa/">rezistent</a>a mai buna la conditiile meteo si o durata de viata mai mare. Dezavantajele pot fi legate de zgomotul motorului sau de faptul ca nu fac fata la vanturi foarte puternice, dar pentru majoritatea situatiilor sunt perfecte. Aici incepi sa vezi si optiuni cu caseta, dar de obicei la limita superioara a bugetului.</p>
-        <p><strong>Buget Mare (peste 4500 lei):</strong><br>Daca bugetul nu e o problema si vrei ce e mai bun, aici gasesti varful de gama. Vorbim de modele cu brat dublu, structura din otel masiv, tesaturi acrilice premium impermeabile, casete de protectie complete si motorizari de top, cu senzori de vant si soare. Modelele de la BrandZ sau <strong>copertine retractabile cu caseta de la BrandB</strong> se incadreaza aici.</p>
-        <p>Avantajele sunt stabilitatea exceptionala, durabilitatea pe termen foarte lung, protectia maxima impotriva elementelor si aspectul premium. Dezavantajele sunt, evident, pretul foarte ridicat si greutatea, care impune un montaj profesional. Sunt investitii pe 10-15 ani, daca nu chiar mai mult, daca sunt bine intretinute.</p>
-        <p>Deci, fie ca ai un buget mic si vrei o solutie simpla, fie ca vrei sa investesti intr-un sistem complex si durabil, exista optiuni. Important e sa stii ce cauti si sa nu te lasi pacalit de preturi prea mici.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa o copertina retractabila pentru terasa
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pretul unei copertine retractabile pentru terasa variaza mult, de la circa 1200 lei pentru modele manuale mici, la peste 9000 lei pentru cele de lux, cu brat dublu si senzori. Modelele medii, motorizate, cu dimensiuni standard, se gasesc in general intre 2000 si 4500 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre copertina cu brat simplu si brat dublu
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O copertina retractabila cu brat dublu ofera stabilitate superioara, fiind ideala pentru terase mari sau zone expuse la vant. Bratul dublu adauga un set suplimentar de brate care intind tesatura mai bine si previn vibratiile, in timp ce bratul simplu e suficient pentru terase medii si protejate de vant.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar o copertina retractabila cu caseta
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca vrei protectie maxima pentru tesatura si mecanism atunci cand copertina e retractata. Caseta protejeaza impotriva prafului, ploii si razelor UV, prelungind durata de viata a copertinei, dar vine cu un cost suplimentar.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce tesatura e mai buna pentru copertina retractabila
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Tesatura acrilica de peste 300g/m², tratata UV, este cea mai recomandata pentru o copertina retractabila. Ea ofera rezistenta buna la decolorare, intemperii si uzura, spre deosebire de poliesterul de densitate mica.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                de ce se strica motorul la copertina retractabila
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Motorul unei copertine retractabile se poate strica din cauza suprasolicitarii (vant puternic, blocaje), a umiditatii excesive, a lipsei de intretinere sau a defectelor de fabricatie. Alegerea unui motor de calitate si respectarea instructiunilor de utilizare sunt esentiale.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cum sa intretin copertina retractabila pentru terasa
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru a intretine o copertina retractabila, curata periodic tesatura cu apa si sapun neutru, verifica si lubrifiaza bratele si mecanismele, si asigura-te ca este complet uscata inainte de a o retracta. Evita deschiderea fortata in conditii de vant puternic.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc copertina retractabila pentru terasa de calitate
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti gasi copertine retractabile pentru terasa de calitate in magazine specializate de mobilier de exterior, showroom-uri de constructii sau online pe site-urile producatorilor sau distribuitorilor autorizati. Verifica recenziile si garantia oferita.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e garantia pentru o copertina retractabila buna
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O copertina retractabila de calitate ar trebui sa aiba o garantie de minim 2-3 ani pentru structura si motor. Producatorii de top pot oferi chiar si 5 ani garantie pe anumite componente, ceea ce indica o calitate superioara a produsului.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru o terasa, cea mai accesibila copertina automata e cea <strong>antracit de 250 cm</strong>, iar cea mai mare umbra o da modelul de <strong>350 cm proiectie</strong>. Daca vrei totul, varianta <strong>completa de 5 metri</strong> are stor, LED si senzor de vant, iar pentru o fereastra sau un balcon, ajung <strong>copertinele compacte de 100 cm</strong>.</p>
+      <p>La o copertina retractabila conteaza <strong>dimensiunea</strong>, adica latimea si proiectia potrivite terasei, <strong>materialul</strong> panzei, <strong>actionarea</strong>, manuala sau cu motor, si dotari ca <strong>senzorul de vant</strong>. Mai jos gasesti direct recomandarile, grupate pe marime si dotari, iar sub ele un ghid despre cum alegi.</p>
+      <p>Trebuie spus cinstit: copertinele din aceasta selectie sunt in mare parte produse noi, de la vidaXL, un brand cunoscut pentru articole de casa si gradina, si au inca putine pareri. Le-am ales asadar dupa dimensiune, material si dotari, nu dupa recenzii, si le-am impartit in copertine mici, de terasa si cu dotari suplimentare, ca sa gasesti repede tipul potrivit spatiului tau. Pentru umbra fixa, vezi si <a href="/pergola-din-lemn-pentru-terasa/">pergolele din lemn</a> si <a href="/pavilion-de-gradina-rezistent-la-apa/">pavilioanele de gradina</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#mici">Mici, de fereastra si balcon</a></li>
+        <li><a href="#terasa">De terasa, automate</a></li>
+        <li><a href="#dotari">Cu stor, LED si senzor de vant</a></li>
+        <li><a href="#de-ce">De ce o copertina retractabila</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#montaj">Montaj si intretinere</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Dimensiune</th><th>Material</th><th>Actionare</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.dim}</td>
+              <td>{x.material}</td>
+              <td>{x.actionare}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mici">Mici, de fereastra si balcon</h2>
+    <p>Compacte, de 100 cm, umbresc o fereastra sau un colt de balcon si sunt cele mai accesibile din selectie. Alegerea daca vrei umbra pe un spatiu mic, fara o copertina mare de terasa. Diferite doar prin culoare.</p>
+    <div class="rd-grid">
+      {MICI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMici} alt="Copertine mici, de fereastra si balcon: vidaXL 100 cm" width="1200" height="675" loading="lazy" />
+
+    <h2 id="terasa">De terasa, automate</h2>
+    <p>Cu proiectii de 250-350 cm si latimi de pana la 450 cm, umbresc o masa cu scaune si se intind cu motor, la o apasare de buton. De aici alegi in functie de cat de mare e terasa si cat de adanca vrei umbra.</p>
+    <div class="rd-grid">
+      {TERASA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figTerasa} alt="Copertine de terasa automate: vidaXL antracit, visiniu si crem" width="1200" height="675" loading="lazy" />
+
+    <h2 id="dotari">Cu stor, LED si senzor de vant</h2>
+    <p>Cele mai complete: un stor frontal pentru soarele piezis, iluminare LED pentru seara si un senzor de vant care strange copertina singura la vant puternic. Pentru cine vrea o terasa complet echipata si o copertina protejata.</p>
+    <div class="rd-grid">
+      {DOTARI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figDotari} alt="Copertine cu stor, LED si senzor de vant: vidaXL" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-copertina').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate copertinele retractabile la oferta</strong>
+        <span>Reducerile din acest moment la copertine retractabile de terasa, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o copertina retractabila</h2>
+    <p>Vara, o terasa fara umbra devine nefolosibila la orele de mijloc ale zilei, cand soarele bate direct. O copertina retractabila rezolva asta elegant: <strong>creeaza umbra la nevoie</strong> si o strangi cand nu o folosesti, fata de o structura fixa, care umbreste mereu si iarna, cand ai vrea soare.</p>
+    <p>Marele avantaj e <strong>flexibilitatea</strong>. O intinzi cand soarele e puternic si o strangi seara sau in zilele racoroase de primavara si toamna, cand vrei lumina. Astfel iti extinzi spatiul de locuit in aer liber pe tot sezonul cald, cu o masa la umbra, ferita si de o ploaie usoara la modelele mai rezistente. Fata de o umbrela, o copertina acopera o suprafata mult mai mare si nu ocupa loc pe terasa, fiind prinsa de perete. Iar modelele moderne, cu motor, iluminare si senzor de vant, o fac comoda si sigura de folosit. E una dintre cele mai practice imbunatatiri pentru o terasa pe care vrei sa o folosesti cu adevarat vara.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua copertine:</p>
+    <ul>
+      <li><strong>Dimensiunea:</strong> latimea, cat de mult perete acoperi, si proiectia, cat de adanca e umbra. Pentru o masa cu scaune, o proiectie de 250-300 cm e in general suficienta.</li>
+      <li><strong>Materialul panzei:</strong> poliester, usor si accesibil, sau textil mai gros, mai robust. Cauta o panza tratata anti-UV si rezistenta la apa.</li>
+      <li><strong>Actionarea:</strong> manuala, cu manivela, mai ieftina, sau automata, cu motor, mult mai comoda la copertinele mari.</li>
+      <li><strong>Senzorul de vant:</strong> strange copertina singura la vant puternic, protejand-o de cea mai frecventa cauza de deteriorare.</li>
+      <li><strong>Dotari extra:</strong> un stor frontal pentru soarele piezis, iluminare LED pentru serile pe terasa.</li>
+      <li><strong>Culoarea:</strong> nuantele inchise, ca antracitul, se potrivesc modern, cele deschise, ca cremul, raman mai racoroase si reflecta lumina.</li>
+    </ul>
+
+    <h2 id="montaj">Montaj si intretinere</h2>
+    <p>Copertina se prinde pe perete, deasupra terasei, cu <strong>console solide fixate in zid</strong>, iar peretele trebuie sa fie rezistent, din caramida sau beton, pentru ca structura si panza intinsa creeaza o forta considerabila, mai ales pe vant. Copertinele mari, de 350 cm proiectie sau de 5 metri latime, se monteaza de obicei in doi si cer prinderi robuste; la cele cu motor ai nevoie si de o sursa de curent aproape. Daca nu esti sigur pe montaj, mai ales la o copertina mare si scumpa, merita un specialist, pentru ca o prindere gresita se poate desprinde.</p>
+    <p>La intretinere, cel mai important e <strong>sa nu o lasi intinsa pe vreme rea</strong>. Strange-o la vant puternic, furtuna sau ploaie abundenta, mai ales daca nu are senzor de vant, si lasa panza sa se usuce complet inainte de a o strange, ca sa nu mucegaiasca. Curata periodic panza de praf si frunze, cu apa si o solutie blanda, si verifica din cand in cand consolele si suruburile, strangandu-le daca s-au slabit. Iarna, tine copertina stransa. Cu aceasta grija simpla, rezista multe veri si isi pastreaza panza si mecanismul in stare buna.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind mult de dimensiune si dotari:</p>
+    <p><strong>Mici, de fereastra si balcon:</strong> de la circa 185 de lei pentru un model compact de 100 cm, cu actionare manuala, pentru a umbri o fereastra sau un colt de balcon.</p>
+    <p><strong>De terasa, automate:</strong> in general intre 1700 si 2700 de lei, cu proiectii de 250-350 cm si latimi de pana la 450 cm, in functie de dimensiune, material si cadru.</p>
+    <p><strong>Complet echipate:</strong> peste 3000 de lei, spre 3600, pentru modelele cu stor frontal, iluminare LED si senzor de vant, sau cele foarte mari, de pana la 5 metri.</p>
+    <p>Pe langa pret, alege dupa <strong>terasa ta</strong>: masoara latimea peretelui si gandeste-te cat de adanca vrei umbra, apoi ia doar dotarile pe care chiar le folosesti, ca senzorul de vant intr-o zona expusa sau LED-ul daca stai mult afara seara. Fiind produse noi, cu putine pareri, verifica bine dimensiunile si specificatiile inainte de a comanda. Pentru umbra mobila, o alternativa mai simpla e o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela de gradina</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a> si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria scrie despre mobilier de gradina si amenajari interioare. Se uita la materiale, dimensiuni si cat rezista lucrurile afara, peste ierni.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="copertina-retractabila-pentru-terasa"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="copertina-retractabila-pentru-terasa"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="copertina-retractabila-pentru-terasa" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="copertina-retractabila-pentru-terasa" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

@@ -1,0 +1,291 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['mobilier-gradina'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { id: 'DWRLSN3BM', badge: 'Cel mai vandut set de masa', tip: 'masa + 6 scaune', mat: 'metal + textilena',
+    specs: ['set masa cu 6 scaune', 'metal cu textilena', 'masa de 135 cm', 'pentru 6 persoane'],
+    pros: ['Cel mai vandut din top, 340 de pareri', 'Sase scaune, buni pentru o familie sau musafiri', 'Structura metalica cu scaune din textilena, rezistente la vreme', 'Pret bun pentru un set complet de 6 locuri'],
+    cons: ['Ocupa loc, are nevoie de o terasa spatioasa', 'Textilena e comoda dar mai putin durabila decat aluminiul'],
+    verdict: 'Cel mai vandut set de mobilier de gradina de pe eMAG si alegerea firesca daca vrei o masa la care sa iei masa afara cu familia. Vine cu o masa de 135 cm si sase scaune, deci acopera o masa cu musafiri fara sa mai cauti scaune in plus. Structura e din metal, iar scaunele din textilena, materialul acela tesut care lasa aerul sa treaca si nu retine apa, deci se usuca repede dupa ploaie. Cele 340 de pareri il fac de departe cel mai testat din selectie. Are nevoie de o terasa sau o curte cu loc, fiind un set de sase, iar textilena, desi comoda, tine mai putin decat un cadru de aluminiu. Il iei cand vrei o masa completa, ieftina, pentru mese in curte.' },
+  { id: 'D7KHV6MBM', badge: 'Cel mai bun set lounge', tip: 'canapea + 2 fotolii + masa', mat: 'poliratan',
+    specs: ['canapea 2 locuri + 2 fotolii + masa', 'poliratan pe cadru', 'zona de relaxare', 'perne incluse'],
+    pros: ['Cel mai bine notat set lounge, 4.76', 'Poliratan, rezistent la ploaie si soare, fara intretinere', 'Canapea, doua fotolii si masa, un colt complet de relaxare', 'Perne incluse pentru confort'],
+    cons: ['Nu e pentru luat masa, ci pentru stat', 'Pernele se scot si se depoziteaza iarna'],
+    verdict: 'Cel mai bun set de tip lounge din selectie, pentru cine vrea un colt de relaxare in curte, nu o masa de mancat. Bica Venetia vine cu o canapea de doua locuri, doua fotolii si o masuta, deci creezi o zona ca de living, dar afara. E facut din poliratan, adica fibra sintetica impletita pe un cadru, cel mai bun material pentru exterior: nu absoarbe apa, se usuca repede, rezista la soare si nu cere aproape nicio intretinere. Nota de 4.76 e cea mai buna dintre seturile lounge. Vine cu perne, pe care le scoti si le pui la adapost iarna. Il iei cand vrei sa stai relaxat afara, cu o cafea sau o carte, nu sa iei masa.' },
+  { id: 'DBZLM2MBM', badge: 'Cel mai bine notat pliabil', tip: 'masa + 2 banci pliabile', mat: 'metal + lemn',
+    specs: ['masa cu 2 banci pliabile', 'se strange usor', 'nota 4.92', 'terasa, camping'],
+    pros: ['Cea mai buna nota din top, 4.92', 'Se plaza si se strange usor, ocupa putin depozitat', 'Bun si pentru camping sau picnic', 'Pret mic pentru un set de masa'],
+    cons: ['Bancile sunt mai putin comode decat scaunele cu spatar', 'Dimensiune mai mica, pentru 4 persoane'],
+    verdict: 'Cel mai bine notat set din tot topul, cu 4.92, si alegerea daca vrei ceva practic, care se strange cand nu il folosesti. Kring vine cu o masa si doua banci care se pliaza, deci il tii intr-un colt sau in portbagaj si il scoti cand ai nevoie, la o masa in curte, la camping sau la un picnic. E din metal cu lemn, usor de manevrat. Bancile sunt mai putin comode decat scaunele cu spatar, iar setul e mai mic, potrivit pentru vreo patru persoane. Il iei cand vrei un set de masa flexibil, ieftin si usor de depozitat, nu unul care sta permanent pe terasa.' },
+  { id: 'D52LV1BBM', badge: 'Pentru balcon (bistro)', tip: 'set bistro 2 persoane', mat: 'metal',
+    specs: ['set bistro pentru 2', 'metal, compact', 'pentru balcon mic', 'aspect de cafenea'],
+    pros: ['Compact, incape pe un balcon mic', 'Aspect de cafenea, doua persoane', 'Metal, rezistent si stabil', 'Nota foarte buna, 4.83'],
+    cons: ['Doar pentru doua persoane', 'Masa mica, pentru cafea, nu pentru masa in doi'],
+    verdict: 'Setul de ales daca ai un balcon sau o terasa mica si vrei doua locuri unde sa iti bei cafeaua afara. Bistroul casa.pro Dina e compact, cu o masuta rotunda si doua scaune, exact ca la o cafenea, si incape acolo unde un set mare nu ar avea loc. E din metal, stabil si rezistent la vreme, iar nota de 4.83 arata clienti multumiti. Fiind bistro, e pentru doua persoane si o masa mica, buna pentru cafea sau o gustare, nu pentru o masa in toata regula. Il iei cand ai un spatiu mic, un balcon sau un colt de terasa, si vrei doua locuri cu aspect placut.' },
+  { id: 'DTN0THYBM', badge: 'Cel mai ieftin', tip: '3 piese', mat: 'polipropilena',
+    specs: ['set 3 piese', 'polipropilena', 'usor si rezistent la apa', 'cel mai mic pret'],
+    pros: ['Cel mai mic pret din top, sub 360 de lei', 'Polipropilena, complet rezistenta la apa', 'Foarte usor, il muti simplu', 'Nu cere nicio intretinere'],
+    cons: ['Doar 3 piese, pentru 2 persoane', 'Aspect simplu, de plastic', 'Usor, se poate rasturna la vant puternic'],
+    verdict: 'Cel mai ieftin set din selectie si alegerea cand vrei ceva simplu si practic, fara sa dai mult. Progarden TREE are trei piese, doua scaune si o masuta, din polipropilena, un plastic dur care nu absoarbe apa deloc si nu cere nicio intretinere: il speli cu furtunul si e ca nou. E foarte usor, deci il muti si il aranjezi cum vrei, iar nota de 4.56 e buna pentru pret. Fiind din plastic, are un aspect mai simplu si, fiind usor, se poate rasturna la vant puternic daca nu il pui la adapost. Il iei cand vrei doua locuri afara, ieftin si fara batai de cap, pentru un balcon sau o curte mica.' },
+  { id: 'DFY8DTMBM', badge: 'Cel mai rezistent la vreme', tip: 'set lounge', mat: 'rasina (resin)',
+    specs: ['set lounge Keter', 'rasina rezistenta UV', 'aspect de ratan', 'canapea + fotolii'],
+    pros: ['Keter, brand specializat in mobilier de exterior', 'Rasina rezistenta la UV, nu se decoloreaza si nu craapa', 'Aspect de ratan, zero intretinere', 'Rezista afara tot anul'],
+    cons: ['Cel mai scump din top', 'Aspect de plastic de aproape, nu de ratan natural'],
+    verdict: 'Alegerea daca vrei un set lounge care rezista afara ani buni, fara sa te ingrijoreze ploaia sau soarele. Keter e un brand specializat in mobilier de exterior, iar setul Emma e facut din rasina, un plastic tehnic turnat, rezistent la UV, care nu se decoloreaza si nu craapa la soare sau ger, spre deosebire de plasticul obisnuit. Imita aspectul de ratan si nu cere absolut nicio intretinere: il lasi afara si il speli din cand in cand. E cel mai scump din top, iar de aproape se vede ca e rasina, nu ratan natural. Il iei cand vrei un set de relaxare care sta afara tot anul, fara grija, si esti dispus sa platesti pentru durabilitate.' },
+  { id: 'D0CB2XYBM', badge: 'Set mare de masa, de brand', tip: 'masa + 6 scaune', mat: 'metal + textilena',
+    specs: ['7 piese: masa + 6 scaune', 'brand Heinner', 'pentru familie', 'terasa mare'],
+    pros: ['Sapte piese, masa si sase scaune', 'Brand cunoscut, Heinner', 'Pentru o familie sau musafiri multi', 'Nota buna, 4.71'],
+    cons: ['Are nevoie de mult spatiu', 'Mai scump decat setul idealStore de 6'],
+    verdict: 'O alternativa de brand la setul idealStore, daca vrei o masa mare cu sase scaune de la un nume cunoscut. Heinner Alegria vine ca sapte piese, o masa si sase scaune, deci mananci afara cu toata familia sau cu musafirii, fara sa mai completezi cu scaune imprumutate. Aspectul e curat si echilibrat, iar nota de 4.71 arata clienti multumiti. Fiind un set de sase, are nevoie de o terasa sau o curte cu loc, si costa ceva mai mult decat setul idealStore echivalent. Il iei cand vrei un set mare de masa, de la un brand de incredere, si ai spatiul pentru el.' },
+  { id: 'D0S93VMBM', badge: 'Lounge compact, ieftin', tip: '2 fotolii + masa', mat: 'poliratan',
+    specs: ['2 fotolii + masa', 'poliratan grafit', 'compact, pentru 2', 'colt de relaxare'],
+    pros: ['Poliratan, rezistent si fara intretinere', 'Compact, doua fotolii si o masuta', 'Pret mic pentru un set de relaxare', 'Culoare grafit, se asorteaza usor'],
+    cons: ['Doar doua locuri', 'Fara canapea, pentru grupuri mici'],
+    verdict: 'La cel mai mic pret ai un colt de relaxare din poliratan in curte sau pe terasa. Bica Lido vine cu doua fotolii si o masuta, deci creezi un loc unde sa stai la o cafea in doi, la un pret mult mai mic decat un set lounge complet cu canapea. Poliratanul rezista la ploaie si soare si nu cere intretinere, iar culoarea grafit se asorteaza cu orice. Nota de 4.75 e foarte buna. Fiind doar doua fotolii, e pentru un cuplu sau un spatiu mic, nu pentru un grup mare. Il iei cand vrei un colt de relaxare din poliratan, compact si accesibil, nu un set mare de lounge.' },
+  { id: 'DYRT3G3BM', badge: 'Pliabil tip valiza, portabil', tip: 'masa + 2 banci valiza', mat: 'metal + lemn',
+    specs: ['masa + 2 banci tip valiza', 'se pliaza ca o valiza', 'portabil, pentru picnic', 'nota 4.86'],
+    pros: ['Se pliaza ca o valiza, cu maner', 'Cea mai buna nota, 4.86', 'Portabil, il iei la iarba verde', 'Masa si banci intr-o singura piesa'],
+    cons: ['Banci fara spatar, mai putin comode', 'Pentru 4 persoane, dimensiune medie'],
+    verdict: 'Cel mai portabil set din top si alegerea daca vrei ceva pe care sa il iei cu tine, nu doar sa il tii pe terasa. Sersimo se pliaza ca o valiza, cu masa si cele doua banci strangandu-se intr-o singura piesa cu maner, deci il duci la iarba verde, la un picnic sau il pui in portbagaj fara probleme. Are cea mai buna nota din top dupa setul Kring, 4.86. Bancile nu au spatar, deci sunt mai putin comode pentru sederi lungi, iar dimensiunea e medie, pentru vreo patru persoane. Il iei cand vrei un set de masa portabil, pentru picnic sau pentru o terasa unde il strangi dupa folosire.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/mobilier-gradina.webp';
+const figTop = '/imagini/articole/mobilier-gradina-top.webp';
+const figTip = '/imagini/articole/mobilier-gradina-tip.webp';
+const figMic = '/imagini/articole/mobilier-gradina-mic.webp';
+const published = '2026-07-18T07:01:00+03:00';
+
+const faq = [
+  { question: 'Ce material de mobilier de gradina rezista cel mai bine?', answer: 'Poliratanul, adica fibra sintetica impletita pe un cadru de aluminiu, e cel mai bun compromis: rezista la ploaie si soare, nu absoarbe apa si nu cere aproape nicio intretinere. Aluminiul e la fel de rezistent si foarte usor. Rasina, ca la Keter, rezista si ea excelent si e mai ieftina. Lemnul arata cel mai frumos, dar cere intretinere periodica cu ulei; otelul trebuie sa fie tratat contra ruginii. Pentru cel mai putin efort, mergi pe poliratan, aluminiu sau rasina.' },
+  { question: 'Set de masa sau set lounge?', answer: 'Un set de masa, cu masa si scaune, e pentru cand iei masa afara, la micul dejun sau la o cina cu musafiri. Un set lounge, cu canapea si fotolii, e pentru relaxare: stat la o cafea, citit sau discutii, nu pentru mancat. Daca ai loc, multi combina ambele: o masa intr-o zona si un colt lounge in alta. Daca alegi doar unul, gandeste-te cum vei folosi curtea cel mai des.' },
+  { question: 'Pot lasa mobilierul de gradina afara iarna?', answer: 'Mobilierul din poliratan, aluminiu sau rasina rezista afara si iarna, dar tot e mai bine sa il protejezi. Ideal, muta-l intr-o magazie sau sub un acoperis in sezonul rece. Daca nu ai unde, acopera-l cu huse impermeabile si ventilate si ridica-l putin de la sol, ca sa nu stea in umezeala. Cel mai important: scoate pernele si tine-le in casa, pentru ca sub husa, in umezeala, mucegaiesc.' },
+  { question: 'Cate scaune imi trebuie?', answer: 'Depinde de cati sunteti si cat de des primesti musafiri. Pentru un cuplu, un set bistro de doua locuri ajunge pe un balcon. Pentru o familie, un set de patru scaune acopera mesele obisnuite. Daca primesti des musafiri sau ai o familie mai mare, un set de sase, ca idealStore sau Heinner, e alegerea. Masoara spatiul liber inainte: un set de sase are nevoie de o terasa sau curte generoasa.' },
+  { question: 'Cum intretin mobilierul de gradina?', answer: 'Poliratanul, aluminiul si rasina se curata simplu, cu apa si o laveta sau cu furtunul, si nu cer nimic altceva. Lemnul trebuie tratat de una-doua ori pe an cu ulei de tec sau o solutie de protectie, ca sa nu craape si sa nu se decoloreze. Otelul, daca apare rugina, se curata si se revopseste. Pernele si textilele se spala dupa instructiuni si se usuca complet inainte de depozitare, ca sa nu mucegaiasca.' },
+];
+
+const images = [hero, figTop, figTip, figMic, ...PICKS.map(x => x.p.image)];
+const money = (n) => n.toLocaleString('ro-RO');
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune seturi de mobilier de gradina in 2026: masa, lounge, bistro si pliabile"
+  description="Ce mobilier de gradina sa iti iei in 2026: seturi de masa, lounge, bistro si pliabile, comparate cu pareri reale. Plus ce material rezista cel mai bine afara si cum protejezi mobilierul iarna."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Maria Ionescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune seturi de mobilier de gradina' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune seturi de mobilier de gradina</span>
+    </nav>
+
+    <h1>Cele mai bune seturi de mobilier de gradina in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune seturi de mobilier de gradina: masa, lounge, bistro si pliabile" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru mese in curte, cel mai bun set este <strong>idealStore cu 6 scaune</strong>: cel mai vandut, la pret bun. Daca vrei sa stai relaxat, nu sa mananci, un set lounge ca <strong>Bica Venetia</strong> din poliratan e alegerea. Pentru un balcon mic, <strong>bistroul casa.pro</strong> are doua locuri, iar cel mai ieftin, <strong>Progarden</strong>, costa sub 360 de lei.</p>
+      <p>La mobilierul de gradina, prima intrebare nu e forma, ci materialul, pentru ca sta afara, in ploaie si soare. De el depinde cat rezista si cata bataie de cap iti da. Mai jos ai intai ce material sa alegi, apoi 9 seturi comparate pe tip, material si parerile reale ale cumparatorilor, si la final cum protejezi mobilierul iarna.</p>
+      <p>Am pornit de la cele mai vandute seturi de pe eMAG, le-am verificat materialul, numarul de locuri si tipul, si le-am asezat dupa cum folosesti curtea si cat spatiu ai. Pentru piese individuale, vezi <a href="/set-masa-si-scaune-pentru-gradina/">seturile de masa si scaune</a> sau o <a href="/banca-de-gradina-din-lemn-masiv/">banca de gradina din lemn</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#material">Materialul: ce rezista afara</a></li>
+        <li><a href="#pe-scurt">Care set pentru cine</a></li>
+        <li><a href="#produse">Cele 9 seturi pe larg</a></li>
+        <li><a href="#marime">Cat de mare, dupa cati sunteti</a></li>
+        <li><a href="#accesorii">Umbrela, perne si accesorii</a></li>
+        <li><a href="#iarna">Cum ierneaza mobilierul</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="material">Materialul: ce rezista cel mai bine afara</h2>
+    <p>Mobilierul de gradina sta afara, in ploaie, soare si vant, deci materialul conteaza mai mult decat orice. Iata ce rezista si cat efort cere fiecare:</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Material</th><th>Rezistenta afara</th><th>Intretinere</th></tr></thead>
+        <tbody>
+          <tr><td>Poliratan (pe aluminiu)</td><td>foarte buna, nu absoarbe apa</td><td>aproape zero</td></tr>
+          <tr><td>Aluminiu</td><td>foarte buna, necoroziv</td><td>aproape zero</td></tr>
+          <tr><td>Rasina / polipropilena</td><td>foarte buna, impermeabila</td><td>doar spalare</td></tr>
+          <tr><td>Lemn (salcam, tec)</td><td>buna, dar sensibil</td><td>ulei de 1-2 ori pe an</td></tr>
+          <tr><td>Otel</td><td>buna, dar poate rugini</td><td>revopsire la nevoie</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Pe scurt: pentru cel mai putin efort, mergi pe <strong>poliratan, aluminiu sau rasina</strong>, care rezista afara ani buni si le speli doar cu apa. Lemnul arata cel mai natural si mai cald, dar cere ulei periodic ca sa nu craape. Otelul e rezistent, dar daca nu e bine vopsit, poate rugini la imbinari. Textilena, folosita la scaune, lasa aerul sa treaca si se usuca repede, dar tine mai putin decat un cadru de aluminiu.</p>
+
+    <h2 id="pe-scurt">Pe scurt: care set pentru cine</h2>
+    <p>Daca esti grabit, tabelul rezuma tipul, materialul si pretul fiecarui set. Preturile si numarul de pareri sunt luate direct de pe eMAG.</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Set</th><th>Tip</th><th>Material</th><th>Pret</th><th>Pareri</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td>{x.badge}</td>
+              <td>{x.tip}</td>
+              <td>{x.mat}</td>
+              <td>{money(x.p.price)} lei</td>
+              <td>{x.p.rating ? `${x.p.rating.toFixed(2)} (${x.p.reviews})` : '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="produse">Cele 9 seturi pe larg</h2>
+    <p>Le-am aranjat de la cele mai vandute la cele de nisa. Fiecare card are pretul, nota si numarul de pareri direct de pe eMAG, plus tipul, materialul si punctele tari si slabe.</p>
+    <div class="rd-grid">
+      {PICKS.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figTop} alt="Cele mai apreciate seturi de gradina: idealStore, Bica Venetia si Sersimo" width="1200" height="675" loading="lazy" />
+
+    <h2 id="marime">Cat de mare, dupa cati sunteti si ce spatiu ai</h2>
+    <p>Dupa material, a doua alegere e marimea, care tine de cati sunteti si cat loc ai:</p>
+    <ul>
+      <li><strong>Un cuplu, balcon mic:</strong> un set bistro de doua locuri, ca al casa.pro, incape si pe un balcon si iti da doua scaune pentru cafea.</li>
+      <li><strong>O familie mica:</strong> un set de patru locuri sau unul pliabil, ca al Kring, acopera mesele obisnuite si se strange cand nu il folosesti.</li>
+      <li><strong>Familie mare sau musafiri:</strong> un set de sase, ca idealStore sau Heinner, pentru mese cu toata lumea, dar are nevoie de o terasa spatioasa.</li>
+      <li><strong>Zona de relaxare:</strong> un set lounge, cu canapea si fotolii, pentru stat afara, separat de zona de masa.</li>
+    </ul>
+    <p>Masoara spatiul liber inainte sa comanzi si lasa loc sa tragi scaunele si sa circuli in jurul mesei. Un set prea mare intr-o curte mica blocheaza trecerea si nu il folosesti confortabil.</p>
+
+    <img class="rd-fig" src={figTip} alt="Set de masa sau set lounge, dupa cum folosesti curtea" width="1200" height="675" loading="lazy" />
+
+    <h2 id="accesorii">Umbrela, perne si accesorii</h2>
+    <p>Un set de gradina se foloseste mai bine cu cateva accesorii, mai ales vara:</p>
+    <p><strong>Umbrela</strong> e aproape obligatorie pe caldura: fara umbra, o masa in plin soare la pranz devine de nefolosit. Unele seturi vin cu gaura in mijlocul mesei pentru umbrela; la altele iei una separat, cu picior.</p>
+    <p><strong>Pernele</strong> aduc confort la scaunele si fotoliile mai tari. Alege perne cu husa detasabila si lavabila, din material rezistent la UV, ca sa nu se decoloreze la soare. Scoate-le si tine-le la adapost cand nu le folosesti sau cand ploua.</p>
+    <p><strong>Husele de protectie</strong> pentru intreg setul sunt utile daca il lasi afara: alege-le impermeabile si ventilate, ca sa nu prinda condens dedesubt.</p>
+
+    <img class="rd-fig" src={figMic} alt="Seturi mici de gradina pentru balcon: bistro casa.pro, Progarden si Bica Lido" width="1200" height="675" loading="lazy" />
+
+    <h2 id="iarna">Cum ierneaza mobilierul de gradina</h2>
+    <p>Chiar si materialele rezistente tin mai mult daca ai grija de ele in sezonul rece. Cateva reguli simple:</p>
+    <ul>
+      <li><strong>Muta-l la adapost</strong> daca poti, intr-o magazie, garaj sau sub un acoperis. Fereste-l de inghet si de variatiile mari de temperatura.</li>
+      <li><strong>Daca ramane afara,</strong> acopera-l cu huse impermeabile si ventilate si ridica-l putin de la sol, pe suporti, ca sa nu stea in umezeala.</li>
+      <li><strong>Scoate mereu pernele</strong> si tine-le in casa. Sub husa, in umezeala, pernele lasate afara mucegaiesc, oricat de rezistent ar fi cadrul.</li>
+      <li><strong>La lemn,</strong> da un strat de ulei de tec sau solutie de protectie inainte de iarna, ca sa nu absoarba apa si sa nu craape.</li>
+    </ul>
+    <p>Cu putina grija toamna, un set bun de gradina arata la fel de bine si dupa cinci-sase sezoane. Pentru umbra deasupra mesei, adaugi o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela rezistenta la vant</a>.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-mobilier-gradina')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi tot mobilierul de gradina la oferta</strong>
+        <span>Reducerile din acest moment la seturi de gradina si terasa, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">MI</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase, si a amenajat sute de spatii exterioare.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-seturi-de-mobilier-de-gradina" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-seturi-de-mobilier-de-gradina" currentCategory="mobilier-gradina" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

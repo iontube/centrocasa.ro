@@ -1,0 +1,292 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['storcatoare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Centrifugale (rapide) ---
+  { g: 'centrif', id: 'D4JJW2BBM', rol: 'Cel mai vandut, cu tub larg', short: 'Heinner XF-1000', tip: 'Centrifugal', putere: '1000 W', pentru: 'Suc rapid', pret: '234 lei',
+    specs: ['1000 W, storcator centrifugal rapid', 'tub de alimentare de 75 mm, incap fructe intregi', '2 viteze, recipient pentru suc si pentru pulpa', 'sita si carcasa din inox'],
+    pros: ['737 de pareri, de departe cel mai testat', 'Tub de 75 mm, pui mere intregi fara sa le tai', '1000 W, stoarce rapid, inclusiv legume tari', 'Doua viteze, pentru fructe moi si tari'],
+    cons: ['Sucul iese cu spuma si se oxideaza repede', 'Centrifuga face zgomot'],
+    verdict: 'Cu 737 de pareri, e cel mai cumparat storcator din articol, si e alegerea logica daca vrei suc rapid, fara batai de cap. La 1000 W si cu un tub de alimentare de 75 de milimetri, ii bagi un mar intreg sau bucati mari de morcov fara sa le tai marunt inainte, iar sucul curge in cateva secunde. Cele doua viteze te lasa sa alegi intre fructe moi si legume tari. E un centrifugal clasic, cu tot ce inseamna asta: rapid si ieftin, dar sucul iese cu un strat de spuma si se oxideaza mai repede decat la un storcator lent, deci il bei imediat. Face si zgomot, ca orice centrifuga. Il iei cand vrei un pahar de suc rapid dimineata si nu te obsedeaza ultima picatura de nutrienti.' },
+  { g: 'centrif', id: 'DWPPDZBBM', rol: 'Compact si accesibil', short: 'Tefal Fruteli', tip: 'Centrifugal', putere: '350 W', pentru: 'Suc rapid', pret: '204 lei',
+    specs: ['350 W, centrifugal compact', 'tub de 60 mm, recipient pentru pulpa', 'de la Tefal, cu service in tara', 'usor de asamblat si spalat'],
+    pros: ['Compact, ocupa putin loc pe blat', 'Brand Tefal, cu piese si service', '218 pareri, bine cotat', 'Simplu de folosit si de curatat'],
+    cons: ['350 W, se descurca greu cu legume foarte tari', 'Tub mai mic, tai fructele inainte'],
+    verdict: 'Nu toata lumea are nevoie de o centrifuga de 1000 de wati; unii vor doar un storcator mic si simplu, iar Fruteli e exact asta. Cu 350 W e printre cele mai blande din articol, deci se descurca bine cu fructele moi si cu morcovii, dar la sfecla sau la legumele foarte tari se opinteste, si tubul de 60 de milimetri te obliga sa tai fructele mai mari inainte. In schimb e compact, incape usor intr-o bucatarie mica, se asambleaza si se spala simplu, si vine de la Tefal, cu service in tara. La 204 lei e o intrare accesibila in stors, potrivita pentru cine face suc din cand in cand, nu zilnic. Il iei cand vrei un storcator mic, ieftin si comod, pentru fructe moi si morcovi.' },
+  { g: 'centrif', id: 'DL5HLVBBM', rol: 'Cel mai ieftin centrifugal cu putere', short: 'Heinner HSF-600', tip: 'Centrifugal', putere: '600 W', pentru: 'Suc rapid', pret: '166 lei',
+    specs: ['600 W, centrifugal, tub de 65 mm', 'recipient pentru suc si pentru pulpa', 'sita din inox', 'pret mic pentru puterea oferita'],
+    pros: ['600 W la doar 166 de lei, bun raport', 'Tub de 65 mm, fructe medii fara sa le tai marunt', 'Recipiente separate pentru suc si pulpa', 'Sita de inox, usor de curatat'],
+    cons: ['90 de pareri, mai putin testat', 'Aceleasi limite de centrifugal: spuma, oxidare'],
+    verdict: 'Intre modelul compact de 350 W si cel de top de 1000, HSF-600 prinde un echilibru bun de pret si putere. Cei 600 W stau confortabil cu majoritatea fructelor si legumelor obisnuite, iar tubul de 65 de milimetri accepta fructe medii fara sa le tai in bucatele. La 166 de lei e cel mai ieftin centrifugal cu putere reala din articol, cu recipiente separate pentru suc si pulpa si sita de inox usor de spalat. Cu 90 de pareri e mai putin testat decat liderii de vanzari, dar bine notat. Ramane un centrifugal, deci sucul face spuma si se bea imediat. Il iei cand vrei putere decenta la cel mai mic pret si nu tii mortis la un brand mare.' },
+  { g: 'centrif', id: 'DGLRLMBBM', rol: 'Centrifugal de brand, bine vandut', short: 'Philips Viva', tip: 'Centrifugal', putere: '800 W', pentru: 'Suc rapid', pret: '499 lei',
+    specs: ['800 W, tub de 75 mm', 'sistem QuickClean, sita usor de curatat', 'recipient de suc integrat', 'de la Philips, cu tehnologie de extractie'],
+    pros: ['378 de pareri, cel mai vandut centrifugal de brand', 'Tub de 75 mm, fructe intregi', 'Sita gandita sa se curete rapid', 'Extractie eficienta, mai putina pulpa in suc'],
+    cons: ['Mai scump decat centrifugalele generice', 'Tot centrifugal: spuma si oxidare'],
+    verdict: 'Daca vrei un centrifugal, dar de la un brand care face storcatoare de zeci de ani, Philips Viva e reperul din articol pe partea asta, cu 378 de pareri in spate. Are 800 W, tub de 75 de milimetri pentru fructe intregi si un sistem de curatare rapida a sitei, partea cea mai enervanta la orice storcator. Extractia e mai eficienta decat la modelele ieftine, deci sucul iese ceva mai curat, cu mai putina pulpa. Costa mai mult decat un centrifugal generic, iar diferenta o platesti pe brand, pe finisaj si pe curatarea mai usoara, nu pe tipul de suc, care ramane cel de centrifuga, cu spuma. Il iei cand vrei un centrifugal de incredere, de brand, si pui pret pe curatarea rapida.' },
+  { g: 'centrif', id: 'DYCX6BBBM', rol: 'Premium, constructie solida', short: 'Bosch MES25', tip: 'Centrifugal', putere: '700 W', pentru: 'Suc rapid', pret: '500 lei',
+    specs: ['700 W, tub de 73 mm', 'sistem anti-picurare la gura de scurgere', 'recipient de suc cu separator de spuma', 'constructie Bosch, robusta'],
+    pros: ['Separator de spuma, sucul iese mai limpede', 'Sistem anti-picurare, blatul ramane curat', 'Constructie Bosch, solida si durabila', 'Tub de 73 mm pentru fructe intregi'],
+    cons: ['Pret premium pentru un centrifugal', '700 W, nu cel mai puternic'],
+    verdict: 'Bosch aduce la un centrifugal doua detalii pe care alte modele le ignora si care se simt la folosire. Primul e separatorul de spuma din recipientul de suc, care retine o parte din spuma tipica centrifugalelor, deci paharul iese mai limpede. Al doilea e sistemul anti-picurare la gura de scurgere: ridici recipientul si nu ramane o dara de suc pe blat. La 700 W nu e cel mai puternic, dar constructia Bosch e solida si gandita sa tina, iar tubul de 73 de milimetri accepta fructe intregi. E premium pentru un centrifugal, iar pretul reflecta finisajul si detaliile, nu o schimbare de tehnologie. Il iei cand vrei un centrifugal bine facut, cu mai putina spuma si zero mizerie pe blat.' },
+  // --- B. Cu presare la rece / masticare (slow) ---
+  { g: 'slow', id: 'DD06SYYBM', rol: 'Cel mai bine notat storcator lent', short: 'Latkon presare la rece', tip: 'Presare la rece', putere: '150 W', pentru: 'Suc dens', pret: '520 lei',
+    specs: ['150 W, melc care preseaza lent, la rece', '2 viteze plus functie reverse anti-blocaj', 'sucul iese dens si cu putina spuma', 'nota 4.9, cea mai mare din articol'],
+    pros: ['Nota 4.9, cea mai mare din tot articolul', 'Suc mai dens, mai mult, cu putina spuma', 'Presare la rece, fara caldura care oxideaza', 'Functie reverse, deblocheaza usor daca se infunda'],
+    cons: ['Mai lent decat un centrifugal', 'Trebuie sa tai fructele in bucati mai mici'],
+    verdict: 'Aici trecem la cealalta lume a storcatoarelor, si Latkon e cel mai bine notat din tot articolul, cu 4.9. Spre deosebire de centrifuga, foloseste un melc care preseaza fructele lent, la rece, fara sa genereze caldura. Rezultatul se vede in pahar: sucul iese mai dens, mai mult la aceeasi cantitate de fructe, cu foarte putina spuma, si se oxideaza mai lent, deci isi tine gustul si culoarea mai mult timp. Are doua viteze si o functie reverse care il deblocheaza cand se infunda cu fibre. Compromisul e ritmul: e mai lent decat un centrifugal si trebuie sa tai fructele in bucati mai mici. La 520 de lei si cu nota asta, e alegerea daca pui pret pe calitatea sucului. Il iei cand vrei suc dens, mult si care se pastreaza, nu viteza.' },
+  { g: 'slow', id: 'D00FSJYBM', rol: 'Presare la rece la pret mai bun', short: 'Biovita Nutrimax', tip: 'Presare la rece', putere: '150 W', pentru: 'Suc dens', pret: '450 lei',
+    specs: ['150 W, melc si sita din inox', 'presare lenta la rece, suc dens', 'functie de curatare usoara', 'nota 4.73'],
+    pros: ['Presare la rece la 450 de lei, mai accesibil', 'Sita de inox, durabila', 'Suc dens, cu putina spuma', 'Nota 4.73, bine cotat'],
+    cons: ['Brand mai putin cunoscut', 'La fel de lent ca orice storcator cu melc'],
+    verdict: 'Aceeasi tehnologie de presare la rece ca Latkon, la un pret cu 70 de lei mai mic, de la un brand mai putin cunoscut. Nutrimax foloseste un melc si o sita de inox ca sa preseze fructele lent, fara caldura, deci obtii acelasi tip de suc dens, cu putina spuma, care se pastreaza mai bine decat cel de la centrifuga. Nota de 4.73, pe 139 de pareri, il confirma ca o alegere solida. Fata de Latkon renunta la ceva finisaj si la faima brandului, dar castiga la pret, iar diferenta de rezultat e mica. Ca la orice storcator cu melc, e mai lent si ceri putina rabdare la alimentare. Il iei cand vrei suc de presare la rece la cel mai bun pret, fara sa platesti pentru un nume.' },
+  { g: 'slow', id: 'DGPPDZBBM', rol: 'Storcator lent de la un brand mare', short: 'Tefal Juiceo', tip: 'Presare la rece', putere: '150 W', pentru: 'Suc dens', pret: '690 lei',
+    specs: ['150 W, melc la 80 de rotatii pe minut', 'presare lenta la rece', 'de la Tefal, cu service in tara', 'sistem usor de asamblat si spalat'],
+    pros: ['Storcator lent de la Tefal, cu service', 'Doar 80 de rotatii pe minut, presare bland', 'Suc dens, cu nutrienti pastrati', 'Constructie de brand mare'],
+    cons: ['Cel mai scump storcator lent din selectie', '81 de pareri, mai putin testat'],
+    verdict: 'Pentru cine vrea un storcator cu presare la rece, dar cu linistea unui brand mare in spate, Tefal Juiceo e varianta din articol. Melcul se invarte la doar 80 de rotatii pe minut, o presare foarte blanda care stoarce fara sa incalzeasca, exact ce cauti la un storcator lent: suc dens, cu gust curat si nutrienti pastrati. In plus, ai service Tefal in tara, un argument real la un aparat cu piese care se pot uza in timp. Reversul e pretul, cel mai mare dintre storcatoarele lente de aici, si numarul mai mic de pareri, 81. Practic platesti in plus pentru brand si service fata de un Biovita sau Latkon care fac acelasi tip de suc. Il iei cand vrei presare la rece si pui pret pe siguranta unui brand consacrat.' },
+  { g: 'slow', id: 'DCNTC2BBM', rol: 'Vertical cu melc, premium', short: 'Biovita cu melc', tip: 'Presare la rece', putere: '240 W', pentru: 'Suc dens', pret: '805 lei',
+    specs: ['240 W, storcator vertical cu melc', 'presare la rece, cu retete incluse', 'ocupa putin loc pe inaltime', 'cea mai mare putere dintre cele lente'],
+    pros: ['Design vertical, ocupa putin loc pe blat', '240 W, cel mai puternic dintre cele lente', 'Presare la rece, suc dens', 'Vine cu retete incluse'],
+    cons: ['Cel mai scump din articol', '58 de pareri, cel mai putin testat'],
+    verdict: 'Storcatoarele cu melc vin in doua forme, orizontale si verticale, iar Biovita SJ5000 e varianta verticala din articol, cu un avantaj practic: ocupa mai putin loc pe blat, crescand in inaltime, nu in latime. Are 240 W, cea mai mare putere dintre storcatoarele lente de aici, ceea ce inseamna ca preseaza ceva mai hotarat prin fibre, si vine cu un caiet de retete, util daca esti la inceput cu sucurile. Ramane un storcator de presare la rece, cu tot ce inseamna asta: suc dens, putina spuma, oxidare lenta. Pretul de 805 lei e cel mai mare din articol, iar cu 58 de pareri e si cel mai putin testat, deci platesti pentru forma verticala si putere, nu pentru un istoric lung de recenzii. Il iei cand vrei un storcator lent care economiseste spatiu si preseaza cu putere.' },
+  // --- C. Storcatoare de citrice ---
+  { g: 'citrice', id: 'DD6LZMBBM', rol: 'De citrice, de la un brand mare', short: 'Tefal VitaPress', tip: 'Citrice', putere: '25 W', pentru: 'Citrice', pret: '110 lei',
+    specs: ['25 W, dedicat citricelor: portocale, lamai, grepfrut', 'con de presare cu pornire automata la apasare', 'filtru dublu pentru mai putina sau mai multa pulpa', 'de la Tefal'],
+    pros: ['Pornire automata cand apesi fructul', 'Filtru dublu, alegi cata pulpa ramane', 'Simplu si rapid pentru citrice', 'Brand Tefal, la doar 110 lei'],
+    cons: ['Doar pentru citrice, nu stoarce alte fructe', 'Recipient mic'],
+    verdict: 'Pentru un pahar de suc de portocale dimineata, un storcator de fructe si legume e mult prea mult; iti trebuie exact un storcator de citrice, iar VitaPress e cel de brand din articol. E dedicat portocalelor, lamailor si grepfrutului: apesi jumatatea de fruct pe con, iar aparatul porneste singur si se opreste cand ridici, deci il folosesti cu o singura mana. Filtrul dublu te lasa sa alegi intre suc limpede si suc cu pulpa. Nu stoarce mere sau morcovi, e specializat, si tocmai de aceea o face simplu si repede, fara vase multe de spalat. La 110 lei, de la Tefal, e o alegere curata pentru cine bea suc de citrice. Il iei cand vrei doar suc de portocale sau lamaie, rapid, dimineata.' },
+  { g: 'citrice', id: 'D7KK4KBBM', rol: 'De citrice, cu mai multa putere', short: 'Heinner C160', tip: 'Citrice', putere: '160 W', pentru: 'Citrice', pret: '180 lei',
+    specs: ['160 W, cea mai mare putere dintre cele de citrice', 'sistem anti-alunecare, stabil pe blat', 'con de presare pentru portocale si grepfrut', 'carcasa din inox'],
+    pros: ['160 W, stoarce si citrice mari, ferm', 'Sistem anti-alunecare, sta fix pe blat', 'Carcasa de inox, arata bine', 'Bun pentru cine face suc des'],
+    cons: ['Mai scump decat un storcator de citrice simplu', '0.24 litri, recipient mic'],
+    verdict: 'Fata de un storcator de citrice de baza, C160 mizeaza pe forta: 160 de wati, cea mai mare putere dintre cele de citrice din articol, ceea ce conteaza daca storci portocale mari sau grepfrut, unde un motor slab se opinteste. Are un sistem anti-alunecare care il tine fix pe blat cat apesi si o carcasa de inox care arata a aparat serios, nu a jucarie. Recipientul de 0.24 litri e mic, deci pentru mai multe pahare golesti pe parcurs. Costa mai mult decat un storcator de citrice simplu, dar diferenta o dai pe putere si pe finisaj, utile daca faci suc de citrice des si vrei sa mearga repede. Il iei cand storci citrice regulat si vrei un aparat ferm si stabil, nu unul de compromis.' },
+  { g: 'citrice', id: 'DFDF9YMBM', rol: 'De citrice, cel mai ieftin', short: 'Heinner Limme', tip: 'Citrice', putere: '30 W', pentru: 'Citrice', pret: '69 lei',
+    specs: ['30 W, recipient de 500 ml', 'doua conuri, pentru citrice mici si mari', 'filtru dublu pentru pulpa', 'pretul cel mai mic din articol'],
+    pros: ['Sub 70 de lei, cel mai ieftin din articol', 'Doua conuri, pentru lamai si portocale', 'Recipient de 500 ml, mai mare decat la altele', 'Filtru dublu pentru pulpa'],
+    cons: ['30 W, doar pentru citrice, bland', '133 de pareri, dar aparat simplu'],
+    verdict: 'Cel mai ieftin aparat din articol, si e cinstit sa il privesti ca atare: un storcator de citrice simplu, sub 70 de lei, pentru cine vrea doar suc de portocale sau lamaie fara sa dea multi bani. Are insa doua atuuri peste asteptarile pretului: vine cu doua conuri, unul mic pentru lamai si lime, unul mare pentru portocale si grepfrut, si un recipient de 500 de mililitri, mai incapator decat la multe modele de citrice. Filtrul dublu iti lasa sa alegi cata pulpa ramane. Cei 30 W sunt blanzi, deci storci fara graba, dar la citrice nici nu ai nevoie de forta mare. Il iei cand vrei minimul functional pentru suc de citrice, ieftin si cu doua conuri pentru orice marime de fruct.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const CENTRIF = PICKS.filter(x => x.g === 'centrif');
+const SLOW = PICKS.filter(x => x.g === 'slow');
+const CITRICE = PICKS.filter(x => x.g === 'citrice');
+
+const hero = '/imagini/articole/cele-mai-bune-storcatoare.webp';
+const figCentrif = '/imagini/articole/storcatoare-centrifugale.webp';
+const figSlow = '/imagini/articole/storcatoare-presare-rece.webp';
+const figCitrice = '/imagini/articole/storcatoare-citrice.webp';
+const published = '2026-07-21T16:54:34+03:00';
+
+const faq = [
+  { question: 'Centrifugal sau cu presare la rece?', answer: 'E decizia principala si tine de ce pretuiesti. Un storcator centrifugal foloseste o sita care se roteste la mare viteza, mii de rotatii pe minut, si separa sucul prin centrifugare: e rapid si ieftin, dar genereaza caldura, face spuma si sucul se oxideaza repede. Un storcator cu presare la rece foloseste un melc care preseaza lent, la 40-110 rotatii pe minut, fara caldura: scoate mai mult suc, mai dens, cu putina spuma, care se pastreaza mai bine. Pe scurt: daca vrei un pahar rapid dimineata, ia centrifugal; daca pui pret pe cantitatea si calitatea sucului, ia presare la rece, desi costa mai mult si e mai lent.' },
+  { question: 'Chiar iese sucul mai bun la presarea la rece?', answer: 'La cantitate si conservare, da, masurabil. Presarea lenta stoarce mai eficient, deci obtii mai mult suc din aceeasi cantitate de fructe, iar pulpa ramasa e mai uscata. Fiindca nu genereaza caldura si amesteca mai putin aer, sucul face putina spuma si se oxideaza mai incet, deci isi tine gustul si culoarea ore in loc de minute. La partea de vitamine, presarea la rece pastreaza ceva mai bine enzimele si nutrientii sensibili la caldura, desi diferenta e mai mica decat sugereaza reclamele. Cel mai onest rezumat: presarea la rece da mai mult suc, mai dens si mai stabil; centrifuga da rapiditate si un pret mai mic.' },
+  { question: 'Am nevoie de un storcator de citrice separat?', answer: 'Depinde ce bei. Daca vrei mai ales suc de portocale, lamaie sau grepfrut, un storcator de citrice dedicat e mai bun decat unul universal: apesi jumatatea de fruct pe con, e rapid, are putine piese de spalat si costa putin. Un storcator de fructe si legume poate stoarce si citrice, dar e mai complicat de folosit si de curatat pentru asa ceva. Daca insa vrei suc din mere, morcovi, sfecla, telina sau amestecuri, iti trebuie un storcator normal, centrifugal sau cu presare la rece; cel de citrice nu le poate stoarce. Multi au un storcator de citrice ieftin in plus, tocmai pentru ca e specializat si comod.' },
+  { question: 'Ce putere imi trebuie la un storcator?', answer: 'Depinde de tip, si aici cifra insala daca nu stii asta. La centrifugale, puterea conteaza: 350-600 W se descurca cu fructe moi si morcovi, dar pentru legume tari, sfecla, telina, radacinoase, vrei de la 700-1000 W. La storcatoarele cu presare la rece, nu te lua dupa wati: ele lucreaza la putere mica, 150-240 W, pentru ca melcul se invarte lent si intentionat, iar 150 W acolo nu inseamna slab, ci eficient. La cele de citrice, 25-160 W, mai multa putere ajuta doar la fructe mari, ca grepfrutul. Deci citeste puterea in contextul tipului, nu ca pe o nota absoluta.' },
+  { question: 'Ce e diametrul tubului si de ce conteaza?', answer: 'Tubul de alimentare e gura prin care bagi fructele, iar diametrul lui decide daca le tai inainte sau nu. Un tub larg, de 70-75 de milimetri, inghite un mar intreg sau bucati mari de morcov, deci gatesti mai repede si murdaresti mai putin. Un tub ingust, de 45-60 de milimetri, te obliga sa tai fructele in bucatele care sa incapa, ceea ce inseamna mai mult timp de pregatire. Conteaza mai ales la centrifugale, unde viteza e argumentul principal; un tub mic anuleaza o parte din rapiditatea aparatului. La storcatoarele cu presare la rece, tuburile sunt de obicei mai inguste oricum, pentru ca presarea e lenta prin natura ei.' },
+  { question: 'Pot face suc verde, din telina si frunze?', answer: 'Da, dar nu la fel de bine cu orice storcator. Legumele cu frunze, telina, spanacul, kale, patrunjelul, sunt fibroase si sarace in lichid, iar aici storcatoarele cu presare la rece sunt clar mai bune: melcul le preseaza si scoate suc, in timp ce o centrifuga le invarte si scoate putin, lasand multa pulpa umeda. Daca sucul verde e motivul principal pentru care cumperi un storcator, mergi pe presare la rece. Un centrifugal poate face si el suc verde, dar cu randament mai mic si mai multa risipa. Pentru fructe si morcovi, ambele tipuri se descurca bine.' },
+  { question: 'Cat de greu se curata un storcator?', answer: 'E partea mai putin placuta si merita stiuta inainte. La centrifugale, sita fina cu lame se infunda cu pulpa si e piesa cea mai greu de curatat; unele modele, ca Philips, au sisteme care usureaza asta. La storcatoarele cu presare la rece sunt mai multe piese de demontat, melc, sita, recipiente, deci curatarea dureaza ceva mai mult, dar piesele se clatesc usor pentru ca pulpa e uscata. La cele de citrice e cel mai simplu: un con si un recipient. Regula valabila la toate: spala imediat dupa folosire, cat pulpa e umeda, pentru ca uscata se prinde si devine greu de scos.' },
+  { question: 'Cat repede trebuie sa beau sucul proaspat?', answer: 'Cat mai repede, mai ales de la centrifugale. Sucul proaspat, fara conservanti, incepe sa se oxideze din momentul stoarcerii: isi pierde din gust, culoare si o parte din vitamine in contact cu aerul. Cel de la centrifuga, care a inglobat mai mult aer si caldura, se degradeaza vizibil in 15-20 de minute, deci se bea imediat. Cel de la presare la rece rezista mai bine, cateva ore la frigider intr-un recipient inchis, umplut pana sus ca sa aiba cat mai putin aer deasupra. Regula simpla ramane insa aceeasi la orice storcator: sucul proaspat e cel mai bun baut in prima jumatate de ora.' },
+];
+
+const images = [hero, figCentrif, figSlow, figCitrice, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune storcatoare de fructe si legume in ${SEO_YEAR}: centrifugale, presare la rece sau citrice`}
+  description="12 storcatoare comparate pe tip: centrifugale, cu presare la rece si de citrice, de la 69 la 805 lei. Cand alegi viteza si cand cantitatea de suc."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune storcatoare de fructe si legume' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune storcatoare de fructe si legume</span>
+    </nav>
+
+    <h1>Cele mai bune storcatoare de fructe si legume</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune storcatoare de fructe si legume: centrifugale rapide, cu presare la rece si de citrice" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Toarna aceiasi morcovi in doua storcatoare si obtii doua sucuri diferite. Unul iese repede, cu un strat de spuma si ceva mai putin la cantitate. Celalalt, mai lent, mai dens si mai mult din aceeasi cantitate de fructe. Diferenta nu e brandul, ci felul in care aparatul stoarce: prin <strong>centrifugare rapida</strong> sau prin <strong>presare lenta, la rece</strong>. Asta e prima decizie, inaintea oricarei alteia.</p>
+      <p>Cel mai vandut din articol, <strong>Heinner XF-1000</strong>, e un centrifugal clasic: rapid si ieftin, pentru un pahar dimineata. Daca pui pret pe cantitatea si calitatea sucului, <strong>Latkon</strong>, cu presare la rece, are cea mai mare nota din selectie, 4.9. Iar daca vrei doar suc de portocale, un storcator de citrice ca <strong>Tefal VitaPress</strong> face treaba mai simplu si mai ieftin decat orice aparat universal.</p>
+      <p>Sunt, deci, trei aparate diferite sub acelasi nume: centrifugal, cu presare la rece si de citrice. Fac lucruri diferite, pentru nevoi diferite, iar alegerea gresita a tipului te lasa nemultumit indiferent de pret. De aceea le-am grupat dupa tip, nu dupa cat costa.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#centrif">Centrifugale, rapide</a></li>
+        <li><a href="#slow">Cu presare la rece, mai mult suc</a></li>
+        <li><a href="#citrice">Storcatoare de citrice</a></li>
+        <li><a href="#tipuri">Centrifugal sau presare la rece: cum alegi</a></li>
+        <li><a href="#putere-tub">Puterea si diametrul tubului</a></li>
+        <li><a href="#suc-verde">Suc verde, din telina si frunze</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Putere</th><th>Ideal pentru</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.putere}</td>
+              <td>{x.pentru}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="centrif">Centrifugale, rapide</h2>
+    <p>Storcatoarele centrifugale sunt cele mai raspandite si cele mai rapide: o sita se roteste la mare viteza si separa sucul de pulpa in cateva secunde. Sunt si cele mai accesibile. Pretul il platesti in doua feluri: sucul face spuma si se oxideaza repede, iar aparatul e mai zgomotos. Pentru un pahar rapid dimineata, sunt exact ce trebuie.</p>
+    {CENTRIF.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figCentrif} alt="Storcatoare centrifugale rapide, Heinner, Philips si Bosch" width="1600" height="900" loading="lazy" />
+
+    <h2 id="slow">Cu presare la rece, mai mult suc</h2>
+    <p>La polul opus, storcatoarele cu presare la rece folosesc un melc care preseaza fructele lent, fara caldura. Rezultatul e un suc mai dens, mai mult din aceeasi cantitate de fructe, cu putina spuma, care se pastreaza mai bine. Costa mai mult si sunt mai lente, dar pentru cine bea suc des si tine la calitate, diferenta se vede in pahar.</p>
+    {SLOW.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figSlow} alt="Storcatoare cu presare la rece, Latkon si Biovita, pentru suc dens" width="1600" height="900" loading="lazy" />
+
+    <h2 id="citrice">Storcatoare de citrice</h2>
+    <p>A treia categorie e specializata pe un singur lucru, dar il face impecabil: suc de portocale, lamaie si grepfrut. Apesi jumatatea de fruct pe con, iar aparatul face restul. Sunt mici, ieftine si cu putine piese de spalat. Nu stoarce mere sau morcovi, dar pentru citrice sunt mai comode decat orice storcator universal.</p>
+    {CITRICE.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figCitrice} alt="Storcatoare de citrice, Tefal VitaPress si Heinner, pentru portocale si lamai" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-storcatoare').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate storcatoarele la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="tipuri">Centrifugal sau presare la rece: cum alegi</h2>
+    <p>E decizia care conteaza cel mai mult intre storcatoarele universale, si tine de cat de des bei suc si ce astepti de la el.</p>
+    <p>Un <strong>centrifugal</strong> foloseste o sita care se roteste la mii de rotatii pe minut si arunca pulpa in lateral, separand sucul. E rapid, faci un pahar in mai putin de un minut, si e ieftin. Dezavantajele vin din aceeasi viteza: se genereaza caldura, sucul inglobeaza aer si iese cu spuma, iar oxidarea rapida inseamna ca il bei imediat.</p>
+    <p>Un storcator cu <strong>presare la rece</strong> foloseste un melc care se invarte lent, la 40-110 rotatii pe minut, si stoarce fructele ca intr-o presa, fara caldura. Scoate mai mult suc, mai dens, cu foarte putina spuma, iar sucul se pastreaza cateva ore. E mai scump si mai lent.</p>
+    <p>Cum alegi, pe scurt:</p>
+    <ul>
+      <li>Bei suc <strong>ocazional</strong> si vrei rapiditate: mergi pe <strong>centrifugal</strong>, e mai ieftin si suficient.</li>
+      <li>Bei suc <strong>des</strong>, faci si suc verde, tii la cantitate si conservare: alege <strong>presare la rece</strong>.</li>
+      <li>Vrei <strong>doar citrice</strong>: nu-ti trebuie niciunul dintre ele, ci un storcator de citrice ieftin.</li>
+    </ul>
+
+    <h2 id="putere-tub">Puterea si diametrul tubului</h2>
+    <p>Doua cifre din fisa care conteaza, dar numai citite corect.</p>
+    <p><strong>Puterea</strong> se judeca in functie de tip. La centrifugale conteaza: 350-600 W duc fructele moi si morcovii, dar pentru legume tari, sfecla, telina, vrei de la 700-1000 W. La storcatoarele cu presare la rece, nu te lua dupa wati: ele lucreaza intentionat la putere mica, 150-240 W, pentru ca melcul se invarte lent, iar acolo 150 W nu inseamna slab. La citrice, mai multa putere ajuta doar la fructe mari, ca grepfrutul.</p>
+    <p><strong>Diametrul tubului</strong> de alimentare decide cat pregatesti inainte. Un tub larg, de 70-75 de milimetri, inghite un mar intreg, deci gatesti mai repede. Unul ingust, de 45-60, te obliga sa tai fructele in bucati, ceea ce anuleaza o parte din viteza unui centrifugal. La modelele rapide, un tub larg e un avantaj real; la cele cu presare la rece, tuburile sunt oricum mai inguste, pentru ca presarea e lenta prin natura ei.</p>
+
+    <h2 id="suc-verde">Suc verde, din telina si frunze</h2>
+    <p>Daca sucul verde e motivul pentru care iei un storcator, tipul conteaza mai mult decat oriunde.</p>
+    <p>Legumele cu frunze, telina, spanacul, kale, patrunjelul, sunt fibroase si au putin lichid. Un storcator cu <strong>presare la rece</strong> le preseaza si scoate suc eficient, pentru ca melcul zdrobeste fibra. Un <strong>centrifugal</strong>, in schimb, le invarte si scoate putin, lasand multa pulpa inca umeda, adica suc irosit.</p>
+    <p>Concluzia e simpla: pentru fructe si morcovi, ambele tipuri merg bine; pentru suc verde regulat, presarea la rece e clar mai buna si iti recuperezi diferenta de pret prin cat suc scoate. Un centrifugal poate face si el suc verde ocazional, dar cu randament mai mic si mai multa risipa.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Iei centrifugal, dar vrei suc verde.</strong> Centrifugalele scot putin din telina si frunze. Pentru verdeturi, presarea la rece e alegerea.</li>
+      <li><strong>Te iei dupa wati la presarea la rece.</strong> Acolo puterea mica e intentionata. 150 W la un melc lent nu inseamna slab.</li>
+      <li><strong>Cumperi un storcator universal doar pentru portocale.</strong> Pentru citrice, un storcator dedicat e mai simplu, mai ieftin si mai comod.</li>
+      <li><strong>Ignori diametrul tubului.</strong> Un centrifugal rapid cu tub mic te pune sa tai fructe marunt si iti fura din viteza.</li>
+      <li><strong>Uiti de curatare.</strong> Sita de centrifugal se infunda, iar pulpa uscata se prinde. Spala imediat dupa folosire, cat e umeda.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la storcatoarele in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca aceleasi aparate apar listate de mai multe ori, in culori diferite, la acelasi pret.</p>
+    <p><strong>Le-am grupat dupa tip, nu dupa pret</strong>, pentru ca tipul, centrifugal, presare la rece sau citrice, e decizia care conteaza. Un cumparator care alege tipul gresit ramane nemultumit oricat ar fi platit, fiindca aparatul face bine altceva decat isi dorea el.</p>
+    <p>Am comparat specificatiile reale din fise, tipul de stoarcere, puterea, diametrul tubului si dotarile, si am semnalat unde cifrele insala, mai ales puterea, care se citeste altfel la un centrifugal fata de un storcator cu melc. Nu testam aparatele in laborator si nu pretindem asta. Ne bazam pe date reale, mii de pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare. Un storcator sta bine langa <a href="/cele-mai-bune-blendere/">un blender</a>, cu care se completeaza: blenderul face smoothie gros, cu tot cu fibra, storcatorul scoate suc limpede.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 69 la 805 lei, iar pretul urmeaza in primul rand tipul.</p>
+    <p><strong>Sub 240 de lei</strong> stau storcatoarele de citrice si centrifugalele accesibile: Heinner Limme, Tefal VitaPress, Heinner C160, plus centrifugalele Tefal Fruteli, Heinner HSF-600 si cel mai vandut, Heinner XF-1000. Cea mai ieftina intrare in stors, cu suc de tip centrifuga.</p>
+    <p><strong>Intre 450 si 520 de lei</strong> intri la centrifugalele de brand, Philips si Bosch, si la primele storcatoare cu presare la rece, Biovita Nutrimax si Latkon, cel mai bine notat. Aici incepe sucul dens, de calitate.</p>
+    <p><strong>Peste 680 de lei</strong> sunt storcatoarele lente premium, Tefal Juiceo si Biovita vertical cu melc. Merita cand bei suc des, mai ales verde, si diferenta de cantitate si calitate chiar conteaza pentru tine.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-storcatoare-de-fructe-si-legume" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-storcatoare-de-fructe-si-legume" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

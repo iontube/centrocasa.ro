@@ -1,13 +1,12 @@
 ---
-const currentYear = new Date().getFullYear();
+import { categories as allCategories } from '../lib/categories.mjs';
+import keywordsData from '../../keywords.json';
+import { visibleArticles } from '../lib/articles.mjs';
 
-const categories = [
-  { name: 'Gradinarit si Unelte', slug: 'gradinarit-unelte' },
-  { name: 'Mobilier Gradina', slug: 'mobilier-gradina' },
-  { name: 'Electrocasnice Casa', slug: 'electrocasnice-casa' },
-  { name: 'Decoratiuni Casa', slug: 'decoratiuni-casa' },
-  { name: 'Curatenie si Intretinere', slug: 'curatenie-intretinere' }
-];
+// Doar categoriile cu articole — pagina unei categorii goale nici nu se genereaza.
+const _populated = new Set(visibleArticles(keywordsData.completed).map(a => a.categorySlug));
+const categories = allCategories.filter(c => _populated.has(c.slug));
+const currentYear = new Date().getFullYear();
 
 const legalLinks = [
   { name: 'Politica de Confidentialitate', slug: 'privacy-policy' },
@@ -50,7 +49,8 @@ const legalLinks = [
       <div>
         <h4 class="footer-title">Link-uri Utile</h4>
         <ul class="footer-links">
-          <li><a href="/">Acasa</a></li>
+          <li><a href="/despre/">Despre noi</a></li>
+          <li><a href="/cum-testam/">Cum testam produsele</a></li>
           <li><a href="/autori/">Autori</a></li>
           <li><a href="/contact/">Contact</a></li>
           <li><a href="/sitemap/">Sitemap</a></li>

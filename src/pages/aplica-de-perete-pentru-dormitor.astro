@@ -1,234 +1,299 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Aplica de perete pentru dormitor",
-  excerpt: "Dormitorul e sanctuarul nostru, locul unde ne retragem dupa o zi lunga. Si cum ar putea fi mai primitor decat cu o lumina calda, plina de personalitate? Astazi vorbim despre aplica de perete pentru dormitor, acele mici bijuterii care fac diferenta.",
-  image: "/images/articles/aplica-de-perete-pentru-dormitor.webp",
-  category: "Decoratiuni Casa",
-  categorySlug: "decoratiuni-casa",
-  date: "2026-01-04T09:17:31.736Z",
-  modifiedDate: "2026-01-26T09:17:31.578Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Ce tip de bec este cel mai potrivit pentru o aplicatie de perete in dormitor?", answer: "Pentru dormitor, cel mai bine se potrivesc becurile LED cu lumina calda (2700K-3000K). Ele consuma putin, tin mult si creeaza o atmosfera relaxanta, ideala pentru odihna si citit. Evitati lumina prea rece sau prea puternica." },
-  { question: "Cat de sus ar trebui montata o aplicatie de perete in dormitor?", answer: "Inaltimea ideala depinde de cum stai in pat. In general, se monteaza la nivelul umerilor sau un pic mai sus, astfel incat lumina sa cada confortabil pe carte sau pe tine, fara sa te orbeasca. Cam 1.5 - 1.7 metri de la podea." },
-  { question: "Pot monta singur o aplicatie de perete sau am nevoie de electrician?", answer: "Daca aplicatia vine cu cablu si stecher, o poti monta singur. Daca necesita conectare directa la retea, este recomandat sa apelezi la un electrician pentru siguranta si corectitudinea instalarii." },
-  { question: "Ce fac daca vreau sa citesc in pat, dar aplicatia nu are lumina suficienta?", answer: "Poti alege o aplicatie cu lumina reglabila sau una cu un brat flexibil, care permite directionarea luminii exact unde ai nevoie. De asemenea, verifica specificatiile legate de Lumeni (lm) – cu cat sunt mai multi, cu atat lumina e mai puternica." },
-  { question: "Exista aplicatii de perete pentru dormitor care sa se potriveasca oricarui stil de amenajare?", answer: "Absolut! Piata ofera o varietate uriasa de stiluri: modern, minimalist, vintage, rustic, industrial, clasic. Poti gasi aplicatii din metal, sticla, lemn, textile, in diverse culori si forme, asa ca vei gasi cu siguranta ceva pe gustul tau." },
-  { question: "Pot folosi o aplicatie de perete ca sursa principala de lumina in dormitor?", answer: "Nu, de obicei aplicile de perete sunt gandite ca lumina auxiliara sau ambientala. Pentru activitatile zilnice sau pentru a ilumina uniform camera, vei avea nevoie si de o sursa de lumina principala, cum ar fi o lustra sau spoturi." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de o aplica de perete in dormitor? Mai mult decat un simplu corp de iluminat", id: "de-ce-ai-nevoie-de-o-aplica-de-perete-in-dormitor-mai-mult-decat-un-simplu-corp-de-iluminat" },
-  { title: "Top recomandari: Aplicile de perete care mi-au furat inima (si nu numai!)", id: "top-recomandari-aplicile-de-perete-care-mi-au-furat-inima-si-nu-numai" },
-  { title: "Cum sa alegi corect: Ghidul meu personal pentru o alegere inspirata", id: "cum-sa-alegi-corect-ghidul-meu-personal-pentru-o-alegere-inspirata" },
-  { title: "Avantaje si dezavantaje: Sinceritatea mea despre aplicile de perete", id: "avantaje-si-dezavantaje-sinceritatea-mea-despre-aplicile-de-perete" },
-  { title: "Sfaturi practice: Trucuri din experienta si greseli de evitat", id: "sfaturi-practice-trucuri-din-experienta-si-greseli-de-evitat" },
-  { title: "Parerea mea finala: Recomand cu drag aplicile de perete pentru dormitor!", id: "parerea-mea-finala-recomand-cu-drag-aplicile-de-perete-pentru-dormitor" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['aplica-dormitor'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Clasice, cu bec propriu (E27) ---
+  { g: 'clasic', id: 'DBPXKJYBM', badge: 'Cel mai bun raport', short: 'Toolight metal si lemn', bec: 'Soclu E27, bec neinclus', lumina: 'La alegere, dupa bec', alim: 'Perete, priza / retea',
+    specs: ['Corpuri din metal si lemn, stil cald', 'soclu E27: pui becul pe care il vrei', 'cel mai vandut din selectie, nota 4.86', 'intrerupator clasic'],
+    pros: ['Cel mai bun pret pe corp de iluminat din selectie', 'De departe cea mai vanduta, cu nota 4.86 din 29 pareri', 'Soclu E27, deci pui un bec LED cald sau reglabil, cum vrei tu', 'Metalul cu lemn se aseaza natural intr-un dormitor'],
+    cons: ['Becul nu e inclus, il cumperi separat', 'Fara reglaj de intensitate din corp'],
+    verdict: 'Punctul de plecare pentru cine vrea o aplica de dormitor solida, fara sa dea multi bani. Modelul Toolight combina metalul cu lemnul, un amestec care merge bine langa un pat, si vine cu soclu E27: asta inseamna ca alegi tu becul, ideal unul LED cu lumina calda de 2700-3000K pentru seara, sau chiar unul reglabil. Becul nu e inclus, deci pune-l pe lista, iar aprinderea se face de la un intrerupator clasic, fara reglaj de intensitate din corp. E cea mai vanduta din selectie, cu nota 4.86 din 29 de pareri, semn ca lumea e multumita. O iei cand vrei o aplica placuta si sigura pe bani putini, si nu te deranjeaza sa cumperi becul separat.' },
+  { g: 'clasic', id: 'D70P6XYBM', badge: 'Cea mai buna pentru citit', short: 'Toolight Vintage 360', bec: '1 x E27, bec neinclus', lumina: 'La alegere, dupa bec', alim: 'Perete, brat rotativ 360',
+    specs: ['Brat rotativ la 360°, directionezi lumina', 'stil industrial, cusca de fier', 'soclu E27, bec neinclus', 'nota 4.86 din 22 de pareri'],
+    pros: ['Bratul rotativ 360° trimite lumina exact pe carte', 'Perfecta ca inlocuitor de veioza, elibereaza noptiera', 'Soclu E27, alegi becul potrivit pentru lectura', 'Aspect industrial-vintage, la moda si acum'],
+    cons: ['Un singur bec, lumina mai punctuala', 'Becul nu e inclus'],
+    verdict: 'Alegerea daca citesti in pat si vrei lumina fix acolo unde tii cartea. Modelul industrial Toolight are un brat rotativ la 360 de grade, deci orientezi fasciculul cum vrei, fara sa lumineze inutil tot peretele: e cel mai bun inlocuitor de veioza din selectie, pentru ca iti elibereaza noptiera. Are un singur soclu E27, cu bec neinclus, asa ca pui unul cu destui lumeni pentru citit, spre 4000K daca vrei lumina care tine mintea trezita, sau 3000K pentru relaxare. Cusca de fier ii da un aer vintage care se poarta. O iei cand vrei o aplica functionala de lectura, cu lumina directionabila, nu doar un decor pe perete.' },
+  { g: 'clasic', id: 'DK54YSYBM', badge: 'Cea mai ieftina', short: 'Goeco lemn masiv', bec: '2 x E27, bec neinclus', lumina: 'La alegere, dupa bec', alim: 'Perete, priza / retea',
+    specs: ['Lemn masiv si metal, stil creativ', 'doua surse E27, bec neinclus', 'cel mai mic pret din selectie', 'nota 4.67 din 12 pareri'],
+    pros: ['Cel mai mic pret din tot articolul', 'Lemn masiv adevarat, cald si natural pentru dormitor', 'Doua surse E27, mai multa lumina decat la un singur bec', 'Design creativ, iese din tiparul aplicelor obisnuite'],
+    cons: ['Becurile nu sunt incluse, ai nevoie de doua', 'Nota ceva mai mica decat la restul'],
+    verdict: 'Cea mai accesibila aplica de lemn adevarat din selectie, pentru dormitor. Modelul Goeco foloseste lemn masiv cu metal, intr-un design creativ care se vede ca nu e produsul de serie, si are doua surse E27: cu doua becuri calde da mai multa lumina decat modelele cu un singur soclu, buna si ca lumina de ambianta, si pentru citit. Becurile nu sunt incluse si ai nevoie de doua, deci socoteste-le in pret, dar chiar si asa ramane cea mai accesibila din selectie. Nota e 4.67, ceva mai mica decat la varf, dar tot buna. O iei cand vrei caldura lemnului si doua surse de lumina, cu cel mai mic buget posibil.' },
+  { g: 'clasic', id: 'DMTTQQMBM', badge: 'Clasica, cu abajur', short: 'Aplica cristal cu abajur', bec: '1 x E27, bec neinclus', lumina: 'Difuza, prin abajur', alim: 'Perete, priza / retea',
+    specs: ['Schelet negru cu abajur alb transparent', 'accente de cristal', 'soclu E27, bec neinclus', 'lumina difuza, blanda'],
+    pros: ['Abajurul da o lumina difuza, blanda, fara orbire', 'Cel mai clasic aspect din selectie, se potriveste oriunde', 'Accentele de cristal aduc un plus discret', 'Pret mic pentru un corp cu abajur'],
+    cons: ['Lumina mai slaba, mai mult ambientala decat de citit', 'Becul nu e inclus'],
+    verdict: 'Alegerea daca vrei o aplica discreta, clasica, care sa dea o lumina blanda langa pat. Modelul cu schelet negru si abajur alb transparent filtreaza lumina si o face difuza, fara punctul orbitor al unui bec la vedere, exact ce vrei seara tarziu; accentele de cristal ii dau un aer un pic mai elegant. Are soclu E27 cu bec neinclus, iar prin abajur lumina iese mai blanda, deci e mai degraba ambientala decat pentru citit ore in sir. E printre cele mai ieftine si merge in aproape orice stil de dormitor. O iei cand vrei atmosfera calda si un aspect clasic, nu neaparat cea mai puternica lumina de lectura.' },
+  // --- LED integrat, design modern ---
+  { g: 'led', id: 'DT9YB3YBM', badge: 'Cea mai spectaculoasa', short: 'Toolight Spirala LED', bec: 'LED integrat, bec inclus', lumina: 'Calda', alim: 'Perete, priza / retea',
+    specs: ['Design spirala din aluminiu si acril', 'LED integrat, lumina calda', 'trei surse, lumina generoasa', 'nota 4.9 din 21 de pareri'],
+    pros: ['Design spirala spectaculos, e o piesa in sine pe perete', 'LED integrat cu lumina calda, nu mai cumperi bec', 'Trei surse, deci lumineaza bine, nu doar decorativ', 'Nota mare, 4.9, si aspect premium la un pret rezonabil'],
+    cons: ['LED integrat: cand se termina, schimbi tot corpul', 'Lumina calda fixa, fara alte temperaturi'],
+    verdict: 'Alegerea daca vrei ca aplica sa fie si obiect de design, nu doar sursa de lumina. Modelul Toolight are un corp in spirala din aluminiu si acril care atrage privirea, cu LED integrat si lumina calda, deci vine gata de montat, fara bec de cumparat. Are trei surse, asa ca da o lumina generoasa, buna si ca accent pe perete, si ca iluminat de seara, nu e doar un decor palid. Fiind LED integrat, cand se uzeaza inlocuiesti tot corpul, iar lumina e calda fixa, fara reglaj de temperatura. A luat nota 4.9 din 21 de pareri, printre cele mai bune din selectie. O iei cand vrei impact vizual si o lumina calda placuta, dintr-un singur corp.' },
+  { g: 'led', id: 'DH08P4MBM', badge: 'Nota maxima', short: 'ADVITI City LED', bec: 'LED 20W, 1600 lm', lumina: 'Calda, 3000K', alim: 'Perete / tavan',
+    specs: ['LED 20W, 1600 lumeni, 3000K', 'forma rotunda, minimalista', 'lumina calda, bec inclus', 'nota maxima, 5 din 5'],
+    pros: ['Nota maxima, 5 din 5, de la cumparatori', '1600 lumeni, printre cele mai luminoase din selectie', 'Lumina calda 3000K, exact temperatura buna de dormitor', 'Design rotund minimalist, discret pe orice perete'],
+    cons: ['Aspect simplu, fara accent decorativ puternic', 'Lumina la o singura temperatura'],
+    verdict: 'Alegerea sigura daca vrei multa lumina calda dintr-un corp discret, cu cea mai buna nota. Modelul ADVITI City are un LED de 20W cu 1600 de lumeni si temperatura de 3000K, adica exact lumina calda recomandata pentru un dormitor, si e printre cele mai luminoase din selectie, deci merge si pentru citit, nu doar ca ambianta. Forma rotunda, minimalista, il face sa treaca neobservat pe orice perete, fara sa concureze cu restul decorului. E lumina la o singura temperatura, fara reglaj, si aspectul e simplu, fara pretentii decorative. A luat nota maxima, 5 din 5. Il iei cand vrei lumina buna, calda, si un corp curat, cu cea mai buna reputatie din selectie.' },
+  { g: 'led', id: 'DKG5JT3BM', badge: 'Finisaj auriu', short: 'Goeco auriu, 3 temperaturi', bec: 'LED 12W, 1200 lm', lumina: '3 temperaturi', alim: 'Perete, priza / retea',
+    specs: ['Finisaj auriu, forma neregulata', 'LED 12W, 1200 lumeni', 'trei temperaturi: calda, neutra, rece', 'nota 4.85 din 13 pareri'],
+    pros: ['Finisajul auriu aduce un accent cald si elegant', 'Trei temperaturi de lumina, alegi dupa moment', 'LED integrat de 1200 lumeni, bec inclus', 'Forma neregulata, moderna, iese in evidenta'],
+    cons: ['Auriul nu se potriveste cu orice mobila', 'LED integrat, nu schimbi doar becul'],
+    verdict: 'Alegerea daca vrei un accent auriu si flexibilitate la culoarea luminii. Modelul Goeco are un finisaj auriu cu o forma neregulata, moderna, care functioneaza ca bijuterie pe perete, si un LED de 12W cu 1200 de lumeni, gata montat. Marele plus e ca da trei temperaturi de lumina: calda pentru relaxare seara, neutra si rece cand ai nevoie de lumina mai vie, deci acoperi mai multe momente cu acelasi corp. Auriul e frumos, dar cere o mobila cu care sa se lege, iar fiind LED integrat, cand se uzeaza schimbi tot corpul. Nota e 4.85. O iei cand vrei un detaliu auriu elegant si posibilitatea de a schimba temperatura luminii dupa cheful tau.' },
+  // --- Fara fir si inteligente ---
+  { g: 'smart', id: 'D2VN3R3BM', badge: 'Fara instalare', short: 'UMMO fara fir', bec: 'LED cu acumulator', lumina: '3 temperaturi, touch', alim: 'Reincarcabila, fara gaurire',
+    specs: ['Reincarcabila, fara fir si fara priza', 'montare fara gaurire, se lipeste', 'intrerupator touch plus telecomanda', 'trei temperaturi de lumina'],
+    pros: ['Zero instalare: fara fir, fara gaura in perete, fara electrician', 'Ideala la chirie sau unde nu ai priza langa pat', 'Comanda prin touch si telecomanda, plus trei temperaturi', 'Nota 4.92, cea mai bine cotata din selectie'],
+    cons: ['Trebuie reincarcata periodic', 'Lumina mai potrivita ca ambianta decat pentru citit lung'],
+    verdict: 'Alegerea daca nu vrei nici cabluri, nici gauri in perete. Aplica UMMO e reincarcabila, deci functioneaza pe acumulator, fara fir si fara priza, si se monteaza fara gaurire, se prinde pe perete si gata: e solutia perfecta la chirie sau acolo unde nu ai instalatie electrica langa pat, unde altfel ai avea nevoie de electrician. O comanzi prin touch direct pe corp sau cu telecomanda, si are trei temperaturi de lumina, de la calda la rece. In schimb, trebuie reincarcata din cand in cand, iar lumina e mai degraba de ambianta decat pentru citit ore in sir. Are nota 4.92, cea mai mare din selectie. O iei cand vrei montaj instant, zero interventii la perete si control comod.' },
+  { g: 'smart', id: 'DTWW6KYBM', badge: 'Control din telefon', short: 'Tuya RGB inteligenta', bec: 'LED 30W, RGB + alb', lumina: 'RGB si alb reglabil', alim: 'Perete, control app + vocal',
+    specs: ['LED inteligent RGB plus alb reglabil (CCT)', 'control din aplicatie Tuya si vocal', 'putere 30W', 'lumina colorata si scene'],
+    pros: ['O controlezi din telefon si prin comanda vocala', 'RGB plus alb reglabil: de la lumina de lucru la ambianta colorata', 'Se leaga de o casa inteligenta, cu scene si program', 'Putere mare, 30W, lumina generoasa'],
+    cons: ['Nota mai mica, 4.0, si cea mai scumpa din selectie', 'Are nevoie de WiFi si de configurare in aplicatie'],
+    verdict: 'Alegerea daca vrei o aplica pe care o comanzi din telefon si o integrezi intr-o casa inteligenta. Modelul Tuya are LED RGB plus alb reglabil, adica trece de la o lumina alba de lucru la orice culoare pentru ambianta, si o controlezi din aplicatia Tuya sau prin comanda vocala, cu scene si programe, util daca ai deja un sistem smart acasa. Are 30W, deci lumina nu lipseste. Partea mai putin buna: e cea mai scumpa din selectie si are cea mai mica nota, 4.0, iar ca sa profiti de ea ai nevoie de WiFi si de putina rabdare la configurare. O iei cand vrei control din telefon, lumina colorata si integrare smart, si esti dispus sa treci peste setarea initiala.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const CLASIC = PICKS.filter(x => x.g === 'clasic');
+const LED = PICKS.filter(x => x.g === 'led');
+const SMART = PICKS.filter(x => x.g === 'smart');
+
+const hero = '/images/articles/aplica-de-perete-pentru-dormitor.webp';
+const figClasic = '/imagini/articole/aplica-clasice.webp';
+const figLed = '/imagini/articole/aplica-led-modern.webp';
+const figSmart = '/imagini/articole/aplica-fara-fir.webp';
+const published = '2026-07-18T14:25:49+03:00';
+
+const faq = [
+  { question: 'Ce fel de lumina e cea mai buna pentru o aplica de dormitor?', answer: 'Pentru dormitor merge cel mai bine lumina calda, de 2700-3000K, care relaxeaza si te pregateste de somn. Daca citesti mult in pat, o temperatura de 4000K, alb neutru, tine mintea mai treaza si e mai comoda pentru ochi la citit. Ideal e un corp cu temperatura reglabila, ca UMMO sau modelul Goeco auriu din selectie, care iti da ambele: cald seara tarziu, neutru cand citesti. La modelele cu soclu E27, unde becul nu e inclus, alegi tu direct un bec cu temperatura potrivita.' },
+  { question: 'La ce inaltime se monteaza o aplica langa pat?', answer: 'Aplicele de perete se monteaza in general la 1,4-1,8 metri de la podea, dar langa pat cobori mai jos, la circa 1,2-1,4 metri, ca lumina sa cada pe carte, nu in ochi. Regula practica pentru citit: pozitioneaza aplica la circa 20-30 cm peste nivelul umarului cand stai asezat in pat. Asa iluminezi zona noptierei si a cartii fara sa orbesti pe cine doarme alaturi. La modelele cu brat rotativ, ca Toolight Vintage 360, mai poti ajusta apoi directia luminii dupa montaj.' },
+  { question: 'Pot monta singur o aplica sau am nevoie de electrician?', answer: 'Depinde de model. Cea mai simpla e o aplica fara fir, reincarcabila, cum e UMMO din selectie: se prinde pe perete fara gaurire si fara instalatie, o montezi in cateva minute, fara electrician. La aplicele clasice, care se leaga la reteaua electrica, e nevoie sa existe un cablu scos in perete in locul respectiv; daca il ai, poti face conexiunea singur cu atentie, dar daca trebuie tras un circuit nou, cheama un electrician. Verifica intai daca ai iesire de curent acolo unde vrei aplica.' },
+  { question: 'Aplica de perete poate inlocui veioza de pe noptiera?', answer: 'Da, si e chiar una dintre cele mai bune idei pentru un dormitor mic. O aplica montata langa pat iti elibereaza complet noptiera, iar daca alegi un model cu brat rotativ sau reglabil, ca modelul Toolight Vintage 360, directionezi lumina exact pe carte, la fel ca o lampa de citit. Pentru asta ai nevoie de suficienti lumeni: modelele LED cu 1200-1600 de lumeni, ca ADVITI City sau Goeco auriu, dau destula lumina pentru lectura, in timp ce un corp cu abajur da mai mult ambianta.' },
+  { question: 'Ce inseamna soclu E27 si de ce conteaza daca becul e inclus sau nu?', answer: 'E27 e cel mai raspandit tip de soclu cu filet din Romania, adica gaura in care insurubezi becul. Cand o aplica are soclu E27 si becul neinclus, ca modelele Toolight sau Goeco din selectie, inseamna ca trebuie sa cumperi separat becul, dar ai libertate totala: alegi puterea, temperatura, chiar un bec inteligent daca vrei. La modelele cu LED integrat, ca Toolight Spirala sau ADVITI, becul e deja inauntru si vine gata de folosit, dar cand se uzeaza inlocuiesti tot corpul, nu doar becul.' },
+  { question: 'De cati lumeni am nevoie pentru o aplica de citit?', answer: 'Pentru citit confortabil in pat, cauta un corp care da in jur de 400-800 de lumeni directionati pe zona cartii; modelele din selectie cu LED integrat merg de la circa 1200 la 1600 de lumeni pe tot corpul, mai mult decat suficient. Conteaza si directia: o aplica cu brat reglabil concentreaza lumina, deci ai nevoie de mai putini lumeni ca sa citesti bine decat una care lumineaza difuz tot peretele. La becurile E27 alese separat, uita-te pe cutie la valoarea in lumeni, nu doar la watti.' },
+  { question: 'Aplica de perete e destula ca lumina principala in dormitor?', answer: 'De obicei nu. Aplicele de perete sunt gandite ca lumina auxiliara sau de ambianta, langa pat, langa oglinda sau ca accent decorativ, nu ca sursa care sa lumineze uniform toata camera. Pentru iluminatul general ai nevoie tot de un plafonier sau de spoturi. Combinatia buna intr-un dormitor este o sursa principala pe tavan, pentru cand faci ordine sau te imbraci, plus una-doua aplice langa pat, pentru citit si pentru atmosfera calda de seara.' },
+];
+
+const images = [hero, figClasic, figLed, figSmart, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Aplica de perete pentru dormitor - CentroCasa"
-  description="Dormitorul e sanctuarul nostru, locul unde ne retragem dupa o zi lunga. Si cum ar putea fi mai primitor decat cu o lumina calda, plina de personalitate? Astazi vorbim despre aplica de perete pentru dormitor, acele mici bijuterii care fac diferenta."
-  image="/images/articles/aplica-de-perete-pentru-dormitor.webp"
+  title="Cele mai bune aplice de perete pentru dormitor in 2026: clasice, LED si fara fir"
+  description="Cele mai bune aplice de perete pentru dormitor in 2026: modele clasice cu bec E27, aplice LED moderne si variante fara fir sau inteligente, comparate pe lumina, montaj si pret. Plus la ce inaltime le montezi si ce temperatura de culoare sa alegi langa pat."
+  image={hero}
   type="article"
-  publishedTime="2026-01-04T09:17:31.736Z"
-  modifiedTime="2026-01-26T09:17:31.578Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Decoratiuni Casa', url: '/decoratiuni-casa/' }, { name: 'Cele mai bune aplice de perete pentru dormitor' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Aplica de perete pentru dormitor</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune aplice de perete pentru dormitor</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
-        <span class="article-date">25 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Aplica de perete pentru dormitor</h1>
-    </header>
+    <h1>Cele mai bune aplice de perete pentru dormitor</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/aplica-de-perete-pentru-dormitor.webp" alt="Aplica de perete pentru dormitor" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune aplice de perete pentru dormitor: modele clasice, LED si fara fir" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-o-aplica-de-perete-in-dormitor-mai-mult-decat-un-simplu-corp-de-iluminat">
-        <h2>De ce ai nevoie de o aplica de perete in dormitor? Mai mult decat un simplu corp de iluminat</h2>
-        <p>Salutare, dragii mei! Astazi vorbim despre un subiect care ma pasioneaza tare mult: cum sa transformam dormitorul intr-un spatiu si mai cozy si functional. Si cand spun functional, ma gandesc in primul rand la lumina. Stiti cum e, seara, cand vrei sa citesti o carte sau doar sa te relaxezi, lumina din tavan e prea puternica, prea rece. Aici intervin aplicile de perete pentru dormitor, niste mici eroi ai confortului.</p><p>Personal, am descoperit cat de mult pot schimba atmosfera dintr-o camera odata ce am inceput sa experimentez cu diverse tipuri de <a href="/corpuri-de-iluminat-pentru-living-modern/">iluminat</a>. Dormitorul nu e doar un loc unde dormim, e un refugiu, un spatiu personal unde ne incarcam bateriile. Si pentru asta, avem nevoie de o lumina care sa ne calmeze, sa ne invite la relaxare, nu sa ne agite.</p><p>O aplica de perete pentru dormitor e perfecta pentru oricine vrea sa adauge un plus de stil si functionalitate. Fie ca locuiesti la bloc sau la casa, fie ca ai un dormitor micut sau unul spatios, o aplica bine aleasa poate face minuni. E ideala pentru cei care citesc in pat, pentru cei care vor sa creeze o atmosfera romantica sau pur si simplu pentru cei care vor sa evite lumina puternica a lustrei principale.</p><p>Am observat ca multi se gandesc la aplicile de perete doar ca la un element decorativ. Si e adevarat, arata grozav! Dar rolul lor depaseste cu mult estetica. Ele sunt practic extensii ale veiozelor de pe <a href="/veioza-pentru-noptiera/">noptiera</a>, dar fara sa ocupe spatiu pretios pe aceasta. Ganditi-va, cate dati peste cap lucrurile de pe noptiera incercand sa stingeti veioza? Cu o aplica, totul e la indemana.</p><p>Pentru mine, aplicile de perete in dormitor au devenit indispensabile. Creeaza un joc de lumini si umbre care da profunzime camerei. Si, cel mai important, ma ajuta sa ma deconectez de la ziua agitata. E ca si cum as aprinde o lumanare, dar mult mai practic si sigur.</p><p>Deci, daca va ganditi sa va imbunatatiti dormitorul, sa-l faceti mai primitor si mai personal, o aplica de perete pentru dormitor ar trebui sa fie pe lista voastra. Nu e un moft, e o investitie in confortul si starea voastra de bine. Si, sincer sa fiu, varietatea de modele de pe piata e atat de mare incat veti gasi sigur ceva care sa se potriveasca stilului vostru.</p>
-      </section>
-
-      <section id="top-recomandari-aplicile-de-perete-care-mi-au-furat-inima-si-nu-numai">
-        <h2>Top recomandari: Aplicile de perete care mi-au furat inima (si nu numai!)</h2>
-        <p>Am tot cautat si testat fel de fel de aplicatii de perete <a href="/perdele-blackout-pentru-dormitor/" class="interlink">pentru dormitor</a>, si am ajuns la cateva favorite pe care vi le recomand cu drag. Fiecare are farmecul ei si rezolva anumite nevoi. Hai sa vedem ce am gasit.</p><p><strong>1. Aplica de perete moderna, reglabila, cu brat flexibil.</strong> Am gasit una super draguta pe un site de specialitate, undeva la <strong>180 RON</strong>. E metalica, neagra mata, cu un design minimalist.</p>
-        <p>Ce-mi place la ea cel mai mult e bratul flexibil. Pot sa o indrept exact unde am nevoie, fie ca citesc, fie ca lucrez la laptop in pat. Lumina e usor directionala, perfecta pentru citit.</p>
-        <p>Dezavantajul? E destul de simpla, poate nu se potriveste in orice decor. Dar functionalitatea e de top.</p><p><strong>2. Aplica de perete vintage, cu abajur textil.</strong> Asta am gasit-o intr-un magazin de decoratiuni, cam la <strong>250 RON</strong>. Are un abajur din material textil, crem, si un piciorus din bronz patinat. Creeaza o lumina foarte difuza, calda, ideala pentru o atmosfera relaxanta. E super potrivita daca aveti un dormitor in stil clasic sau rustic. Contra? Lumina nu e foarte <a href="/hota-pentru-bucatarie-puternica/" class="interlink">puternica</a>, deci nu e ideala daca vreti sa cititi mult. E mai mult pentru ambiance.</p><p><strong>3. Aplica LED incastrata, cu lumina indirecta.</strong> Asta e o optiune mai moderna, am dat pe ea cam <strong>120 RON</strong>. Arata ca un mic cub sau un dreptunghi mic, se monteaza pe perete si lumina iese pe sus si pe jos, creand un efect de "halo" pe perete. E super eleganta si da un aer sofisticat camerei. Lumina e placuta, nu deranjeaza. Partea mai putin faina e ca lumina e fixa, nu o poti directiona. Si daca becul se arde, de obicei trebuie schimbata toata aplicatia.</p><p><strong>4. Aplica de perete cu priza USB integrata.</strong> Asta e o descoperire geniala! Am gasit una la <strong>220 RON</strong>. E tot moderna, din metal, dar are in plus o mica priza USB unde poti incarca telefonul sau tableta. Cat de util e asta cand stai in pat! Nu mai ai nevoie de prelungitoare sau sa te intinzi dupa priza. Lumina e reglabila, e destul de puternica pentru citit. Un mic minus ar fi ca designul e mai mult modern, s-ar putea sa nu se potriveasca oricui.</p><p><strong>5. Aplica de perete cu intrerupator pe fir.</strong> Asta e o solutie clasica si buna. Am gasit una destul de simpla, alba, undeva la <strong>150 RON</strong>. Avantajul mare e ca ai intrerupatorul la indemana, nu trebuie sa te ridici din pat sa-l cauti pe perete. Lumina e ok pentru citit. Dezavantajul e ca firul de la intrerupator poate fi inestetic daca nu e ascuns cum trebuie. Dar ca functionalitate, e una dintre cele mai practice.</p><p>Fiecare dintre ele are rolul ei. Conteaza mult ce cautati: lumina directionala, atmosfera, design sau functii extra. Eu le-am incercat pe rand si am vazut ce mi se potriveste cel mai bine in diverse zone ale dormitorului.</p>
-      </section>
-
-      <section id="cum-sa-alegi-corect-ghidul-meu-personal-pentru-o-alegere-inspirata">
-        <h2>Cum sa alegi corect: Ghidul meu personal pentru o alegere inspirata</h2>
-        <p>Alegerea unei aplicatii de perete <a href="/umidificator-pentru-dormitor/" class="interlink">pentru dormitor</a> poate parea simpla, dar sunt cateva aspecte pe care eu le iau in considerare si care fac toata diferenta. Nu vrei sa cumperi ceva ce nu ti se potriveste sau, mai rau, ceva ce nu face ce trebuie.</p><p><strong>1. Tipul de lumina.</strong> Asta e cel mai important pentru mine. Vrei lumina calda, galbuie, care creeaza o atmosfera de relaxare? Sau vrei lumina mai alba, mai rece, buna pentru citit? Majoritatea aplicilor vin cu specificatii despre temperatura de culoare (masurata in Kelvin). Sub 3000K e considerata calda, peste 4000K e rece. Eu prefer undeva intre 2700K si 3000K pentru dormitor.</p><p><strong>2. Intensitatea luminii.</strong> Asta se masoara in Lumeni (lm). Pentru citit, ai nevoie de o intensitate mai mare (peste 300-400 lm). Pentru atmosfera, ceva mai putin (100-200 lm) e suficient. Unele aplicatii permit reglarea intensitatii (dimmer), ceea ce e un mare plus!</p><p><strong>3. Designul si stilul.</strong> Aici tine de gustul personal si de cum e amenajat dormitorul. Ai un stil modern, minimalist? Atunci cauta aplicatii din metal, sticla, cu linii drepte. E mai rustic sau clasic? Atunci mergi pe materiale naturale, textile, finisaje patinate. Eu incerc sa aleg ceva ce se integreaza armonios, nu sa iasa in evidenta in mod fortat.</p><p><strong>4. Materialele.</strong> De la metal, sticla, plastic, la textile. Fiecare confera un aspect diferit. Metalul e durabil, sticla e eleganta, textilele dau caldura. Eu prefer combinatii, de exemplu metal cu un pic de lemn sau sticla mata.</p><p><strong>5. Montajul.</strong> Majoritatea aplicilor se monteaza destul de usor, dar e bine sa te interesezi. Unele necesita conexiune la retea, altele vin cu cablu si stecher. Daca nu te pricepi la electrice, alege o varianta cu stecher sau cheama un electrician.</p><p><strong>6. Functii suplimentare.</strong> Cum ziceam, priza USB, intrerupator pe fir, posibilitatea de reglare a directiei luminii sau a intensitatii. Acestea pot face o mare diferenta in utilizare.</p><p>Eu am invatat ca e mai bine sa investesti un pic mai mult intr-o aplicatie de calitate, decat sa cumperi una ieftina care se strica repede sau nu ofera lumina potrivita. Uita-te la specificatii, citeste parerile altor cumparatori si, daca poti, vezi produsul inainte de a-l cumpara.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-sinceritatea-mea-despre-aplicile-de-perete">
-        <h2>Avantaje si dezavantaje: Sinceritatea mea despre aplicile de perete</h2>
-        <p>Ca orice produs, si aplicile de perete au plusurile si minusurile lor. Eu am incercat sa fiu mereu obiectiv, asa ca hai sa vedem care sunt, in viziunea mea, cele mai importante.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Economie de spatiu:</strong> Asta e, cred, cel mai mare atu. Nu mai ai nevoie de veioze pe noptiera, eliberand astfel suprafata pentru carti, paharul cu apa sau alte lucruri. E perfect pentru dormitoarele mici.</li><li><strong>Ambianță placuta:</strong> Creeaza o lumina discreta, calda, ideala pentru relaxare. Lumina din tavan e adesea prea puternica si prea directa pentru momentele de odihna.</li><li><strong>Functionalitate sporita:</strong> Multe modele sunt reglabile, permitand directionarea luminii exact unde ai nevoie – perfect pentru citit.</li><li><strong>Design versatil:</strong> Exista o varietate uriasa de stiluri, de la minimalist la vintage, de la modern la industrial. Poti gasi aplicatii care sa completeze perfect decorul camerei.</li><li><strong>Securitate:</strong> Lumina ambientala de la aplicile de perete poate face deplasarea prin camera pe timp de noapte mai sigura, fara a fi nevoie sa aprinzi lumina principala.</li><li><strong>Costuri accesibile:</strong> Desi exista si modele scumpe, poti gasi aplicatii de perete foarte dragute si functionale la preturi rezonabile.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Instalare:</strong> Unele modele necesita conectare la retea <a href="/motocoasa-electrica-sau-pe-benzina/" class="interlink">electrica</a>, ceea ce poate implica niste lucrari suplimentare sau apelarea la un electrician, mai ales daca nu ai prize in peretele respectiv.</li><li><strong>Luminozitate limitata:</strong> Daca ai nevoie de o lumina foarte puternica pentru activitati precum cusutul sau alte hobby-uri care necesita precizie, o singura aplicatie s-ar putea sa nu fie suficienta.</li><li><strong>Schimbarea becului:</strong> La modelele cu becuri non-LED sau cu becuri integrate, schimbarea acestora poate fi uneori dificila sau chiar imposibila, necesitand inlocuirea intregii aplicatii.</li><li><strong>Designul poate deveni depasit:</strong> Daca alegi un model foarte la moda, exista riscul ca in cativa ani sa nu ti se mai para la fel de atractiv.</li><li><strong>Pozitionarea:</strong> Daca nu esti atent la pozitionarea aplicatiei, o poti monta prea sus, prea jos, sau intr-un loc care nu e practic.</li></ul><p>Parerea mea e ca avantajele depasesc cu mult dezavantajele, mai ales daca faci o alegere informata si iti cunosti bine nevoile. E un element de decor si functionalitate care merita investitia.</p>
-      </section>
-
-      <section id="sfaturi-practice-trucuri-din-experienta-si-greseli-de-evitat">
-        <h2>Sfaturi practice: Trucuri din experienta si greseli de evitat</h2>
-        <p>Am trecut prin multe pana sa ajung sa aleg aplicile de perete potrivite pentru dormitorul meu. Am facut si greseli, am si invatat multe pe parcurs. Iata cateva sfaturi pe care le-as da oricui se gandeste sa faca aceasta achizitie.</p><p><strong>1. Gandeste-te la scopul principal.</strong> Vrei lumina pentru citit? Atunci cauta un model cu brat flexibil sau cu lumina directionala, usor de pozitionat deasupra patului. Vrei doar o lumina ambientala, de "atmosfera"? Atunci un model cu abajur textil sau cu lumina difuza e perfect.</p><p><strong>2. Pozitionarea conteaza enorm.</strong> Eu am pus o aplicatie pe fiecare parte a patului, la nivelul la care imi vine confortabil sa apas pe intrerupator sau sa reglez lumina. Nu le monta prea sus, ca iti cade lumina in cap, si nici prea jos, ca nu lumineaza unde trebuie. In general, cam la nivelul umerilor sau un pic mai sus, cand stai asezat in pat.</p><p><strong>3. Verifica sursa de alimentare.</strong> Daca nu ai prize in peretele unde vrei sa montezi aplicatia, va trebui sa tragi cablu. Unele aplicatii vin cu cablu si stecher, ceea ce e mult mai usor. Altfel, poate fi nevoie de un electrician. Eu am preferat initial modelele cu stecher, ca sa nu ma complic.</p><p><strong>4. Nu te feri de becurile LED.</strong> Consuma putin, tin mult si se incing mai greu. Unele aplicatii vin cu LED integrat, altele permit folosirea becurilor LED. Eu prefer sa pot schimba becul, ca sa am flexibilitate.</p><p><strong>5. Atentie la dimensiuni.</strong> Intr-un dormitor micut, o aplicatie masiva poate parea prea mare si incarca spatiul. Intr-un dormitor mare, o aplicatie prea mica se poate pierde. Masoara peretele si vizualizeaza-ti aplicatia acolo inainte de a cumpara.</p><p><strong>6. Culoarea luminii.</strong> Am mentionat asta si inainte, dar e crucial. Lumina calda (galbuie) e ideala pentru relaxare. Lumina neutra sau rece (alba) e mai buna pentru activitati care necesita concentrare. Eu am ales becuri cu lumina calda pentru dormitorul meu.</p><p><strong>7. Greșeli de evitat:</strong></p><ul><li><strong>Alegerea unui model prea complicat:</strong> Uneori, simplitatea e cheia. Nu te complica cu un design prea incarcat daca nu se potriveste stilului tau.</li><li><strong>Ignorarea specificațiilor tehnice:</strong> Nu cumpara doar pentru ca arata bine. Verifica puterea becului, tipul de soc, temperatura de culoare.</li><li><strong>Montajul prost:</strong> Daca nu esti sigur, cere ajutor. O aplicatie montata stramb sau nesigur poate fi periculoasa.</li><li><strong>Uitatul la pretul total:</strong> Uneori, pretul aplicatiei nu include becul. Asigura-te ca stii costul total.</li></ul><p>Sper ca aceste mici sfaturi sa va fie de ajutor. Eu am invatat ca e mai bine sa investesti timp in cercetare decat sa regretzi o achizitie nepotrivita.</p>
-      </section>
-
-      <section id="parerea-mea-finala-recomand-cu-drag-aplicile-de-perete-pentru-dormitor">
-        <h2>Parerea mea finala: Recomand cu drag aplicile de perete pentru dormitor!</h2>
-        <p>Dupa toata aceasta discutie, pot spune cu mana pe inima ca aplicile de perete pentru dormitor sunt o investitie excelenta in confortul si estetica casei tale. Le-am incercat, le-am testat si le-am adorat.</p><p>Pentru mine, dormitorul e un sanctuar. E locul unde ma deconectez, unde ma relaxez, unde ma pregatesc pentru o noua zi. Si o lumina potrivita face o diferenta uriasa in tot acest proces. Aplicile de perete aduc acea lumina blanda, primitoare, care te imbie la odihna. Nu mai e nevoie sa te chinui cu intrerupatorul lustrei sau sa te impiedici de mobila pe intuneric.</p><p>Daca ma intrebati pe cine recomand aplicile de perete, raspunsul e simplu: tuturor! Fie ca ai un dormitor mic si vrei sa economisesti spatiu, fie ca ai unul mare si vrei sa creezi zone de interes, fie ca esti un cititor pasionat sau pur si simplu apreciezi o atmosfera calduroasa, o aplicatie de perete isi gaseste locul.</p><p>Am vazut cum mici modificari pot aduce transformari mari. Si in cazul aplicilor de perete, vorbim de un impact vizual si functional semnificativ pentru o investitie, de cele mai multe ori, destul de modesta. Un pret de 150-250 RON pentru o aplicatie de calitate, care sa iti aduca bucurie si confort zi de zi, mi se pare absolut justificat.</p><p>Ce sfat final va dau? Nu va fie teama sa experimentati! Alegeti un model care va place, care se potriveste stilului vostru si, cel mai important, care va ajuta sa va simtiti mai bine in propriul dormitor. Sincer sa fiu, de cand am inceput sa folosesc aplicile de perete, noptile mele au devenit mult mai linistite si mai placute.</p><p>Deci, daca va ganditi la o mica renovare sau doar la un upgrade de atmosfera, nu uitati de aplicile de perete pentru dormitor. Sunt un mic detaliu care face o diferenta mare!</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce tip de bec este cel mai potrivit pentru o aplicatie de perete in dormitor?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru dormitor, cel mai bine se potrivesc becurile LED cu lumina calda (2700K-3000K). Ele consuma putin, tin mult si creeaza o atmosfera relaxanta, ideala pentru odihna si citit. Evitati lumina prea rece sau prea puternica.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de sus ar trebui montata o aplicatie de perete in dormitor?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Inaltimea ideala depinde de cum stai in pat. In general, se monteaza la nivelul umerilor sau un pic mai sus, astfel incat lumina sa cada confortabil pe carte sau pe tine, fara sa te orbeasca. Cam 1.5 - 1.7 metri de la podea.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot monta singur o aplicatie de perete sau am nevoie de electrician?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Daca aplicatia vine cu cablu si stecher, o poti monta singur. Daca necesita conectare directa la retea, este recomandat sa apelezi la un electrician pentru siguranta si corectitudinea instalarii.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fac daca vreau sa citesc in pat, dar aplicatia nu are lumina suficienta?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti alege o aplicatie cu lumina reglabila sau una cu un brat flexibil, care permite directionarea luminii exact unde ai nevoie. De asemenea, verifica specificatiile legate de Lumeni (lm) – cu cat sunt mai multi, cu atat lumina e mai puternica.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Exista aplicatii de perete pentru dormitor care sa se potriveasca oricarui stil de amenajare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Absolut! Piata ofera o varietate uriasa de stiluri: modern, minimalist, vintage, rustic, industrial, clasic. Poti gasi aplicatii din metal, sticla, lemn, textile, in diverse culori si forme, asa ca vei gasi cu siguranta ceva pe gustul tau.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi o aplicatie de perete ca sursa principala de lumina in dormitor?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nu, de obicei aplicile de perete sunt gandite ca lumina auxiliara sau ambientala. Pentru activitatile zilnice sau pentru a ilumina uniform camera, vei avea nevoie si de o sursa de lumina principala, cum ar fi o lustra sau spoturi.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Daca vrei o aplica de dormitor buna, cu cel mai bun raport calitate-pret alegi <strong>Toolight din metal si lemn</strong>, cu soclu E27 si cea mai buna nota din selectie. Pentru citit in pat, <strong>Toolight Vintage 360</strong> are brat rotativ si trimite lumina fix pe carte. Iar daca stai la chirie sau nu ai priza langa pat, <strong>UMMO reincarcabila</strong> se monteaza fara fir si fara gaurire, deci fara electrician.</p>
+      <p>La o aplica de dormitor conteaza patru lucruri: <strong>ce lumina da</strong> (calda pentru relaxare, neutra pentru citit), daca are <strong>bec propriu E27 sau LED integrat</strong>, <strong>cum o montezi</strong> (la retea, la priza sau fara fir) si, evident, <strong>cat de bine se leaga de stilul camerei</strong>. Le luam pe rand mai jos.</p>
+      <p>Am pornit de la aplicele de interior pentru dormitor, in stoc pe eMAG, cu cele mai multe pareri, si le-am impartit in trei: clasice cu bec propriu, LED integrat de design si variante fara fir sau inteligente. Pentru restul iluminatului, vezi si <a href="/veioza-pentru-noptiera/">veiozele de noptiera</a> si <a href="/corpuri-de-iluminat-pentru-living-modern/">corpurile de iluminat pentru living</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#de-ce">De ce o aplica, si nu doar o veioza</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#montaj">La ce inaltime o montezi</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#clasic">Clasice, cu bec propriu</a></li>
+        <li><a href="#led">LED integrat, design modern</a></li>
+        <li><a href="#smart">Fara fir si inteligente</a></li>
+        <li><a href="#cat-costa">Cat costa o aplica de dormitor</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="de-ce">De ce o aplica, si nu doar o veioza</h2>
+    <p>O aplica de perete langa pat face ceea ce o veioza nu poate: <strong>elibereaza noptiera</strong>. In loc sa pierzi jumatate din blatul noptierei pe o lampa, il lasi liber pentru carte, telefon sau un pahar cu apa, iar lumina vine de pe perete, la inaltimea potrivita pentru citit. Intr-un dormitor mic, diferenta se simte imediat.</p>
+    <p>In plus, o aplica da acea <strong>lumina calda si joasa</strong>, de seara, care pregateste camera de somn mult mai bine decat plafonierul din mijloc. Multe cupluri monteaza cate una de fiecare parte a patului, ca fiecare sa aiba lumina lui de citit, fara sa il deranjeze pe celalalt. E, in acelasi timp, si o piesa de decor: un finisaj auriu, lemnul masiv sau un design in spirala schimba complet peretele de la capul patului.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Dincolo de cum arata, cateva lucruri fac diferenta reala intre doua aplice:</p>
+    <ul>
+      <li><strong>Temperatura luminii:</strong> pentru dormitor, lumina calda de 2700-3000K relaxeaza; 4000K, alb neutru, e mai buna pentru citit. Un corp cu temperatura reglabila iti da ambele.</li>
+      <li><strong>Bec propriu (E27) sau LED integrat:</strong> la E27 alegi si schimbi becul cum vrei, dar de obicei nu e inclus. La LED integrat becul e inauntru, gata montat, dar cand se uzeaza schimbi tot corpul.</li>
+      <li><strong>Lumina de citit:</strong> daca citesti in pat, cauta lumeni multi si, ideal, un brat reglabil care sa directioneze lumina pe carte.</li>
+      <li><strong>Montajul:</strong> unele se leaga la reteaua electrica din perete, altele au stecher de priza, iar cele reincarcabile se prind fara fir si fara gaura, potrivite la chirie.</li>
+      <li><strong>Intrerupatorul:</strong> clasic pe perete, pe fir, touch pe corp sau chiar din telefon, la modelele inteligente.</li>
+    </ul>
+
+    <h2 id="montaj">La ce inaltime o montezi</h2>
+    <p>E intrebarea la care se blocheaza toata lumea. In general, o aplica de perete se monteaza la <strong>1,4-1,8 metri de la podea</strong>, dar langa pat cobori mai jos, la circa <strong>1,2-1,4 metri</strong>, ca lumina sa cada pe carte, nu direct in ochi. Regula practica pentru citit: pune aplica la aproximativ <strong>20-30 cm peste nivelul umarului</strong> cand stai asezat in pat.</p>
+    <p>Asa luminezi zona noptierei fara sa deranjezi pe cine doarme alaturi. Daca nu esti sigur, alege un model cu <strong>brat rotativ</strong>, ca Toolight Vintage 360, care iti lasa loc de ajustat directia dupa montaj, sau o <strong>aplica fara fir</strong>, pe care o poti muta si repozitiona oricand fara sa mai gauresti peretele.</p>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Bec / surse</th><th>Lumina</th><th>Alimentare</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.bec}</td>
+              <td>{x.lumina}</td>
+              <td>{x.alim}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="clasic">Clasice, cu bec propriu</h2>
+    <p>Corpuri cu soclu E27, in care alegi si schimbi becul dupa cheful tau: pui o lumina calda pentru seara sau una mai vie pentru citit. Metal, lemn masiv sau abajur, la preturile cele mai mici din articol.</p>
+    <div class="rd-grid">
+      {CLASIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figClasic} alt="Aplice de perete clasice pentru dormitor: metal, lemn si abajur" width="1200" height="675" loading="lazy" />
+
+    <h2 id="led">LED integrat, design modern</h2>
+    <p>Vin gata de montat, cu becul inclus, si sunt gandite sa fie si piesa de decor: o spirala pe perete, un finisaj auriu sau un corp minimalist cu multa lumina. Unele dau si mai multe temperaturi de culoare.</p>
+    <div class="rd-grid">
+      {LED.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figLed} alt="Aplice LED moderne pentru dormitor: spirala, minimalista si aurie" width="1200" height="675" loading="lazy" />
+
+    <h2 id="smart">Fara fir si inteligente</h2>
+    <p>Pentru cine nu vrea cabluri sau gauri in perete: o aplica reincarcabila care se lipeste fara instalare, ideala la chirie, si una inteligenta pe care o controlezi din telefon si prin comanda vocala.</p>
+    <div class="rd-grid">
+      {SMART.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSmart} alt="Aplice de perete fara fir si inteligente pentru dormitor" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-aplica-dormitor').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate aplicele de dormitor la oferta</strong>
+        <span>Reducerile din acest moment la aplice de perete pentru dormitor, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa o aplica de dormitor</h2>
+    <p>Vestea buna: o aplica de perete buna nu costa mult. Preturile depind mai ales de tip:</p>
+    <p><strong>Clasice, cu bec propriu E27:</strong> in general 45-95 de lei pentru corp, de la un model cu abajur sau lemn masiv pana la seturi din metal si lemn. Adauga becul, un LED cald E27 costa cativa lei.</p>
+    <p><strong>LED integrat de design:</strong> circa 85-140 de lei, cu becul inclus si, la unele, mai multe temperaturi de lumina sau un finisaj special, ca auriul.</p>
+    <p><strong>Fara fir si inteligente:</strong> in jur de 140-150 de lei, fie pentru comoditatea unei aplice reincarcabile fara montaj, fie pentru controlul din telefon al unui model smart RGB.</p>
+    <p>Pe langa pret, gandeste-te la <strong>montaj</strong>: daca nu ai deja un cablu scos in perete langa pat, o aplica reincarcabila fara fir te scuteste de un electrician si de gauri, iar diferenta de pret se poate justifica singura. Intr-un colt, un <a href="/lampadar-modern-pentru-colt/">lampadar modern</a> adauga lumina ambientala.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
-        <p class="author-role">Designer <a href="/plante-artificiale-decorative-pentru-interior/">Interior</a></p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in design interior, cu accent pe iluminat, textile si amenajarea spatiilor de zi si de noapte. A colaborat cu peste 200 de clienti pentru transformarea locuintelor in spatii calde si functionale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="aplica-de-perete-pentru-dormitor"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="aplica-de-perete-pentru-dormitor"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="aplica-de-perete-pentru-dormitor" currentCategory="decoratiuni-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="aplica-de-perete-pentru-dormitor" currentCategory="decoratiuni-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

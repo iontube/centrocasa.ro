@@ -1,0 +1,290 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['mobila-dormitor'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { g: 'matrimonial', id: 'D0KG5BMBM', badge: 'Cel mai vandut',
+    specs: ['pat 160x200 + dulap 3 usi', '2 noptiere + comoda', 'dulap cu oglinda', 'PAL 16 mm, soft-close'],
+    pros: ['Cel mai vandut set din top, 342 de pareri', 'Include tot: pat, dulap cu oglinda, 2 noptiere si comoda', 'Balamale soft-close, se inchid silentios', 'Multe combinatii de culoare, de la 1399 de lei'],
+    cons: ['Nu include salteaua si somiera, le iei separat', 'PAL de 16 mm, subtire', 'Dulapul are usi batante, cer loc de deschidere'],
+    verdict: 'Cel mai vandut set de dormitor de pe eMAG si punctul de plecare firesc pentru un dormitor matrimonial. Vine complet: pat pentru saltea de 160x200, dulap cu trei usi si oglinda, doua noptiere si o comoda cu sertar, tot ce iti trebuie pentru o camera organizata. Balamalele sunt soft-close, iar oamenii spun ca se monteaza usor si arata bine, de aici cele 342 de pareri. Atentie insa la un lucru important: patul nu include salteaua si nici somiera, deci le cumperi separat, iar pentru saltea poti vedea comparatia noastra dedicata. Dulapul are usi batante, deci lasa loc in fata sa se deschida. Pentru un dormitor obisnuit, la buget corect, e alegerea sigura.' },
+  { g: 'matrimonial', id: 'DDH1XCMBM', badge: 'Complet, cu comoda',
+    specs: ['pat matrimonial 160x200', 'dulap + comoda', '2 noptiere', 'depozitare generoasa'],
+    pros: ['Set complet cu dulap, comoda si 2 noptiere', 'Pat matrimonial standard, 160x200', 'Depozitare generoasa pentru o familie', 'Nota buna, 4.33'],
+    cons: ['Numar mic de pareri', 'Salteaua nu e inclusa', 'Cere spatiu pentru toate piesele'],
+    verdict: 'O alternativa solida la Irim Treff, pentru cine vrea depozitare cat mai multa intr-un dormitor matrimonial. Setul Hera vine cu pat de 160x200, dulap incapator, o comoda cu sertare si doua noptiere, deci acopera nevoile unei familii care are multe de pus la pastrare. Nota de 4.33 e buna, chiar daca vine de la un numar mai mic de pareri. Ca la mai toate seturile, salteaua se cumpara separat. Fiind un set complet cu multe piese, are nevoie de un dormitor de dimensiuni normale ca sa incapa comod. Il alegi cand vrei un set matrimonial cu depozitare generoasa si o comoda in plus.' },
+  { g: 'buget', id: 'D36V10MBM', badge: 'Cel mai ieftin',
+    specs: ['pat 160x200 + dulap', 'set complet', 'PAL', 'cel mai mic pret'],
+    pros: ['Cel mai mic pret din top, sub 850 de lei', 'Set complet cu pat matrimonial si dulap', 'Culori neutre, usor de asortat', 'Bun pentru prima casa sau chirie'],
+    cons: ['Nota medie, 3.96', 'PAL subtire, finisaj simplu', 'Salteaua nu e inclusa'],
+    verdict: 'Cel mai ieftin set de dormitor matrimonial din selectie si alegerea cand ai buget strans, la prima casa sau intr-o locuinta de inchiriat. Sub 850 de lei primesti un set complet, cu pat de 160x200 si dulap, in culori neutre care se asorteaza usor. Nota de 3.96 e medie, la nivelul pretului: finisajul e simplu si PAL-ul subtire, deci nu te astepta la calitate premium. Ca peste tot, salteaua se ia separat. Il iei cand vrei sa mobilezi un dormitor repede si ieftin, fara pretentii mari la finisaj, si preferi sa pui banii economisiti pe o saltea buna.' },
+  { g: 'buget', id: 'DSJDSYMBM', badge: 'Cel mai bun raport pe buget',
+    specs: ['pat 140x200 + dulap 3 usi', 'compact', 'sub 1000 de lei', 'nota 4.39'],
+    pros: ['Nota buna la pret mic, 4.39', 'Dulap cu 3 usi, spatiu decent', 'Pat de 140x200, bun pentru un cuplu', 'Sub 1000 de lei'],
+    cons: ['Pat de 140, mai ingust decat 160', 'Salteaua nu e inclusa', 'Finisaj simplu'],
+    verdict: 'Cea mai buna afacere pe segmentul de buget, cu o nota mai buna decat multe seturi mai scumpe. Irim Pito vine cu pat de 140x200 si un dulap cu trei usi care ofera spatiu decent de depozitare, tot sub 1000 de lei. Patul de 140 e mai ingust decat standardul de 160, dar ramane confortabil pentru un cuplu intr-un dormitor mai mic. Nota de 4.39 din 18 pareri arata clienti multumiti pentru ce costa. Salteaua se cumpara separat. Il alegi cand vrei un set corect, bine notat, la pret mic, si dormitorul nu e foarte mare.' },
+  { g: 'premium', id: 'DSGM22BBM', badge: 'Cel mai bine notat',
+    specs: ['Stejar Bardolino si Alb', 'set complet de dormitor', 'finisaj de calitate', 'nota 4.90'],
+    pros: ['Cea mai buna nota din top, 4.90', 'Combinatie Stejar Bardolino cu Alb, aspect modern', 'Finisaj si constructie de calitate', 'Set complet, echilibrat'],
+    cons: ['Scump, peste 4000 de lei', 'Numar mai mic de pareri', 'Salteaua nu e inclusa'],
+    verdict: 'Cel mai bine notat set din selectie si alegerea daca vrei un dormitor care sa arate si sa reziste peste medie. Combinatia de Stejar Bardolino cu Alb da un aspect modern si cald, iar finisajul e vizibil mai bun decat la seturile ieftine din PAL subtire. Nota de 4.90 e cea mai mare din top, chiar daca de la un numar mai mic de pareri. E un set complet, echilibrat ca piese si dimensiuni. Costa peste 4000 de lei, deci e o investitie, si ca peste tot, salteaua se ia separat. Il iei cand vrei calitate si un aspect elegant pentru dormitor, si ai bugetul pentru asta.' },
+  { g: 'premium', id: 'DWFFZWMBM', badge: 'Premium de brand, mare',
+    specs: ['ansamblu 270 cm', 'pat 140x200', 'culoare Sonoma', 'dulap mare'],
+    pros: ['Brand cunoscut, KringX', 'Ansamblu mare, 270 cm, mult spatiu', 'Culoare Sonoma calda', 'Aspect unitar, bine gandit'],
+    cons: ['Pat de 140, nu 160', 'Numar mic de pareri', 'Are nevoie de un dormitor mare'],
+    verdict: 'Alegerea daca vrei un set de dormitor mare, de la un brand cunoscut, fara sa treci de 3000 de lei. KringX Mary e un ansamblu de 270 cm, cu dulap generos si pat de 140x200, in culoarea Sonoma, calda si usor de asortat. Aspectul e unitar si bine gandit, ca la piesele de brand, iar nota de 4.50 e buna. Patul e de 140, nu de 160, deci e pentru un cuplu care nu are nevoie de latimea maxima, iar ansamblul fiind mare, cere un dormitor pe masura. Salteaua se cumpara separat. Il alegi cand vrei un set incapator, de brand, la un pret rezonabil pentru dimensiune.' },
+  { g: 'tineret', id: 'DSN11VMBM', badge: 'Pentru camera de tineret',
+    specs: ['set de tineret', 'pat + dulap + rafturi', '220 cm ansamblu', 'nota 4.62'],
+    pros: ['Cea mai buna nota cu multe pareri, 4.62 din 50', 'Gandit pentru o camera de copil sau adolescent', 'Include pat, dulap si spatii de depozitare', 'Aspect vesel, colorat'],
+    cons: ['Pentru o persoana, nu matrimonial', 'Salteaua nu e inclusa'],
+    verdict: 'Cel mai bun set din top pentru o camera de copil sau adolescent, si unul dintre cele mai bine notate din toata selectia, cu 4.62 din 50 de pareri. Irim Kinder e gandit pentru o camera de tineret: are pat, dulap si spatii de depozitare potrivite pentru haine, carti si jucarii, intr-un ansamblu de 220 cm cu aspect vesel. E pentru o singura persoana, deci nu il iei pentru dormitorul parintilor, ci pentru camera copilului. Ca la restul, salteaua se cumpara separat. Il alegi cand mobilezi o camera de copil sau de adolescent si vrei un set complet, bine notat, gandit pentru varsta lor.' },
+  { g: 'tineret', id: 'DVB33KMBM', badge: 'Cel mai compact, pentru o persoana',
+    specs: ['pat 90x200', 'dulap + raft', 'pentru o persoana', 'compact'],
+    pros: ['Pat single de 90x200, ocupa putin', 'Include dulap si raft', 'Sub 1000 de lei', 'Bun pentru o camera mica'],
+    cons: ['Doar pentru o persoana', 'Depozitare limitata de dimensiune', 'Salteaua nu e inclusa'],
+    verdict: 'Cel mai compact set din selectie si alegerea pentru o camera mica de o persoana, fie copil, fie student. Nanu vine cu pat single de 90x200, un dulap si un raft, deci ai unde dormi si unde pune hainele fara sa inghesui camera. Costa sub 1000 de lei si ocupa putin loc, potrivit pentru o camera mica sau o garsoniera. Fiind de o persoana, nu il iei pentru un cuplu, iar depozitarea e limitata de dimensiunea mica. Salteaua se cumpara separat. Il alegi pentru o camera de o persoana, cand spatiul e putin si vrei un set complet, ieftin.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MATRIMONIAL = PICKS.filter(x => x.g === 'matrimonial');
+const BUGET = PICKS.filter(x => x.g === 'buget');
+const PREMIUM = PICKS.filter(x => x.g === 'premium');
+const TINERET = PICKS.filter(x => x.g === 'tineret');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/mobila-dormitor.webp';
+const figVandute = '/imagini/articole/mobila-dormitor-vandute.webp';
+const figGame = '/imagini/articole/mobila-dormitor-game.webp';
+const figStil = '/imagini/articole/mobila-dormitor-stil.webp';
+const published = '2026-07-17T22:10:00+03:00';
+
+const faq = [
+  { question: 'Ce include un set de mobila de dormitor?', answer: 'Un set complet include de obicei patul, un dulap cu doua, trei sau patru usi, doua noptiere si uneori o comoda cu sertare. Ce NU include, aproape mereu, e salteaua si de multe ori nici somiera, adica suportul pe care sta salteaua. Astea se cumpara separat, deci pune-le la buget cand calculezi cat te costa dormitorul gata de folosit.' },
+  { question: 'Pat de 140 sau de 160?', answer: 'Un pat de 160x200 e standardul pentru un dormitor matrimonial si ofera cel mai bun confort pentru doua persoane. Unul de 140x200 e mai ingust, dar ramane confortabil pentru un cuplu si e o alegere buna intr-un dormitor mai mic, unde vrei sa ramana loc de circulatie. Daca ai spatiu, ia 160; daca dormitorul e mic sau bugetul strans, 140 e un compromis rezonabil.' },
+  { question: 'Setul include salteaua?', answer: 'De regula nu. Aproape toate seturile de dormitor vin cu patul, dar fara saltea si de multe ori si fara somiera. Patul e gandit pentru o saltea de o anumita dimensiune, de exemplu 160x200, pe care o cumperi separat. E important sa alegi o saltea buna, pentru ca de ea depinde somnul, nu de mobila; poti vedea comparatia noastra de saltele pentru asta.' },
+  { question: 'Dulap cu usi batante sau glisante?', answer: 'Usile batante se deschid in fata, ca la un dulap clasic, si au nevoie de spatiu liber ca sa nu se loveasca de pat sau de alta mobila. Usile glisante aluneca lateral si nu cer spatiu de deschidere, deci sunt mai bune intr-un dormitor mic sau cand dulapul e langa pat. Cele mai multe seturi ieftine au usi batante; daca spatiul e strans, cauta un dulap cu usi glisante.' },
+  { question: 'Cat de greu se monteaza un set de dormitor?', answer: 'Vine la pachet plat si se asambleaza acasa. Un set obisnuit se poate monta si singur, cu rabdare, dar sunt multe piese, iar dulapul mare e cel mai laborios si de multe ori merge mai usor in doi. Balamalele soft-close si feroneria de calitate usureaza montajul. Daca nu vrei sa te ocupi, multi retaileri ofera si serviciu de montaj contra cost.' },
+  { question: 'Ce e somiera si de ce nu e inclusa in set?', answer: 'Somiera e suportul pe care sta salteaua, de obicei o rama cu lamele de lemn curbate care sustin salteaua si o lasa sa respire. Multe seturi vin cu patul, adica rama si tablia, dar fara somiera, care se cumpara separat, uneori chiar la comanda cu salteaua. Verifica in descriere daca patul are somiera inclusa; daca nu, pune-o la buget alaturi de saltea, pentru ca fara ea nu poti folosi patul.' },
+  { question: 'Cat de mult tine un set de dormitor?', answer: 'Un set din PAL, folosit normal, tine in general 7-10 ani; cele cu fronturi din MDF si feronerie mai buna rezista mai mult. Ce se uzeaza primul sunt balamalele si glisierele sertarelor, de aceea soft-close-ul si feroneria de calitate conteaza. Daca il montezi corect, il tii departe de umezeala si nu il suprasoliciti, mobila de dormitor e printre cele mai durabile din casa, pentru ca nu are traficul din bucatarie sau living.' },
+];
+
+const images = [hero, figVandute, figGame, figStil, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune seturi de mobila de dormitor in 2026: matrimonial, buget, premium si tineret"
+  description="Ce set de dormitor sa iti iei in 2026: seturi matrimoniale, pe buget, premium si pentru camera de tineret, comparate cu pareri reale. Plus ce include un set, ce marime de pat si dulap cu ce usi."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Ioana Stan"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobila si Dormitor', url: '/mobila-dormitor/' }, { name: 'Cele mai bune seturi de mobila de dormitor' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobila-dormitor/">Mobila si Dormitor</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune seturi de mobila de dormitor</span>
+    </nav>
+
+    <h1>Cele mai bune seturi de mobila de dormitor in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/ioana-stan/">Ioana Stan</a>, Consultant Amenajari Dormitor · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune seturi de mobila de dormitor: Irim, Lara, KringX si Asaro" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru un dormitor matrimonial, cel mai bun set din acest moment este <strong>Irim Treff</strong>: pat, dulap cu oglinda, doua noptiere si comoda, cu cele mai multe pareri. Daca ai buget strans, <strong>Asaro Aria</strong> costa sub 850 de lei. Daca vrei calitate, <strong>Lara Sonoma</strong> are cea mai buna nota, iar pentru camera unui copil, <strong>Irim Kinder</strong> e cel mai bine notat set de tineret.</p>
+      <p>Un lucru de stiut de la inceput: seturile de dormitor vin cu patul, dar aproape niciodata cu salteaua, si de multe ori nici cu somiera. Astea se cumpara separat, iar salteaua conteaza cel mai mult pentru somn, deci nu o lasa la urma. Mai jos ai intai ce include un set si ce marime de pat alegi, apoi seturile grupate pe nevoie: matrimoniale, pe buget, premium si pentru camera de tineret.</p>
+      <p>Am pornit de la cele mai vandute seturi de pe eMAG, le-am verificat continutul si dimensiunile si le-am asezat dupa cine si pentru ce dormitor le cauta. Completeaza dormitorul cu o <a href="/cele-mai-bune-saltele/">saltea buna</a>, <a href="/perdele-blackout-pentru-dormitor/">perdele blackout</a> si o <a href="/aplica-de-perete-pentru-dormitor/">aplica de perete</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#include">Ce include un set si ce marime de pat</a></li>
+        <li><a href="#matrimonial">Seturi matrimoniale vandute</a></li>
+        <li><a href="#buget">Seturi pe buget</a></li>
+        <li><a href="#premium">Seturi premium</a></li>
+        <li><a href="#tineret">Pentru camera de tineret</a></li>
+        <li><a href="#dulap">Dulap cu usi batante sau glisante</a></li>
+        <li><a href="#culoare">Culoarea si tablia</a></li>
+        <li><a href="#dispui">Cum asezi mobila in dormitor</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="include">Ce include un set si ce marime de pat</h2>
+    <p>Un set complet de dormitor inseamna de obicei pat, dulap, doua noptiere si uneori o comoda. Ce NU include, aproape mereu, e <strong>salteaua</strong>, si de multe ori nici somiera, adica suportul pe care sta salteaua. Astea se cumpara separat, iar salteaua e cea care iti da somnul, nu mobila, deci alege-o cu grija. Daca vrei ajutor, avem o <a href="/cele-mai-bune-saltele/">comparatie de saltele</a> pe fermitate si tip.</p>
+    <p>A doua decizie e marimea patului, care depinde de spatiu si de cate persoane dorm:</p>
+    <ul>
+      <li><strong>90x200</strong> e pentru o persoana, potrivit pentru o camera de copil sau de student.</li>
+      <li><strong>140x200</strong> e mai ingust, dar confortabil pentru un cuplu, bun intr-un dormitor mai mic.</li>
+      <li><strong>160x200</strong> e standardul matrimonial si ofera cel mai bun confort pentru doi.</li>
+      <li><strong>180x200</strong> e varianta cea mai lata, pentru cine vrea spatiu maxim si are dormitor mare.</li>
+    </ul>
+    <p>Ca sa ai o idee de buget, un set complet de dormitor incepe pe la 850-1000 de lei pentru variantele de baza din PAL, cu finisaj simplu. Zona cu cel mai bun raport e 1300-1800 de lei, unde primesti pat, dulap cu oglinda, noptiere si comoda, cu balamale soft-close, ca la Irim Treff. Peste 2500-3000 de lei intri in seturile premium, cu finisaje mai bune, culori mai frumoase si constructie mai solida, ca Lara Sonoma. La toate, adauga pretul saltelei si, uneori, al somierei, care nu sunt incluse si conteaza direct pentru cat de bine dormi. Un dormitor gata de folosit inseamna, deci, setul plus salteaua, nu doar mobila.</p>
+
+    <h2 id="matrimonial">Seturi matrimoniale vandute</h2>
+    <p>Astea sunt seturile pentru dormitorul principal: pat de 160x200, dulap, noptiere si, uneori, comoda. Le-am ales pe cele mai vandute si mai complete.</p>
+    <div class="rd-grid">
+      {MATRIMONIAL.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figVandute} alt="Cele mai vandute seturi de dormitor matrimoniale: Irim Treff, Hera si Irim Pito" width="1200" height="675" loading="lazy" />
+
+    <h2 id="buget">Seturi pe buget</h2>
+    <p>Daca mobilezi prima casa, o locuinta de inchiriat sau vrei doar sa nu dai mult, astea sunt seturile complete la cel mai mic pret, cu compromisurile de asteptat la finisaj.</p>
+    <div class="rd-grid">
+      {BUGET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <h2 id="premium">Seturi premium</h2>
+    <p>Cand vrei un dormitor care arata si rezista peste medie, seturile astea aduc finisaj mai bun, culori mai frumoase si constructie mai solida, la un pret pe masura.</p>
+    <div class="rd-grid">
+      {PREMIUM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figGame} alt="Seturi de dormitor de la buget la premium: Lara Sonoma, KringX Mary si Asaro Aria" width="1200" height="675" loading="lazy" />
+
+    <h2 id="tineret">Pentru camera de tineret</h2>
+    <p>Camera unui copil sau adolescent cere alt tip de set: pat de o persoana, depozitare pentru haine, carti si jucarii, si un aspect mai vesel. Astea sunt cele mai bune optiuni.</p>
+    <div class="rd-grid">
+      {TINERET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <h2 id="dulap">Dulap cu usi batante sau glisante</h2>
+    <p>Dulapul e piesa care ocupa cel mai mult loc, iar tipul de usi conteaza mai ales in dormitoarele mici:</p>
+    <ul>
+      <li><strong>Usi batante:</strong> se deschid in fata, ca la un dulap clasic, si au nevoie de spatiu liber ca sa nu se loveasca de pat sau de alta mobila. Le au cele mai multe seturi ieftine.</li>
+      <li><strong>Usi glisante:</strong> aluneca lateral si nu cer spatiu de deschidere, deci sunt mai bune cand dulapul e langa pat sau camera e mica.</li>
+    </ul>
+    <p>Masoara distanta dintre dulap si pat inainte de cumparare: daca e mica, un dulap cu usi batante devine incomod, iar unul cu usi glisante rezolva problema.</p>
+
+    <h2 id="culoare">Culoarea si tablia</h2>
+    <p>La dormitor, culoarea da tonul camerei. Cateva repere care merg aproape mereu:</p>
+    <p><strong>Combinatiile clasice</strong>, ca wenge cu alb sau stejar cu alb, sunt sigure si se asorteaza usor cu orice lenjerie sau perdea. Sunt cele mai des intalnite la seturi.</p>
+    <p><strong>Culorile deschise</strong>, alb sau stejar deschis ca Sonoma, fac un dormitor mic sa para mai mare si mai luminos, si dau un aer mai relaxant, potrivit camerei in care dormi.</p>
+    <p><strong>Tablia patului</strong> conteaza pentru confort si aspect: una tapitata e mai placuta daca stai rezemat in pat sa citesti, in timp ce una din PAL e mai simpla si mai ieftina. Alege dupa cum folosesti patul.</p>
+
+    <img class="rd-fig" src={figStil} alt="Pat de 140 sau 160, culoare si tablie pentru dormitor" width="1200" height="675" loading="lazy" />
+
+    <h2 id="dispui">Cum asezi mobila in dormitor</h2>
+    <p>Degeaba iei un set bun daca il inghesui gresit. Cateva reguli simple, care fac diferenta intre un dormitor comod si unul in care te lovesti de mobila:</p>
+    <ul>
+      <li><strong>Patul</strong> se aseaza cu tablia pe peretele cel mai lung fara usa sau fereastra, ideal centrat, ca sa ai acces pe ambele laturi. Asa pui si noptierele de o parte si de alta.</li>
+      <li><strong>Spatiul in jurul patului:</strong> lasa cel putin 60-70 cm liberi pe laturi si la picioare, ca sa poti circula si sa faci patul fara sa te chinui. Sub atat, camera devine incomoda.</li>
+      <li><strong>Dulapul</strong> se pune pe alt perete, unde nu blocheaza usa sau geamul. La usile batante, lasa loc in fata sa se deschida complet; daca nu ai loc, un dulap cu usi glisante rezolva.</li>
+      <li><strong>Culoarul de circulatie</strong> spre usa si spre geam trebuie sa ramana liber. Masoara camera si deseneaza pe hartie inainte, ca sa vezi daca setul intra fara sa blocheze trecerea.</li>
+    </ul>
+    <p>Intr-un dormitor mic, prioritizeaza spatiul din jurul patului si un dulap cu usi glisante; comoda si piesele in plus le pui doar daca mai ramane loc de circulatie.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-mobila-dormitor')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate seturile de dormitor la oferta</strong>
+        <span>Reducerile din acest moment la mobila de dormitor, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">IS</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/ioana-stan/" class="author-name-link">Ioana Stan</a></p>
+        <p class="author-role">Consultant Amenajari Dormitor</p>
+        <p class="author-bio">Ioana ajuta de peste 7 ani oameni sa isi aleaga si sa isi compuna dormitorul potrivit, cu focus pe confort, spatiu si somn bun.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-seturi-de-mobila-de-dormitor" currentCategory="mobila-dormitor" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-seturi-de-mobila-de-dormitor" currentCategory="mobila-dormitor" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd-intro a { font-weight: 600; text-decoration: underline; }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd p a { font-weight: 600; text-decoration: underline; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

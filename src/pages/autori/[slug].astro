@@ -6,7 +6,12 @@ import { visibleArticles, slugify } from '../../lib/articles.mjs';
 
 export async function getStaticPaths() {
   const authors = keywordsData.authors || [];
-  return authors.map(a => ({ params: { slug: slugify(a.name) }, props: { author: a } }));
+  // Un autor fara niciun articol publicat ar produce o pagina goala — vezi nota din
+  // [category]/[...page].astro. Apare automat cand semneaza primul articol.
+  const withArticles = new Set(visibleArticles(keywordsData.completed).map(a => a.categorySlug));
+  return authors
+    .filter(a => (a.categories || []).some(c => withArticles.has(c)))
+    .map(a => ({ params: { slug: slugify(a.name) }, props: { author: a } }));
 }
 
 const { author } = Astro.props;
@@ -15,15 +20,18 @@ const siteUrl = 'https://centrocasa.ro';
 const cats = author.categories || [];
 const initials = author.name.split(' ').map(n => n[0]).join('');
 
+// Filtram dupa AUTORUL REAL al articolului, nu dupa categorie. Filtrarea pe categorie
+// insemna ca o reincadrare de categorie muta articolul pe pagina altui autor, cu semnatura
+// autorului initial ramasa in pagina. Cad inapoi pe categorie doar daca lipseste campul author.
 const articles = visibleArticles(keywordsData.completed)
-  .filter(item => cats.includes(item.categorySlug))
+  .filter(item => (item.author ? item.author === author.name : cats.includes(item.categorySlug)))
   .map(item => {
-    const s = slugify(item.keyword);
+    const s = item.slug || slugify(item.keyword);
     return {
       title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
       slug: s,
       excerpt: item.excerpt || '',
-      image: `/images/articles/${s}.webp`,
+      image: item.image || `/images/articles/${s}.webp`,
       category: item.category,
       categorySlug: item.categorySlug,
       date: item.date || new Date().toISOString()

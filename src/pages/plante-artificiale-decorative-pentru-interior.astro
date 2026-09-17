@@ -1,271 +1,294 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Plante artificiale decorative pentru interior",
-  excerpt: "Daca iti doresti sa aduci un strop de verdeata in casa ta, dar nu ai timp sau nu ai deloc mana forte pentru plante vii, astazi vorbim despre o alternativa care a evoluat enorm: plantele artificiale decorative. Nu te gandi la vechile imitatii din plastic, ci la solutii care pot pacali ochiul si pot infrumuseta orice colt al casei tale.",
-  image: "/images/articles/plante-artificiale-decorative-pentru-interior.webp",
-  category: "Decoratiuni Casa",
-  categorySlug: "decoratiuni-casa",
-  date: "2026-01-19T09:15:45.052Z",
-  modifiedDate: "2026-01-31T09:15:45.684Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat de des trebuie curatate plantele artificiale?", answer: "Ideal ar fi sa le stergi de praf o data pe saptamana sau la doua saptamani cu o carpa moale, uscata sau usor umeda. Daca sunt amplasate intr-un loc unde se aduna mai mult praf, curatarea poate fi necesara mai des. O data pe luna, sau de cate ori simti nevoia, le poti clati usor sub dus cu apa calduta si un pic de detergent de vase, apoi le lasi sa se usuce complet la aer." },
-  { question: "Pot plantele artificiale sa se decoloreze in soare?", answer: "Da, absolut. La fel cum se intampla cu multe materiale, expunerea prelungita la lumina directa a soarelui poate duce la decolorarea frunzelor si a tijelor. De aceea, mi se pare important sa le plasezi in zone unde nu sunt direct luminate de soare, sau sa alegi modele tratate UV, desi acestea sunt mai rare si mai scumpe." },
-  { question: "Ce fac daca o frunza de la o planta artificiala se rupe?", answer: "In functie de tipul plantei si de modul in care sunt prinse frunzele, uneori le poti lipi la loc cu un adeziv puternic, cum ar fi un adeziv pentru materiale textile sau un lipici universal. Daca planta este mai complexa, poti incerca sa cauti o frunza de rezerva sau sa o inlocuiesti cu o frunza de la o alta planta artificiala mai veche sau deteriorata." },
-  { question: "Sunt plantele artificiale ieftine o alegere buna?", answer: "Din experienta mea, plantele artificiale foarte ieftine sunt rareori o alegere buna pe termen lung. De obicei, materialele sunt de proasta calitate, aspectul este artificial (plastic lucios, culori nenaturale) si nu rezista in timp. Recomand sa investesti un pic mai mult intr-o planta de calitate medie spre buna, care va arata mult mai bine si va rezista mai mult." },
-  { question: "Pot folosi plante artificiale in baie sau bucatarie?", answer: "Da, plantele artificiale sunt o optiune excelenta pentru baie si bucatarie, mai ales daca aceste incaperi nu au multa lumina naturala. In baie, umiditatea ridicata nu le afecteaza, iar in bucatarie pot adauga un strop de culoare si prospetime. Asigura-te doar ca le cureti periodic, pentru a elimina eventualele mirosuri sau depuneri de grasime." },
-  { question: "Cum pot face o planta artificiala sa arate mai natural?", answer: "Secretul sta in detalii. Aranjeaza frunzele si tijele pentru a crea un aspect mai dinamic si mai putin uniform. Foloseste un ghiveci decorativ, nu cel simplu de transport. Poti adauga pamant decorativ, pietricele sau muschi uscat in ghiveci pentru a acoperi baza. Unele plante artificiale au frunze care pot fi modelate usor, asa ca nu ezita sa le sculptezi putin pana obtii aspectul dorit." }
-];
-
-const toc = [
-  { title: "De ce plante artificiale? O solutie pentru oricine isi doreste verdeata in casa", id: "de-ce-plante-artificiale-o-solutie-pentru-oricine-isi-doreste-verdeata-in-casa" },
-  { title: "Top 5 Plante Artificiale Decorative care mi-au atras atentia", id: "top-5-plante-artificiale-decorative-care-mi-au-atras-atentia" },
-  { title: "Cum alegi verdele perfect pentru casa ta - Ghid practic", id: "cum-alegi-verdele-perfect-pentru-casa-ta-ghid-practic" },
-  { title: "Avantaje si Dezavantaje: E aur curat sau doar o iluzie?", id: "avantaje-si-dezavantaje-e-aur-curat-sau-doar-o-iluzie" },
-  { title: "Trucuri din experienta: Cum sa le faci sa arate wow", id: "trucuri-din-experienta-cum-sa-le-faci-sa-arate-wow" },
-  { title: "Parerea mea: Sunt plantele artificiale o alegere buna? Da, dar cu cap!", id: "parerea-mea-sunt-plantele-artificiale-o-alegere-buna-da-dar-cu-cap" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['plante-artificiale'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Buchete si flori ---
+  { g: 'buchet', id: 'DDWP6PMBM', badge: 'Cel mai vandut', short: '5 buchete flori UV', tip: 'Buchete', inaltime: '-', material: 'plastic',
+    specs: ['set de 5 buchete de flori', 'rezistente la UV, nu se decoloreaza', 'multicolor', 'pentru vaza sau aranjamente'],
+    pros: ['Cel mai vandut din selectie, cu nota foarte mare', 'Rezistente la UV, nu se decoloreaza la soare', 'Cinci buchete, multe posibilitati de aranjament', 'Pret foarte mic'],
+    cons: ['Plastic, aspectul depinde de vaza in care le pui', 'Multicolor, trebuie sa se potriveasca cu decorul tau'],
+    verdict: 'Cea mai populara si mai ieftina cale de a aduce culoare intr-o camera, fara nicio grija. Setul de cinci buchete de flori artificiale e rezistent la UV, deci nu se decoloreaza langa fereastra, si iti da material din care sa compui mai multe aranjamente, intr-o vaza pe masa, pe pervaz sau in baie. E cel mai vandut din selectie, cu nota foarte mare, semn ca arata bine pentru pret. Fiind din plastic si multicolore, aspectul final depinde mult de vaza in care le pui si de cat de bine se asorteaza cu decorul. Le iei cand vrei culoare imediata si ieftina, fara apa si fara intretinere.' },
+  { g: 'buchet', id: 'D831CVYBM', badge: 'Lalele realiste', short: 'SINBINTA 20 lalele', tip: 'Buchet', inaltime: '-', material: 'plastic',
+    specs: ['buchet de 20 de lalele', 'nu se decoloreaza, reutilizabil', 'usor de asortat', 'aspect natural'],
+    pros: ['Lalele cu aspect natural, elegante si simple', 'Nu se decoloreaza si sunt reutilizabile an de an', 'Usor de asortat cu orice decor', 'Nota mare de la cumparatori'],
+    cons: ['Un singur tip de floare, mai putin variat', 'Ca la orice buchet, conteaza vaza aleasa'],
+    verdict: 'Alegerea daca vrei un aranjament simplu si elegant, cu un singur tip de floare. Buchetul SINBINTA are 20 de lalele cu aspect natural, o floare discreta si eleganta care merge in aproape orice camera, de la living la dormitor. Nu se decoloreaza si e reutilizabil an de an, spre deosebire de florile taiate, si e usor de asortat pentru ca lalelele au o forma curata, nu incarcata. Are nota mare de la cumparatori. Fiind un singur tip de floare, e mai putin variat decat un aranjament mixt, iar aspectul final depinde de vaza. Il iei cand vrei un buchet elegant si simplu, care arata bine tot anul.' },
+  { g: 'buchet', id: 'D05M6Y3BM', badge: 'Set mare, 8 buchete', short: 'ARKOTEX Set 8 buchete', tip: 'Set buchete', inaltime: '40 cm', material: 'plastic',
+    specs: ['set de 8 buchete de flori', 'rezistente la UV', 'inaltime 40 cm', 'roz si alb'],
+    pros: ['Opt buchete, umpli mai multe vaze si camere', 'Rezistente la UV, nu se decoloreaza', 'Inaltime buna, 40 cm, pentru vaze medii si inalte', 'ARKOTEX, cu nota buna si multe pareri'],
+    cons: ['Mai scump decat un singur buchet', 'Culorile roz si alb trebuie sa se potriveasca cu decorul'],
+    verdict: 'Alegerea daca vrei sa decorezi mai multe locuri deodata, nu doar o vaza. Setul ARKOTEX are opt buchete de flori artificiale rezistente la UV, de 40 cm inaltime, potrivite pentru vaze medii si inalte, in nuante de roz si alb. Cu opt buchete umpli living-ul, dormitorul si baia dintr-o singura comanda, sau compui un aranjament mai bogat intr-o vaza mare. Are nota buna si multe pareri. E mai scump decat un buchet simplu, dar iti da mult mai mult material, iar nuantele roz si alb trebuie sa se potriveasca cu ce ai. Il iei cand vrei sa decorezi mai multe camere sau sa faci aranjamente ample, la un pret pe buchet mic.' },
+  // --- Plante in ghiveci ---
+  { g: 'ghiveci', id: 'DCG68BYBM', badge: 'Orhidee in ghiveci', short: 'Orhidee ghiveci ceramic', tip: 'Orhidee', inaltime: '30 cm', material: 'ceramica',
+    specs: ['orhidee cu aspect natural', 'in ghiveci ceramic inclus', 'inaltime 30 cm', 'gata de pus pe raft'],
+    pros: ['Vine deja in ghiveci ceramic, gata de asezat', 'Orhideea are aspect natural, elegant', 'Nu cere apa, lumina sau ingrijire, spre deosebire de una vie', 'Perfecta pe un raft, birou sau masa'],
+    cons: ['Ghiveciul ceramic e simplu, il poti muta intr-unul mai frumos', 'Orhideea vie e greu de imitat perfect'],
+    verdict: 'Alegerea daca vrei o planta gata de asezat, fara sa mai cauti ghiveci. Orhideea vine deja intr-un ghiveci ceramic si are 30 cm, cu un aspect natural care merge pe un birou, un raft sau o masa, acolo unde o orhidee vie ar cere lumina si ingrijire atenta. Marele avantaj: nu uzi, nu muti dupa lumina si arata mereu inflorita, ceea ce o face perfecta pentru cine nu are mana verde sau pleaca des. Ghiveciul e simplu, dar il poti muta usor intr-unul mai frumos, iar o orhidee vie ramane greu de imitat perfect de aproape. O iei cand vrei o planta eleganta si zero griji, gata de pus pe raft.' },
+  { g: 'ghiveci', id: 'DWTN7FBBM', badge: 'Bonsai, nota maxima', short: 'Bonsai artificial', tip: 'Bonsai', inaltime: '23 cm', material: 'PVC',
+    specs: ['bonsai artificial', 'verde deschis si inchis', 'inaltime 23 cm', 'nota maxima de la cumparatori'],
+    pros: ['Nota maxima de la cumparatori', 'Bonsai realist, cu verde deschis si inchis', 'Compact, 23 cm, incape pe orice birou sau raft', 'Un bonsai viu cere ingrijire foarte pretentioasa; asta nu'],
+    cons: ['Compact, e un accent mic, nu o planta mare', 'Ca la orice artificial, se vede de foarte aproape'],
+    verdict: 'Un accent verde deosebit, pentru cine iubeste aspectul unui bonsai fara ingrijirea lui pretentioasa. Modelul artificial are 23 cm, cu frunze in doua nuante de verde care ii dau un aspect realist, si nota maxima de la cumparatori. Un bonsai viu e printre cele mai greu de ingrijit plante, cu udare, taiere si lumina exacte; varianta artificiala arata la fel tot anul, fara nimic din toate astea. E compact, deci e un accent mic pe birou, raft sau masuta, nu o planta care umple un colt, si, ca orice artificial, detaliile se vad de foarte aproape. Il iei cand vrei un obiect verde elegant si zero intretinere.' },
+  { g: 'ghiveci', id: 'DWW7SFMBM', badge: 'Set 2, mai mari', short: 'Outsunny Set 2 Lisianthus', tip: 'Plante ghiveci', inaltime: '34 cm', material: 'polietilena',
+    specs: ['set de 2 plante artificiale', 'Lisianthus, pentru interior si exterior', 'inaltime 34 cm, polietilena', 'aspect bogat, verde cu flori'],
+    pros: ['Set de doua plante, pentru simetrie pe o consola sau intrare', 'Polietilena de calitate, aspect mai realist', 'Pentru interior si exterior, rezistente', 'Nota maxima de la cumparatori'],
+    cons: ['Cele mai scumpe din selectie', 'La 34 cm, sunt plante de masa, nu de podea'],
+    verdict: 'Alegerea de calitate din selectie, pentru cine vrea un aspect mai realist si o pereche pentru simetrie. Setul Outsunny are doua plante Lisianthus de 34 cm din polietilena, un material care imita mai bine planta vie decat plasticul simplu, si sunt gandite pentru interior si exterior, deci rezista si pe o terasa. Doua plante identice arata bine in oglinda, pe o consola, o intrare sau de o parte si de alta a unei canapele. Au nota maxima de la cumparatori. Sunt cele mai scumpe din selectie si, la 34 cm, sunt plante de masa, nu de podea. Le iei cand vrei calitate mai buna si o pereche pentru un aranjament simetric.' },
+  // --- Ghirlande si accente verzi ---
+  { g: 'accent', id: 'DFC626MBM', badge: 'Iedera agatata', short: 'Iedera artificiala Set 2', tip: 'Ghirlanda', inaltime: '110 cm', material: 'plastic',
+    specs: ['set de 2 ghirlande de iedera', 'lungime 110 cm', 'verde, pentru agatat', 'raft, oglinda, balustrada'],
+    pros: ['Doua ghirlande lungi, 110 cm, multe posibilitati', 'Iedera cazatoare, aspect natural si relaxat', 'Se pune pe raft, oglinda, balustrada sau perete', 'Cel mai mic pret din selectie'],
+    cons: ['Verdele trebuie sa arate natural, nu prea lucios', 'Se aseaza cu putina atentie ca sa cada frumos'],
+    verdict: 'Alegerea pentru un accent verde cazator, care da viata unui raft, unei oglinzi sau unui perete gol. Setul are doua ghirlande de iedera artificiala de 110 cm, pe care le drapezi peste o biblioteca, o oglinda, o balustrada sau le lasi sa cada dintr-un ghiveci suspendat, pentru un aspect natural, relaxat, de planta cazatoare. E cel mai ieftin produs din selectie si, cu doua ghirlande, ai destul cat sa decorezi mai multe locuri. Conteaza sa alegi un verde care nu bate prea tare in lucios si sa le asezi cu putina atentie ca sa cada frumos. Le iei cand vrei sa aduci verde pe verticala, ieftin si fara intretinere.' },
+  { g: 'accent', id: 'DD5S03YBM', badge: 'Muschi stabilizat', short: 'Lichen stabilizat', tip: 'Muschi', inaltime: '-', material: 'natural stabilizat',
+    specs: ['lichen natural stabilizat', 'ales si curatat pentru decor', 'pentru tablouri vegetale handmade', 'zero intretinere, moale la atingere'],
+    pros: ['Muschi natural stabilizat, aspect si textura reale', 'Zero intretinere, nu cere apa sau lumina', 'Perfect pentru tablouri vegetale si accente de perete', 'Moale si placut la atingere, nu plastic'],
+    cons: ['Nu e o planta cu forma, ci material pentru aranjamente', 'Il combini singur intr-un cadru sau pe un suport'],
+    verdict: 'O alegere aparte: nu o floare, ci muschi natural stabilizat, adica muschi real conservat, care ramane moale si verde ani intregi fara apa sau lumina. E materialul din spatele tablourilor vegetale la moda, panourile verzi de perete pe care le vezi in cafenele si birouri, si il folosesti ca sa iti faci propriul accent handmade, intr-un cadru sau pe un suport. Fiind natural stabilizat, are textura si aspectul reale, nu de plastic, si e placut la atingere. Nu e o planta cu forma, ci material pe care il compui tu, deci cere putina creativitate. Il iei cand vrei un perete verde, natural la aspect, fara nicio ingrijire.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const BUCHET = PICKS.filter(x => x.g === 'buchet');
+const GHIVECI = PICKS.filter(x => x.g === 'ghiveci');
+const ACCENT = PICKS.filter(x => x.g === 'accent');
+
+const site = 'https://centrocasa.ro';
+const hero = '/images/articles/plante-artificiale-decorative-pentru-interior.webp';
+const figBuchet = '/imagini/articole/plante-buchete.webp';
+const figGhiveci = '/imagini/articole/plante-ghiveci.webp';
+const figAccent = '/imagini/articole/plante-accente.webp';
+const published = '2026-07-18T13:37:15+03:00';
+
+const faq = [
+  { question: 'De ce sa aleg plante artificiale in loc de vii?', answer: 'Pentru zero intretinere si aspect constant. Plantele artificiale nu cer apa, lumina sau ingrijire, arata la fel tot anul si sunt ideale pentru camere intunecate, birouri, bai fara geam sau pentru cine pleaca des si nu are cine sa ude. Sunt si o solutie pentru cei alergici la polen sau care nu au mana verde. Plantele vii raman mai frumoase si mai sanatoase pentru aer, dar cer timp si conditii; cele artificiale iti dau verdeata si culoare fara nicio grija.' },
+  { question: 'Cum fac plantele artificiale sa arate natural, nu a plastic?', answer: 'Cateva trucuri simple fac toata diferenta. Alege modele cu material mat, nu lucios, pentru ca luciul da imediat aspectul de plastic ieftin. Muta-le din ghiveciul original de plastic intr-unul frumos, de ceramica sau lut, care ridica mult aspectul. Amesteca mai multe tipuri si inaltimi, ca in natura, si aranjeaza frunzele si tulpinile ca sa cada firesc, nu perfect simetric. Si sterge-le de praf regulat, pentru ca praful e ce le tradeaza cel mai repede.' },
+  { question: 'Unde arata cel mai bine plantele artificiale?', answer: 'Acolo unde o planta vie ar avea probleme sau unde vrei constanta. Buchetele si florile merg pe masa, pe pervaz sau in baie; plantele in ghiveci, ca orhideea sau bonsaiul, pe un birou, un raft sau o consola; iar ghirlandele de iedera si muschiul stabilizat pe un perete, o oglinda sau o biblioteca. Sunt perfecte in colturi intunecate, unde nimic viu nu ar creste, si in locuri greu de udat. Grupeaza-le cateva la un loc, ca un aranjament, in loc sa pui una singura ratacita.' },
+  { question: 'Ce inseamna plante stabilizate?', answer: 'Plantele stabilizate, ca muschiul sau florile de tip lagurus, sunt plante reale conservate printr-un proces care le pastreaza aspectul, culoarea si textura fara sa mai aiba nevoie de apa sau lumina. Practic, sunt naturale, nu din plastic, dar nu mai cresc si nu se ofilesc, si tin ani intregi. Muschiul stabilizat e foarte folosit pentru tablouri vegetale si panouri verzi de perete. Fata de artificialul din plastic, arata si se simt mai autentic, la un pret ceva mai mare.' },
+  { question: 'Cum le intretin?', answer: 'Foarte simplu, dar nu chiar zero. Praful e singurul lor dusman: sterge-le periodic cu o laveta uscata sau moale, sufla-le cu un uscator de par pe rece la florile dese, sau, la cele de plastic rezistent, clateste-le usor cu apa rece si lasa-le sa se usuce. Tine modelele care nu sunt rezistente la UV departe de soarele direct puternic, ca sa nu se decoloreze in timp. Muschiul stabilizat nu se sterge cu apa, doar se scutura usor de praf. Atat, si arata bine ani buni.' },
+  { question: 'Plantele artificiale rezista si afara, pe balcon?', answer: 'Doar cele facute pentru exterior. Multe plante artificiale sunt gandite pentru interior si se decoloreaza sau se degradeaza la soare si ploaie. Cele marcate ca rezistente la UV si pentru exterior, ca setul Outsunny din aceasta selectie, rezista pe un balcon sau o terasa. Daca vrei verdeata pe balcon fara sa uzi, cauta explicit modele pentru exterior si rezistente la UV; altfel, tine-le la interior, unde arata bine mult mai mult timp.' },
+];
+
+const images = [hero, figBuchet, figGhiveci, figAccent, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
 ---
 
 <Layout
-  title="Plante artificiale decorative pentru interior - CentroCasa"
-  description="Daca iti doresti sa aduci un strop de verdeata in casa ta, dar nu ai timp sau nu ai deloc mana forte pentru plante vii, astazi vorbim despre o alternativa care a evoluat enorm: plantele artificiale decorative. Nu te gandi la vechile imitatii din plastic, ci la solutii care pot pacali ochiul si pot infrumuseta orice colt al casei tale."
-  image="/images/articles/plante-artificiale-decorative-pentru-interior.webp"
+  title="Plante artificiale decorative pentru interior in 2026: alegeri fara intretinere"
+  description="Ce plante artificiale decorative pentru interior sa alegi in 2026: buchete de flori, orhidee si bonsai in ghiveci, iedera si muschi stabilizat. Plus de ce artificiale, cum sa arate natural si unde le pui."
+  image={hero}
   type="article"
-  publishedTime="2026-01-19T09:15:45.052Z"
-  modifiedTime="2026-01-31T09:15:45.684Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Decoratiuni Casa', url: '/decoratiuni-casa/' }, { name: 'Plante artificiale decorative pentru interior' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
-      <span class="breadcrumb-separator">/</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a><span class="breadcrumb-separator">/</span>
       <span>Plante artificiale decorative pentru interior</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
-        <span class="article-date">24 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Plante artificiale decorative pentru interior</h1>
-    </header>
+    <h1>Plante artificiale decorative pentru interior</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/plante-artificiale-decorative-pentru-interior.webp" alt="Plante artificiale decorative pentru interior" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Plante artificiale decorative pentru interior: buchete, ghiveci si accente verzi" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-plante-artificiale-o-solutie-pentru-oricine-isi-doreste-verdeata-in-casa">
-        <h2>De ce plante artificiale? O solutie pentru oricine isi doreste verdeata in casa</h2>
-        <p>Hei prietene! Stiu ca uneori ideea de a avea plante vii in casa poate parea intimidanta. Fie ca ai un program super incarcat, fie ca pur si simplu nu ai "mana forte" pentru plante, s-ar putea sa te fi gandit ca verdeleata nu e pentru tine. Ei bine, gresit! In ultimii ani, plantele artificiale au facut pasi uriasi inainte.</p>
-        <p>Nu mai vorbim de acele imitatii lucioase, din plastic ieftin, care stau praduite in colturi. Astazi, vorbim despre plante artificiale care arata incredibil de realist, care pot aduce textura, culoare si o atmosfera placuta in orice spatiu. Din experienta mea, sunt perfecte pentru persoanele care calatoresc mult, pentru cei care locuiesc in apartamente fara multa lumina naturala sau pur si simplu pentru cei care vor un decor fara griji.</p>
-        <p>Nu ai nevoie de apa, de soare, de pamant special... doar de un pic de prafuit ocazional. Mi se pare o solutie geniala pentru a revitaliza un hol intunecat, pentru a da un pic de viata biroului de acasa sau pentru a completa un aranjament de mobilier. Si sincer, cand vezi cat de bine arata unele modele, iti vine sa le cumperi pe toate! Nu te lasa pacalit de prejudecati, plantele artificiale de astazi sunt o optiune serioasa pentru decorul casei tale.</p>
-      </section>
-
-      <section id="top-5-plante-artificiale-decorative-care-mi-au-atras-atentia">
-        <h2>Top 5 Plante Artificiale Decorative care mi-au atras atentia</h2>
-        <p>Am testat si am vazut o gramada de plante artificiale, si pot sa spun ca unele chiar ies in evidenta. Am ales cateva optiuni care mi s-au parut ca ofera cel mai bun raport calitate-pret si un aspect cat mai natural:</p>
-        <p>1.  <strong>Ficus Lyrata (Chitară) artificial:</strong> Acesta este un "must-have" in multe case acum, si pe buna dreptate. Frunzele mari, in forma de vioara, dau un aer modern si sofisticat. Am vazut modele cu tulpina de 1.5m pana la 2m, cu frunze din material textil de buna calitate, care chiar imita textura pieloasa a celor vii.</p>
-        <p>Multe vin si cu un ghiveci simplu, negru, pe care il poti inlocui cu unul ceramic mai elegant. Pretul pentru un ficus de 1.5m incepe de la aproximativ 200-300 RON, insa modelele mai mari, cu aspect foarte realist, pot ajunge si la 500-700 RON. Imi place la acest model ca poate transforma instantaneu un colt gol.</p>
-        <p>2.  <strong>Monstera Deliciosa artificială:</strong> Un alt "trend-setter" in decorul de <a href="/ghirlanda-luminoasa-pentru-interior/" class="interlink">interior</a>. Frunzele mari, cu acele "taieturi" specifice, aduc un vibe tropical si relaxant. Am gasit modele cu 3-5 tije, cu frunze lucioase sau mate, in functie de preferinte. Cele cu aspect mai mat si usor "ridat" mi se par mai realiste. Cele de dimensiuni medii, cam 80-100cm inaltime, se invart pe la 150-250 RON. Cele mai mari, cu multe frunze si ramificatii, pot trece de 400 RON.</p>
-        <p>3.  <strong>Bambus artificial (in ghiveci sau ca paravan):</strong> Daca vrei sa creezi o atmosfera zen sau sa delimitezi un spatiu, bambusul artificial e o alegere excelenta. Am vazut tije de bambus grupate in ghivece mari, care arata foarte bine langa o fereastra sau intr-un hol. De asemenea, paravanele din bambus artificial, fie ca sunt pliate, fie ca sunt dispuse pe un cadru, sunt practice si estetice.</p>
-        <p>Un grup de tije de bambus in ghiveci de 1.2m poate fi in jur de 180-280 RON. Paravanele sunt mai scumpe, incepand de la 300-400 RON.</p>
-        <p>4.  <strong>Plante suculente si cactusi artificiali:</strong> Pentru cei care iubesc "micile comori" verzi, dar nu au rabdare sa le ingrijeasca, suculentele si cactusi artificiali sunt perfecti. Vin intr-o varietate uriasa de forme si culori. De multe ori sunt vandute in seturi mici, cu ghivece simpatice, gata de pus pe birou sau pe o etajera. Un set de 3-5 suculente mici, cu ghivece, poate fi gasit si cu 50-100 RON. Cele mai mari, cu aspect mai elaborat, pot ajunge la 150 RON.</p>
-        <p>5.  <strong>Eucalipt artificial (crengute sau buchete):</strong> Eucaliptul, cu frunzele sale argintii sau verzui, aduce un plus de delicatete si prospetime. Crengutele de eucalipt artificial sunt incredibil de versatile. Le poti pune intr-o vaza simpla, le poti integra in buchete de flori artificiale sau le poti folosi pentru a crea coronite <a href="/ceas-de-perete-decorativ-mare/">decorativ</a>e. Pretul pentru un buchet de eucalipt artificial de calitate buna este undeva intre 60-120 RON, in functie de marime si numarul de crengute.</p>
-      </section>
-
-      <section id="cum-alegi-verdele-perfect-pentru-casa-ta-ghid-practic">
-        <h2>Cum alegi "verdele" perfect pentru casa ta? Ghid practic</h2>
-        <p>Alegerea plantelor artificiale potrivite poate parea simpla, dar sunt cateva aspecte la care eu m-as uita atent, ca sa nu dau banii degeaba pe ceva ce nu arata bine. In primul rand, <strong>materialul</strong>. Asta e cel mai important.</p>
-        <p>Azi, plantele bune sunt facute din materiale textile (matase, poliester de calitate), uneori cu inserții de silicon sau cauciuc pentru a imita mai bine textura. Evita plasticul lucios, ala se vede de la o posta ca e artificial. Verifica daca frunzele sunt bine prinse de tije si daca nu au defecte de fabricatie.</p>
-        <p>Un alt aspect important este <strong>realismul</strong>. Uita-te la detalii: venaturile frunzelor, cum sunt dispuse pe tije, daca au mici "imperfețiuni" naturale. Unele plante artificiale au si "praf" sau "pete" subtile care le fac sa para mai autentice.</p>
-        <p>Gandeste-te si la <strong>dimensiune si proportie</strong>. O planta prea mare intr-un spatiu mic va fi sufocanta, iar una prea mica intr-un living spatios se va pierde. Masoara spatiul unde vrei sa o pui si cauta ceva ce se potriveste.</p>
-        <p>Nu uita de <strong>ghiveci</strong>! Multe plante vin in ghivece simple, de transport. E bine sa te gandesti daca vrei sa le schimbi cu unele mai <a href="/perne-decorative-pentru-canapea/" class="interlink">decorative</a>, care sa se potriveasca stilului tau de amenajare. Culorile sunt si ele importante.</p>
-        <p>Incearca sa alegi nuante cat mai naturale. Unele plante artificiale au culori prea aprinse sau prea uniforme, ceea ce le trage in jos. Si la final, dar nu cel din urma, <strong>bugetul</strong>.</p>
-        <p>Pretul variaza enorm in functie de calitate, marime si brand. Eu as recomanda sa investesti un pic mai mult intr-o piesa centrala, cum ar fi un ficus mare, si sa completezi cu piese mai mici si mai accesibile. Nu te grabi, cauta oferte si compara preturile intre diferite magazine online si fizice.</p>
-        <p>Sper ca aceste sfaturi sa te ajute sa faci alegerea potrivita!</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-e-aur-curat-sau-doar-o-iluzie">
-        <h2>Avantaje si Dezavantaje: E aur curat sau doar o iluzie?</h2>
-        <p>Cand vine vorba de plante artificiale, parerile sunt impartite. Dar, din experienta mea, beneficiile sunt destul de evidente, desi exista si cateva puncte slabe pe care ar trebui sa le luam in considerare.</p>
-        <p><strong>Avantaje:</strong></p>
-        <p><strong>Intretinere zero:</strong> Acesta e probabil cel mai mare avantaj. Nu trebuie sa le uzi, sa le fertilizezi, sa le schimbi pamantul sau sa te ingrijorezi de lumina. Sunt perfecte pentru persoanele ocupate, pentru cei care calatoresc des sau pentru cei care pur si simplu nu au timp sau inclinatie pentru ingrijirea plantelor vii.</p>
-        <p><strong>Durabilitate:</strong> Odata achizitionate, plantele artificiale de calitate pot rezista ani de zile, fara sa-si piarda aspectul, atata timp cat sunt ingrijite corespunzator (prafuite). Spre deosebire de plantele vii, care pot muri din diverse motive, cele artificiale sunt o investitie pe termen lung.</p>
-        <p><strong><a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">Solutie pentru</a> spatii cu lumina redusa:</strong> Ai un hol intunecat, o baie fara geam sau un birou unde lumina naturala e la minimum? Plantele artificiale sunt raspunsul. Ele pot aduce verdeata si viata in orice colt al casei, indiferent de conditiile de lumina.</p>
-        <p><strong>Varietate si disponibilitate:</strong> Poti gasi aproape orice tip de planta, in orice dimensiune, indiferent de sezon. Vrei o planta tropicala rara iarna? Nicio problema! Poti crea aranjamente complexe si personalizate, fara sa te limitezi la ce creste in zona ta sau la ce este disponibil in pepiniere.</p>
-        <p><strong>Hipoalergenice:</strong> Pentru persoanele cu alergii la polen sau la anumite tipuri de flori, plantele artificiale sunt o alternativa excelenta pentru a se bucura de frumusetea plantelor fara riscuri.</p>
-        <p><strong>Dezavantaje:</strong></p>
-        <p><strong>Aspectul:</strong> Chiar si cele mai bune plante artificiale pot fi identificate ca atare de catre un ochi mai atent. Unele materiale pot parea prea lucioase, prea uniforme sau pur si simplu "moarte". Este important sa alegi produse de calitate pentru a minimiza acest aspect.</p>
-        <p><strong>Potențialul de a aduna praf:</strong> Fara a fi udate, plantele artificiale pot acumula praf in timp, ceea ce le poate face sa para mai vechi si mai neatractive. Necesita o curatare periodica, fie prin stergere cu o carpa umeda, fie prin pulverizare cu apa.</p>
-        <p><strong>Costul initial:</strong> Plantele artificiale de calitate, care arata natural, pot fi destul de scumpe. O piesa deosebita, mare si bine realizata, poate costa la fel de mult sau chiar mai mult decat o planta vie de dimensiuni similare.</p>
-        <p><strong>Lipsa beneficiilor pentru aer:</strong> Spre deosebire de plantele vii, cele artificiale nu purifica aerul si nu produc oxigen. Acesta este un dezavantaj major pentru cei care cauta beneficiile de mediu ale plantelor.</p>
-        <p><strong>Pot fi considerate "false" sau "artificiale":</strong> Pentru unii oameni, ideea de a avea "fake plants" in casa este pur si simplu neplacuta. Preferinta pentru naturalețe este o chestiune de gust personal.</p>
-      </section>
-
-      <section id="trucuri-din-experienta-cum-sa-le-faci-sa-arate-wow">
-        <h2>Trucuri din experienta: Cum sa le faci sa arate "wow!"</h2>
-        <p>Am invatat cateva "secrete" in timp despre cum sa fac plantele artificiale sa arate cat mai bine si sa se integreze perfect in decorul casei. Nu e suficient sa le cumperi si sa le arunci pe un raft, trebuie sa le acorzi un pic de atentie. In primul rand, <strong>nu le lasa sa stea "ca din cutie"</strong>.</p>
-        <p>Multe plante artificiale vin presate in ambalaj. Ia-ti cateva minute sa "aranjezi" frunzele, sa le deschizi, sa le "aerisesti". Unele tije pot fi indoite sau modelate usor pentru a da un aspect mai natural, mai "haotic" si mai dinamic.</p>
-        <p>Eu imi petrec uneori 10-15 minute cu o planta noua, "sculptand-o" putin pana cand imi place cum arata. Un alt truc pe care il folosesc des este <strong>combinarea cu elemente naturale</strong>. Nu te sfii sa pui o crenguta artificiala de eucalipt langa cateva flori uscate sau sa combini o planta artificiala cu cateva ghivece cu plante vii mai mici.</p>
-        <p>Acest mix creeaza un echilibru si face ca si planta artificiala sa para mai putin "singura" si mai integrata in mediul natural. <strong>Ghiveciul face diferenta!</strong> Am spus-o si mai sus, dar merita repetat. Un ghiveci simplu, de plastic, poate strica complet aspectul unei plante altfel frumoase. Investeste intr-un ghiveci ceramic, de pamant, sau unul din ratan, care sa se potriveasca stilului tau.</p>
-        <p>Poate chiar sa pui cateva pietre decorative sau muschi uscat in ghiveci, pentru a acoperi pamantul (cel artificial, evident!) si a da un aspect mai finisat. <strong>Plasarea strategica</strong> este esentiala. Nu pune o planta artificiala intr-o pozitie unde lumina directa a soarelui o va lovi constant. Asta poate duce la decolorare in timp.</p>
-        <p>Alege colturi mai umbroase, unde plantele vii s-ar chinui, dar unde o planta artificiala va straluci. De asemenea, gandeste-te la inaltime. O planta mai inalta langa o canapea sau un fotoliu poate crea un punct focal interesant, iar una mai mica pe o etajera poate adauga un strop de culoare.</p>
-        <p>Si nu uita de <strong>curatare</strong>! Un prafuit regulat cu o carpa moale sau cu un pamatuf special pentru praf face minuni. Daca sunt mai murdare, le poti clati usor sub dus, cu apa calduta, si apoi le lasi sa se usuce complet la aer (nu in soare direct!).</p>
-      </section>
-
-      <section id="parerea-mea-sunt-plantele-artificiale-o-alegere-buna-da-dar-cu-cap">
-        <h2>Parerea mea: Sunt plantele artificiale o alegere buna? Da, dar cu cap!</h2>
-        <p>Dupa atatia ani in care am vazut si am testat tot felul de <a href="/produse-pentru-curatarea-baii/" class="interlink">produse pentru</a> casa, pot sa spun cu mana pe inima ca plantele artificiale de astazi sunt o revolutie in decorul de interior. Mi se pare incredibil cum tehnologia a avansat si a reusit sa creeze produse care imita atat de bine natura. Totusi, nu as recomanda sa inlocuiesti complet plantele vii cu cele artificiale, mai ales daca ai posibilitatea sa le ingrijesti pe cele vii.</p>
-        <p>Plantele vii aduc o energie aparte, un sentiment de prospetime si, sa fim sinceri, purifica si aerul. Dar, pentru momentele in care asta nu e posibil, plantele artificiale sunt o solutie fantastica. Secretul sta in <strong>alegerea potrivita</strong>.</p>
-        <p>Nu te arunca la prima oferta ieftina. Cauta produse de calitate, cu aspect cat mai natural. Investeste intr-o piesa centrala care sa arate spectaculos si completeaza cu accente mai mici.</p>
-        <p>Nu te astepta la miracole de la cele mai ieftine modele. Gandeste-te la ele ca la niste accesorii de decor, la fel ca o perna <a href="/oglinda-decorativa-pentru-hol/">decorativa</a> sau o vaza. Daca sunt alese corect, pot transforma complet un spatiu.</p>
-        <p>Eu am cateva "plante vedeta" in casa, pe care le rotesc prin diverse camere in functie de sezon sau de starea mea de spirit. Si sincer, de fiecare data cand vine cineva nou, ma intreaba "Ce planta frumoasa ai!" Si eu zambesc si raspund "E artificiala!". Surpriza lor e mereu pe masura.</p>
-        <p>Asa ca, da, le recomand cu caldura, atat timp cat stii ce cumperi si cum sa le integrezi in decorul tau. Bucura-te de verdeata, indiferent de cum ajunge ea in casa ta!</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie curatate plantele artificiale?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Ideal ar fi sa le stergi de praf o data pe saptamana sau la doua saptamani cu o carpa moale, uscata sau usor umeda. Daca sunt amplasate intr-un loc unde se aduna mai mult praf, curatarea poate fi necesara mai des. O data pe luna, sau de cate ori simti nevoia, le poti clati usor sub dus cu apa calduta si un pic de detergent de vase, apoi le lasi sa se usuce complet la aer.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot plantele artificiale sa se decoloreze in soare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, absolut. La fel cum se intampla cu multe materiale, expunerea prelungita la lumina directa a soarelui poate duce la decolorarea frunzelor si a tijelor. De aceea, mi se pare important sa le plasezi in zone unde nu sunt direct luminate de soare, sau sa alegi modele tratate UV, desi acestea sunt mai rare si mai scumpe.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fac daca o frunza de la o planta artificiala se rupe?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                In functie de tipul plantei si de modul in care sunt prinse frunzele, uneori le poti lipi la loc cu un adeziv puternic, cum ar fi un adeziv pentru materiale textile sau un lipici universal. Daca planta este mai complexa, poti incerca sa cauti o frunza de rezerva sau sa o inlocuiesti cu o frunza de la o alta planta artificiala mai veche sau deteriorata.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Sunt plantele artificiale ieftine o alegere buna?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Din experienta mea, plantele artificiale foarte ieftine sunt rareori o alegere buna pe termen lung. De obicei, materialele sunt de proasta calitate, aspectul este artificial (plastic lucios, culori nenaturale) si nu rezista in timp. Recomand sa investesti un pic mai mult intr-o planta de calitate medie spre buna, care va arata mult mai bine si va rezista mai mult.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi plante artificiale in baie sau bucatarie?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, plantele artificiale sunt o optiune excelenta pentru baie si bucatarie, mai ales daca aceste incaperi nu au multa lumina naturala. In baie, umiditatea ridicata nu le afecteaza, iar in bucatarie pot adauga un strop de culoare si prospetime. Asigura-te doar ca le cureti periodic, pentru a elimina eventualele mirosuri sau depuneri de grasime.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum pot face o planta artificiala sa arate mai natural?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Secretul sta in detalii. Aranjeaza frunzele si tijele pentru a crea un aspect mai dinamic si mai putin uniform. Foloseste un ghiveci decorativ, nu cel simplu de transport. Poti adauga pamant decorativ, pietricele sau muschi uscat in ghiveci pentru a acoperi baza. Unele plante artificiale au frunze care pot fi modelate usor, asa ca nu ezita sa le "sculptezi" putin pana obtii aspectul dorit.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru culoare imediata, cel mai bun set e <strong>5 buchete de flori</strong> rezistente la UV, cel mai vandut si ieftin. Daca vrei o planta gata de asezat, o <strong>orhidee in ghiveci</strong> sau un <strong>bonsai</strong> merg pe orice raft, fara ingrijire. Pentru un accent pe perete, o <strong>iedera agatata</strong> sau <strong>muschi stabilizat</strong>. Iar pentru calitate mai buna, setul <strong>Outsunny Lisianthus</strong>.</p>
+      <p>Marele motiv pentru care alegi artificial e simplu: <strong>zero intretinere</strong>, aspect constant si verdeata acolo unde o planta vie ar suferi, in colturi intunecate, birouri sau bai fara geam. Secretul e insa sa nu arate a plastic: conteaza <strong>materialul, ghiveciul si cum le aranjezi</strong>.</p>
+      <p>Am pornit de la plantele artificiale pentru interior vandute pe eMAG, le-am verificat tipul, materialul si aspectul, si le-am grupat pe buchete si flori, plante in ghiveci si ghirlande si accente verzi. Pentru restul decorului, vezi si <a href="/covor-modern-pentru-living/">covoarele moderne</a> si <a href="/oglinda-decorativa-pentru-hol/">oglinzile decorative</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#de-ce">De ce plante artificiale</a></li>
+        <li><a href="#natural">Cum sa arate natural, nu a plastic</a></li>
+        <li><a href="#unde">Ce tip alegi si unde le pui</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#buchete">Buchete si flori</a></li>
+        <li><a href="#ghiveci">Plante in ghiveci</a></li>
+        <li><a href="#accente">Ghirlande si accente verzi</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="de-ce">De ce plante artificiale</h2>
+    <p>Motivul principal e comoditatea, dar avantajele merg mai departe:</p>
+    <ul>
+      <li><strong>Zero intretinere:</strong> fara apa, fara lumina, fara ingrijire. Arata la fel tot anul.</li>
+      <li><strong>Merg unde plantele vii nu pot:</strong> colturi intunecate, bai fara geam, birouri, camere in care nu intra soarele.</li>
+      <li><strong>Pentru cine pleaca des:</strong> nu ai grija cine le uda cat esti plecat.</li>
+      <li><strong>Fara alergii:</strong> nu au polen, o solutie pentru cei sensibili.</li>
+      <li><strong>Si o varianta naturala:</strong> plantele stabilizate, ca muschiul, sunt plante reale conservate, fara plastic si fara ingrijire.</li>
+    </ul>
+    <p>Plantele vii raman mai bune pentru aer si mai vii, dar cer timp si conditii; cele artificiale iti dau verdeata si culoare fara nicio grija.</p>
+
+    <h2 id="natural">Cum sa arate natural, nu a plastic</h2>
+    <p>Aici se vede diferenta dintre un decor frumos si unul care striga a plastic ieftin. Cateva trucuri de designer:</p>
+    <ul>
+      <li><strong>Material mat, nu lucios:</strong> luciul da imediat aspectul de plastic. Cauta frunze si petale mate, ca cele reale.</li>
+      <li><strong>Schimba ghiveciul:</strong> muta planta din ghiveciul original de plastic intr-unul de ceramica, lut sau impletitura. Ridica enorm aspectul.</li>
+      <li><strong>Amesteca si grupeaza:</strong> combina tipuri si inaltimi, ca in natura, si pune cateva la un loc, nu una singura ratacita.</li>
+      <li><strong>Aranjeaza firesc:</strong> indoaie tulpinile si frunzele ca sa cada natural, nu perfect simetric.</li>
+      <li><strong>Sterge praful:</strong> praful e ce le tradeaza cel mai repede. O laveta uscata, periodic, le tine ca noi.</li>
+    </ul>
+
+    <h2 id="unde">Ce tip alegi si unde le pui</h2>
+    <p>Fiecare tip isi are locul lui in casa:</p>
+    <p><strong>Buchete si flori:</strong> intr-o vaza, pe masa, pe pervaz sau in baie, pentru culoare rapida.</p>
+    <p><strong>Plante in ghiveci</strong> (orhidee, bonsai): pe un birou, un raft sau o consola, ca accent verde gata de asezat.</p>
+    <p><strong>Ghirlande si muschi:</strong> pe un perete, o oglinda, o biblioteca sau ca tablou vegetal, pentru verde pe verticala.</p>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Produs</th><th>Tip</th><th>Inaltime</th><th>Material</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (<tr><td>{x.short}</td><td>{x.tip}</td><td>{x.inaltime}</td><td>{x.material}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="buchete">Buchete si flori</h2>
+    <p>Culoare rapida intr-o vaza, pe masa sau pe pervaz. Rezistente la UV, nu se decoloreaza, si le refolosesti an de an, spre deosebire de florile taiate.</p>
+    <div class="rd-grid">
+      {BUCHET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuchet} alt="Buchete de flori artificiale pentru interior" width="1200" height="675" loading="lazy" />
+
+    <h2 id="ghiveci">Plante in ghiveci</h2>
+    <p>Gata de asezat pe un raft, birou sau consola: orhidee, bonsai si plante mai mari, cu aspect natural si fara apa, lumina sau ingrijire.</p>
+    <div class="rd-grid">
+      {GHIVECI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figGhiveci} alt="Plante artificiale in ghiveci: orhidee, bonsai si Lisianthus" width="1200" height="675" loading="lazy" />
+
+    <h2 id="accente">Ghirlande si accente verzi</h2>
+    <p>Verde pe verticala, pentru un perete, o oglinda sau o biblioteca: iedera cazatoare si muschi stabilizat, materialul din spatele tablourilor vegetale la moda.</p>
+    <div class="rd-grid">
+      {ACCENT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAccent} alt="Ghirlande de iedera si muschi stabilizat pentru perete" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={b64('oferte-plante-artificiale')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate plantele artificiale la oferta</strong>
+        <span>Reducerile din acest moment la flori, plante si aranjamente artificiale, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa plantele artificiale</h2>
+    <p>Vestea buna e ca sunt printre cele mai ieftine accente decorative:</p>
+    <p><strong>Buchete si ghirlande:</strong> de la circa 25-50 de lei pentru un buchet de flori sau un set de ghirlande de iedera. Cel mai mic prag pentru culoare si verde.</p>
+    <p><strong>Plante in ghiveci:</strong> in general 35-90 de lei pentru o orhidee sau un bonsai gata de asezat, cu ghiveci inclus.</p>
+    <p><strong>Seturi si modele de calitate:</strong> spre 190 de lei pentru seturi de plante mai mari, din materiale mai realiste, pentru interior si exterior.</p>
+    <p>Pe langa planta, merita sa investesti intr-un <strong>ghiveci frumos</strong> sau o vaza pe masura, pentru ca schimba complet aspectul. Cu cateva zeci de lei si putina atentie la aranjament, aduci verdeata intr-o camera fara nicio grija de intretinere. Pe un perete gol, un <a href="/ceas-de-perete-decorativ-mare/">ceas de perete decorativ mare</a> completeaza aranjamentul.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a> si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor interioare si exterioare in oaze de relaxare.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="plante-artificiale-decorative-pentru-interior"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="plante-artificiale-decorative-pentru-interior"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="plante-artificiale-decorative-pentru-interior" currentCategory="decoratiuni-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="plante-artificiale-decorative-pentru-interior" currentCategory="decoratiuni-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

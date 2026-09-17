@@ -13,38 +13,22 @@ interface Props {
   articles: Article[];
 }
 
+import keywordsData from '../../keywords.json';
+import { slugify } from '../lib/articles.mjs';
+
 const { currentSlug, currentCategory, articles } = Astro.props;
 
-// Sort articles chronologically (oldest first)
-const sorted = [...articles]
-  .filter(a => a.slug !== currentSlug)
+// Prev/Next DOAR in aceeasi categorie + ACELASI grup de vizibilitate: articolele vechi
+// (legacy) nu se amesteca cu cele noi. Fara fallback cross-categorie sau cross-grup.
+const legacyBySlug = new Map(keywordsData.completed.map(a => [a.slug || slugify(a.keyword), !!a.legacy]));
+const currentLegacy = legacyBySlug.get(currentSlug) ?? false;
+const sameCatAll = [...articles]
+  .filter(a => a.categorySlug === currentCategory && (legacyBySlug.get(a.slug) ?? false) === currentLegacy)
   .sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime());
+const catIndex = sameCatAll.findIndex(a => a.slug === currentSlug);
 
-// Find current article index in full sorted list (including current)
-const allSorted = [...articles]
-  .sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime());
-const currentIndex = allSorted.findIndex(a => a.slug === currentSlug);
-
-// Try same category first
-const sameCategory = sorted.filter(a => a.categorySlug === currentCategory);
-
-let prevArticle: Article | null = null;
-let nextArticle: Article | null = null;
-
-if (sameCategory.length > 0) {
-  const sameCatAll = allSorted.filter(a => a.categorySlug === currentCategory);
-  const catIndex = sameCatAll.findIndex(a => a.slug === currentSlug);
-  if (catIndex > 0) prevArticle = sameCatAll[catIndex - 1];
-  if (catIndex < sameCatAll.length - 1) nextArticle = sameCatAll[catIndex + 1];
-}
-
-// Fallback to chronological if no same-category prev/next
-if (!prevArticle && currentIndex > 0) {
-  prevArticle = allSorted[currentIndex - 1];
-}
-if (!nextArticle && currentIndex < allSorted.length - 1) {
-  nextArticle = allSorted[currentIndex + 1];
-}
+const prevArticle: Article | null = catIndex > 0 ? sameCatAll[catIndex - 1] : null;
+const nextArticle: Article | null = (catIndex >= 0 && catIndex < sameCatAll.length - 1) ? sameCatAll[catIndex + 1] : null;
 ---
 
 {(prevArticle || nextArticle) && (

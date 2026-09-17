@@ -1,0 +1,242 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['tocatoare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Compacte (0.8-1.2 l) ---
+  { g: 'compact', id: 'EPRTNBBBM', rol: 'Cel mai vandut, de la Bosch', short: 'Bosch MMR08R2', cap: '0.8 l', putere: '400 W', bol: 'Plastic', pret: '170 lei',
+    specs: ['400 W, bol de 0.8 litri, o viteza', 'lama in forma de S pentru tocare fina', 'toaca, marunteste si zdrobeste gheata', 'de la Bosch, brand de referinta'],
+    pros: ['690 de pareri, de departe cel mai testat', 'Compact, ideal pentru ceapa, usturoi, verdeturi', 'Zdrobeste si gheata, nu doar toaca', 'Brand Bosch, fiabil si cu service'],
+    cons: ['Bol de doar 0.8 litri, mic pentru cantitati mari', 'Bol de plastic, nu de sticla'],
+    verdict: 'Cu 690 de pareri, e cel mai cumparat tocator din articol, si e alegerea sigura pentru munca marunta de zi cu zi. Bolul de 0.8 litri e mic, dar exact cat trebuie pentru ce folosesti cel mai des un tocator: o ceapa, cativa catei de usturoi, un pumn de patrunjel sau de nuci, tocate in cateva secunde cu o apasare. Lama in forma de S se invarte si marunteste fin, iar peste tocare stie sa si zdrobeasca gheata, un bonus. In spate e Bosch, cu fiabilitatea si service-ul unui brand mare. Limitele sunt firesti la formatul asta: bolul mic nu e pentru cantitati de familie, iar plasticul, spre deosebire de sticla, se poate pata in timp de la morcov sau sfecla. Il iei ca tocator principal pentru portii mici, de la un brand de incredere.' },
+  { g: 'compact', id: 'DQSZ22MBM', rol: 'Bol de sticla, cel mai ieftin cu 2 viteze', short: 'Heinner HMC-K500WHR', cap: '1 l', putere: '500 W', bol: 'Sticla', pret: '110 lei',
+    specs: ['500 W, bol de sticla de 1 litru', '2 viteze pentru control mai bun al texturii', '2 cutite din inox', 'sticla nu retine mirosuri si pete'],
+    pros: ['Bol de sticla, nu se pateaza si nu retine miros', '2 viteze, alegi cat de fin toci', '500 W, putere buna pentru pret', 'Sub 110 lei'],
+    cons: ['1 litru, tot pentru portii mici-medii', '170 de pareri, sub liderul Bosch'],
+    verdict: 'Fata de Bosch, Heinner aduce doua lucruri utile la un pret mai mic: bolul de sticla si a doua viteza. Sticla conteaza mai mult decat pare, pentru ca nu se pateaza de la morcov sau sfecla si nu retine mirosul de usturoi, deci bolul ramane curat, nu parfumat. Cele 2 viteze iti dau control asupra texturii: viteza mica pentru o tocatura grosiera, mare pentru una fina. Cei 500 W si cele 2 cutite de inox se descurca bine cu legumele si verdeturile. Bolul de 1 litru ramane potrivit mai degraba pentru portii mici si medii, nu pentru cantitati mari. Cu 170 de pareri e mai putin testat decat Bosch, dar bine notat. Il iei cand vrei bol de sticla si control pe viteza, la cel mai mic pret.' },
+  { g: 'compact', id: 'D388V4YBM', rol: 'Multifunctional, cu doua boluri', short: 'Latkon Multifunctional', cap: '1.2 + 2 l', putere: '400 W', bol: 'Sticla + inox', pret: '200 lei',
+    specs: ['400 W, doua boluri: unul de sticla de 1.2 l, unul de inox de 2 l', '2 viteze, macina, toaca si marunteste', 'nota 4.82, printre cele mai mari', 'un aparat pentru mai multe nevoi'],
+    pros: ['Doua boluri, unul mic si unul mare, dupa nevoie', 'Sticla pentru tocat fin, inox pentru cantitati mari', 'Macina si nuci sau cafea, nu doar toaca', 'Nota 4.82, foarte bine cotat'],
+    cons: ['Cel mai scump din articol', '133 de pareri, brand mai putin cunoscut'],
+    verdict: 'Latkon rezolva dilema capacitatii dandu-ti doua boluri in aceeasi cutie: unul de sticla de 1.2 litri, pentru tocat fin ceapa si verdeturi, si unul de inox de 2 litri, pentru cantitati mari. Practic acopera si nevoia de zi cu zi, si gatitul pentru multi, fara sa cumperi doua aparate. Cele 2 viteze si functia de macinare il fac versatil: pe langa tocat, macina nuci, seminte sau chiar cafea. Nota de 4.82 e printre cele mai mari din articol. Reversul e pretul, cel mai mare din selectie, si brandul mai putin cunoscut, cu 133 de pareri. Practic platesti pentru versatilitatea celor doua boluri. Il iei cand vrei un singur tocator care sa acopere si portii mici, si cantitati mari, cu optiunea de macinare.' },
+  // --- B. Cu bol mare (1.5-2 l) ---
+  { g: 'mare', id: 'DZSZ22MBM', rol: 'Bol de sticla de 1.5 litri', short: 'Heinner HMC-K500BKR', cap: '1.5 l', putere: '500 W', bol: 'Sticla', pret: '126 lei',
+    specs: ['500 W, bol de sticla de 1.5 litri', '3 cutite din inox pentru tocare rapida', 'sticla rezistenta, nu retine mirosuri', 'nota 4.78'],
+    pros: ['Bol de sticla de 1.5 litri, mai mult odata', '3 cutite de inox, tocare rapida si fina', 'Sticla nu se pateaza si nu retine miros', '325 de pareri, bine testat'],
+    cons: ['Fara a doua viteza declarata', 'Bolul de sticla e mai greu decat plasticul'],
+    verdict: 'Cel mai bine vandut tocator cu bol mare din articol, cu 325 de pareri, si o alegere foarte echilibrata. Bolul de sticla de 1.5 litri iti da spatiu pentru mai mult odata, o portie mai mare de legume pentru o supa sau o tocatura de carne pentru chiftele, iar sticla nu se pateaza si nu retine mirosul, ca la plastic. Cele 3 cutite de inox, mai multe decat lama simpla a unui tocator de baza, toaca mai rapid si mai uniform. Cu 500 W se descurca bine cu majoritatea legumelor si cu carnea in bucati. Nu declara o a doua viteza, deci controlezi textura din durata apasarilor, prin impulsuri, iar bolul de sticla e ceva mai greu de manevrat decat unul de plastic. Il iei cand vrei bol de sticla mai mare si tocare rapida, la un pret foarte bun.' },
+  { g: 'mare', id: 'DPZKRTMBM', rol: 'Cu bol de sticla si functie de macinare', short: 'Biovita 1.5 l', cap: '1.5 l', putere: '500 W', bol: 'Sticla', pret: '150 lei',
+    specs: ['500 W, bol de sticla de 1.5 litri', 'macina, toaca si marunteste', 'cutite din inox', 'nota 4.73 pe 319 pareri'],
+    pros: ['Bol de sticla de 1.5 litri, incapator', 'Macina nuci si seminte, nu doar toaca', '319 pareri, bine testat', 'Sticla usor de curatat, fara mirosuri'],
+    cons: ['Brand mai putin cunoscut', 'Diferenta mica fata de Heinner de 1.5 l'],
+    verdict: 'Foarte aproape de Heinner de 1.5 litri ca profil, dar cu accent pe versatilitate: pe langa tocat, Biovita macina nuci, seminte sau condimente, util daca vrei un aparat care face mai mult decat sa marunteasca legume. Bolul de sticla de 1.5 litri e incapator si, ca la orice bol de sticla, nu se pateaza si nu retine miros. Cele 319 pareri si nota 4.73 il aseaza printre cele mai testate din articol. Diferenta reala fata de Heinner de aceeasi capacitate e mica, tine mai mult de brand si de functia de macinare pe care Biovita o scoate in fata. Il iei cand vrei un tocator cu bol mare de sticla si vrei sa poti si macina, nu doar toca.' },
+  { g: 'mare', id: 'DD94TVMBM', rol: 'Cel mai ieftin, cu bol mare de inox', short: 'Sokany SK-7002A', cap: '2 l', putere: '700 W', bol: 'Inox', pret: '65 lei',
+    specs: ['700 W, cea mai mare putere din articol', 'bol de inox de 2 litri, cel mai incapator', '4 lame din otel inoxidabil', 'pretul cel mai mic din selectie'],
+    pros: ['Sub 65 de lei, cel mai ieftin din articol', 'Bol de 2 litri, cel mai mare', '700 W si 4 lame, toaca ferm si carne', 'Bol de inox, rezistent la lovituri'],
+    cons: ['Nota 4.14, cea mai mica din articol', '80 de pareri, mai putin testat'],
+    verdict: 'Cel mai ieftin tocator din articol, dar si cel mai puternic si mai incapator, ceea ce il face o oferta interesanta pentru cine vrea cantitate la pret mic. Cei 700 W si cele 4 lame de inox toaca ferm, inclusiv carne pentru chiftele sau mici, iar bolul de inox de 2 litri e cel mai mare din selectie, bun pentru gatit in cantitate. Inoxul rezista la lovituri si nu se sparge ca sticla. Trebuie insa spus direct: nota de 4.14 e cea mai mica din articol, semn ca unii utilizatori au avut probleme sau asteptari mai mari, iar cu 80 de pareri e mai putin testat. La pretul asta, e un compromis intre pret si finisaj. Il iei cand vrei putere si bol mare la cel mai mic pret, constient ca nu are notele celor de brand.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const COMPACT = PICKS.filter(x => x.g === 'compact');
+const MARE = PICKS.filter(x => x.g === 'mare');
+
+const hero = '/imagini/articole/cele-mai-bune-tocatoare-de-legume.webp';
+const figCompact = '/imagini/articole/tocatoare-compacte.webp';
+const figMare = '/imagini/articole/tocatoare-bol-mare.webp';
+const published = '2026-07-21T21:58:25+03:00';
+
+const faq = [
+  { question: 'Ce capacitate de tocator imi trebuie?', answer: 'Depinde ce toci cel mai des. Pentru munca marunta de zi cu zi, o ceapa, usturoi, verdeturi, un pumn de nuci, un bol de 0.5-0.8 litri e suficient si chiar mai practic, pentru ca lama prinde mai bine cantitatile mici. Pentru portii medii, de familie, alege 1-1.5 litri. Peste 2 litri e pentru cine toaca des in cantitate mare, carne pentru chiftele sau legume pentru muraturi. Un detaliu util: un bol prea mare pentru un pic de usturoi imprastie totul pe pereti si nu il toaca uniform, deci nu supradimensiona daca folosesti tocatorul mai ales pentru cantitati mici.' },
+  { question: 'Bol de sticla, plastic sau inox?', answer: 'Fiecare are avantaje. Sticla nu se pateaza de la morcov sau sfecla, nu retine mirosul de usturoi si arata bine, dar e mai grea si se poate sparge daca o scapi. Plasticul e usor si nu se sparge, dar in timp se poate pata si tulbura si poate retine mirosuri. Inoxul e cel mai rezistent la lovituri si arata a aparat serios, dar nu vezi prin el cat de fin ai tocat. Pentru majoritatea, bolul de sticla e cea mai buna alegere, pentru ca ramane curat si fara mirosuri; inoxul e bun pentru cantitati mari si rezistenta, plasticul pentru cine vrea cel mai usor aparat.' },
+  { question: 'Ce pot toca intr-un tocator electric?', answer: 'Mai mult decat legume. Un tocator se descurca cu ceapa, usturoi, morcov, telina, ardei, verdeturi, dar si cu carne in bucati, pentru chiftele sau mici, cu nuci, migdale si alune, si cu cascaval mai tare. Multe modele macina si seminte sau cafea. Ce nu poate: nu face suc si nu passeaza lichide multe, pentru asta ai nevoie de blender, si nu felie sau rade ca un robot de bucatarie, doar toaca marunt. Regula practica: taie ingredientele mari in bucati de 2-3 centimetri inainte, ca sa se toace uniform, si nu umple bolul peste linia maxima.' },
+  { question: 'Tocator, blender sau robot de bucatarie?', answer: 'Sunt trei aparate cu scopuri diferite. Un tocator are un bol jos si o lama in forma de S care marunteste uscat: ceapa, carne, nuci. Un blender are un vas inalt si face lichide: smoothie, supa crema, sosuri. Un robot de bucatarie e cel mai versatil, cu accesorii interschimbabile care toaca, felie, rade si framanta, dar e mai scump si mai voluminos. Daca vrei doar sa maruntesti repede legume si carne, un tocator simplu e ieftin si suficient. Daca vrei si feliere sau razuire, uita-te la un robot de bucatarie. Daca vrei bauturi si creme, ai nevoie de blender.' },
+  { question: 'Cate lame si cate viteze conteaza?', answer: 'Mai multe lame toaca mai repede si mai uniform: un tocator cu 4 lame pe doua niveluri prinde ingredientele din mai multe unghiuri fata de unul cu o singura lama. Nu e obligatoriu, dar ajuta la tocare fina si rapida, mai ales la carne. Vitezele conteaza pentru control: cu doua viteze alegi intre o tocatura grosiera, la viteza mica, si una fina, la viteza mare. Modelele cu o singura viteza le controlezi prin impulsuri, apesi si eliberezi in reprize scurte, pana ajungi la textura dorita. Pentru majoritatea, o singura viteza folosita cu impulsuri e suficienta; doua viteze sunt un plus de comoditate.' },
+  { question: 'Pot toca carne cruda intr-un tocator?', answer: 'Da, iar multi il cumpara tocmai pentru asta, ca alternativa la masina de tocat. Taie carnea in cuburi de 2-3 centimetri, scoate cat poti din zgarciuri si tendoane, si toac-o in reprize scurte, prin impulsuri, ca sa nu se transforme in pasta. Pentru cantitati, lucreaza pe transe mici, nu umple bolul, pentru ca motorul se forteaza la bol plin de carne. Un tocator cu putere mai mare, de la 500-700 W, si cu mai multe lame se descurca mai bine cu carnea decat unul slab. Spala bolul si lama imediat dupa, cu apa calda, pentru igiena.' },
+  { question: 'Cum curat un tocator electric?', answer: 'Simplu, pentru ca partile care ating mancarea se detaseaza. Bolul, lama si capacul se scot si se spala cu apa calda si detergent; multe boluri de sticla si lame de inox sunt compatibile cu masina de spalat vase, verifica in manual. Atentie mare la lama, e ascutita, spal-o tinand-o de partea de plastic din centru, nu de taisuri. Corpul cu motorul, partea de sus in care sta butonul, il stergi doar cu o carpa umeda si niciodata nu il bagi in apa. Spala bolul imediat dupa folosire, cat resturile sunt moi, mai ales dupa usturoi sau carne, ca sa nu ramana miros.' },
+];
+
+const images = [hero, figCompact, figMare, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune tocatoare de legume in ${SEO_YEAR}: compacte sau cu bol mare`}
+  description="6 tocatoare de legume electrice comparate pe capacitate si material, de la 65 la 200 de lei. Cand alegi un bol mic si cand unul mare, sticla sau inox."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune tocatoare de legume' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune tocatoare de legume</span>
+    </nav>
+
+    <h1>Cele mai bune tocatoare de legume</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune tocatoare de legume electrice: de la modele compacte la boluri mari de sticla si inox" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Toaca o ceapa in cateva secunde, fara lacrimi si fara ca tocatorul de lemn sa miroasa a usturoi o saptamana. Asta face un tocator electric: munca marunta si enervanta din bucatarie, rezolvata cu o apasare. Alegerea intre modele se reduce la doua lucruri: <strong>cat de mult toci odata</strong> si <strong>din ce e facut bolul</strong>.</p>
+      <p>Cel mai vandut din articol, <strong>Bosch MMR08R2</strong>, cu 690 de pareri, e compact si perfect pentru ceapa, usturoi si verdeturi. Daca gatesti in cantitate, <strong>Heinner de 1.5 litri</strong>, cu bol de sticla, iti da mai mult spatiu la un pret foarte bun. Iar la buget, <strong>Sokany</strong> ofera un bol de 2 litri de inox si 700 W la doar 65 de lei.</p>
+      <p>E o categorie mica si focusata: am pastrat doar tocatoarele dedicate, cu bol si lama in forma de S, si am lasat deoparte blenderele si aparatele multifunctionale care apar la aceeasi cautare, pentru ca fac altceva. Le-am grupat dupa capacitate, compacte si cu bol mare, pentru ca asta e decizia care conteaza.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#compact">Compacte, pentru cantitati mici</a></li>
+        <li><a href="#mare">Cu bol mare, pentru mai mult odata</a></li>
+        <li><a href="#capacitate">Ce capacitate iti trebuie</a></li>
+        <li><a href="#bol">Bol de sticla, plastic sau inox</a></li>
+        <li><a href="#vs">Tocator, blender sau robot de bucatarie</a></li>
+        <li><a href="#ce-toci">Ce poti toca si ce nu</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Putere</th><th>Bol</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.putere}</td>
+              <td>{x.bol}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="compact">Compacte, pentru cantitati mici</h2>
+    <p>Sub aproximativ 1.2 litri, tocatoarele compacte sunt cele mai practice pentru ce folosesti de fapt un tocator: ceapa, usturoi, verdeturi, un pumn de nuci. Bolul mic prinde mai bine cantitatile mici, iar aparatul se depoziteaza usor. Difera prin materialul bolului si numarul de viteze.</p>
+    {COMPACT.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figCompact} alt="Tocatoare de legume compacte, Bosch, Heinner si Latkon" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mare">Cu bol mare, pentru mai mult odata</h2>
+    <p>Intre 1.5 si 2 litri, tocatoarele cu bol mare sunt pentru cine gateste in cantitate: o portie mai mare de legume pentru supa sau tocatura de carne pentru chiftele, dintr-o data. Au adesea mai multe lame, pentru tocare mai rapida, si costa surprinzator de putin.</p>
+    {MARE.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMare} alt="Tocatoare de legume cu bol mare de sticla si inox, Heinner, Biovita si Sokany" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-tocatoare').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate tocatoarele de legume la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="capacitate">Ce capacitate iti trebuie</h2>
+    <p>E prima decizie si depinde de ce toci cel mai des, nu de cat de mult ai vrea sa poti toca la limita.</p>
+    <ul>
+      <li><strong>0.5-0.8 litri</strong> pentru munca marunta zilnica: o ceapa, usturoi, verdeturi, nuci. Cel mai practic pentru cantitati mici, pentru ca lama prinde bine putin.</li>
+      <li><strong>1-1.5 litri</strong> pentru portii de familie: legume pentru o supa, tocatura pentru chiftele.</li>
+      <li><strong>2 litri</strong> pentru cine toaca des in cantitate mare, carne sau legume pentru muraturi.</li>
+    </ul>
+    <p>Un detaliu care se uita: un bol prea mare pentru o cantitate mica lucreaza prost. Cateva bucati de usturoi intr-un bol de 2 litri sunt aruncate pe pereti de lama si tocate inegal. De aceea, daca folosesti tocatorul mai ales pentru cantitati mici, un bol compact e mai bun decat unul mare. Cine gateste variat poate alege un model cu doua boluri, ca Latkon.</p>
+
+    <h2 id="bol">Bol de sticla, plastic sau inox</h2>
+    <p>Materialul bolului conteaza la folosirea zilnica mai mult decat pare.</p>
+    <p><strong>Sticla</strong> e alegerea buna pentru majoritatea: nu se pateaza de la morcov sau sfecla, nu retine mirosul de usturoi si vezi prin ea cat de fin ai tocat. E mai grea si se poate sparge daca o scapi, dar in bucatarie sta pe blat, nu o cari. O au Heinner si Biovita din articol.</p>
+    <p><strong>Inoxul</strong> e cel mai rezistent la lovituri, arata a aparat serios si e bun pentru cantitati mari, ca la Sokany. Dezavantajul: nu vezi prin el, deci nu urmaresti textura fara sa ridici capacul.</p>
+    <p><strong>Plasticul</strong> e usor si nu se sparge, ca la Bosch, dar in timp se poate pata si tulbura si poate retine mirosuri. E un compromis acceptabil, mai ales la un bol mic pe care il speli des.</p>
+
+    <h2 id="vs">Tocator, blender sau robot de bucatarie</h2>
+    <p>Trei aparate care se confunda, dar fac lucruri diferite. Alegerea gresita e cea mai frecventa cauza de dezamagire.</p>
+    <p>Un <strong>tocator</strong> are un bol jos si o lama in forma de S care marunteste uscat: ceapa, carne, nuci. E ieftin, mic si face un singur lucru bine.</p>
+    <p>Un <strong>blender</strong> are un vas inalt si face lichide: smoothie, supa crema, sosuri. Nu toaca uscat cum trebuie si nu inlocuieste un tocator.</p>
+    <p>Un <strong>robot de bucatarie</strong> e cel mai versatil, cu accesorii care toaca, felie, rade si framanta, dar e mai scump si mai voluminos. Daca vrei doar sa maruntesti legume si carne, un tocator simplu e suficient si mult mai ieftin; daca vrei si feliere sau razuire, uita-te la un robot de bucatarie.</p>
+
+    <h2 id="ce-toci">Ce poti toca si ce nu</h2>
+    <p>Un tocator face mai mult decat legume, dar are si limite clare.</p>
+    <p><strong>Se descurca bine cu:</strong> ceapa, usturoi, morcov, telina, ardei, verdeturi, carne in bucati pentru chiftele sau mici, nuci, migdale, alune, cascaval mai tare. Multe modele macina si seminte sau cafea.</p>
+    <p><strong>Nu e facut pentru:</strong> lichide multe, nu passeaza supe si nu face suc, aici ai nevoie de blender; si nu felie sau rade, doar toaca marunt, pentru feliere iti trebuie un robot de bucatarie.</p>
+    <p>Doua reguli care fac diferenta la rezultat: taie ingredientele mari in bucati de 2-3 centimetri inainte, ca sa se toace uniform, si nu umple bolul peste linia maxima, pentru ca la bol prea plin tocarea iese inegala si motorul se forteaza. Pentru textura, foloseste impulsuri scurte, nu tine apasat continuu.</p>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la tocatoarele in stoc pe eMAG, sortate dupa numarul de pareri. Categoria de cautare amesteca tocatoare cu blendere si aparate multifunctionale, asa ca <strong>am pastrat doar tocatoarele dedicate</strong>, cele cu bol si lama in forma de S, si am lasat deoparte blenderele si seturile de tip mixer vertical, pentru ca sunt alta categorie, cu alt scop. De aceea selectia e mai scurta: sunt putine tocatoare cu adevarat dedicate, dar le-am acoperit pe cele bune.</p>
+    <p><strong>Le-am grupat dupa capacitate</strong>, pentru ca marimea bolului e decizia care conteaza cel mai mult, urmata de materialul lui. Am comparat specificatiile reale din fise, capacitatea, puterea, materialul bolului si numarul de lame, si am semnalat unde un model iese in evidenta, cum e Latkon cu doua boluri, sau unde nota e mai mica, ca la Sokany.</p>
+    <p>Nu testam aparatele in laborator si nu pretindem asta. Ne bazam pe date reale, mii de pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare. Un tocator se completeaza firesc cu <a href="/cele-mai-bune-mixere-de-mana/">un mixer de mana</a> pentru copt si cu <a href="/robot-de-bucatarie-multifunctional/">un robot de bucatarie</a> daca ai nevoie si de feliere sau razuire.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 65 la 200 de lei, un interval mic, pentru ca tocatoarele sunt printre cele mai accesibile electrocasnice.</p>
+    <p><strong>Sub 130 de lei</strong> gasesti majoritatea: Sokany cu bol mare de inox, Heinner de 1 si de 1.5 litri cu bol de sticla, plus Bosch, cel mai vandut. Cel mai bun raport pentru un tocator bun de zi cu zi.</p>
+    <p><strong>Intre 150 si 200 de lei</strong> stau Biovita de 1.5 litri, cu functie de macinare, si Latkon, cu doua boluri si cea mai buna nota. Le alegi cand vrei versatilitate in plus, macinare sau doua capacitati, nu doar tocare simpla.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-tocatoare-de-legume" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-tocatoare-de-legume" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

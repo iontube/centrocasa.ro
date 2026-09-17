@@ -1,0 +1,321 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['generatoare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Invertoare (curent curat) ---
+  { g: 'invertor', id: 'DLXYRGMBM', badge: 'Cel mai bun invertor',
+    specs: ['invertor, curent curat (sinusoida pura)', '2000 W, 2.7 CP, benzina', 'rezervor 4 l, carcasa insonorizata', 'silentios, portabil, pornire la sfoara'],
+    pros: ['Curent curat, sigur pentru laptop, televizor si placa electronica a centralei', 'Silentios si usor de carat, carcasa insonorizata', 'Bobinaj 100% cupru, Könner & Söhnen e printre cele mai cerute branduri', 'Nota buna de la cumparatori, protectii complete'],
+    cons: ['2000 W acopera electronicele si un frigider, nu toata casa deodata', 'Pornire manuala, la sfoara, nu la cheie'],
+    verdict: 'Alegerea daca vrei sa alimentezi lucruri sensibile: laptop, televizor, router, consola sau placa electronica a centralei termice. Fiind invertor, produce curent pe care il reconstruieste ca sinusoida pura, la fel de fin ca cel de la retea, spre deosebire de un generator clasic care da un curent mai "brut". La 2000 W acopera confortabil electronicele si un frigider, dar nu conta pe el pentru toata casa pornita deodata. E silentios, cu carcasa insonorizata, si suficient de usor cat sa il muti singur. Könner & Söhnen e un brand german ca nume, asamblat in fabrici din China ca aproape toate de pe piata, dar cu reputatie buna si service la noi. Il iei cand conteaza calitatea curentului, nu puterea multa.' },
+  { g: 'invertor', id: 'DX8HV6MBM', badge: 'Invertor accesibil',
+    specs: ['invertor, 2.3 kW, benzina', 'rezervor 4 l, 58 dB, 18 kg', '2 x priza 230 V, 2 x USB', 'mod ECO, se leaga in paralel'],
+    pros: ['Curent curat la unul dintre cele mai mici preturi pentru un invertor', 'Doar 18 kg, il cari de mana oriunde', 'Mod ECO, tureaza dupa consum, sta silentios la 58 dB', 'Are prize USB si se poate cupla in paralel cu inca unul, pentru mai multa putere'],
+    cons: ['Maxpeedingrods e un brand mai nou, fara traditia Könner sau Senci', 'Tot 2.3 kW, pentru electronice si cateva aparate, nu casa intreaga'],
+    verdict: 'Un invertor bun cand vrei curent curat, dar nu vrei sa dai mult pe el. Maxpeedingrods e un brand chinezesc care vinde direct, cu produse incarcate de dotari la pret mic: aici ai mod ECO, doua prize de 230 V, USB si posibilitatea de a lega doua unitati in paralel daca ai nevoie de mai multa putere. La 18 kg e printre cele mai usoare din selectie, deci il duci in curte, la o rulota sau pe un santier mic fara efort. Nu are in spate reputatia unui Könner sau Senci, dar pentru electronice, un frigider si iluminat isi face treaba curat si linistit. Il iei cand vrei curent de invertor cu buget strans.' },
+  // --- Clasice pentru casa la pene de curent ---
+  { g: 'clasic', id: 'DRM16CBBM', badge: 'Cel mai bun pret',
+    specs: ['clasic (open-frame), 2900 W', 'AVR (stabilizator de tensiune)', 'benzina, autonomie ~10 h', 'cadru metalic, pornire la sfoara'],
+    pros: ['Cel mai mic pret din selectie, sub 900 de lei', 'De departe cele mai multe pareri, peste 500, cu nota buna', 'Are AVR, deci tine tensiunea aproape de 230 V', '2900 W acopera frigiderul, luminile si cateva prize la o pana de curent'],
+    cons: ['Curent clasic, mai putin fin decat la un invertor', 'Steinhaus e o gama de buget, calitatea mai variaza de la bucata la bucata', 'Pornire la sfoara, fara roti'],
+    verdict: 'Curentul de rezerva cel mai ieftin la o pana, si modelul cu cele mai multe pareri din tot topul, peste 500, semn ca s-a vandut mult. Are 2900 W si stabilizator de tensiune AVR, cat sa tina in viata frigiderul, cateva becuri, routerul si un televizor cat dureaza pana revine curentul. Steinhaus e o gama de buget, cu nume nemtesc dar productie ieftina, iar parerile sunt in general bune, cu cate un utilizator care se plange de pornire grea; la pretul asta e un compromis rezonabil. Curentul e clasic, deci pentru placa unei centrale pe gaz nu e ideal (vezi mai jos). Il iei cand vrei minimul necesar la cel mai mic pret, pentru aparate care nu se supara pe curent.' },
+  { g: 'clasic', id: 'DDKCTRMBM', badge: 'Cel mai ieftin 3 kW',
+    specs: ['clasic, 3000 W, 7.5 CP', 'AVR, monofazat', 'benzina, 2 prize 230 V', 'cadru metalic, pornire la sfoara'],
+    pros: ['Cel mai ieftin generator de 3 kW din selectie', 'AVR pentru tensiune stabila, doua prize de 230 V', 'Cei 3 kW acopera nevoile de baza ale unei case', 'Nota buna de la cumparatori'],
+    cons: ['Kamrad e brand de buget, cu service mai greu de gasit', 'Pornire manuala, curent clasic'],
+    verdict: 'Un pas mai sus in putere fata de modelul de 2900 W, la un pret care ramane mic: 3000 W si sub 900 de lei. Kamrad K-3500A e un generator clasic simplu, cu AVR si doua prize de 230 V, gandit exact pentru scenariul "a picat curentul, vreau sa tin casa in functiune cateva ore". Cei 3 kW iti dau ceva marja peste strictul necesar, cat sa nu stai cu grija ca il incarci prea tare. Kamrad e un brand de buget, deci nu te astepta la reteaua de service a unui Senci, iar curentul e clasic, nu de invertor. Il iei cand vrei cei mai multi wati pe leu, pentru unelte, pompe si aparate obisnuite.' },
+  { g: 'clasic', id: 'DM9YS6BBM', badge: 'Cel mai bun raport',
+    specs: ['clasic, 3100 W, 208 cc', 'AVR, pornire la cheie (electrica)', 'benzina, rezervor 15 l, ~12 h', 'cadru metalic'],
+    pros: ['Pornire la cheie, nu tragi de sfoara pe frig', 'Senci e un producator cu peste 30 de ani, cu piese si service usor de gasit la noi', 'Nota cea mai mare din grupul de clasice, 4.8', 'Rezervor de 15 l, autonomie in jur de 12 ore la sarcina medie'],
+    cons: ['Mai scump decat variantele de buget', 'Cativa cumparatori mentioneaza pornire mai grea pe timp foarte rece'],
+    verdict: 'Cel mai echilibrat generator pentru o casa la pene de curent si recomandarea mea principala din grupul de clasice. Senci SC-3500E Lite are 3100 W, AVR si, important, pornire electrica la cheie, deci nu mai tragi de sfoara in frig sau pe intuneric. Senci e un producator serios, cu peste 30 de ani vechime si cu retea de piese si service la noi, ceea ce conteaza mult la un utilaj pe care il tii ani intregi. Rezervorul de 15 litri ii da autonomie in jur de 12 ore la o sarcina medie, cat sa treci linistit peste o pana lunga. Cateva pareri vorbesc de pornire mai grea pe ger, normal la orice motor pe benzina. Il iei cand vrei un generator pe care te bazezi, cu pornire comoda si un brand de incredere.' },
+  { g: 'clasic', id: 'D0C5S8MBM', badge: 'Se poate automatiza',
+    specs: ['clasic, 3 kW, pornire electrica', 'AVR, permite automatizare (ATS)', 'benzina, cadru metalic cu roti', 'brand prezent de mult pe piata din RO'],
+    pros: ['Permite montarea unei automatizari (ATS), ca sa porneasca singur la pana de curent', 'Pornire electrica la cheie', 'Cadru cu roti, il muti usor prin curte', 'Stager e o gama binecunoscuta la noi, cu raport bun'],
+    cons: ['Automatizarea (ATS) se cumpara si se monteaza separat', 'Curent clasic, nu de invertor'],
+    verdict: 'Alegerea daca vrei ca generatorul sa porneasca singur cand pica curentul, fara sa fii acasa. Stager FD 3600ER are 3 kW, pornire electrica si, spre deosebire de multe modele din pretul lui, e pregatit sa i se monteze o automatizare ATS: un modul care simte pana de curent, porneste generatorul si comuta casa pe el in vreo zece secunde, apoi il opreste cand revine reteaua. E exact ce vrei pentru o centrala termica pe gaz iarna, sa nu inghete casa cat esti plecat. Stager e un nume prezent de mult la noi, cu reputatie de raport bun calitate-pret, desi eticheta "germana" tine mai mult de marketing, productia fiind tot chinezeasca. Automatizarea se ia separat. Il iei cand vrei backup nesupravegheat.' },
+  // --- Hibrid GPL si putere mare ---
+  { g: 'plus', id: 'DT159ZBBM', badge: 'Hibrid GPL si benzina',
+    specs: ['hibrid: merge pe GPL sau benzina', '3.0 kW, AVR, Easy Start, LED', 'autonomie ~15 h, bobinaj cupru', 'monofazat, pornire la sfoara'],
+    pros: ['Merge pe butelie de GPL sau pe benzina, la alegere', 'GPL-ul se pastreaza practic la nesfarsit, benzina se strica in cateva luni', 'Pe gaz arde mai curat, cu mai putine depuneri si intretinere', 'Vine cu furtun si reductoare de presiune pentru butelie'],
+    cons: ['Pe GPL da cu circa 5-10% mai putina putere decat pe benzina', 'Pe ger presiunea din butelie scade si pornirea pe gaz devine capricioasa'],
+    verdict: 'Alegerea inteligenta pentru un generator de rezerva pe care il folosesti rar. Könner & Söhnen KS 3000G merge si pe GPL, si pe benzina, iar avantajul mare e combustibilul: o butelie de GPL se pastreaza ani buni fara sa se strice, in timp ce benzina din rezervor se degradeaza in cateva luni si iti infunda carburatorul exact cand ai nevoie de generator. Pe gaz arde mai curat, deci motorul aduna mai putine depuneri si cere mai putina intretinere. Vine cu furtun si reductoare, il legi direct la butelie. In schimb, pe GPL pierzi cam 5-10% din putere fata de benzina, iar pe frig presiunea din butelie scade. Il iei cand vrei un generator care porneste si dupa ce a stat luni intregi in garaj.' },
+  { g: 'plus', id: 'D3HM01BBM', badge: 'Putere mare, cu automatizare',
+    specs: ['clasic, 8000 W, 18 CP', 'pornire electrica + automatizare (ATS)', 'AVR, benzina, autonomie ~14 h', 'prize de 16 A si 32 A, bobinaj cupru'],
+    pros: ['8 kW, acopera o casa mare cu mai multe aparate pornite in acelasi timp', 'Vine cu automatizare ATS, porneste singur la pana si comuta casa pe el', 'Prize de 16 si 32 A, pentru consumatori mari', 'Pornire electrica, cadru robust, protectii complete'],
+    cons: ['Investitie mare, peste 5000 de lei', 'Inca putine pareri, e o categorie de nisa si scumpa', 'Consuma pe masura puterii, il iei doar daca chiar ai nevoie de atatia wati'],
+    verdict: 'Cel mai puternic din selectie, pentru o casa mare care vrea curent de rezerva serios si complet automat. Könner & Söhnen KS10000E ATS are 8000 W, deci poti tine pornite simultan frigiderul, congelatorul, centrala, pompa si iluminatul, fara sa il incarci la limita. Vine cu automatizare ATS din fabrica: la pana de curent porneste singur si comuta casa pe generator in cateva secunde, apoi se opreste cand revine reteaua, deci nu trebuie sa fii acasa. Are prize de 16 si 32 A pentru consumatori mari si pornire electrica. E o investitie de peste 5000 de lei, cu inca putine pareri, normal la o categorie scumpa. Il iei cand ai o casa mare, vrei putere multa si pornire automata, si ai bugetul pentru asta.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const INVERTOR = PICKS.filter(x => x.g === 'invertor');
+const CLASIC = PICKS.filter(x => x.g === 'clasic');
+const PLUS = PICKS.filter(x => x.g === 'plus');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/generatoare.webp';
+const figInvertor = '/imagini/articole/generatoare-invertor.webp';
+const figClasic = '/imagini/articole/generatoare-clasic.webp';
+const figPlus = '/imagini/articole/generatoare-hibrid.webp';
+const published = '2026-07-18T09:19:25+03:00';
+
+const consum = [
+  { ap: 'Frigider / combina frigorifica', mers: '150 - 400 W', varf: '1000 - 1600 W' },
+  { ap: 'Congelator', mers: '100 - 400 W', varf: '1000 - 2000 W' },
+  { ap: 'Centrala termica pe gaz (murala)', mers: '80 - 200 W', varf: 'mic, fara varf real' },
+  { ap: 'Pompa de apa / hidrofor', mers: '700 - 1000 W', varf: '2000 - 4000 W' },
+  { ap: 'Iluminat LED (toata casa)', mers: '40 - 150 W', varf: '-' },
+  { ap: 'Televizor', mers: '50 - 120 W', varf: '-' },
+  { ap: 'Laptop, router, telefoane', mers: '60 - 200 W', varf: '-' },
+  { ap: 'Cuptor cu microunde', mers: '1000 - 1500 W', varf: '-' },
+  { ap: 'Aer conditionat (o unitate)', mers: '600 - 1500 W', varf: '2000 - 3500 W' },
+];
+
+const faq = [
+  { question: 'Ce putere de generator imi trebuie pentru casa?', answer: 'Aduna consumul aparatelor pe care vrei sa le tii pornite in acelasi timp si adauga o marja de 20-30%. Pentru strictul necesar la o pana, frigider, centrala pe gaz, cateva becuri si internet, ajung 2000-2500 W. Pentru confort, cu congelator, televizor, microunde si o pompa folosite pe rand, mergi spre 3000-4000 W. Pentru o casa mare cu multe aparate pornite deodata sau cu pompa mare, ai nevoie de 5 kW si peste. Atentie la aparatele cu motor: la pornire cer de cateva ori puterea din mers, deci generatorul trebuie sa acopere acel varf, nu doar suma consumurilor in mers.' },
+  { question: 'Invertor sau generator clasic?', answer: 'Un generator clasic (open-frame) produce un curent mai "brut", cu distorsiuni, perfect pentru unelte, pompe, iluminat sau frigider, care nu se supara. Da mult mai multa putere pe leu. Un invertor produce curent, apoi il reconstruieste ca sinusoida pura, la fel de fin ca de la retea, si e alegerea pentru electronice sensibile: laptop, televizor, consola, placa electronica a unei centrale. Invertorul e mai silentios si mai usor, dar mai scump si de obicei cu mai putina putere. Alege clasic pentru putere si buget, invertor pentru curent curat.' },
+  { question: 'Pot alimenta centrala termica pe gaz cu orice generator?', answer: 'Nu, si multa lume se loveste de asta. Centrala porneste, are afisaj, dar nu face flacara. Sunt doua motive: placa electronica vrea un curent curat, de tip invertor, iar sistemul care detecteaza flacara are nevoie de o referinta corecta la nul si la impamantare. Generatoarele monofazate au adesea "nulul flotant", adica le lipseste nulul de serviciu, iar centrala vede asta ca lipsa de flacara si se opreste, ca masura de siguranta. Solutia sigura este un invertor cu sinusoida pura, cu nulul legat corect la pamant, sau un UPS cu sinusoida pura intre generator si centrala. Un truc vazut pe forumuri e sa pui in paralel un mic consumator, un bec, ca placa sa "prinda", dar solutia curata ramane invertorul plus impamantarea corecta.' },
+  { question: 'Pot baga generatorul intr-o priza din casa?', answer: 'Nu, niciodata. Se numeste backfeeding si e periculos din doua motive. Intai, curentul se poate intoarce prin instalatie in reteaua stradala, unde un transformator il ridica la mii de volti si poate electrocuta mortal un electrician care crede ca linia e moarta. Al doilea, cand revine curentul de la retea, cele doua surse se ciocnesc, generatorul se suprasolicita si risti incendiu. Alimenteaza aparatele cu prelungitoare groase direct de la generator, sau, pentru toata casa, pune un electrician sa monteze un comutator de sursa (inversor de retea) care separa fizic reteaua de generator.' },
+  { question: 'Ce inseamna AVR si de ce conteaza?', answer: 'AVR este stabilizatorul automat de tensiune. El tine tensiunea generatorului aproape de 230 V chiar si cand sarcina variaza, ca sa nu ai salturi care sa strice aparatele. Aproape toate generatoarele serioase, inclusiv cele din acest top, au AVR, si merita sa il ceri. Atentie insa: AVR-ul stabilizeaza tensiunea, dar nu curata forma undei. Un generator clasic cu AVR ramane un generator clasic, nu devine invertor, deci pentru electronice foarte sensibile tot un invertor iti trebuie.' },
+  { question: 'Merita un generator hibrid pe GPL?', answer: 'Da, mai ales daca il tii ca rezerva si il folosesti rar. Marele avantaj e combustibilul: GPL-ul din butelie se pastreaza ani de zile fara sa se strice, in timp ce benzina din rezervor se degradeaza in cateva luni si iti infunda carburatorul exact cand ai nevoie de generator. Pe gaz arde mai curat, cu mai putine depuneri si intretinere. Dezavantajele: pe GPL pierzi cam 5-10% din putere fata de benzina, iar pe ger presiunea din butelie scade si pornirea pe gaz e mai capricioasa. Multe modele hibride pot porni direct pe gaz si vin cu furtunul si reductoarele incluse.' },
+  { question: 'Ce e automatizarea ATS si pentru cine e?', answer: 'ATS inseamna comutator automat de transfer. Este un modul care supravegheaza tot timpul reteaua: cand pica curentul, porneste singur generatorul si comuta casa pe el in circa zece secunde, iar cand revine reteaua comuta inapoi si opreste generatorul. Merita pentru backup nesupravegheat: o centrala termica pe gaz iarna ca sa nu inghete instalatia cand esti plecat, o casa de vacanta, echipamente medicale sau o firma cu frigidere si servere. Are nevoie de un generator cu pornire electrica si baterie. Daca esti mereu acasa langa generator, pornirea manuala sau la cheie e suficienta si mai ieftina.' },
+  { question: 'Monofazat sau trifazat pentru casa?', answer: 'Aproape toate casele au bransament monofazat (230 V) si atunci alegi un generator monofazat. Ai nevoie de unul trifazat (400 V) doar daca ai chiar bransament trifazat si aparate trifazate, de exemplu motoare mari sau utilaje de atelier. Un generator trifazat imparte puterea egal pe cele trei faze, deci pe o singura faza monofazata tragi doar in jur de o treime din putere, iar incarcarea unei singure faze poate arde infasurarea. Daca ai bransament trifazat dar consumatori monofazati, solutia corecta e un generator monofazat cu automatizare trifazata.' },
+];
+
+const images = [hero, figInvertor, figClasic, figPlus, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune generatoare de curent in 2026: invertor, clasic si hibrid GPL"
+  description="Ce generator de curent sa iei in 2026: invertoare cu curent curat, generatoare clasice pentru casa la pene si modele hibride GPL. Cum il dimensionezi, invertor vs clasic, curentul pentru centrala termica si conectare in siguranta."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Radu Popescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Amenajari si Instalatii', url: '/amenajari-instalatii/' }, { name: 'Cele mai bune generatoare de curent' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/amenajari-instalatii/">Amenajari si Instalatii</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune generatoare de curent</span>
+    </nav>
+
+    <h1>Cele mai bune generatoare de curent in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/radu-popescu/">Radu Popescu</a>, Consultant Amenajari · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune generatoare de curent: invertor, clasic si hibrid GPL" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru o casa care ramane fara curent, cel mai echilibrat generator din selectie e <strong>Senci SC-3500E Lite</strong>: 3.1 kW, pornire la cheie si nota cea mai mare din grup. Daca vrei sa alimentezi electronice sau placa unei <strong>centrale termice pe gaz</strong>, ia un invertor cu curent curat, ca <strong>Könner & Söhnen KSB 22i S</strong>. Cel mai mic pret il are <strong>Steinhaus PRO-GEN2900</strong>, sub 900 de lei, iar daca vrei sa porneasca singur cand pica curentul, un model cu automatizare ATS ca <strong>Könner & Söhnen KS10000E</strong>.</p>
+      <p>La generatoare, doua intrebari decid totul: <strong>de cat de mult curent ai nevoie</strong> (adica ce putere) si <strong>cat de curat trebuie sa fie curentul</strong> (invertor sau clasic). De asta depinde si daca poti alimenta o centrala pe gaz, un punct unde multa lume se loveste de o surpriza. Le luam pe rand mai jos, cu un tabel de consum ca sa iti dimensionezi corect generatorul.</p>
+      <p>Am pornit de la generatoarele vandute pe eMAG, le-am verificat puterea, tipul de curent, modul de pornire si combustibilul, si le-am grupat pe invertoare, clasice pentru casa si modele cu ceva in plus, hibrid sau putere mare. Ca sursa alternativa de energie, vezi si <a href="/cele-mai-bune-panouri-solare/">panourile solare</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#dimensionare">De cat de mare ai nevoie</a></li>
+        <li><a href="#invertor-clasic">Invertor sau clasic</a></li>
+        <li><a href="#invertoare">Invertoare (curent curat)</a></li>
+        <li><a href="#clasice">Generatoare clasice pentru casa</a></li>
+        <li><a href="#plus">Hibrid GPL si putere mare</a></li>
+        <li><a href="#pornire">Pornire: manuala, la cheie sau automata</a></li>
+        <li><a href="#siguranta">Cum il conectezi la casa in siguranta</a></li>
+        <li><a href="#cat-costa">Cat costa un generator</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="dimensionare">De cat de mare ai nevoie</h2>
+    <p>Prima decizie e puterea, iar aici cei mai multi gresesc in doua feluri: ori iau prea putin si generatorul se blocheaza, ori dau bani pe wati pe care nu ii folosesc niciodata. Reteta simpla: aduna consumul aparatelor pe care vrei sa le tii pornite <strong>in acelasi timp</strong> si adauga o marja de 20-30%.</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Aparat</th><th>In mers</th><th>Varf la pornire</th></tr></thead>
+        <tbody>
+          {consum.map(r => (<tr><td>{r.ap}</td><td>{r.mers}</td><td>{r.varf}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+    <p>Cifrele sunt orientative, difera cu modelul si marimea. Ce trebuie sa retii:</p>
+    <ul>
+      <li><strong>Strictul necesar la o pana</strong> (frigider, centrala pe gaz, cateva becuri, internet): 2000-2500 W ajung. Un invertor de 2 kW e la limita, mai comod e 2.5-3 kW.</li>
+      <li><strong>Confort</strong> (in plus congelator, televizor, microunde, o pompa, folosite pe rand): 3000-4000 W.</li>
+      <li><strong>Casa mare</strong> cu multe aparate pornite deodata sau cu pompa mare: 5 kW si peste.</li>
+      <li><strong>Aer conditionat pe toata casa</strong> nu se acopera cu un generator portabil, cere puteri de zeci de kW.</li>
+    </ul>
+    <p>Cel mai important lucru: aparatele cu motor (frigider, congelator, pompa, aer conditionat) cer <strong>la pornire de cateva ori puterea din mers</strong>, o fractiune de secunda. O pompa care merge pe 800 W poate cere 3000 W la pornire. Generatorul trebuie sa acopere acel varf, nu doar suma consumurilor in mers, altfel cade tensiunea si se opreste exact cand porneste motorul. Centrala pe gaz, in schimb, consuma putin, sub 200 W, si nu are varf de pornire.</p>
+
+    <h2 id="invertor-clasic">Invertor sau clasic: ce fel de curent primesti</h2>
+    <p>A doua decizie e la fel de importanta ca puterea, dar mai putin inteleasa. Cele doua tipuri produc curent de calitate diferita:</p>
+    <p><strong>Generatorul clasic</strong> (open-frame, cu cadru metalic) are un motor care invarte un alternator, iar curentul iese direct de acolo, cu mici distorsiuni. E perfect pentru unelte, pompe, iluminat, incarcatoare sau un frigider, adica lucruri care nu se supara pe un curent mai putin fin. Iti da cel mai multi wati pe leu si putere multa, dar e mai zgomotos si mai greu.</p>
+    <p><strong>Invertorul</strong> produce curent, il transforma si il reconstruieste electronic ca <strong>sinusoida pura</strong>, la fel de curata ca cea de la retea. E alegerea pentru electronice sensibile: laptop, televizor, consola, echipamente cu placa electronica. E mai silentios si mai usor, dar mai scump si de obicei cu mai putina putere pentru acelasi pret.</p>
+    <p>Un cuvant despre <strong>AVR</strong>: e stabilizatorul de tensiune, il gasesti pe aproape toate modelele de aici si tine tensiunea aproape de 230 V. Dar AVR stabilizeaza tensiunea, nu curata forma undei, deci un generator clasic cu AVR ramane clasic, nu devine invertor.</p>
+    <div class="rd-callout">
+      <p><strong>Cazul special: centrala termica pe gaz.</strong> Multi cumpara un generator ieftin si constata ca centrala porneste, are afisaj, dar nu face flacara. Sunt doua cauze. Prima, placa electronica vrea curent curat, de invertor. A doua, mai subtila: generatoarele monofazate au adesea "nulul flotant", le lipseste nulul de serviciu, iar sistemul care detecteaza flacara are nevoie de o referinta corecta la nul si la impamantare. Fara ea, centrala "vede" lipsa de flacara si se opreste, ca masura de siguranta. Solutia sigura: un invertor cu sinusoida pura, cu nulul legat corect la pamant, sau un UPS cu sinusoida pura intre generator si centrala. Daca ai deja un generator clasic, un electrician poate rezolva legarea nulului la masa.</p>
+    </div>
+
+    <h2 id="invertoare">Invertoare: curent curat pentru electronice</h2>
+    <p>Cand conteaza calitatea curentului, nu puterea multa: laptop, televizor, router, consola sau placa unei centrale. Silentioase, usoare, dar cu putere mai mica pentru banii dati.</p>
+    <div class="rd-grid">
+      {INVERTOR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figInvertor} alt="Invertoare Könner & Söhnen si Maxpeedingrods cu curent curat" width="1200" height="675" loading="lazy" />
+
+    <h2 id="clasice">Generatoare clasice pentru casa la pene de curent</h2>
+    <p>Cel mai cautat scenariu: a picat curentul, vrei sa tii casa in functiune cateva ore. Aici clasicele dau cea mai multa putere pe leu, de la modele de buget la pornire cu sfoara pana la variante cu pornire la cheie.</p>
+    <div class="rd-grid">
+      {CLASIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figClasic} alt="Generatoare clasice Steinhaus, Kamrad, Senci si Stager pentru casa" width="1200" height="675" loading="lazy" />
+
+    <h2 id="plus">Hibrid GPL si putere mare</h2>
+    <p>Doua nevoi aparte: un model hibrid, care merge si pe butelie de GPL, pentru cine il tine ca rezerva si il foloseste rar, si un model mare cu automatizare, pentru o casa mare care vrea backup automat.</p>
+    <div class="rd-grid">
+      {PLUS.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPlus} alt="Generator hibrid GPL si generator de putere mare cu automatizare" width="1200" height="675" loading="lazy" />
+
+    <h2 id="pornire">Pornire: manuala, la cheie sau automata</h2>
+    <p>Modul de pornire schimba mult confortul de zi cu zi:</p>
+    <ul>
+      <li><strong>Manuala (la sfoara):</strong> tragi de demaror, ca la o motocoasa. Cea mai ieftina, dar cere efort si prezenta, iar pe ger poate fi greu.</li>
+      <li><strong>Electrica (la cheie sau buton):</strong> pornesti dintr-o cheie, alimentata de o baterie inclusa. Mult mai comoda, mai ales noaptea sau iarna. E si conditia pentru automatizare.</li>
+      <li><strong>Automata (ATS):</strong> un modul supravegheaza reteaua, porneste singur generatorul la pana si comuta casa pe el in vreo zece secunde, apoi il opreste cand revine curentul. Pentru backup nesupravegheat.</li>
+    </ul>
+    <p>Daca esti mereu acasa cand pica curentul, pornirea la cheie e suficienta. ATS-ul merita cand curentul trebuie sa revina singur: centrala iarna cat esti plecat, o casa de vacanta, echipamente medicale sau o firma.</p>
+
+    <h2 id="siguranta">Cum il conectezi la casa in siguranta</h2>
+    <p>Aici se fac cele mai periculoase greseli, asa ca merita cateva randuri clare:</p>
+    <ul>
+      <li><strong>Nu baga niciodata generatorul intr-o priza din perete.</strong> Se numeste backfeeding si e periculos din doua motive: curentul se poate intoarce in reteaua stradala si electrocuta un electrician care repara linia, iar cand revine reteaua cele doua surse se ciocnesc si risti incendiu.</li>
+      <li><strong>Varianta simpla si sigura:</strong> prelungitoare groase, direct de la generator la aparate, ocolind instalatia casei.</li>
+      <li><strong>Varianta corecta pentru toata casa:</strong> un comutator de sursa (inversor de retea, transfer switch), montat de un electrician langa tablou. Separa fizic reteaua de generator, nu pot fi pornite simultan. Un kit de interblocare face acelasi lucru mai ieftin.</li>
+      <li><strong>Impamantare:</strong> cand alimentezi casa printr-un comutator de sursa, generatorul trebuie legat la o priza de pamant, conform manualului. Ea protejeaza si detectia de flacara a centralei.</li>
+      <li><strong>Mereu afara, ventilat:</strong> generatorul functioneaza doar in aer liber. Gazele de esapament contin monoxid de carbon, inodor si mortal in spatii inchise sau semi-inchise, inclusiv garaj cu usa deschisa.</li>
+    </ul>
+
+    <div class="rd-offers" data-o={b64('oferte-generatoare')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate generatoarele la oferta</strong>
+        <span>Reducerile din acest moment la invertoare, clasice si hibride, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa un generator</h2>
+    <p>Preturile variaza mult cu tipul, puterea si pornirea, deci merita sa stii de la inceput la ce sa te astepti:</p>
+    <p><strong>Invertoare</strong> de 2-2.5 kW: in general 1800-2500 de lei; modelele mai mari sau de brand urca peste. Platesti in plus fata de un clasic tocmai pentru curentul curat.</p>
+    <p><strong>Clasice de circa 3 kW:</strong> incep de la 800-900 de lei la modelele de buget cu pornire la sfoara (Steinhaus, Kamrad), si ajung la 2000-2200 de lei la cele cu pornire la cheie si brand serios (Senci, Stager).</p>
+    <p><strong>Hibride pe GPL</strong> de 3 kW: in jur de 2500-2900 de lei, ceva mai mult decat un clasic echivalent, dar castigi flexibilitatea combustibilului.</p>
+    <p><strong>Putere mare, 7-8 kW, cu automatizare:</strong> de la 4500 de lei in sus, spre 6000 si peste la modelele cu ATS inclus.</p>
+    <p>Pe langa pretul generatorului, pune la buget combustibilul si uleiul, si eventual montajul unui comutator de sursa de catre un electrician, daca vrei sa alimentezi toata casa. E o cheltuiala mica fata de siguranta pe care ti-o da. Pentru un apartament racoros pe caldura, vezi si <a href="/aer-conditionat-pentru-apartament-mic/">aerul conditionat pentru apartament mic</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">RP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/radu-popescu/" class="author-name-link">Radu Popescu</a></p>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Radu are peste 9 ani in amenajari si dotari pentru casa, de la usi si cabine de dus la generatoare si panouri solare, si explica pe intelesul tuturor ce conteaza la putere, montaj si siguranta.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-generatoare-de-curent" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-generatoare-de-curent" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-callout { border: 1px solid var(--color-primary-200, #bbf7d0); background: var(--color-primary-50, #f0fdf4); border-left: 4px solid var(--color-primary-500, #22c55e); border-radius: 10px; padding: .3rem 1.1rem; margin: 1.5rem 0; }
+  .rd-callout p { color: var(--color-gray-700); }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

@@ -1,0 +1,302 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['fotolii-masaj'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Relaxare cu vibratii si caldura (fara role pe senila) ---
+  { g: 'relax', id: 'D0J6FY2BM', rol: 'Cel mai ieftin punct de intrare', short: 'Relaxare cu incalzire', tip: 'Vibratii', senila: 'Fara', zg: 'Nu', pret: '1850 lei',
+    specs: ['4 zone de vibratie, nu role pe senila', 'incalzire lombara', 'spatar rabatabil, suport picioare extensibil', 'suporta pana la 120 kg'],
+    pros: ['Cel mai mic pret din toata categoria', 'Incalzire lombara, buna pentru muschi obositi', 'Spatar rabatabil si suport de picioare', 'Piele PU usor de curatat'],
+    cons: ['Masajul e din vibratii, nu din role care framanta', 'Doar 4 zone, fara scanare a corpului'],
+    verdict: 'Aici incepe categoria, si e important sa stii exact ce cumperi la pretul asta. Cele "8 puncte de masaj" din denumire sunt motoare de vibratie plasate in spatar si sezut, nu role care urca pe coloana si framanta muschiul. Diferenta se simte: vibratia relaxeaza si incalzeste, dar nu inlocuieste framantarea unui masaj adevarat. Pentru asta e insa perfect adecvat: un fotoliu confortabil in care te lasi pe spate dupa o zi lunga, cu caldura pe zona lombara si o inclinare buna. Il iei daca vrei relaxare si caldura, nu terapie pe puncte, si nu vrei sa treci de 2000 de lei.' },
+  { g: 'relax', id: 'D0VB8W3BM', rol: 'Relaxare simpla, cu telecomanda', short: 'Relaxare rabatabil', tip: 'Vibratii', senila: 'Fara', zg: 'Nu', pret: '2040 lei',
+    specs: ['4 zone de vibratie plus caldura', 'telecomanda dedicata', 'spatar rabatabil, suport picioare extensibil', 'suporta pana la 120 kg'],
+    pros: ['Telecomanda separata, mai comoda decat butoanele de pe brat', '13 pareri, ceva mai verificat decat modelul de intrare', 'Rabatare si suport de picioare', 'Ramane sub 2100 de lei'],
+    cons: ['Acelasi masaj prin vibratie, fara role', 'Diferenta reala fata de modelul de 1850 e mica'],
+    verdict: 'Practic acelasi fotoliu ca varianta de 1850 de lei, cu o telecomanda dedicata in loc de butoane pe brat si cu ceva mai multe pareri in spate. Are aceleasi 4 zone de vibratie si aceeasi incalzire, deci nu astepta o saritura de calitate a masajului, ci un plus de comoditate la reglaj. Merita cei 190 de lei in plus doar daca pui pret pe telecomanda si pe faptul ca alti cumparatori l-au testat mai mult. Altfel, modelul de intrare face aceeasi treaba. Il iei pentru relaxare cu caldura, controlata usor din fotoliu.' },
+  { g: 'relax', id: 'D9V6FY2BM', rol: 'Cu ridicare, pentru mobilitate redusa', short: 'Cu ridicare si rabatare', tip: 'Vibratii', senila: 'Fara', zg: 'Nu', pret: '2300 lei',
+    specs: ['ridicare si rabatare electrica, te impinge in picioare', '4 zone de vibratie plus incalzire lombara', 'telecomanda', 'suporta pana la 120 kg'],
+    pros: ['Mecanism de ridicare care ajuta la asezare si ridicare', 'Potrivit pentru varstnici sau persoane cu genunchi durerosi', 'Are si vibratii cu incalzire', 'Rabatare aproape la orizontala'],
+    cons: ['Tot masaj prin vibratie, nu role', 'Motorul de ridicare adauga cost fata de un recliner simplu'],
+    verdict: 'Singurul din selectie cu functie de ridicare: spatarul si sezutul se inclina inainte si te ridica usor in picioare, iar asta schimba complet cui i se adreseaza. Nu il cumperi pentru masaj, ci pentru cineva caruia ridicatul din fotoliu ii este greu, un parinte in varsta sau o persoana in recuperare dupa o operatie la genunchi sau sold. Vibratiile si caldura sunt un bonus placut, nu motivul principal. Il iei ca fotoliu de zi confortabil si sigur pentru o persoana cu mobilitate redusa, unde ridicarea in picioare conteaza mai mult decat tipul masajului.' },
+  // --- B. Fotolii de masaj full-body, intrare (role pe senila) ---
+  { g: 'full', id: 'DS3TJ53BM', rol: 'Intrarea in masajul cu role', short: 'TOPSCAUNE QUITUS', tip: 'Role 2D', senila: 'SL', zg: 'Da', pret: '5400 lei',
+    specs: ['role reale pe senila, nu vibratii', 'zero gravity, ecran LCD, Bluetooth', 'suporta pana la 150 kg, cel mai mult din selectie', '9 zone acoperite, incalzire'],
+    pros: ['Cel mai ieftin fotoliu cu role adevarate din categorie', 'Suporta 150 kg, peste majoritatea modelelor mai scumpe', 'Zero gravity si incalzire', 'Ecran de control clar'],
+    cons: ['Role 2D, presiune fixa, nu reglabila in adancime', 'Un salt mare de pret fata de fotoliile cu vibratii'],
+    verdict: 'Aici se face saltul de la vibratie la masaj adevarat. QUITUS are role montate pe o senila care urca de la ceafa in jos si framanta muschiul, exact ce nu fac fotoliile de sub 2300 de lei. E entry-level in gama cu role, deci nu astepta ajustare fina: rolele sunt 2D, adica se misca sus-jos si in lateral, cu presiune fixa, nu ies in fata sa mearga mai adanc. In schimb suporta 150 kg, mai mult decat modele de doua ori mai scumpe din aceeasi gama, are pozitie zero gravity si incalzire. Il iei ca prima intalnire serioasa cu un fotoliu de masaj, fara sa treci de 5500 de lei.' },
+  { g: 'full', id: 'DG68TJ2BM', rol: 'Cele mai multe programe la pret mic', short: 'GAIUS ULTRA PRO', tip: 'Role', senila: 'SL', zg: 'Da', pret: '6000 lei',
+    specs: ['16 programe automate, cele mai multe din grupa de intrare', 'comanda vocala AI, zero gravity', 'incalzire lombara, boxe Bluetooth', 'suporta pana la 120 kg'],
+    pros: ['16 programe automate, alegi dupa nevoie fara sa reglezi manual', 'Comanda vocala, utila cand esti deja intins', 'Zero gravity si incalzire', 'Sub 6000 de lei'],
+    cons: ['Suporta 120 kg, mai putin decat QUITUS', 'Comanda vocala e comoda, nu o necesitate'],
+    verdict: 'Fata de QUITUS, GAIUS aduce doua lucruri pentru 600 de lei in plus: 16 programe automate in loc de 3 si comanda vocala. Programele conteaza mai mult decat par, pentru ca un fotoliu de masaj il folosesti cel mai des pe automat, alegand o rutina gata facuta pentru gat, spate sau relaxare, nu regland manual fiecare rola. Comanda vocala e reala si utila: cand esti deja intins in zero gravity, sa spui comanda in loc sa cauti telecomanda chiar ajuta. Suporta insa 120 kg, cu 30 mai putin decat QUITUS, deci daca esti peste 120, modelul de intrare e mai potrivit. Il iei pentru varietatea de programe la un pret inca rezonabil.' },
+  { g: 'full', id: 'DC68TJ2BM', rol: 'Singurul 4D sub 8000 de lei', short: 'MECHA CONFORT', tip: 'Role 4D', senila: 'SL', zg: 'Da', pret: '6600 lei',
+    specs: ['role 4D: presiune si ritm variabile, nu doar sus-jos', 'senila SL, airbag complet 360 de grade', '16 programe, incalzire', 'suporta pana la 120 kg'],
+    pros: ['Role 4D la cel mai mic pret din selectie', 'Senila SL si airbag pe tot corpul', '16 programe automate', 'Cel mai bun raport tehnologie-pret din articol'],
+    cons: ['Suporta 120 kg', 'Airbag-urile stranse pot parea agresive la inceput'],
+    verdict: 'Cel mai interesant produs din articol pentru raportul dintre ce oferi si ce platesti. MECHA are role 4D, adica pe langa miscarea sus-jos si iesirea in fata, rolele isi schimba viteza si ritmul in timpul aceleiasi treceri, cel mai apropiat de mainile unui maseur. La 6600 de lei, e mai ieftin decat modele 3D sau chiar 2D din aceeasi gama, ceea ce arata ca pretul nu urca ordonat cu tehnologia. Are senila SL care coboara spre sezut si airbag pe 360 de grade. Singura rezerva: ca la orice 4D, presiunea poate parea puternica in primele sedinte, asa ca incepe de la intensitate mica. Il iei cand vrei tehnologia de top la cel mai mic pret posibil.' },
+  { g: 'full', id: 'D03TJ53BM', rol: 'Pentru gabarit mai mare', short: 'TOPSCAUNE IULIUS', tip: 'Role', senila: 'SL', zg: 'Da', pret: '7000 lei',
+    specs: ['suporta pana la 150 kg', 'zero gravity, ecran LCD, Bluetooth', '9 zone, incalzire', 'role pe senila'],
+    pros: ['Suporta 150 kg, printre cele mai rezistente din selectie', 'Zero gravity si ecran de control clar', 'Incalzire si Bluetooth', 'Constructie gandita pentru utilizatori mai grei'],
+    cons: ['La 7000 de lei, MECHA aduce 4D pentru mai putin', 'Fisa nu detaliaza dimensiunea rolelor'],
+    verdict: 'IULIUS e ruda mai mare a lui QUITUS: aceeasi filozofie, cu accent pe robustete. Suporta 150 kg, ceea ce conteaza real, pentru ca un fotoliu de masaj impins la limita greutatii se uzeaza mai repede la senila si la motoare. Daca esti un barbat solid sau il cumperi pentru cineva peste 100 de kg, capacitatea asta cantareste mai mult decat un numar de programe in plus. Merita insa spus direct: la 7000 de lei, MECHA de mai sus ofera role 4D pentru 400 de lei mai putin, deci IULIUS are sens mai ales cand capacitatea de 150 kg e criteriul care decide. Il iei pentru utilizatori mai grei care vor un fotoliu solid.' },
+  { g: 'full', id: 'DWGSXK2BM', rol: 'Full body cu comanda vocala', short: 'TOPSCAUNE IGNIUS', tip: 'Role', senila: 'SL', zg: 'Da', pret: '7200 lei',
+    specs: ['senila SL, airbag full body pe 360 de grade', 'comanda vocala AI, zero gravity', '16 programe, incalzire lombara', 'suporta pana la 120 kg'],
+    pros: ['Airbag pe tot corpul, de la umeri la gambe', 'Comanda vocala si 16 programe', 'Senila SL si zero gravity', 'Masaj complet, nu doar pe spate'],
+    cons: ['Suporta 120 kg', 'Nu declara clar daca rolele sunt 3D sau 4D'],
+    verdict: 'IGNIUS pune accentul pe airbag-uri, nu doar pe role. Pe langa rolele de pe senila SL, are perne de aer care se umfla si comprima pe umeri, brate, solduri si gambe, iar masajul prin compresie e diferit de cel prin framantare: prinde muschii mari si imbunatateste circulatia in picioare, ceva ce rolele singure nu fac. Cu 16 programe si comanda vocala, il folosesti usor de pe automat. Fisa nu spune raspicat daca rolele sunt 3D sau 4D, o lipsa reala la pretul asta, asa ca daca ajustarea in adancime e prioritara, uita-te la MECHA. Il iei cand vrei masaj complet, cu accent pe compresie pentru brate si picioare.' },
+  // --- C. Premium 3D si 4D, cu scanare corporala ---
+  { g: 'premium', id: 'DHN3FW3BM', rol: '3D cu scanare corporala', short: 'TOPSCAUNE SEVERNIUS', tip: 'Role 3D', senila: 'SL', zg: 'Da', pret: '8280 lei',
+    specs: ['role 3D: presiune reglabila in adancime', 'scanare corporala automata, potriveste rolele pe spate', 'suporta pana la 150 kg', 'control vocal AI, ecran LCD'],
+    pros: ['Scanare a corpului, aliniaza rolele la inaltimea ta', 'Role 3D cu presiune reglabila', 'Suporta 150 kg', 'Control vocal si ecran clar'],
+    cons: ['Ramane 3D, in timp ce MECHA de la 6600 e 4D', 'Salt de pret fata de grupa de intrare'],
+    verdict: 'Aici incepe segmentul premium, iar noutatea reala e scanarea corporala. Inainte de masaj, fotoliul isi plimba rolele o data pe spate ca sa masoare unde iti sunt umerii si gatul, apoi potriveste traseul dupa inaltimea ta. Conteaza mai mult decat pare: un fotoliu fara scanare aplica acelasi traseu tuturor, iar daca esti inalt, rolele pot rata zona gatului cu totul. SEVERNIUS are role 3D, deci reglezi presiunea in adancime, si suporta 150 kg. Nuanta de onestitate: la 8280 de lei ramane 3D, in timp ce MECHA ofera 4D pentru 6600, deci platesti in plus pentru scanare si capacitate, nu pentru dimensiunea rolelor. Il iei pentru potrivirea automata pe corp si pentru utilizatori inalti sau grei.' },
+  { g: 'premium', id: 'DFN3FW3BM', rol: '4D complet, airbag full body', short: 'TOPSCAUNE MAXIMUS', tip: 'Role 4D', senila: 'SL', zg: 'Da', pret: '10.790 lei',
+    specs: ['role 4D cu ritm si viteza variabile', 'airbag full body, senila SL', 'motor de 120 W, cel mai puternic din selectie', 'zero gravity, incalzire lombara'],
+    pros: ['Role 4D combinate cu airbag pe tot corpul', 'Motor de 120 W, printre cele mai puternice', 'Senila SL si zero gravity', 'Masaj intens, apropiat de cel profesional'],
+    cons: ['Peste 10.000 de lei', 'Intensitatea mare cere obisnuinta, incepe usor'],
+    verdict: 'MAXIMUS combina ce era imprastiat prin gama de intrare: role 4D, airbag pe tot corpul si un motor de 120 W, cel mai puternic din selectie, care sustine o presiune constanta fara sa slabeasca la muschii intepeniti. E fotoliul pentru cineva care chiar are nevoie de masaj ferm, nu doar de relaxare: dureri cronice de spate, muschi incordati dupa efort, tensiune care nu cedeaza la vibratii. Puterea asta are un revers, valabil la orice 4D bun: in primele sedinte poate parea prea intens pe muschii neobisnuiti, deci pornesti de la intensitate mica si cresti treptat. Il iei cand vrei masaj puternic si controlabil si esti dispus sa treci de 10.000 de lei.' },
+  { g: 'premium', id: 'DSN3FW3BM', rol: 'Senila L, masaj pana la pulpe', short: 'LUXOR L183 PRO', tip: 'Role', senila: 'L', zg: 'Da', pret: '11.520 lei',
+    specs: ['senila L, cea mai lunga, ajunge la fesieri si coapse', 'incalzire lombara si la pulpe', 'motor de 120 W, control vocal AI', 'suporta pana la 135 kg'],
+    pros: ['Senila L, masajul coboara pana la fesieri si coapse', 'Incalzire si la pulpe, nu doar lombara', 'Motor puternic de 120 W', '12 programe si control vocal'],
+    cons: ['Peste 11.000 de lei', 'Diferenta fata de o senila SL buna e subtila'],
+    verdict: 'Numele "L183" trimite la ce conteaza aici: senila L, cea mai lunga forma de traseu, care nu se opreste la baza spatelui ca o senila S, ci coboara in jurul fesierilor pana la partea de sus a coapselor. Pentru cine sta mult pe scaun si acumuleaza tensiune in zona sezutului si a soldurilor, acoperirea asta e diferenta reala. In plus, are incalzire nu doar pe zona lombara, ci si la pulpe, unde stau perna picioarelor. Motor de 120 W, 12 programe, control vocal. Onest, diferenta fata de o senila SL bine facuta nu e uriasa, dar daca zona fesieri-coapse e cea care te doare, senila L o acopera cel mai bine. Il iei pentru masaj care ajunge cu adevarat jos, pana la coapse.' },
+  { g: 'premium', id: 'DGYDNK2BM', rol: 'Varful de gama', short: 'TOPSCAUNE VIGOS', tip: 'Role 4D', senila: 'SL', zg: 'Da', pret: '14.280 lei',
+    specs: ['role 4D plus scanare corporala automata', 'senila SL, airbag full body, zero gravity', 'cel mai scump din selectie', 'incalzire lombara, Bluetooth'],
+    pros: ['Are totul: role 4D, scanare corporala si airbag full body', 'Se potriveste automat pe corp si regleaza adancimea', 'Zero gravity si incalzire', 'Constructie de varf de gama'],
+    cons: ['Cel mai scump din articol, peste 14.000 de lei', 'La pretul asta, un masaj real la salon costa ani de zile'],
+    verdict: 'VIGOS aduna toate functiile de top intr-un singur fotoliu: role 4D cu ritm variabil, scanare corporala care le aliniaza pe spatele tau si airbag pe tot corpul, plus zero gravity si incalzire. Ce ai la MAXIMUS si SEVERNIUS separat, aici e la un loc. E fotoliul pe care il alegi cand vrei sa nu faci compromisuri si bugetul nu e obstacolul principal. Merita insa asezata cifra in context: la 14.280 de lei, un abonament la un maseur bun inseamna cateva sute de sedinte reale. Un fotoliu se justifica prin faptul ca il folosesti zilnic, ani la rand, si il imparte toata familia. Il iei cand vrei varful gamei si il vei folosi des, nu ocazional.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const RELAX = PICKS.filter(x => x.g === 'relax');
+const FULL = PICKS.filter(x => x.g === 'full');
+const PREMIUM = PICKS.filter(x => x.g === 'premium');
+
+const hero = '/imagini/articole/cele-mai-bune-fotolii-de-masaj.webp';
+const figRelax = '/imagini/articole/fotolii-masaj-relaxare.webp';
+const figFull = '/imagini/articole/fotolii-masaj-fullbody.webp';
+const figPremium = '/imagini/articole/fotolii-masaj-premium.webp';
+const published = '2026-07-21T12:29:47+03:00';
+
+const faq = [
+  { question: 'Care e cel mai ieftin fotoliu de masaj adevarat?', answer: 'In selectia asta, QUITUS la 5400 de lei este primul model cu role reale montate pe o senila, adica masaj care framanta muschiul, nu doar vibratie. Tot ce costa sub aproximativ 2300 de lei sunt fotolii de relaxare cu vibratii si incalzire: confortabile si utile pentru destindere, dar fara rolele care fac masajul propriu-zis. Intre 2300 si 5400 de lei practic nu exista nimic pe eMAG la vanzatorul care domina categoria, deci saltul de pret de la relaxare la masaj cu role este brusc si merita anticipat in buget.' },
+  { question: 'Ce inseamna 2D, 3D si 4D la un fotoliu de masaj?', answer: 'Numarul descrie in cate feluri se pot misca rolele. La 2D, rolele merg sus-jos si stanga-dreapta, cu o presiune fixa, la fel pentru toata lumea. La 3D, rolele pot iesi in fata din senila, tipic pana la 5 centimetri, deci reglezi cat de adanc apasa, de la un masaj usor la unul de tesut profund. La 4D se adauga variatia de ritm si viteza in timpul aceleiasi treceri, ceea ce imita cel mai bine mainile unui maseur. Un detaliu care surprinde: in gama analizata, un model 4D de 6600 de lei coexista cu unul 3D de 8280, deci pretul nu creste ordonat cu dimensiunea rolelor. Verifica dimensiunea in fisa, nu presupune dupa pret.' },
+  { question: 'Ce diferenta e intre senila S, L si SL?', answer: 'Senila e sina pe care aluneca rolele. O senila S urmeaza curba coloanei si merge de la gat pana la baza spatelui. O senila L continua mai jos, in jurul fesierilor, pana la partea de sus a coapselor, deci acopera mai multe grupe musculare. SL combina cele doua: urmeaza curba spatelui si coboara si spre sezut. Pentru cine sta mult pe scaun si simte tensiune in zona soldurilor si a fesierilor, o senila L sau SL conteaza mai mult decat un plus de la 3D la 4D, pentru ca ajunge acolo unde o senila S scurta nu ajunge deloc.' },
+  { question: 'Cat spatiu imi trebuie pentru un fotoliu de masaj?', answer: 'Mai mult decat par cand sunt drepte. Majoritatea fotoliilor de masaj au nevoie de 1,8 pana la 2 metri de spatiu in lungime cand se rabat complet, plus o distanta fata de perete pentru ca spatarul sa se poata lasa pe spate. Multe modele au tehnologie care le apropie de perete cand se inclina, dar tot lasa loc pentru suportul de picioare care se extinde in fata. Masoara locul inainte de comanda, cu fotoliul imaginat in pozitie complet rabatata, nu asezat drept. Intr-o camera mica, un fotoliu de masaj domina spatiul, iar asta e un motiv real pentru care unii aleg un model care nu se rabate la orizontala.' },
+  { question: 'Ce greutate si inaltime suporta?', answer: 'Modelele din selectie suporta intre 120 si 150 de kilograme, iar cifra e trecuta in fisa fiecarui produs. Nu e un detaliu de ignorat: un fotoliu folosit aproape de limita de greutate isi solicita mai tare senila si motoarele si se uzeaza mai repede. Daca esti peste 120 de kg, alege dintre modelele care declara 150, cum sunt QUITUS, IULIUS sau SEVERNIUS. La inaltime, fotoliile cu scanare corporala, precum SEVERNIUS si VIGOS, se potrivesc mai bine persoanelor inalte, pentru ca isi masoara traseul pe corpul tau. La modelele fara scanare, daca esti peste 1,85 metri, exista riscul ca rolele sa nu ajunga corect la gat.' },
+  { question: 'De ce apar aceleasi pareri la mai multe modele?', answer: 'Pentru ca eMAG afiseaza numarul de pareri la nivel de gama de produs, nu de model individual. In cazul acesta, cele 43 de pareri apar identic la aproape toate fotoliile scumpe de la acelasi vanzator, pentru ca sunt variante ale aceleiasi linii. Cifra e reala si arata ca linia de produs e cumparata si notata bine, dar nu inseamna ca fix modelul afisat a strans 43 de pareri separate. Am folosit-o ca semnal de incredere in vanzator si in gama, nu ca dovada despre un anumit fotoliu, si e corect sa stii asta cand compari.' },
+];
+
+const images = [hero, figRelax, figFull, figPremium, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune fotolii de masaj in ${SEO_YEAR}: de la relaxare cu vibratii la role 4D`}
+  description="12 fotolii de masaj comparate pe tipul rolelor si senila, de la 1850 la 14.280 de lei. Plus de ce sub 2300 de lei nu e masaj adevarat."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Ioana Stan"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobila si Dormitor', url: '/mobila-dormitor/' }, { name: 'Cele mai bune fotolii de masaj' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobila-dormitor/">Mobila si Dormitor</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune fotolii de masaj</span>
+    </nav>
+
+    <h1>Cele mai bune fotolii de masaj</h1>
+    <p class="rd-byline">de <a href="/autori/ioana-stan/">Ioana Stan</a>, Consultant Amenajari Dormitor · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune fotolii de masaj: de la fotolii de relaxare cu vibratii la fotolii cu role 4D si scanare corporala" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Daca vrei un fotoliu de masaj adevarat, cu role care urca pe coloana si framanta muschiul, cel mai ieftin punct de intrare rezonabil este <strong>QUITUS</strong>, la 5400 de lei. Sub pragul asta, tot ce gasesti sunt fotolii de relaxare cu vibratii si caldura, utile dar fara masajul propriu-zis. La varf, <strong>VIGOS</strong> costa 14.280 de lei si aduce role 4D cu scanare corporala.</p>
+      <p>Primul lucru de stiut inainte de orice comparatie: pe eMAG, categoria asta e practic <strong>un singur vanzator</strong>. Aproape tot ce apare cand cauti fotoliu de masaj vine de la aceeasi gama, cu modele purtand nume romane, QUITUS, IULIUS, MAXIMUS, VIGOS. Nu inseamna ca sunt slabe, inseamna ca alegi intre variantele aceleiasi linii, iar diferentele reale sunt <strong>tipul rolelor si senila</strong>, nu brandul.</p>
+      <p>Al doilea: <strong>pretul nu urca la fel cu tehnologia</strong>. MECHA, la 6600 de lei, are role 4D si senila SL, in timp ce SEVERNIUS, la 8280, ramane pe 3D. Nici numarul de zone de masaj nu e o scara de calitate. De aceea le-am grupat dupa tipul de masaj, nu dupa pret.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#relax">Fotolii de relaxare cu vibratii, sub 2300 lei</a></li>
+        <li><a href="#full">Fotolii de masaj cu role, de la 5400 lei</a></li>
+        <li><a href="#premium">Premium 3D si 4D, cu scanare corporala</a></li>
+        <li><a href="#vibratii-role">Vibratii sau role: de ce conteaza pragul de 2300 lei</a></li>
+        <li><a href="#dimensiuni">2D, 3D, 4D: ce inseamna si cat conteaza</a></li>
+        <li><a href="#senila">Senila S, L sau SL: unde ajunge masajul</a></li>
+        <li><a href="#zero-gravity">Zero gravity: la ce foloseste de fapt</a></li>
+        <li><a href="#inainte">Inainte sa comanzi: spatiu, greutate, garantie</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip masaj</th><th>Senila</th><th>Zero G</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.senila}</td>
+              <td>{x.zg}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="relax">Fotolii de relaxare cu vibratii, sub 2300 lei</h2>
+    <p>Acestea nu sunt, tehnic, fotolii de masaj cu role. Masajul vine din motoare de vibratie plasate in spatar si sezut, insotite de incalzire. Relaxeaza si incalzesc muschii, dar nu framanta. Sunt potrivite pentru destindere dupa o zi lunga sau pentru cineva care vrea un recliner confortabil cu un plus de vibratie, nu pentru terapie pe puncte.</p>
+    {RELAX.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figRelax} alt="Fotolii de relaxare cu vibratii si incalzire, sub 2300 de lei" width="1600" height="900" loading="lazy" />
+
+    <h2 id="full">Fotolii de masaj cu role, de la 5400 lei</h2>
+    <p>Aici incepe masajul adevarat: role montate pe o senila care urca pe coloana si framanta muschiul, pozitie zero gravity si airbag-uri care comprima bratele si picioarele. E si pragul unde pretul sare brusc, pentru ca intre fotoliile cu vibratii si cele cu role nu prea exista nimic la mijloc.</p>
+    {FULL.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figFull} alt="Fotolii de masaj cu role pe senila SL, de la 5400 de lei" width="1600" height="900" loading="lazy" />
+
+    <h2 id="premium">Premium 3D si 4D, cu scanare corporala</h2>
+    <p>Peste 8000 de lei, doua lucruri fac diferenta: role care isi regleaza adancimea si ritmul, si scanarea corporala, prin care fotoliul isi masoara traseul pe corpul tau inainte de masaj. Pentru utilizatori inalti sau grei, scanarea conteaza mai mult decat orice numar de programe.</p>
+    {PREMIUM.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPremium} alt="Fotolii de masaj premium 3D si 4D cu scanare corporala automata" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-fotolii-masaj').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate fotoliile de masaj la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="vibratii-role">Vibratii sau role: de ce conteaza pragul de 2300 lei</h2>
+    <p>E cea mai importanta distinctie din categorie si cea pe care denumirile o ascund, pentru ca ambele tipuri se vand ca "fotoliu de masaj".</p>
+    <p>Un fotoliu de <strong>relaxare cu vibratii</strong> are motoare care vibreaza in spatar si sezut. Senzatia e placuta, incalzeste zona si ajuta la destindere, dar vibratia sta pe suprafata: nu apasa in profunzime si nu framanta muschiul.</p>
+    <p>Un fotoliu de <strong>masaj cu role</strong> are role fizice montate pe o sina, senila, care se plimba pe spate si preseaza punctual, exact cum ar face degetele unui maseur. Asta ajunge la nodurile musculare si la tensiunea reala.</p>
+    <p>Pe eMAG, ruptura dintre cele doua lumi e si de pret: fotoliile cu vibratii stau intre 1850 si 2300 de lei, iar primul cu role sare direct la 5400. Intre ele, gol. Consecinta practica e simpla:</p>
+    <ul>
+      <li>Daca vrei doar sa te relaxezi seara cu putina caldura si vibratie, <strong>nu ai motiv sa treci de 2300 de lei</strong>.</li>
+      <li>Daca vrei masaj care sa lucreze un spate incordat sau dureri cronice, <strong>bugetul real porneste de la 5400 de lei</strong>, si nu exista scurtatura pe la mijloc.</li>
+    </ul>
+
+    <h2 id="dimensiuni">2D, 3D, 4D: ce inseamna si cat conteaza</h2>
+    <p>Numarul descrie in cate feluri se pot misca rolele, si e util sa il intelegi pentru ca apare in aproape fiecare denumire.</p>
+    <ul>
+      <li><strong>2D.</strong> Rolele merg sus-jos si in lateral, cu o presiune fixa, aceeasi pentru toata lumea. Simplu si fiabil. QUITUS, modelul de intrare, e 2D.</li>
+      <li><strong>3D.</strong> Rolele pot iesi in fata din senila, tipic pana la 5 centimetri, deci <strong>reglezi cat de adanc apasa</strong>, de la un masaj usor la tesut profund. Aici e saltul cel mai util pentru cei cu dureri reale.</li>
+      <li><strong>4D.</strong> Peste 3D, rolele isi <strong>schimba ritmul si viteza</strong> in timpul aceleiasi treceri, ceea ce imita cel mai bine mainile unui maseur, cu apasari mai lente si mai rapide.</li>
+    </ul>
+    <p>Partea care surprinde si merita retinuta: in gama de pe eMAG, <strong>pretul nu urca ordonat cu dimensiunea</strong>. MECHA, cu role 4D, costa 6600 de lei, in timp ce SEVERNIUS, cu role 3D, costa 8280, pentru ca la SEVERNIUS platesti scanarea corporala si capacitatea de 150 kg, nu rolele. Morala: nu presupune dimensiunea dupa pret, citeste-o in fisa.</p>
+
+    <h2 id="senila">Senila S, L sau SL: unde ajunge masajul</h2>
+    <p>Senila e sina curbata pe care aluneca rolele, iar forma ei decide pana unde pe corp ajunge masajul.</p>
+    <p>O senila <strong>S</strong> urmeaza curba coloanei si merge de la gat pana la baza spatelui. O senila <strong>L</strong> continua mai jos, coboara in jurul fesierilor pana la partea de sus a coapselor, deci acopera mai multe grupe musculare. <strong>SL</strong> combina cele doua: urmareste curba spatelui si coboara si spre sezut.</p>
+    <p>Pentru cine sta mult pe scaun si acumuleaza tensiune in solduri si fesieri, o senila L sau SL conteaza mai mult decat trecerea de la 3D la 4D, fiindca ajunge unde o senila S scurta nu ajunge deloc. In selectie, LUXOR L183 PRO e singurul cu senila L declarata explicit, iar restul fotoliilor cu role folosesc SL, care acopera oricum si zona sezutului.</p>
+
+    <h2 id="zero-gravity">Zero gravity: la ce foloseste de fapt</h2>
+    <p>Aproape toate fotoliile cu role din selectie au pozitia zero gravity, iar termenul suna a marketing pana intelegi ce face concret.</p>
+    <p>Este o pozitie de inclinare inspirata din cercetarile NASA pentru reducerea presiunii pe corp. Fotoliul se lasa pe spate la un unghi de aproximativ 120 pana la 130 de grade si <strong>ridica picioarele deasupra nivelului inimii</strong>. Efectul are doua parti reale:</p>
+    <ul>
+      <li><strong>Descarca coloana.</strong> In pozitia asta, greutatea corpului nu mai apasa vertical pe vertebre, iar presiunea pe zona lombara si pe gat scade. Pentru cineva cu dureri de spate, diferenta fata de masajul in pozitie dreapta se simte.</li>
+      <li><strong>Ajuta rolele sa lucreze mai bine.</strong> Cu spatele lipit relaxat de senila, rolele preseaza uniform, nu pe un spate incordat care le tine la distanta.</li>
+    </ul>
+    <p>Nu e un moft: pe un fotoliu cu role, zero gravity chiar schimba calitatea masajului, motiv pentru care lipseste doar la fotoliile cu vibratii, unde oricum nu ar avea ce sustine.</p>
+
+    <h2 id="inainte">Inainte sa comanzi: spatiu, greutate, garantie</h2>
+    <p>Un fotoliu de masaj e cel mai mare si mai scump obiect din casa care are motoare in el, iar trei lucruri practice conteaza mai mult decat orice functie.</p>
+    <p><strong>Spatiul.</strong> Rabatat complet, un fotoliu de masaj cere in jur de 1,8 pana la 2 metri in lungime, plus loc fata de perete pentru spatar. Masoara locul cu fotoliul imaginat intins, nu asezat drept. Intr-o camera mica domina incaperea, si asta e un motiv real sa alegi un model care nu se lasa la orizontala.</p>
+    <p><strong>Greutatea suportata.</strong> Modelele din selectie declara intre 120 si 150 de kilograme. Un fotoliu folosit aproape de limita isi solicita mai tare senila si motoarele si se uzeaza mai repede. Peste 120 de kg, alege dintre cele care declara 150: QUITUS, IULIUS, SEVERNIUS.</p>
+    <p><strong>Potrivirea pe inaltime.</strong> Fotoliile cu <strong>scanare corporala</strong>, precum SEVERNIUS si VIGOS, isi masoara traseul pe corpul tau si se potrivesc mai bine celor inalti. La cele fara scanare, daca esti peste 1,85 metri, rolele pot rata zona gatului.</p>
+    <p><strong>Garantia si service-ul.</strong> La un aparat cu motoare, rolele si mecanismele se pot defecta in timp, iar reparatia costa. Cum toata categoria vine de la un singur vanzator, verifica inainte de comanda ce acopera garantia si daca service-ul se face la tine acasa sau esti nevoit sa trimiti un fotoliu de 40-50 de kilograme inapoi. E intrebarea care conteaza cel mai mult la un obiect atat de greu.</p>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la fotoliile de masaj in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca aceeasi gama apare listata de mai multe ori, in culori diferite si cu coduri diferite, la acelasi pret.</p>
+    <p><strong>Le-am grupat dupa tipul de masaj, nu dupa pret</strong>, pentru ca aceasta e decizia care conteaza: un fotoliu cu vibratii si unul cu role sunt produse diferite, chiar daca se vand sub acelasi nume, iar pretul, dupa cum am aratat, nu urmeaza tehnologia.</p>
+    <p><strong>O precizare despre pareri.</strong> eMAG afiseaza numarul de pareri la nivel de gama, nu de model. Cele 43 de pareri apar identic la aproape toate fotoliile scumpe din selectie, pentru ca sunt variante ale aceleiasi linii. Cifra e reala, dar apartine gamei, nu exact modelului afisat. Am folosit-o ca semnal de incredere in vanzator si in linia de produs, nu ca dovada despre un fotoliu anume.</p>
+    <p>Toata categoria e dominata de un singur vanzator pe eMAG, iar selectia reflecta asta fara sa o forteze. Nu testam fotoliile in laborator si nu pretindem asta. Comparam specificatiile reale din fise, tipul rolelor si al senilei, capacitatea si dotarile, si semnalam diferentele pe care fisa nu le scoate in evidenta, cum e cea dintre vibratii si role sau dintre 3D si 4D la acelasi pret. Un fotoliu de masaj sta bine langa <a href="/cele-mai-bune-canapele/">o canapea confortabila</a> si intr-un <a href="/cele-mai-bune-seturi-de-mobila-de-dormitor/">dormitor bine gandit</a>, ca piesa de relaxare a casei.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 1850 la 14.280 de lei, cu o ruptura clara la mijloc.</p>
+    <p><strong>Intre 1850 si 2300 de lei</strong> stau fotoliile de relaxare cu vibratii si caldura, inclusiv modelul cu ridicare pentru mobilitate redusa. Confortabile pentru destindere, fara masaj cu role.</p>
+    <p><strong>Intre 5400 si 7200 de lei</strong> incepe masajul adevarat: role pe senila SL, zero gravity, airbag. Aici e cel mai bun echilibru, iar MECHA la 6600 de lei, singurul cu role 4D din grupa, e reperul de raport tehnologie-pret.</p>
+    <p><strong>Peste 8000 de lei</strong> primesti scanare corporala, role 3D sau 4D si constructie de varf, pana la VIGOS de 14.280 de lei. Merita cand il folosesti zilnic, ani la rand, si il imparte toata familia. La pretul de varf, aseaza cifra langa cost: un fotoliu se justifica prin folosire deasa, nu ocazionala.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">IS</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/ioana-stan/" class="author-name-link">Ioana Stan</a></p>
+        <p class="author-role">Consultant Amenajari Dormitor</p>
+        <p class="author-bio">Ioana scrie despre mobila, saltele si piese de relaxare pentru casa. Traduce materialele, dimensiunile si dotarile in recomandari clare, dupa cum traiesti in camera respectiva.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-fotolii-de-masaj" currentCategory="mobila-dormitor" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-fotolii-de-masaj" currentCategory="mobila-dormitor" articles={relatedArticles} />
+  </article>
+</Layout>

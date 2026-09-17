@@ -1,0 +1,332 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['aer-conditionat'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { id: 'DQT56GYBM', badge: 'Alegerea noastra',
+    specs: ['9000 BTU, pana la ~25 mp', 'SEER 6.1, clasa A++/A+', 'inverter R32, min 22 dB', 'kit de instalare inclus'],
+    pros: ['Cel mai bine notat din selectie, 4.84 din 355 de pareri', 'Kit de instalare inclus, mai putini bani la montaj', 'Merge de la 22 dB in modul Silent, il uiti pornit noaptea', 'Autocuratare in 4 pasi si Golden Fin contra coroziunii'],
+    cons: ['Brand mai putin cunoscut decat Samsung sau LG', 'Fara ecosistem smart de tip SmartThings'],
+    verdict: 'Cel mai echilibrat aparat de 9000 BTU din selectie si prima recomandare pentru un dormitor sau o camera de pana la 25 mp. Are cea mai buna nota din tot topul, 4.84 din 355 de pareri, iar oamenii lauda tocmai lucrurile care conteaza la un aer conditionat: raceste repede, e silentios si nu se strica. Eficienta sezoniera SEER de 6.1 il tine in clasa A++ la racire, deci consumul e mic vara. Vine cu kit de instalare inclus, adica tevi si conexiuni, si cu tratament Golden Fin pe schimbatorul de caldura, care intarzie coroziunea unitatii exterioare. Il iei daca vrei un aparat corect, fara batai de cap, la cel mai bun raport pret-performanta.' },
+  { id: 'DHWT4LBBM', badge: 'Cel mai ieftin',
+    specs: ['9000 BTU, ~16-20 mp', '3D Inverter, clasa A++', 'functie incalzire', 'WiFi, display'],
+    pros: ['Cel mai mic pret din top, sub 1050 de lei', 'Peste 580 de pareri, cel mai testat de cumparatori', '3D Inverter, mai economic decat un aparat on/off', 'Se controleaza din aplicatie si are functie de incalzire'],
+    cons: ['Kit de instalare nu e inclus, il platesti separat', 'Potrivit pentru camere mici, pana la 16-20 mp', 'Fara filtre speciale sau functii premium'],
+    verdict: 'Cu cel mai mic pret pui aer conditionat inverter intr-o camera mica, si totusi are peste 580 de pareri bune, ceea ce e rar la acest pret. Tehnologia 3D Inverter regleaza continuu compresorul in loc sa il porneasca si opreasca brusc, deci consuma mai putin si mentine temperatura mai stabil decat un aparat clasic on/off. Are functie de incalzire pentru sezonul rece si control din aplicatie. Compromisurile sunt de asteptat la pretul asta: kitul de instalare nu e inclus si e gandit pentru spatii mici, pana in 16-20 mp. Il alegi pentru un dormitor sau un birou mic, cu buget strans, unde vrei inverter fara sa dai mult.' },
+  { id: 'DSYFDLYBM', badge: 'Cel mai bun raport',
+    specs: ['9000 BTU, ~20-25 mp', 'inverter, clasa A++/A+', 'filtre cu ioni de argint, iFeel', 'WiFi, Eco Mode'],
+    pros: ['WiFi si filtre cu ioni de argint sub 1100 de lei', 'Functie iFeel, senzor de temperatura chiar in telecomanda', 'Inverter cu Eco Mode pentru consum redus', 'Nota buna, 4.60 din 371 de pareri'],
+    cons: ['Zgomot pana la 50 dB in treapta maxima de ventilatie', 'Varianta NK nu vine cu kit de instalare', 'Garantie standard de 2 ani'],
+    verdict: 'Saltul logic peste Star-Light daca vrei mai multe functii fara sa treci de 1100 de lei. Aduce filtre cu ioni de argint, care retin bacteriile din aer, si functia iFeel, unde senzorul de temperatura sta in telecomanda si aparatul raceste dupa cat de cald e langa tine, nu langa perete. Are WiFi si Eco Mode pentru consum mic. Pe treapta maxima de ventilatie urca la 50 dB, deci il tii pe viteza mica noaptea, iar varianta NK nu include kitul de instalare. Il iei daca vrei WiFi, filtre si iFeel la pretul unui aparat de baza, pentru o camera de pana la 25 mp.' },
+  { id: 'D150YQBBM', badge: '12000 BTU pe buget',
+    specs: ['12000 BTU, ~30-35 mp', 'clasa A++, R32', 'Follow me, functie Turbo', 'WiFi, Self Clean'],
+    pros: ['Cel mai ieftin aparat de 12000 BTU din selectie', 'Functie Follow me, urmareste temperatura langa tine', 'Turbo pentru racire rapida in camere mai mari', 'Detecteaza scurgerile de agent frigorific'],
+    cons: ['Brand mai putin cunoscut', 'Kit de instalare nu e inclus', 'Fara ecosistem smart matur'],
+    verdict: 'Cea mai ieftina cale spre 12000 BTU, adica pasul de care ai nevoie pentru un living sau o camera de 30-35 mp, unde 9000 ar trage prea din greu. Heinner Crystal are functia Follow me, care muta reperul de temperatura la tine in camera prin telecomanda, plus un mod Turbo pentru cand vrei sa raceasca repede la venire. Are WiFi, autocuratare si un senzor care detecteaza scurgerile de freon, util pe termen lung. Nu are numele de brand al unui Samsung si nu vine cu kit de instalare. Il alegi cand vrei putere de 12000 BTU la cel mai mic pret posibil, iar functiile smart avansate nu sunt o prioritate.' },
+  { id: 'DXXQ3ZBBM', badge: 'Mid-range de brand',
+    specs: ['12000 BTU, ~30-35 mp', 'G10 Inverter, SEER 6.1', 'Cold Plasma, buton Turbo', 'WiFi, auto-diagnoza'],
+    pros: ['Brand consacrat in climatizare, cu service raspandit', 'Generator de ioni Cold Plasma pentru aer mai curat', 'Buton Turbo si auto-diagnoza a defectelor', 'Eficient, SEER 6.1, functioneaza pana la -15°C afara'],
+    cons: ['Mai scump decat aparatele de 9000 BTU', 'Kitul de instalare depinde de varianta'],
+    verdict: 'Gree face aparate de aer conditionat de zeci de ani si acest Bora A4 e alegerea de brand la 12000 BTU, cand vrei ceva mai serios decat un Heinner, dar sub pretul unui Samsung sau LG. Are compresor G10 Inverter, un SEER de 6.1 care il tine in A++ la racire, si un generator de ioni Cold Plasma care curata aerul de praf si mirosuri. Butonul Turbo raceste repede, iar auto-diagnoza iti arata codul defectului daca apare o problema, ceea ce simplifica service-ul. Functioneaza pana la -15°C afara la incalzire. Il iei pentru o camera de 30-35 mp, cand vrei un brand de incredere in climatizare la un pret rezonabil.' },
+  { id: 'DQF8PY2BM', badge: 'Cel mai silentios',
+    specs: ['9000 BTU, ~25 mp', 'de la 20 dB', 'SmartThings WiFi', 'Fast Cooling, Good Sleep'],
+    pros: ['Cel mai silentios din top, de la 20 dB', 'Brand consacrat, piese si service usor de gasit', 'SmartThings, cea mai matura aplicatie din selectie', 'Fast Cooling la venire si Good Sleep pentru noapte'],
+    cons: ['Mai scump decat aparatele cu specificatii similare', 'Kit de instalare nu e inclus'],
+    verdict: 'Daca dormi in camera unde pui aparatul, Samsung AR35 e alegerea: pornit pe viteza mica coboara pana la 20 dB, adica sub un soptit, cel mai silentios din tot topul. E si un Samsung, cu tot ce inseamna asta pentru piese, service si valoare in timp. Aplicatia SmartThings e cea mai bine facuta dintre toate marcile de aici, iar functiile Fast Cooling si Good Sleep chiar au sens: prima raceste repede cand ajungi acasa, a doua ridica usor temperatura peste noapte ca sa nu te trezesti inghetat. Kitul de instalare nu e inclus si costa ceva mai mult decat un aparat asiatic echivalent. Il iei pentru dormitor, cand linistea si numele de brand conteaza cel mai mult.' },
+  { id: 'D14RBWMBM', badge: 'Cel mai complet echipat',
+    specs: ['9000 BTU, ~25 mp', 'HomeWhiz WiFi', 'SelfClean+, ZoneFollow', 'Silver Ion, incalzire la -10°C'],
+    pros: ['Cel mai bogat in functii: SelfClean+, ZoneFollow, Silver Ion', 'Kit de instalare inclus', 'Incalzeste si cand afara sunt -10°C', 'HomeWhiz, control complet din aplicatie'],
+    cons: ['Cel mai scump aparat de 9000 BTU din top', 'Multe functii pe care poate nu le folosesti pe toate'],
+    verdict: 'Cel mai incarcat aparat de 9000 BTU din selectie, pentru cine vrea toate functiile intr-un singur produs. SelfClean+ usuca si curata interiorul ca sa nu se formeze mucegai si mirosuri, ZoneFollow trimite aerul catre zona unde stai, iar filtrele Silver Ion retin bacteriile. Kitul de instalare e inclus, spre deosebire de Samsung, si incalzeste eficient chiar si la -10°C afara, deci il poti folosi ca sursa de caldura in serile reci. E cel mai scump aparat de 9000 BTU de aici, iar o parte din functii raman nefolosite de multi. Il alegi cand vrei un Beko complet echipat, cu montaj inclus si incalzire buna pe frig.' },
+  { id: 'DSS08FBBM', badge: 'Pentru camere mari',
+    specs: ['18000 BTU, ~40-55 mp', 'Dual Inverter, 10 ani garantie compresor', 'Fast Heating, Jet Cool', 'clasa A++/A+, R32'],
+    pros: ['Acopera un living mare sau un open space, 40-55 mp', 'Compresor Dual Inverter cu 10 ani garantie', 'Fast Heating, incalzeste 6% mai repede fara jet direct', 'Afiseaza consumul de energie in timp real'],
+    cons: ['Cel mai scump din top', 'Modelul standard nu are WiFi', 'Cere priza si circuit dimensionate pentru 18000 BTU'],
+    verdict: 'Cand camera trece de 40 mp, un aparat de 9000 sau 12000 BTU se chinuie si merge non-stop la maxim, asa ca ai nevoie de 18000 BTU, iar acest LG e alegerea. Compresorul Dual Inverter vine cu 10 ani garantie, cea mai lunga din top, si e cunoscut ca durabil si economic. Fast Heating imparte fluxul prin doua clape ca sa incalzeasca mai repede fara sa iti sufle aer fierbinte direct in fata, iar Jet Cool raceste rapid la venire. Afiseaza consumul, deci vezi negru pe alb cat te costa. Modelul standard nu are WiFi si, fiind de 18000 BTU, cere o priza si un circuit pe masura. Il iei pentru living, open space sau o camera mare, unde durabilitatea conteaza.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/aer-conditionat.webp';
+const figBuget = '/imagini/articole/aer-conditionat-buget.webp';
+const figBtu = '/imagini/articole/aer-conditionat-btu.webp';
+const figPremium = '/imagini/articole/aer-conditionat-premium.webp';
+const published = '2026-07-17T11:20:00+03:00';
+
+const faq = [
+  { question: 'Cate BTU trebuie sa aiba aerul conditionat?', answer: 'Regula simpla e in jur de 350-400 BTU pe metru patrat, la o inaltime normala a tavanului. Pentru o camera de pana la 25 mp ajunge un aparat de 9000 BTU, pentru 25-35 mp ia 12000 BTU, pentru 40-55 mp treci la 18000 BTU, iar pentru un etaj intreg de 65-75 mp vrei 24000 BTU. Adauga putere daca odaia are multe geamuri spre sud, tavan inalt sau multe aparate care incalzesc, ca bucataria.' },
+  { question: 'Ce inseamna inverter la aerul conditionat si merita?', answer: 'Un aparat inverter regleaza continuu turatia compresorului in loc sa il porneasca si sa il opreasca brusc, ca modelele on/off. Rezultatul e o temperatura mai stabila, mai putin zgomot si un consum cu 30-50% mai mic pe termen lung. Toate aparatele din acest comparativ sunt inverter. La cat il folosesti vara, diferenta de pret fata de un on/off se recupereaza din factura in cateva sezoane.' },
+  { question: 'Ce clasa energetica sa aleg?', answer: 'Uita-te la SEER pentru racire si SCOP pentru incalzire, nu doar la litera. Aproape toate aparatele bune sunt A++ la racire, cu SEER intre 6.1 si 7. Cu cat SEER e mai mare, cu atat consumul e mai mic la aceeasi racire. O diferenta de la 6.1 la 7 se simte pe factura daca tii aparatul pornit multe ore pe zi, vara.' },
+  { question: 'Aerul conditionat poate incalzi iarna?', answer: 'Da, aproape toate modelele split de azi sunt cu pompa de caldura si incalzesc, nu doar racesc. Important e pana la ce temperatura exterioara raman eficiente. Modele ca Beko BRHPG090 incalzesc bine si la -10°C, iar Gree Bora merge pana la -15°C. Sub aceste praguri, randamentul scade, asa ca in zonele foarte reci ramane o sursa de caldura de rezerva, nu principala.' },
+  { question: 'Kitul de instalare si montajul sunt incluse in pret?', answer: 'Kitul de instalare, adica tevile de cupru, cablurile si suportii, e inclus doar la unele modele, ca Yamato Optimum sau Beko. Montajul propriu-zis, facut de un tehnician autorizat, e aproape intotdeauna separat si costa in general intre 400 si 800 de lei pentru un aparat obisnuit, mai mult daca traseul e lung sau unitatea exterioara se monteaza la inaltime.' },
+  { question: 'Cat de des se curata aerul conditionat?', answer: 'Filtrele din unitatea interioara se scot si se spala la 2-4 saptamani in sezonul de folosire; sunt cea mai frecventa cauza pentru racire slaba si mirosuri. O data pe an, ideal primavara, fa o igienizare completa cu verificarea presiunii de agent frigorific la un tehnician. Modelele cu SelfClean, ca Beko sau Samsung, isi usuca singure interiorul si intarzie mucegaiul, dar nu inlocuiesc spalarea filtrelor.' },
+];
+
+const images = [hero, figBuget, figBtu, figPremium, ...PICKS.map(x => x.p.image)];
+const money = (n) => n.toLocaleString('ro-RO');
+const b64 = (s) => Buffer.from(s).toString('base64');
+const shortName = (n) => n.replace(/’/g, "'").replace(/^Aparat de aer conditionat /i, '').split(',')[0];
+---
+
+<Layout
+  title="Cele mai bune aparate de aer conditionat in 2026: 8 modele comparate (Yamato, Samsung, LG, Gree)"
+  description="Ce aer conditionat sa iti iei in 2026: 8 modele comparate pe BTU, inverter, consum, zgomot si pareri reale, de la Star-Light ieftin la LG pentru camere mari. Plus cati BTU iti trebuie si cat costa montajul."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Incalzire si Climatizare', url: '/incalzire-climatizare/' }, { name: 'Cele mai bune aparate de aer conditionat' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/incalzire-climatizare/">Incalzire si Climatizare</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune aparate de aer conditionat</span>
+    </nav>
+
+    <h1>Cele mai bune aparate de aer conditionat in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune aparate de aer conditionat: Yamato, Samsung, Gree si LG" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru un dormitor sau o camera de pana la 25 mp, cel mai bun aer conditionat din acest moment este <strong>Yamato Optimum YW09T2n</strong>: are cea mai buna nota din selectie, e silentios si vine cu kit de instalare inclus. Daca vrei sa dai cat mai putin, <strong>Star-Light ACT-09WIFI</strong> iti da un aparat inverter cu WiFi sub 1050 de lei. Daca dormi chiar in camera aceea, <strong>Samsung AR35</strong> coboara pana la 20 dB, iar pentru un living mare ai nevoie de <strong>LG de 18000 BTU</strong>.</p>
+      <p>Prima intrebare la orice aer conditionat nu e ce brand, ci cati BTU, adica ce putere iti trebuie pentru marimea camerei. Un aparat prea mic merge non-stop la maxim si nu raceste, unul prea mare porneste si se opreste des si scoate aer umed. Mai jos ai tabelul de dimensionare, apoi 8 modele comparate pe putere, consum, zgomot, functie de incalzire si parerile reale ale cumparatorilor.</p>
+      <p>Am pornit de la cele mai vandute aparate de pe eMAG, am verificat specificatiile fiecarui model, de la SEER si nivelul de zgomot la temperatura minima de functionare, si le-am pus fata in fata cu notele a mii de cumparatori. Pentru un apartament mic, vezi <a href="/aer-conditionat-pentru-apartament-mic/">aerul conditionat de 9000 BTU</a>, iar pentru facturi mai mici, <a href="/cele-mai-bune-panouri-solare/">panourile solare</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#pe-scurt">Care aparat pentru cine</a></li>
+        <li><a href="#btu">Cati BTU iti trebuie, dupa marimea camerei</a></li>
+        <li><a href="#produse">Cele 8 aparate pe larg</a></li>
+        <li><a href="#cum-alegi">Cum alegi un aer conditionat</a></li>
+        <li><a href="#inverter">De ce toate sunt inverter</a></li>
+        <li><a href="#montaj">Montajul si costul care se uita</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cat-costa">Cat costa un aer conditionat</a></li>
+        <li><a href="#intretinere">Cum ai grija de aparat</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="pe-scurt">Pe scurt: care aparat pentru cine</h2>
+    <p>Daca esti grabit, tabelul rezuma pentru ce e potrivit fiecare model, ce putere are si cat costa. Preturile si numarul de pareri sunt luate direct de pe eMAG.</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>BTU</th><th>Cel mai bun la</th><th>Pret</th><th>Pareri</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td>{shortName(x.p.name)}</td>
+              <td>{x.specs[0].split(',')[0]}</td>
+              <td>{x.badge}</td>
+              <td>{money(x.p.price)} lei</td>
+              <td>{x.p.rating ? `${x.p.rating.toFixed(2)} (${x.p.reviews})` : '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="btu">Cati BTU iti trebuie, dupa marimea camerei</h2>
+    <p>BTU e unitatea care masoara puterea de racire. E cel mai important numar de pe eticheta, pentru ca de el depinde daca aparatul face fata camerei tale. Regula de baza e in jur de 350-400 BTU pe metru patrat, la un tavan de 2.5 metri. Iata cum se traduce:</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Putere</th><th>Suprafata</th><th>Unde se potriveste</th></tr></thead>
+        <tbody>
+          <tr><td>9000 BTU</td><td>pana la ~25 mp</td><td>dormitor, birou, camera mica</td></tr>
+          <tr><td>12000 BTU</td><td>~25-35 mp</td><td>living mediu, garsoniera</td></tr>
+          <tr><td>18000 BTU</td><td>~40-55 mp</td><td>living mare, open space</td></tr>
+          <tr><td>24000 BTU</td><td>~65-75 mp</td><td>etaj de casa, spatiu comercial mic</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Cifrele sunt un punct de plecare, nu o lege. Adauga putere daca odaia are geamuri mari spre sud, tavan de 3 metri, multe persoane sau aparate care incalzesc. O bucatarie de 20 mp cere mai mult decat un dormitor de 20 mp, din cauza caldurii de la cuptor si plita. Invers, nu lua un aparat mult prea mare doar ca sa fii sigur: un 18000 BTU intr-o camera de 20 mp raceste in cateva minute, apoi se opreste, porneste iar si lasa aerul umed, in loc sa lucreze constant si sa il usuce.</p>
+
+    <img class="rd-fig" src={figBtu} alt="Cati BTU iti trebuie: 9000, 12000 si 18000 BTU dupa marimea camerei" width="1200" height="675" loading="lazy" />
+
+    <p>Aproape fiecare model din acest comparativ vine in mai multe variante de putere, de la 9000 la 24000 BTU, pe acelasi nume. Alege intai puterea potrivita pentru camera, apoi vezi ce brand iti place la bugetul respectiv.</p>
+
+    <h2 id="produse">Cele 8 aparate de aer conditionat pe larg</h2>
+    <p>Le-am aranjat de la cea mai echilibrata alegere la modelul pentru camere mari. Fiecare card are pretul, nota si numarul de pareri direct de pe eMAG, plus specificatiile reale si punctele tari si slabe.</p>
+    <div class="rd-grid">
+      {PICKS.map(x => (
+        <ProductCard
+          name={x.p.name.replace(/’/g, "'")}
+          image={x.p.image}
+          price={x.p.price}
+          rating={x.p.rating}
+          reviews={x.p.reviews}
+          badge={x.badge}
+          specs={x.specs}
+          pros={x.pros}
+          cons={x.cons}
+          verdict={x.verdict}
+          outKey={'p-' + x.id}
+        />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Aer conditionat bun sub 1700 de lei: Star-Light, Daewoo si Heinner" width="1200" height="675" loading="lazy" />
+
+    <h2 id="cum-alegi">Cum alegi un aer conditionat</h2>
+    <p>Dupa ce ai stabilit puterea in BTU, restul deciziei se rezuma la cateva lucruri concrete. Uite ce conteaza cu adevarat.</p>
+
+    <h3>Eficienta: SEER si SCOP, nu doar litera</h3>
+    <p>Toate aparatele serioase sunt A++ la racire, deci litera nu prea le mai desparte. Ce le desparte sunt numerele din spate: SEER pentru racire si SCOP pentru incalzire. Un SEER de 6.1, ca la Yamato sau Gree, e bun; peste 7 e foarte bun. Cu cat e mai mare, cu atat platesti mai putin pentru aceeasi racire. La cateva ore de folosire pe zi in iulie si august, diferenta se vede pe factura.</p>
+
+    <h3>Functia de incalzire si temperatura minima</h3>
+    <p>Aproape toate modelele split de azi au pompa de caldura, deci incalzesc iarna, nu doar racesc. Diferenta o face pana la ce temperatura exterioara raman eficiente. Beko BRHPG090 incalzeste bine si la -10°C, iar Gree Bora merge pana la -15°C. In zonele cu ierni blande, un aer conditionat poate fi sursa principala de caldura in sezoanele de trecere; in zonele foarte reci, ramane un ajutor, nu inlocuitorul centralei.</p>
+
+    <h3>Zgomotul, mai ales in dormitor</h3>
+    <p>Daca aparatul sta in camera unde dormi, nivelul de zgomot pe viteza mica conteaza mai mult decat orice functie. Samsung AR35 coboara la 20 dB, sub un soptit; Yamato pleaca de la 22 dB. Un aparat care urca la 40-50 dB pe treapta maxima nu e o problema ziua, dar il vrei silentios noaptea. Verifica intotdeauna valoarea minima, nu doar cea maxima.</p>
+
+    <h3>WiFi, filtre si functii utile</h3>
+    <p>WiFi-ul e comod pentru pornit aparatul inainte sa ajungi acasa; SmartThings de la Samsung e cea mai matura aplicatie din selectie. Filtrele cu ioni de argint, la Daewoo si Beko, retin bacteriile, iar functiile SelfClean isi usuca singure interiorul si intarzie mucegaiul. Functia iFeel sau Follow me muta senzorul de temperatura in telecomanda, ca aparatul sa raceasca dupa cat de cald e langa tine, nu langa perete.</p>
+
+    <h2 id="inverter">De ce toate aparatele din top sunt inverter</h2>
+    <p>Un aparat vechi, on/off, functioneaza ca un intrerupator: porneste la putere maxima pana atinge temperatura, apoi se opreste complet, iar cand se incalzeste iar camera, reporneste brusc. De aici vin varfurile de consum, temperatura in dinti de fierastrau si zgomotul la fiecare pornire.</p>
+    <p>Un aparat inverter regleaza continuu turatia compresorului. Cand camera e aproape la temperatura dorita, incetineste si merge lin, in loc sa se opreasca. Rezultatul e o temperatura mai stabila, mai putin zgomot si un consum cu 30-50% mai mic pe sezon. La cat tii aparatul pornit vara, un inverter isi recupereaza diferenta de pret fata de un on/off in doua-trei sezoane, apoi economiseste. De aceea toate cele 8 modele de mai sus sunt inverter, iar un aparat on/off nou nu mai are sens azi.</p>
+
+    <h2 id="montaj">Montajul si costul care se uita</h2>
+    <p>Pretul de pe eMAG e doar o parte. Un aer conditionat split trebuie montat de un tehnician autorizat, care leaga unitatea interioara de cea exterioara, vacuumeaza traseul si verifica presiunea. Iata la ce sa te astepti:</p>
+    <ul>
+      <li><strong>Kitul de instalare</strong> (tevi de cupru, cabluri, suporti) e inclus doar la unele modele, ca Yamato Optimum sau Beko. La restul il platesti separat, in general 150-300 de lei.</li>
+      <li><strong>Manopera de montaj</strong> costa de obicei 400-800 de lei pentru un aparat obisnuit, cu traseu scurt. Creste daca teava e lunga, daca unitatea exterioara se pune la inaltime sau daca e nevoie de gaura noua in perete.</li>
+      <li><strong>Priza si circuitul.</strong> Un 9000 sau 12000 BTU merge pe o priza obisnuita; un 18000 sau 24000 BTU cere un circuit dimensionat, uneori tras separat din tablou.</li>
+    </ul>
+    <p>Pune la buget si montajul cand compari doua aparate. Un model cu 200 de lei mai scump, dar cu kit inclus, poate iesi mai ieftin decat unul fara kit la care platesti separat tevile.</p>
+
+    <h2 id="greseli">Greseli frecvente cand cumperi un aer conditionat</h2>
+    <p>Cateva capcane in care cad multi cumparatori:</p>
+    <ul>
+      <li><strong>Iei un aparat subdimensionat ca sa economisesti.</strong> Un 9000 BTU intr-un living de 35 mp merge non-stop la maxim, nu raceste bine si consuma mai mult decat un 12000 corect dimensionat.</li>
+      <li><strong>Sau, invers, iei prea mult.</strong> Un 18000 BTU intr-un dormitor mic porneste si se opreste des, lasa aerul umed si nu il usuca, plus ca a costat degeaba.</li>
+      <li><strong>Te uiti doar la pretul aparatului.</strong> Adauga kitul si montajul; abia atunci compari corect doua modele.</li>
+      <li><strong>Ignori nivelul de zgomot in dormitor.</strong> Un aparat zgomotos pe treapta mica te tine treaz; verifica valoarea minima in dB, nu doar cea maxima.</li>
+      <li><strong>Uiti de intretinere.</strong> Filtrele nespalate taie din racire, cresc consumul si aduc mirosuri; e cea mai frecventa cauza pentru care un aparat pare ca s-a stricat.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa un aer conditionat</h2>
+    <p>Pragurile pentru un aparat de 9000-12000 BTU arata cam asa in 2026, fara montaj:</p>
+    <p><strong>1000 - 1300 de lei</strong> sunt modelele de intrare, inverter, cu WiFi, ca Star-Light ACT-09WIFI sau Daewoo. Bune pentru un dormitor sau o camera mica, cu functii de baza.</p>
+    <p><strong>1300 - 1800 de lei</strong> aduc branduri mai cunoscute si mai multe functii, ca Yamato Optimum, Heinner Crystal de 12000 BTU sau Samsung AR35. Aici e cel mai bun raport pentru majoritatea caselor.</p>
+    <p><strong>1800 - 2800 de lei</strong> sunt aparatele de brand cu dotari complete, ca Gree Bora A4 sau Beko cu SelfClean+ si kit inclus. Platesti pentru service raspandit, filtre si automatizari.</p>
+    <p><strong>Peste 3000 de lei</strong> intra modelele de 18000 BTU pentru camere mari, ca LG Dual Inverter, sau variantele premium ale marcilor mari. Aici conteaza puterea, durabilitatea si garantia lunga a compresorului.</p>
+
+    <img class="rd-fig" src={figPremium} alt="Aparate de brand: Samsung, LG si Beko, cele mai silentioase si durabile" width="1200" height="675" loading="lazy" />
+
+    <h2 id="intretinere">Cum ai grija de aparat</h2>
+    <p>Un aer conditionat curat raceste la putere ani buni si consuma putin; unul neglijat pierde din randament, creste factura si incepe sa miroasa. Rutina e simpla.</p>
+    <ul>
+      <li><strong>La 2-4 saptamani in sezon:</strong> scoate filtrele din unitatea interioara, spala-le cu apa calduta, lasa-le sa se usuce si pune-le la loc. E cea mai importanta operatie si o faci singur.</li>
+      <li><strong>Periodic:</strong> porneste functia SelfClean, daca aparatul o are, ca sa isi usuce interiorul si sa nu se formeze mucegai. Sterge masca si grila de praf.</li>
+      <li><strong>O data pe an, ideal primavara:</strong> cheama un tehnician pentru igienizare completa si verificarea presiunii de agent frigorific. Daca aparatul raceste slab desi filtrele sunt curate, de obicei a scazut nivelul de freon.</li>
+    </ul>
+    <p>Unitatea exterioara vrea si ea spatiu liber in jur si o curatare de frunze si praf o data pe an. Un schimbator infundat afara duce la acelasi rezultat ca un filtru murdar inauntru: racire slaba si consum mare.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-aer-conditionat')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate aparatele de aer conditionat la oferta</strong>
+        <span>Reducerile din acest moment la aer conditionat, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-aparate-de-aer-conditionat" currentCategory="incalzire-climatizare" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-aparate-de-aer-conditionat" currentCategory="incalzire-climatizare" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

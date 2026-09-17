@@ -1,0 +1,320 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['mobila-bucatarie'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { id: 'D913XVBBM', badge: 'Cel mai vandut set',
+    specs: ['set complet 240 cm', 'PAL, blat termorezistent 28 mm', '11 usi, 1 sertar', 'Stejar Sonoma'],
+    pros: ['Cel mai vandut set din top, peste 370 de pareri', '240 cm, acopera un perete intreg', 'Blat termorezistent de 28 mm', 'Corpuri sus si jos, mult spatiu de depozitare'],
+    cons: ['Nu include chiuveta si aragazul, le iei separat', 'Un singur sertar, restul sunt usi', 'Fara iluminare inclusa', 'Cere ceva indemanare la montaj'],
+    verdict: 'Cel mai vandut set de bucatarie de pe eMAG si punctul de plecare firesc pentru o bucatarie obisnuita. Are 240 cm, acopera un perete intreg si vine cu corpuri sus si jos, deci ai spatiu de depozitare atat la inaltime cat si sub blat. Blatul e termorezistent, de 28 mm, si suporta vase calde. Corpul e din PAL tratat, rezistent la umezeala la un pret accesibil. Cele peste 370 de pareri il fac cel mai testat din selectie. Minusurile: nu include chiuveta si aragazul, are un singur sertar si nu are iluminare, iar montajul cere putina rabdare. Pentru o bucatarie de zi cu zi, la buget corect, e alegerea sigura.' },
+  { id: 'DK6V10MBM', badge: 'Cel mai mic pret',
+    specs: ['set mic 130 cm', 'cu blat inclus', 'Wenge/Alb', 'compact'],
+    pros: ['Cel mai mic pret din top', 'Vine cu blat inclus', 'Compact, 130 cm, pentru bucatarii mici', 'Nota buna, 4.45'],
+    cons: ['Doar 130 cm, spatiu de depozitare limitat', 'Potrivit pentru o bucatarie mica sau garsoniera', 'Fara fronturi MDF'],
+    verdict: 'Cu cel mai mic buget mobilezi o bucatarie mica, cu tot cu blat inclus. Are 130 cm, deci e gandit pentru o garsoniera, un apartament mic sau o bucatarie de bloc unde nu ai mult perete liber. Combinatia Wenge cu alb arata curat si modern. Nota de 4.45 e buna pentru acest segment de pret. Spatiul de depozitare e limitat de dimensiune, iar fronturile sunt din PAL, nu MDF, deci nu te astepta la finisaj premium. Il iei cand ai o bucatarie mica si un buget strans, dar vrei un set complet, nu corpuri razlete.' },
+  { id: 'D2R4R1YBM', badge: 'Cel mai ieftin set alb',
+    specs: ['set 120 cm', 'alb', 'corpuri sus si jos', 'compact'],
+    pros: ['Alb curat, se potriveste in orice bucatarie mica', 'Peste 110 pareri', 'Corpuri sus si jos', 'Pret accesibil'],
+    cons: ['120 cm, foarte compact', 'Fara blat mare sau sertare multe', 'Pentru spatii mici'],
+    verdict: 'Alegerea daca vrei o bucatarie alba, curata, intr-un spatiu mic. Are 120 cm si corpuri atat sus cat si jos, deci foloseste bine peretele in inaltime, acolo unde nu ai latime. Albul face camera sa para mai mare si se asorteaza cu orice. Cele peste 110 pareri arata ca oamenii sunt multumiti pentru ce costa. Fiind foarte compact, la 120 cm, are un blat mic si putine sertare, deci e pentru o bucatarie de garsoniera, nu pentru o familie mare. Il alegi cand vrei alb si un pret mic, intr-un spatiu strans.' },
+  { id: 'DX8GHMMBM', badge: 'Cel mai bine notat set mare',
+    specs: ['set 240 cm', 'corpuri inalte pana la 202 cm', 'Astra Cacao', 'depozitare pe verticala'],
+    pros: ['Cea mai buna nota la seturile mari, 4.57', '240 cm plus corpuri inalte de 202 cm', 'Culoare Cacao calda', 'Mult spatiu de depozitare pe verticala'],
+    cons: ['Fara chiuveta si aragaz incluse', 'Montaj mai laborios la corpurile inalte'],
+    verdict: 'Cel mai bine notat set mare din selectie si alegerea daca vrei maxim de depozitare pe un perete de 240 cm. Fata de Yasmine, Irim Lara merge mai mult pe inaltime, cu corpuri de pana la 202 cm, deci castigi spatiu de depozitare in sus, acolo unde de obicei ramane perete gol. Culoarea Astra Cacao e calda si eleganta. Nota de 4.57 e cea mai buna dintre seturile mari. Nu include chiuveta si aragazul, iar corpurile inalte cer ceva mai multa atentie la montaj si prindere in perete. Il iei cand ai un perete intreg si vrei sa folosesti si inaltimea, nu doar latimea.' },
+  { id: 'D24DLJMBM', badge: 'Cel mai mare, fronturi MDF',
+    specs: ['set 260 cm', 'fronturi din MDF', 'capucino', 'cel mai lung'],
+    pros: ['Cel mai lung din top, 260 cm', 'Fronturi din MDF, finisaj superior', 'Culoare capucino eleganta', 'Fronturile rezista mai bine la umezeala'],
+    cons: ['Mai scump, peste 2200 de lei', 'Are nevoie de un perete lung', 'Numar mai mic de pareri'],
+    verdict: 'Cel mai lung set din selectie, la 260 cm, si primul cu fronturi din MDF, nu doar PAL. Diferenta se vede si se simte: MDF-ul are un finisaj mai fin, rezista mai bine la umezeala si arata mai bine pe termen lung decat PAL-ul melaminat. Culoarea capucino da un aer cald si elegant. Fiind cel mai lung, cere un perete pe masura, de peste 2,6 metri liberi. Costa mai mult decat seturile din PAL, peste 2200 de lei, si are inca putine pareri. Il alegi cand ai spatiu si vrei fronturi de calitate mai buna, nu doar depozitare.' },
+  { id: 'DS4YHNMBM', badge: 'Premium, cu soft-close',
+    specs: ['set premium seria Square', 'fronturi MDF', 'balamale soft-close', 'finisaj de calitate'],
+    pros: ['Cea mai buna nota din top, 4.78', 'Balamale soft-close, usile se inchid silentios', 'Fronturi din MDF de calitate', 'Finisaj premium'],
+    cons: ['Cel mai scump din top, peste 4200 de lei', 'Putine pareri, 23', 'Investitie mare pentru o bucatarie'],
+    verdict: 'Cel mai rafinat set din selectie, pentru cine vrea o bucatarie care sa arate si sa se simta premium. Are fronturi din MDF si, cel mai important, balamale soft-close: usile si sertarele se inchid singure, silentios, fara sa se tranteasca, ceea ce prelungeste viata mobilei si e mult mai placut la folosire zilnica. Nota de 4.78 e cea mai buna din top, chiar daca vine de la un numar mai mic de pareri. E cel mai scump set de aici, peste 4200 de lei, deci e o investitie serioasa. Il iei daca vrei calitate, finisaj bun si confortul soft-close, si ai bugetul pentru asta.' },
+  { id: 'D5T6SPMBM', badge: 'Cea mai buna insula',
+    specs: ['insula de bucatarie', '126 x 90 cm', '2 usi', 'blat de lucru extra'],
+    pros: ['Adauga blat de lucru si depozitare in mijloc', 'Compacta, 126 cm', 'Cu 2 usi pentru depozitare', 'Pret mic pentru ce ofera'],
+    cons: ['Nu e set complet, e o piesa in plus', 'Are nevoie de spatiu liber in jur'],
+    verdict: 'Nu e un set, ci o piesa care completeaza o bucatarie deja mobilata, si e cea mai buna optiune de insula din selectie. Iti da un blat de lucru in plus in mijlocul bucatariei, plus depozitare cu 2 usi dedesubt, util cand ai mult de gatit sau vrei un loc unde sa iei masa in picioare. E compacta, la 126 cm, si costa putin pentru ce ofera. Are nevoie de o bucatarie destul de mare ca sa ramana spatiu de circulatie in jur, de cel putin un metru pe fiecare parte. O iei daca ai o bucatarie spatioasa si vrei mai mult blat si depozitare centrala.' },
+  { id: 'DH61HDMBM', badge: 'Corp individual, pentru modular',
+    specs: ['corp inferior individual', '80 cm', 'PAL de 18 mm', 'Sonoma'],
+    pros: ['Cea mai buna nota din top, 4.90', 'PAL de 18 mm, mai gros decat la multe seturi', 'Il combini cu alte corpuri, la dimensiunile tale', 'Pret mic per corp'],
+    cons: ['E un singur corp, nu un set', 'Trebuie sa cumperi mai multe si sa le potrivesti', 'Fara blat sau fronturi speciale'],
+    verdict: 'Alegerea daca vrei sa iti faci bucataria pe corpuri individuale, exact pe dimensiunile peretelui tau, nu cu un set fix. Acest corp inferior de 80 cm e din PAL de 18 mm, mai gros si mai robust decat PAL-ul subtire de la unele seturi ieftine, si are cea mai buna nota din top, 4.90. Ideea e sa cumperi mai multe corpuri, inferioare si superioare, si sa le pui cap la cap cat iti trebuie, plus un blat taiat separat. E mai mult efort de planificare decat un set gata facut, dar castigi potrivirea perfecta la spatiu. Il iei cand vrei o bucatarie modulara, facuta dupa peretele tau.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/mobila-bucatarie.webp';
+const figBuget = '/imagini/articole/mobila-bucatarie-buget.webp';
+const figTip = '/imagini/articole/mobila-bucatarie-tip.webp';
+const figPremium = '/imagini/articole/mobila-bucatarie-premium.webp';
+const published = '2026-07-17T18:40:00+03:00';
+
+const faq = [
+  { question: 'Set gata facut sau corpuri individuale?', answer: 'Un set gata facut e mai ieftin, mai rapid si mai simplu: primesti toate corpurile potrivite intre ele, la o dimensiune fixa. Corpurile individuale iti dau libertatea sa faci bucataria exact pe lungimea peretelui tau si sa alegi ce corp pui unde, dar cer planificare si mai mult montaj. Daca peretele tau se apropie de o dimensiune standard, ia un set; daca ai un spatiu neregulat sau vrei ceva anume, mergi pe corpuri.' },
+  { question: 'PAL sau MDF pentru mobila de bucatarie?', answer: 'PAL-ul e economic, rezistent la zgarieturi si vine in multe decoruri, dar e mai sensibil la umiditate si tine mai putin. MDF-ul rezista mai bine la umezeala, are un finisaj mai fin si se preteaza la fronturi vopsite sau lucioase. Cea mai buna combinatie, pe care o folosesc multe seturi bune, e corp din PAL si fronturi din MDF: economic la structura si de calitate la partea care se vede si se atinge.' },
+  { question: 'Ce blat sa aleg pentru bucatarie?', answer: 'Pentru majoritatea bucatariilor, un blat din PAL termorezistent de 28-38 mm e robust, rezista la vase calde si e economic. Daca vrei ceva mai rezistent la pete si zgarieturi si ai buget, blatul din compozit de cuart e varful de gama. Verifica sa fie termorezistent si sa aiba cant bine aplicat, ca sa nu intre apa in placa la imbinari.' },
+  { question: 'Ce inseamna balamale soft-close si merita?', answer: 'Balamalele soft-close au un amortizor care inchide usile si sertarele singur, incet si silentios, fara sa se tranteasca. Merita pentru ca sunt mult mai placute la folosire zilnica si prelungesc viata mobilei, reducand socurile. Se gasesc mai ales la seturile de gama medie si premium, ca seria Square de la Badenmob. Daca prinzi un set cu soft-close la un pret bun, e un plus real.' },
+  { question: 'Setul de bucatarie include chiuveta si aragazul?', answer: 'De obicei nu. Cele mai multe seturi, ca Yasmine sau Irim Lara, vin cu corpurile, usile si blatul, dar chiuveta, bateria si aragazul se cumpara separat si se monteaza in spatiile lasate. Verifica descrierea inainte de cumparare: unele includ o masca de chiuveta, dar rar si chiuveta propriu-zisa. Pune la buget si aceste piese cand calculezi cat te costa bucataria completa.' },
+  { question: 'Cat de greu se monteaza mobila de bucatarie?', answer: 'Vine la pachet plat, in colete, si se asambleaza acasa. Un set drept se poate monta si singur, cu ceva rabdare si sculele de baza, dar corpurile superioare trebuie prinse bine in perete, cu dibluri potrivite pentru tipul de zid. Daca peretele e din gips-carton sau nu esti sigur pe prindere, merita un montator. Corpurile inalte si seturile lungi sunt mai laborioase decat unul mic.' },
+];
+
+const images = [hero, figBuget, figTip, figPremium, ...PICKS.map(x => x.p.image)];
+const money = (n) => n.toLocaleString('ro-RO');
+const b64 = (s) => Buffer.from(s).toString('base64');
+const shortName = (n) => n.replace(/’/g, "'").replace(/^(Set Mobila Bucatarie|Set Bucatarie|Set|Insula bucatarie|Corp Inferior Bucatarie|Corp Inferior)\s*/i, '').split(',')[0];
+---
+
+<Layout
+  title="Cele mai bune seturi de mobila de bucatarie in 2026: 8 modele comparate (PAL, MDF, soft-close)"
+  description="Ce mobila de bucatarie sa iti iei in 2026: 8 seturi si o insula comparate pe dimensiune, material, blat si pareri reale, de la Asaro ieftin la Badenmob premium. Plus set gata sau corpuri individuale."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Ioana Stan"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobila si Dormitor', url: '/mobila-dormitor/' }, { name: 'Cele mai bune seturi de mobila de bucatarie' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobila-dormitor/">Mobila si Dormitor</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune seturi de mobila de bucatarie</span>
+    </nav>
+
+    <h1>Cele mai bune seturi de mobila de bucatarie in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/ioana-stan/">Ioana Stan</a>, Consultant Amenajari Dormitor · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune seturi de mobila de bucatarie: KringX, Irim, Asaro si Badenmob" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru o bucatarie obisnuita, cel mai bun set din acest moment este <strong>KringX Yasmine</strong>: 240 cm, blat termorezistent si cele mai multe pareri. Daca ai o bucatarie mica, <strong>Asaro Mira</strong> costa sub 550 de lei cu tot cu blat. Daca vrei fronturi de calitate, <strong>KringX Touch</strong> are MDF, iar pentru premium cu soft-close, <strong>Badenmob Square</strong> e varful.</p>
+      <p>Prima intrebare la mobila de bucatarie nu e brandul, ci daca iei un set gata facut sau iti faci bucataria pe corpuri individuale, si ce material alegi, PAL sau MDF. De astea depinde cat cheltui, cat de bine se potriveste la peretele tau si cat tine. Mai jos ai intai aceste decizii, apoi 8 optiuni comparate pe dimensiune, material si parerile reale ale cumparatorilor.</p>
+      <p>Am pornit de la cele mai vandute seturi de pe eMAG, le-am verificat constructia, de la material si blat la ce include si ce nu, si le-am asezat dupa spatiul si bugetul pentru care se potrivesc. Pentru electrocasnice, vezi <a href="/plita-cu-inductie-pentru-bucatarie/">plitele cu inductie</a>, <a href="/hota-pentru-bucatarie-puternica/">hotele</a> si <a href="/masina-de-spalat-vase-incorporabila/">masinile de spalat vase</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#pe-scurt">Care set pentru cine</a></li>
+        <li><a href="#decizie">Set gata facut sau corpuri individuale</a></li>
+        <li><a href="#produse">Cele 8 optiuni pe larg</a></li>
+        <li><a href="#cum-alegi">Cum alegi mobila de bucatarie</a></li>
+        <li><a href="#include">Ce include si ce nu un set</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cat-costa">Cat costa o bucatarie</a></li>
+        <li><a href="#montaj">Cat de greu se monteaza</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="pe-scurt">Pe scurt: care set pentru cine</h2>
+    <p>Daca esti grabit, tabelul rezuma dimensiunea, materialul si pretul fiecarei optiuni. Preturile si numarul de pareri sunt luate direct de pe eMAG si se pot schimba.</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Cel mai bun la</th><th>Pret</th><th>Pareri</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td>{shortName(x.p.name)}</td>
+              <td>{x.specs[0]}</td>
+              <td>{x.badge}</td>
+              <td>{money(x.p.price)} lei</td>
+              <td>{x.p.rating ? `${x.p.rating.toFixed(2)} (${x.p.reviews})` : '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="decizie">Set gata facut sau corpuri individuale</h2>
+    <p>E prima decizie si tine de spatiul tau si de cata bataie de cap vrei. Sunt doua cai.</p>
+
+    <h3>Set gata facut</h3>
+    <p>Primesti toate corpurile deja potrivite intre ele, la o dimensiune fixa, de obicei 120, 180, 240 sau 260 cm. E mai ieftin, mai rapid si mai simplu, pentru ca nu trebuie sa calculezi nimic. Merge cel mai bine daca peretele tau se apropie de una din aceste lungimi standard.</p>
+
+    <h3>Corpuri individuale</h3>
+    <p>Cumperi corpuri separat, inferioare si superioare, si le pui cap la cap exact cat iti trebuie, plus un blat taiat pe masura. Iti da potrivire perfecta la un perete neregulat sau la un spatiu anume, dar cere planificare si mai mult montaj. Alege asta daca setul standard nu se incadreaza sau vrei o configuratie aparte.</p>
+
+    <img class="rd-fig" src={figTip} alt="Set gata facut, set cu fronturi MDF sau corpuri individuale pentru bucatarie modulara" width="1200" height="675" loading="lazy" />
+
+    <h2 id="produse">Cele 8 optiuni pe larg</h2>
+    <p>Le-am aranjat de la cele mai vandute si accesibile la premium. Fiecare card are pretul, nota si numarul de pareri direct de pe eMAG, plus dimensiunile si punctele tari si slabe.</p>
+    <div class="rd-grid">
+      {PICKS.map(x => (
+        <ProductCard
+          name={x.p.name.replace(/’/g, "'")}
+          image={x.p.image}
+          price={x.p.price}
+          rating={x.p.rating}
+          reviews={x.p.reviews}
+          badge={x.badge}
+          specs={x.specs}
+          pros={x.pros}
+          cons={x.cons}
+          verdict={x.verdict}
+          outKey={'p-' + x.id}
+        />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Seturi de bucatarie bune sub 1200 de lei: Asaro Mira, haaus Ara si KringX Yasmine" width="1200" height="675" loading="lazy" />
+
+    <h2 id="cum-alegi">Cum alegi mobila de bucatarie</h2>
+    <p>Dupa ce ai ales calea, set sau corpuri, restul deciziei tine de material, blat si dimensiuni.</p>
+
+    <h3>Materialul: PAL sau MDF</h3>
+    <p>PAL-ul e economic, rezistent la zgarieturi si vine in multe decoruri, dar e mai sensibil la umezeala si tine mai putin. MDF-ul rezista mai bine la umiditate si are un finisaj mai fin, potrivit pentru fronturi vopsite sau lucioase. Cea mai buna combinatie e corp din PAL si fronturi din MDF, ca la KringX Touch: economic la structura, de calitate la ce se vede.</p>
+
+    <h3>Blatul</h3>
+    <p>Un blat din PAL termorezistent de 28-38 mm e robust, suporta vase calde si e ieftin, deci acopera nevoile celor mai multi. Daca vrei rezistenta maxima la pete si zgarieturi, blatul din compozit de cuart e varful de gama. Verifica sa aiba cant bine aplicat, ca sa nu patrunda apa in placa la imbinari, mai ales langa chiuveta.</p>
+
+    <h3>Dimensiunea si inaltimea</h3>
+    <p>Masoara peretele liber inainte de a comanda si alege setul cel mai apropiat, fara sa il inghesui. Un set de 240 cm are nevoie de 2,4 metri liberi. Daca ai perete gol pe inaltime, un set cu corpuri inalte, ca Irim Lara, foloseste spatiul de sus, unde de obicei ramane loc nefolosit.</p>
+
+    <h3>Balamalele si finisajul</h3>
+    <p>Balamalele soft-close inchid usile silentios, fara sa se tranteasca, si prelungesc viata mobilei. Se gasesc la seturile de gama medie si premium. Uita-te si la cant, manere si feronerie: sunt detaliile care fac diferenta intre un set care arata bine ani de zile si unul care se uzeaza repede.</p>
+
+    <h2 id="include">Ce include si ce nu un set</h2>
+    <p>E capcana in care cad multi cumparatori. Un set de bucatarie inseamna aproape intotdeauna doar corpurile, usile si blatul. Ce NU include, de obicei:</p>
+    <ul>
+      <li><strong>Chiuveta si bateria.</strong> Se lasa un spatiu si o masca, dar chiuveta propriu-zisa se cumpara separat.</li>
+      <li><strong>Aragazul sau plita si cuptorul.</strong> Setul are locul pentru ele, dar electrocasnicele nu sunt incluse.</li>
+      <li><strong>Iluminarea.</strong> Benzile LED sub corpurile superioare se adauga separat, la majoritatea seturilor.</li>
+      <li><strong>Hota.</strong> Uneori exista un corp de hota, dar hota in sine se cumpara aparte.</li>
+    </ul>
+    <p>Pune la buget toate aceste piese cand calculezi cat te costa bucataria gata de folosit, nu doar pretul setului.</p>
+
+    <img class="rd-fig" src={figPremium} alt="Cele mai apreciate seturi mari: Irim Lara, KringX Touch si Badenmob Square" width="1200" height="675" loading="lazy" />
+
+    <h2 id="greseli">Greseli frecvente cand cumperi mobila de bucatarie</h2>
+    <p>Cateva capcane des intalnite:</p>
+    <ul>
+      <li><strong>Nu masori peretele inainte.</strong> Un set prea lung nu incape, unul prea scurt lasa gol. Masoara latimea si inaltimea libera si tine cont de tevi, prize si pervaz.</li>
+      <li><strong>Crezi ca setul include tot.</strong> Chiuveta, aragazul, hota si iluminarea se cumpara aproape mereu separat. Calculeaza bucataria completa, nu doar setul.</li>
+      <li><strong>Iei PAL subtire ca sa economisesti.</strong> PAL-ul de 16 mm se lasa mai repede la corpuri lungi; unul de 18 mm rezista mai bine. Verifica grosimea.</li>
+      <li><strong>Ignori umezeala.</strong> PAL-ul se umfla la apa; langa chiuveta si aragaz, fronturile MDF sau cantul bine aplicat conteaza mult.</li>
+      <li><strong>Uiti de prinderea in perete.</strong> Corpurile superioare pline cad daca sunt prinse cu dibluri nepotrivite. Foloseste dibluri pentru tipul tau de zid sau cheama un montator.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa o bucatarie</h2>
+    <p>Pragurile pentru mobila, fara electrocasnice si chiuveta, arata cam asa in 2026:</p>
+    <p><strong>500 - 1000 de lei</strong> sunt seturile mici, de 120-130 cm, din PAL, ca Asaro Mira sau haaus Ara. Bune pentru o garsoniera sau o bucatarie de bloc mica.</p>
+    <p><strong>1000 - 2000 de lei</strong> aduc seturi de 240 cm din PAL, cu blat si multe corpuri, ca KringX Yasmine sau Irim Lara. Aici e cel mai bun raport pentru majoritatea caselor.</p>
+    <p><strong>2000 - 3000 de lei</strong> sunt seturile mari cu fronturi MDF, ca KringX Touch. Platesti pentru finisaj si rezistenta la umezeala mai buna.</p>
+    <p><strong>Peste 4000 de lei</strong> intri in seturile premium, cu MDF si balamale soft-close, ca Badenmob Square. Confort si calitate de durata.</p>
+
+    <h2 id="montaj">Cat de greu se monteaza</h2>
+    <p>Mobila de bucatarie vine la pachet plat, in colete, si se asambleaza acasa. Un set drept, mic sau mediu, se poate monta si singur, cu rabdare si sculele de baza. Partea sensibila e prinderea corpurilor superioare in perete: pline cu vase, trebuie fixate bine, cu dibluri potrivite pentru tipul de zid.</p>
+    <ul>
+      <li><strong>Zid de caramida sau beton:</strong> dibluri si suruburi obisnuite tin bine.</li>
+      <li><strong>Gips-carton:</strong> ai nevoie de dibluri speciale, tip fluture sau metalice, altfel corpurile cad.</li>
+      <li><strong>Seturi lungi si corpuri inalte:</strong> sunt mai laborioase; daca nu esti sigur, un montator merita banii.</li>
+    </ul>
+    <p>Verifica orizontalitatea cu o nivela cand montezi, ca usile sa se inchida drept si blatul sa fie la nivel.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-mobila-bucatarie')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toata mobila de bucatarie la oferta</strong>
+        <span>Reducerile din acest moment la seturi si corpuri de bucatarie, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">IS</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/ioana-stan/" class="author-name-link">Ioana Stan</a></p>
+        <p class="author-role">Consultant Amenajari Dormitor</p>
+        <p class="author-bio">Ioana ajuta de peste 7 ani oameni sa isi aleaga mobila potrivita pentru casa lor, cu focus pe materiale, dimensiuni si durabilitate.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-seturi-de-mobila-de-bucatarie" currentCategory="mobila-dormitor" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-seturi-de-mobila-de-bucatarie" currentCategory="mobila-dormitor" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

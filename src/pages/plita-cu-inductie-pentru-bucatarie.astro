@@ -1,254 +1,321 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Plita cu inductie pentru bucatarie",
-  excerpt: "Daca vrei o plita cu inductie pentru bucatarie care sa fie rapida, sigura si eficienta energetic, iti recomand sa te uiti la modelele de la Bosch, Electrolux sau Teka. Sunt branduri serioase, cu experienta, si au plite care fac treaba excelent, fara drame.",
-  image: "/images/articles/plita-cu-inductie-pentru-bucatarie.webp",
-  category: "Electrocasnice Casa",
-  categorySlug: "electrocasnice-casa",
-  date: "2026-02-21T13:17:42.550Z",
-  modifiedDate: "2026-02-21T13:17:42.550Z",
-  author: "Cristian Popa",
-  authorRole: "Specialist Electrocasnice",
-  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
-};
-
-const faq = [
-  { question: "cat costa o plita cu inductie pentru bucatarie", answer: "O plita cu inductie pentru bucatarie costa in medie intre 1500 si 3500 de lei. Modelele mai simple, cu 2 zone, pot fi gasite si sub 1000 de lei, in timp ce cele premium, cu functii avansate, pot depasi 5000 de lei." },
-  { question: "care e diferenta intre plita cu inductie si cea vitroceramica", answer: "Plita cu inductie incalzeste direct oala prin camp electromagnetic, suprafata ramanand rece, pe cand plita vitroceramica (electrica) incalzeste rezistenta de sub sticla, care apoi transfera caldura oalei, suprafata devenind fierbinte." },
-  { question: "merita sa cumpar o plita cu inductie", answer: "Da, merita daca vrei gatire rapida, eficienta energetica crescuta si siguranta sporita. Incalzirea e mult mai rapida decat la cele electrice sau pe gaz, iar consumul de curent e mai mic." },
-  { question: "ce fel de oale se folosesc la plita cu inductie", answer: "Se folosesc oale si tigai cu fundul gros si magnetic. Poti verifica compatibilitatea punand un magnet pe fundul vasului; daca se lipeste, este potrivit pentru plita cu inductie." },
-  { question: "de ce se zgaraie plita cu inductie", answer: "Plita cu inductie se poate zgâria daca folosesti bureti abrazivi, obiecte metalice ascutite sau daca tragi vasele de pe suprafata in loc sa le ridici. Curatarea corecta cu lavete moi previne zgarieturile." },
-  { question: "cat curent consuma o plita cu inductie", answer: "O plita cu inductie pentru bucatarie este eficienta energetic, consumand cu pana la 30-50% mai putin curent decat o plita electrica clasica. Consumul exact depinde de puterea utilizata si de durata gatirii." },
-  { question: "cum se curata corect o plita cu inductie", answer: "Se curata cu o solutie speciala pentru plite vitroceramice/inductie si o laveta moale, imediat ce suprafata s-a racit. Se evita produsele abrazive si bureti de sarma pentru a preveni zgarieturile." },
-  { question: "unde gasesc plite cu inductie ieftine si bune", answer: "Poti gasi plite cu inductie la preturi bune in magazinele mari de electrocasnice (eMAG, Altex, Flanco) sau pe site-urile brandurilor. Cauta modele de la Teka, Whirlpool sau Beko pentru optiuni mai accesibile, dar verifica recenziile pentru fiabilitate." }
-];
-
-const toc = [
-  { title: "Plita cu Inductie Pentru Bucatarie: Ghidul Tau Direct de la Un Vecin Priceput", id: "plita-cu-inductie-pentru-bucatarie-ghidul-tau-direct-de-la-un-vecin-priceput" },
-  { title: "Top Recomandari Plite cu Inductie: Ce Merita Bani Mai Multi (Si Ce Nu)", id: "top-recomandari-plite-cu-inductie-ce-merita-bani-mai-multi-si-ce-nu" },
-  { title: "Cum Alegi Plita cu Inductie Potrivita Pentru Bucataria Ta: Ghid Pas Cu Pas", id: "cum-alegi-plita-cu-inductie-potrivita-pentru-bucataria-ta-ghid-pas-cu-pas" },
-  { title: "Plita pe Gaz vs. Inductie vs. Vitroceramica: Marele Duel", id: "plita-pe-gaz-vs-inductie-vs-vitroceramica-marele-duel" },
-  { title: "Secrete si Sfaturi de Insider: Cum Sa Nu Dai cu Pumnul in Plita cu Inductie", id: "secrete-si-sfaturi-de-insider-cum-sa-nu-dai-cu-pumnul-in-plita-cu-inductie" },
-  { title: "Verdictul Pe Bugete: Ce Plita cu Inductie Iti Permiti Si Ce Primesti", id: "verdictul-pe-bugete-ce-plita-cu-inductie-iti-permiti-si-ce-primesti" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['plita-inductie'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Accesibile, sub 900 lei ---
+  { g: 'acc', id: 'DT80N8YBM', badge: 'Cea mai ieftina', short: 'Heinner 2 zone', zone: '2 zone', latime: '30 cm', putere: '3500 W',
+    specs: ['cea mai ieftina din selectie', '2 zone, latime 30 cm, tip domino', '3500 W, comanda touch', 'de la Heinner, brand cu service la noi'],
+    pros: ['Cea mai accesibila plita cu inductie din selectie', 'Compacta, 30 cm, ideala pentru bucatarii mici', 'Comanda touch, functie booster', 'Heinner, brand cu service in Romania'],
+    cons: ['Doar 2 zone, pentru gatit simplu', 'Putine pareri, 10'],
+    verdict: 'Trecerea la inductie la cel mai mic pret, ideala pentru o bucatarie mica sau ca a doua plita. Heinner HBHI-M2ZBSTC are 2 zone de gatit pe o latime de doar 30 cm, formatul domino, deci incape oriunde, si 3500 W cu comanda touch si functie booster pentru incalzire rapida. E potrivita pentru o persoana, un cuplu sau o rulota, o garsoniera sau ca plita suplimentara langa una existenta. Vine de la Heinner, un brand cu service la noi, un plus la un electrocasnic. Cu 2 zone e limitata la gatit simplu, cu una-doua oale odata, iar cu 10 pareri e inca putin testata. O iei cand vrei cel mai ieftin mod de a avea inductie, intr-un format compact de 30 cm, pentru o bucatarie mica sau ca a doua plita, si nu ai nevoie de patru zone.' },
+  { g: 'acc', id: 'DKVCP8MBM', badge: 'Domino bine vandut', short: 'Starcrest domino', zone: '2 zone', latime: '30 cm', putere: '3300 W',
+    specs: ['plita domino, 2 zone, 30 cm', '3300 W, 9 trepte de putere', 'panou touch frontal', 'nota mare, 4.67 din 36 de pareri'],
+    pros: ['Bine vandut si testat, 36 de pareri', 'Nota mare, 4.67', 'Compacta, 30 cm, pentru spatii mici', '9 trepte de putere, control fin'],
+    cons: ['Doar 2 zone', 'Panou frontal, mai expus la stropi'],
+    verdict: 'O plita domino compacta si bine testata, alegerea sigura in formatul mic. Starcrest SIH-3030 are 2 zone pe 30 cm latime, 3300 W si 9 trepte de putere, deci controlezi fin caldura, de la topit ciocolata la fiert rapid, cu un panou touch frontal. Cu 36 de pareri, printre cele mai multe din selectie, si nota 4.67, e clar apreciata la banii ei, un semn bun de fiabilitate. Formatul domino de 30 cm o face perfecta pentru bucatarii mici sau pentru a completa o alta plita, iar pretul mic o face accesibila oricui vrea sa incerce inductia. Are 2 zone, deci pentru meniuri complexe cu multe oale in acelasi timp exista modele de 4 zone. O iei cand vrei o plita domino compacta, bine cotata si ieftina, pentru un spatiu mic sau ca a doua plita, cu control fin al puterii.' },
+  { g: 'acc', id: 'D080N8YBM', badge: '4 zone sub 800 lei', short: 'Heinner 4 zone', zone: '4 zone', latime: '60 cm', putere: '7400 W',
+    specs: ['4 zone la sub 800 de lei', 'latime standard 60 cm, 7400 W', 'comanda touch, functie booster', 'nota 4.79 din 14 pareri'],
+    pros: ['4 zone la cel mai mic pret din selectie', 'Latime standard 60 cm, se potriveste oriunde', 'Putere mare, 7400 W', 'Nota excelenta, 4.79'],
+    cons: ['Inca 14 pareri', 'Brand mai putin premium'],
+    verdict: 'Cea mai buna afacere din selectie daca vrei 4 zone la buget minim. Heinner HBHI-M4ZBSTC are 4 zone de gatit pe o latime standard de 60 cm, cea mai raspandita, deci se potriveste in orice blat de bucatarie, si 7400 W, putere din belsug pentru a gati mai multe feluri odata. Comanda touch si functia booster sunt standardul asteptat, iar nota de 4.79 din 14 pareri arata cumparatori multumiti, la un pret pe care rar il vezi pentru o plita cu patru zone. Fiind de la Heinner, gasesti service la noi, un plus de siguranta. Are inca putine pareri si vine de la un brand mai putin premium decat Bosch sau Electrolux. O iei cand vrei o plita cu 4 zone, latime standard de 60 cm si putere mare, la cel mai mic pret posibil, pentru o familie care gateste des.' },
+  { g: 'acc', id: 'D2KC2YYBM', badge: 'Cea mai vanduta accesibila', short: 'Starcrest 4 zone', zone: '4 zone', latime: '60 cm', putere: '7 kW',
+    specs: ['cea mai vanduta accesibila, 36 pareri', '4 zone, 60 cm, 7 kW', 'doua arzatoare mari, 9 trepte', 'panou touch deasupra'],
+    pros: ['Cea mai vanduta plita accesibila din selectie, 36 pareri', 'Doua zone mari, pentru oale si tigai mari', 'Nota mare, 4.67, si 9 trepte de putere', 'Panou touch deasupra, ferit de stropi'],
+    cons: ['Brand mai putin premium', 'Fara zona flexibila'],
+    verdict: 'Cea mai vanduta plita accesibila cu 4 zone din selectie, o alegere echilibrata la un pret bun. Starcrest SIH-6060 are 4 zone pe 60 cm, cu doua arzatoare mari, potrivite pentru oale si tigai mari, 7 kW putere totala si 9 trepte pentru control fin. Panoul touch e pozitionat deasupra, in fata, ferit de stropii de la gatit. Cu 36 de pareri, printre cele mai multe din selectie, si nota 4.67, e clar preferata cumparatorilor la aceasta categorie, semn de fiabilitate. Vine de la un brand mai putin premium decat marile nume, si nu are o zona flexibila, dar acopera nevoile obisnuite ale unei familii. O iei cand vrei cea mai testata plita accesibila cu 4 zone, cu doua arzatoare mari si panou ferit de stropi, la un raport pret-nota foarte bun.' },
+  // --- Echilibrate, 900-2000 lei ---
+  { g: 'ech', id: 'DD2F2YMBM', badge: 'Arctic, echilibrat', short: 'Arctic 4 zone', zone: '4 zone', latime: '58 cm', putere: '7200 W',
+    specs: ['4 zone, 58 cm, 7200 W', 'panou touch deasupra, 9 trepte', 'de la Arctic, brand cunoscut la noi', 'nota 4.61 din 28 de pareri'],
+    pros: ['Arctic, brand foarte cunoscut si cu service la noi', 'Bine testat, 28 de pareri', '4 zone, 7200 W, 9 trepte', 'Nota buna, 4.61'],
+    cons: ['Fara zona flexibila', 'Design simplu, fara extra'],
+    verdict: 'O plita echilibrata de la un brand foarte cunoscut la noi, pentru cine vrea siguranta unui nume familiar. Arctic ARSI6440MTB are 4 zone pe 58 cm, 7200 W si 9 trepte de putere, cu un panou touch pozitionat deasupra, tot ce trebuie pentru gatitul zilnic al unei familii. Arctic e un brand foarte raspandit in Romania, cu service usor de gasit, un avantaj real la un electrocasnic pe care il folosesti zilnic ani la rand. Cu 28 de pareri si nota 4.61 e bine cotata si verificata. Are un design simplu, fara zona flexibila sau functii speciale, dar face treaba fara probleme. O iei cand vrei o plita cu inductie fiabila, cu 4 zone si putere buna, de la un brand cunoscut cu service la noi, si nu ai nevoie de dotari premium, ci de un aparat solid pentru zi de zi.' },
+  { g: 'ech', id: 'DZX713YBM', badge: 'Beko, cel mai bine notat', short: 'Beko SMTX', zone: '4 zone', latime: '60 cm', putere: '7.2 kW',
+    specs: ['4 zone, 60 cm, 7.2 kW', 'panou touch deasupra, 9 trepte', 'nota 4.76, cea mai buna din grup', 'Beko, brand popular de electrocasnice'],
+    pros: ['Cea mai buna nota din grupul echilibrat, 4.76', 'Beko, brand foarte raspandit cu service la noi', '4 zone, latime standard 60 cm', 'Bine testata, 21 de pareri'],
+    cons: ['Fara zona flexibila', 'Pret spre mijlocul segmentului'],
+    verdict: 'Cea mai bine notata plita din grupul echilibrat, de la Beko, un brand popular si de incredere. HII64401SMTX are 4 zone pe 60 cm latime standard, 7.2 kW si 9 trepte de putere, cu panou touch pozitionat deasupra. Cu nota 4.76 din 21 de pareri e cea mai apreciata din segment, semn ca isi face treaba bine si ii multumeste pe cumparatori, iar Beko e un brand foarte raspandit la noi, cu piese si service usor de gasit. Nu are o zona flexibila sau dotari premium, dar oferi fiabilitate si o nota excelenta la un pret rezonabil. O iei cand vrei cea mai bine cotata plita din segmentul echilibrat, de la un brand popular cu service la noi, cu 4 zone si latime standard, pentru o bucatarie de familie.' },
+  { g: 'ech', id: 'DLXHJWBBM', badge: 'Cea mai vanduta', short: 'Beko HII64200', zone: '4 zone', latime: '58 cm', putere: '7.2 kW',
+    specs: ['de departe cea mai vanduta, 46 pareri', '4 zone, 58 cm, 7.2 kW', 'panou touch frontal, 9 trepte', 'Beko, brand popular'],
+    pros: ['De departe cea mai vanduta din selectie, 46 de pareri', 'Beko, brand foarte cunoscut cu service la noi', '4 zone, 7.2 kW, putere buna', 'Pret echilibrat pentru un brand popular'],
+    cons: ['Nota 4.02, mai modesta, verifica recenziile', 'Panou frontal, mai expus la stropi'],
+    verdict: 'Cea mai vanduta plita din tot articolul, alegerea preferata de cei mai multi cumparatori. Beko HII64200MT are 4 zone pe 58 cm, 7.2 kW si 9 trepte de putere, cu panou touch frontal, si vine de la Beko, unul dintre cele mai raspandite branduri de electrocasnice la noi, cu service usor de gasit. Cu 46 de pareri, cele mai multe din selectie, e clar cea mai populara, un semn de incredere in timp. Nota de 4.02 e insa mai modesta decat la alte modele Beko din selectie, asa ca merita sa citesti recenziile inainte, iar panoul frontal e ceva mai expus la stropii de la gatit. O iei cand vrei cea mai vanduta si mai verificata plita din selectie, de la un brand popular cu service la noi, si esti dispus sa te uiti atent la pareri pentru nota ceva mai jos.' },
+  { g: 'ech', id: 'D8X36JBBM', badge: 'Electrolux, de brand', short: 'Electrolux EIT', zone: '4 zone', latime: '60 cm', putere: '7200 W',
+    specs: ['4 zone, 60 cm, 7200 W', 'panou touch deasupra', 'de la Electrolux, brand premium', 'nota 4.38 din 26 de pareri'],
+    pros: ['Electrolux, brand premium de electrocasnice', 'Bine testata, 26 de pareri', '4 zone, latime standard 60 cm', 'Constructie si finisaje de calitate'],
+    cons: ['Nota 4.38, buna dar nu maxima', 'Pret spre limita de sus a segmentului'],
+    verdict: 'Poarta de intrare in gama Electrolux, pentru cine vrea un brand premium fara sa ajunga la preturile de top. EIT61443B are 4 zone pe 60 cm, 7200 W si un panou touch pozitionat deasupra, cu constructia si finisajele de calitate specifice Electrolux, un brand recunoscut in electrocasnice. Cu 26 de pareri si nota 4.38 e bine cotata si testata, o alegere solida pentru cine pune pret pe marca. Pretul e spre limita de sus a segmentului echilibrat, pentru ca platesti si brandul, iar nota nu e maxima. Nu are inca dotari premium ca zona flexibila. O iei cand vrei o plita Electrolux fiabila, cu 4 zone si latime standard, la cel mai accesibil pret din gama, si pui pret pe calitatea si numele brandului.' },
+  // --- Premium, peste 2000 lei ---
+  { g: 'prem', id: 'DN8VSRBBM', badge: 'Premium, cea mai vanduta', short: 'Electrolux LIV', zone: '4 zone', latime: '60 cm', putere: '7350 W',
+    specs: ['cea mai vanduta premium, 46 pareri', '4 zone, 60 cm, 7350 W', 'panou digital cu afisaj', 'doua zone mari, pentru vase mari'],
+    pros: ['Cea mai vanduta plita premium din selectie, 46 pareri', 'Panou digital cu afisaj, control precis', 'Doua zone mari, pentru oale si tigai mari', 'Electrolux, brand premium de incredere'],
+    cons: ['Pret premium', 'Fara zona complet flexibila'],
+    verdict: 'Cea mai vanduta plita premium din selectie si o alegere echilibrata in zona de sus, cu 46 de pareri, cele mai multe din tot articolul alaturi de modelul Beko. Electrolux LIV63431BK are 4 zone pe 60 cm, 7350 W si un panou digital cu afisaj care iti da control precis asupra puterii, plus doua zone mari, pentru vase mari, oale de supa sau tigai late. Electrolux inseamna calitate si finisaje premium, iar volumul mare de pareri arata fiabilitate si multumire. E o investitie, dar oferi in schimb constructia si controlul unui brand de top. Nu are o zona complet flexibila, ca modelele cu flex. O iei cand vrei cea mai testata plita premium din selectie, cu panou digital precis si doua zone mari, de la Electrolux, si esti dispus la un pret premium pentru calitate si fiabilitate.' },
+  { g: 'prem', id: 'D71GWGMBM', badge: 'Cel mai bine notat', short: 'Samsung Bespoke', zone: '4 zone', latime: '60 cm', putere: '7.4 kW',
+    specs: ['Samsung Bespoke, 4 zone, 7.4 kW', '15 trepte de putere, control fin', 'booster puternic, pana la 3700 W', 'nota 4.83, cea mai buna din selectie'],
+    pros: ['Cea mai buna nota din selectie, 4.83', '15 trepte de putere, cel mai fin control', 'Booster puternic, pana la 3700 W pe o zona', 'Design Bespoke, aspect deosebit'],
+    cons: ['Pret ridicat', 'Inca 12 pareri'],
+    verdict: 'Cea mai bine notata plita din tot articolul si un varf de gama Samsung, pentru cine vrea control fin si un aspect deosebit. Bespoke NZ64B5067YY are 4 zone pe 60 cm, 7.4 kW si 15 trepte de putere, cel mai fin control din selectie, plus un booster puternic care duce o zona pana la 3700 W pentru incalzire fulger, cand vrei sa fierbi apa sau sa prajesti rapid. Designul Bespoke, cu panou deschis la culoare, ii da un aspect elegant, diferit de plitele negre obisnuite. Cu nota 4.83 din 12 pareri e cea mai apreciata de aici, iar Samsung inseamna tehnologie de varf. E scumpa si are inca putine pareri, deci te bazezi si pe brand si specificatii. O iei cand vrei cea mai bine cotata plita din selectie, cu cel mai fin control al puterii, booster puternic si un design deosebit, si esti dispus la o investitie premium.' },
+  { g: 'prem', id: 'DR936JBBM', badge: 'AEG, control fin', short: 'AEG', zone: '4 zone', latime: '60 cm', putere: '7200 W',
+    specs: ['AEG IKB64413FB, 4 zone, 7200 W', '14 trepte de putere, control precis', 'panou touch deasupra', 'AEG, brand premium de electrocasnice'],
+    pros: ['AEG, brand premium recunoscut pentru gatit', '14 trepte de putere, control foarte fin', '4 zone, latime standard 60 cm', 'Constructie si finisaje de top'],
+    cons: ['Pret ridicat', 'Inca 11 pareri'],
+    verdict: 'O plita premium de la AEG, un brand recunoscut pentru aparatele de gatit de calitate. IKB64413FB are 4 zone pe 60 cm, 7200 W si 14 trepte de putere, un control foarte fin al caldurii, apreciat de cei care gatesc mult si vor precizie, de la fiert incet la prajit intens. AEG inseamna constructie si finisaje de top, o marca premium in electrocasnicele de bucatarie. Cu 11 pareri si nota 4.45 e bine cotata, chiar daca inca putin testata, deci te bazezi si pe reputatia brandului. E o investitie, justificata daca pui pret pe calitate si pe controlul fin al gatitului. O iei cand vrei o plita premium de la AEG, cu 14 trepte de putere pentru control precis, si pretuiesti calitatea si reputatia brandului in aparatele de gatit.' },
+  { g: 'prem', id: 'D7Y54JBBM', badge: 'Cu zona flexibila', short: 'Whirlpool 8 zone', zone: '8 zone flex', latime: '65 cm', putere: '—',
+    specs: ['8 zone de gatit, zona flexibila', 'latime mai mare, 65 cm', 'gatesti cu vase de orice forma si marime', 'panou touch, sticla neagra'],
+    pros: ['Zona flexibila, gatesti cu vase de orice forma', '8 zone care se combina, spatiu generos', 'Latime mai mare, 65 cm', 'Panou touch, sticla neagra eleganta'],
+    cons: ['Nota 3.7, mai modesta, verifica recenziile', 'Pret ridicat'],
+    verdict: 'Plita de ales daca vrei libertate totala la asezarea vaselor, cu o zona flexibila. Whirlpool SMP 658C are 8 zone de gatit pe o latime de 65 cm, mai mare decat standardul, iar zonele se combina intr-o suprafata flexibila, deci pui o oala, o tigaie lunga sau un vas de gratar oriunde pe plita, fara sa te limitezi la cercuri fixe, si aparatul incalzeste exact unde ai asezat vasul. E cel mai versatil mod de a gati, potrivit pentru cine foloseste vase de forme si marimi diferite. Panoul touch si sticla neagra ii dau un aspect elegant. Cu nota 3.7 din 20 de pareri e mai modest cotata, asa ca citeste recenziile cu atentie, iar pretul e ridicat. O iei cand vrei o zona flexibila, cu 8 zone care se combina si latime mai mare, pentru libertate totala la vase, si esti dispus sa verifici parerile pentru nota mai jos.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const ECH = PICKS.filter(x => x.g === 'ech');
+const PREM = PICKS.filter(x => x.g === 'prem');
+
+const hero = '/images/articles/plita-cu-inductie-pentru-bucatarie.webp';
+const figAcc = '/imagini/articole/plita-accesibile.webp';
+const figEch = '/imagini/articole/plita-echilibrate.webp';
+const figPrem = '/imagini/articole/plita-premium.webp';
+const published = '2026-07-19T14:00:49+03:00';
+
+const faq = [
+  { question: 'Cum functioneaza o plita cu inductie?', answer: 'O plita cu inductie incalzeste direct vasul, nu suprafata de sticla. Sub fiecare zona se afla o bobina care creeaza un camp magnetic, iar acesta genereaza caldura chiar in fundul oalei sau al tigaii, prin inductie electromagnetica. De aceea, plita raspunde instant: cresti sau scazi puterea si caldura se schimba imediat, ca la gaz, dar mai precis. Sticla din jurul vasului ramane relativ rece, se incalzeste doar de la caldura vasului, ceea ce face inductia mai sigura si mai eficienta decat vitroceramica clasica. Zona functioneaza doar cand detecteaza un vas potrivit pe ea, altfel ramane oprita.' },
+  { question: 'De ce inductie si nu vitroceramica sau gaz?', answer: 'Inductia e cea mai rapida, mai eficienta si mai sigura optiune. Fata de vitroceramica, care incalzeste sticla si apoi vasul, inductia incalzeste direct vasul, deci gateste mai repede, consuma mai putin si raspunde instant la reglaje. Fata de gaz, e mai curata, mai usor de curatat, fara flacara si fara riscul scaparilor de gaz, si tot mai precisa. In plus, sticla ramane rece in jurul vasului, deci nu te arzi si mancarea varsata nu se arde pe plita. Singurele conditii sunt sa ai vase compatibile cu inductia si o instalatie electrica potrivita, pentru ca plitele au putere mare. Pentru majoritatea bucatariilor moderne, inductia e alegerea de top.' },
+  { question: 'Cate zone de gatit imi trebuie?', answer: 'Depinde de cat si pentru cati gatesti. O plita cu 2 zone, in format domino de 30 cm, e potrivita pentru o persoana, un cuplu, o garsoniera sau ca a doua plita. Cele mai multe familii aleg 4 zone, formatul standard de 60 cm, care iti permite sa gatesti mai multe feluri odata, cu oale si tigai diferite. Modelele cu zona flexibila sau cu mai multe zone, ca cel Whirlpool de 8 zone si 65 cm din selectie, iti dau libertatea de a aseza vase de orice forma oriunde pe plita, utile daca gatesti mult si cu vase mari. Pentru o bucatarie obisnuita, 4 zone pe 60 cm sunt alegerea potrivita.' },
+  { question: 'Ce este functia booster si zona flexibila?', answer: 'Boosterul concentreaza temporar putere suplimentara pe o zona, ridicand-o la maximum, la unele modele pana spre 3700 W, ca sa fierbi apa sau sa incingi o tigaie foarte repede, in cateva secunde. E util cand te grabesti, iar dupa cateva minute puterea revine la normal. Zona flexibila inseamna ca mai multe zone alaturate se pot combina intr-o singura suprafata mare de gatit, cu inductoare care lucreaza impreuna: asa pui o tigaie lunga, un vas de gratar sau doua oale una langa alta oriunde in acea zona, fara sa te limitezi la cercuri fixe. Amandoua sunt dotari care fac gatitul mai rapid si mai comod, mai frecvente la modelele de mijloc si premium.' },
+  { question: 'Ce vase pot folosi pe inductie?', answer: 'Doar vase compatibile cu inductia, adica cele cu fund magnetic, din fonta, otel emailat sau inox magnetic. Un test simplu: daca un magnet se lipeste de fundul oalei, vasul e bun pentru inductie. Vasele din aluminiu, cupru, sticla sau ceramica obisnuita, fara fund magnetic special, nu functioneaza, pentru ca plita nu le detecteaza. Multe seturi noi de oale sunt marcate ca fiind pentru inductie. Fundul vasului trebuie sa fie plat, curat si neted, ca sa faca un contact bun cu sticla si sa incalzeasca eficient. Daca treci la inductie de la gaz sau vitroceramica, verifica intai vasele; s-ar putea sa fie nevoie sa cumperi cateva noi, compatibile.' },
+  { question: 'Ce functii de siguranta are o plita cu inductie?', answer: 'Plitele cu inductie sunt printre cele mai sigure. Detectarea vasului face ca zona sa functioneze doar cand are un vas potrivit deasupra, altfel ramane oprita, deci nu ramane pornita degeaba. Blocarea pentru copii, sau child lock, impiedica pornirea sau modificarea accidentala a setarilor, utila intr-o casa cu copii. Indicatorul de caldura reziduala arata care zone sunt inca fierbinti dupa gatit, ca sa nu le atingi. Protectia la supraincalzire opreste automat plita daca se incinge prea tare. In plus, sticla din jurul vasului ramane rece, deci riscul de arsuri e mult mai mic decat la gaz sau vitroceramica. Cauta aceste functii cand alegi, mai ales daca ai copii.' },
+  { question: 'Cum curat si intretin o plita cu inductie?', answer: 'E foarte usor de curatat, unul dintre marile avantaje. Fiind o suprafata plana din sticla, o stergi cu o carpa umeda si o solutie blanda dupa fiecare folosire, iar pentru ca sticla ramane relativ rece, mancarea varsata nu se arde si nu se lipeste ca pe gaz sau vitroceramica. Pentru pete uscate, foloseste un razuitor special pentru vitroceramica si o solutie dedicata, fara bureti abrazivi care zgarie sticla. Sterge imediat zaharul sau mancarea varsata cat plita e calda, cu grija sa nu te arzi, pentru ca se pot lipi. Nu folosi detergenti agresivi sau obiecte ascutite. Cu aceasta grija simpla, sticla ramane ca noua ani la rand.' },
+  { question: 'Cat costa o plita cu inductie buna?', answer: 'In selectie, plitele accesibile pornesc de la circa 460 de lei pentru un model domino cu 2 zone, ca Heinner, si ajung spre 850 de lei pentru unul cu 4 zone si latime standard, ca Starcrest. Segmentul echilibrat, cu Arctic, Beko si Electrolux, se aseaza intre circa 1200 si 1700 de lei si aduce branduri cunoscute cu service la noi si note bune. Modelele premium, de la Electrolux, Samsung sau AEG, trec de 2000 si urca spre 3600 de lei, cu control mai fin al puterii, booster puternic, zona flexibila sau design deosebit. Cel mai bun raport il gasesti alegand numarul de zone si dotarile potrivite nevoii tale, nu neaparat cel mai scump model.' },
+];
+
+const images = [hero, figAcc, figEch, figPrem, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Plita cu inductie pentru bucatarie - CentroCasa"
-  description="Daca vrei o plita cu inductie pentru bucatarie care sa fie rapida, sigura si eficienta energetic, iti recomand sa te uiti la modelele de la Bosch, Electrolux sau Teka. Sunt branduri serioase, cu experienta, si au plite care fac treaba excelent, fara drame."
-  image="/images/articles/plita-cu-inductie-pentru-bucatarie.webp"
+  title="Cele mai bune plite cu inductie in 2026: accesibile, echilibrate si premium"
+  description="Care sunt cele mai bune plite cu inductie incorporabile in 2026: modele accesibile de la Heinner si Starcrest, echilibrate de la Arctic, Beko si Electrolux, si premium de la Samsung, AEG si Whirlpool, comparate pe numar de zone, latime si putere. Plus cum alegi, booster, zona flexibila si ce vase folosesti."
+  image={hero}
   type="article"
-  publishedTime="2026-02-21T13:17:42.550Z"
-  modifiedTime="2026-02-21T13:17:42.550Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Cristian Popa"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune plite cu inductie' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/electrocasnice-casa/">Electrocasnice Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Plita cu inductie pentru bucatarie</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune plite cu inductie</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/electrocasnice-casa/" class="article-category">Electrocasnice Casa</a>
-        <span class="article-date">21 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Plita cu inductie pentru bucatarie</h1>
-    </header>
+    <h1>Cele mai bune plite cu inductie</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    
+    <img class="rd-hero" src={hero} alt="Cele mai bune plite cu inductie: modele accesibile, echilibrate si premium" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="plita-cu-inductie-pentru-bucatarie-ghidul-tau-direct-de-la-un-vecin-priceput">
-        <h2>Plita cu Inductie Pentru Bucatarie: Ghidul Tau Direct de la Un Vecin Priceput</h2>
-        <p>Hai sa fim directi: daca te gandesti la o <strong>plita cu inductie <a href="/hota-pentru-bucatarie-puternica/" class="interlink">pentru bucatarie</a></strong> noua, probabil vrei sa stii ce-i bun si ce nu, fara balast. Stai linistit, nu te coplesesc cu termeni tehnici. Uite care-i treaba: inductia e cea mai desteapta chestie aparuta in bucatarie de cand cu cuptorul cu microunde, pe bune.</p><p>Ce inseamna asta pentru tine? Inseamna ca mancarea se face mult mai repede. Serios, fierberea apei dureaza cateva secunde, nu minute. Si e si mai sigura, ca suprafata plitei ramane relativ rece. Copiii se ard mai greu, si nici nu-ti mai arde cearsaful de pe jos daca scapi ceva pe ea. Plus ca e si economica. Consuma mai putin curent decat o plita electrica clasica sau chiar gaz, uneori.</p><p>Acum, poate te intrebi daca merita investitia. Daca ai un buget decent si vrei sa-ti faci viata mai usoara in bucatarie, raspunsul e un mare DA. O <strong>plita cu inductie pentru bucatarie</strong> e un upgrade pe care nu-l regreti. Dar, ca la orice, exista si mici chestii la care sa te uiti.</p><p>De exemplu, o sa ai nevoie de oale si tigai speciale, alea cu fund magnetic. Nu merge orice de prin dulap. Asta e, e un mic pret pentru confortul si viteza pe care le castigi. Si, sincer, majoritatea oamenilor oricum isi schimba setul de vase la un moment dat, deci nu e o tragedie.</p><p>Am avut prieteni care au trecut pe inductie si au zis ca nu s-ar mai intoarce la nimic altceva. Unul mi-a zis ca de cand are plita cu inductie, chiar mai gateste, ca e mult mai simplu si rapid. Si asta e mare lucru, ca inainte abia daca ii vedeai pe langa aragaz.</p><p>Deci, ca un prim sfat, daca vrei o <strong>plita cu inductie pentru bucatarie</strong>, nu te teme de ea. E o tehnologie matura, fiabila si, cel mai important, face gatitul o experienta mult mai placuta. Urmeaza sa vorbim despre cum alegi modelul potrivit si ce sa urmaresti la specificatii.</p>
-      </section>
-
-      <section id="top-recomandari-plite-cu-inductie-ce-merita-bani-mai-multi-si-ce-nu">
-        <h2>Top Recomandari Plite cu Inductie: Ce Merita Bani Mai Multi (Si Ce Nu)</h2>
-        <p>Bun, hai sa vedem ce gasesti pe piata si ce ar merita sa iei in considerare. Nu-ti pot da o lista batuta in cuie, ca modelele se schimba mereu, dar iti zic ce branduri si ce tipuri de plite au fost mereu in top. Si, important, o sa-ti zic si unde mai pot aparea probleme, ca sa nu zici ca te-am mintit.</p><h3>Bosch - Clasic si Fiabil</h3><p>Bosch face lucruri bune, asta e clar. Modelele lor de <strong>plita cu inductie pentru <a href="/robot-de-bucatarie-multifunctional/" class="interlink">bucatarie</a></strong> sunt de obicei solide, cu un design simplu, dar elegant. Gasesti variante cu 4 zone de gatit, cu functii de booster (care da un plus de putere cand ai nevoie) si control tactil. Sunt intuitive, nu prea ai cum sa te incurci in ele.</p><ul><li><strong>Avantaje:</strong> Foarte fiabile, usor de folosit, design placut, functii utile.</li><li><strong>Dezavantaje:</strong> Unele modele pot fi mai scumpe, iar curatarea rapida a petelor de pe sticla e importanta, ca se poate zgâria daca freci prea tare cu bureti abrazivi.</li></ul><p>Am avut un model Bosch acum vreo 5 ani, si a mers brici pana am vandut casa. Niciodata o problema.</p><h3>Electrolux - Inovatie si Flexibilitate</h3><p>Electrolux vine mereu cu ceva nou. Plitele lor cu inductie au adesea zone flexibile, care se pot uni pentru a face loc la oala mai mare sau la gratar. Asta e super daca gatesti des chestii mai... neconventionale. Sunt si foarte rapide si precise la controlul temperaturii.</p><ul><li><strong>Avantaje:</strong> Zone flexibile, control precis, design modern, functii smart.</li><li><strong>Dezavantaje:</strong> Pot fi printre cele mai scumpe optiuni, iar functiile smart pot fi un pic overkill pentru cineva care vrea doar sa fiarba o oala de ciorba.</li></ul><p>Un prieten si-a luat un Electrolux cu zone flexibile si e super multumit, mai ales ca gateste paste in oale mari si plate.</p><h3>Teka - Un Echilibru Bun</h3><p>Teka mi se pare o optiune buna daca vrei o <strong>plita cu inductie pentru bucatarie</strong> care sa fie buna, dar sa nu te rupa la buzunar. Au modele cu performante decente, si de obicei sunt mai accesibile ca pret decat marile branduri germane. Calitatea e buna, nu te astepta sa se strice in 2 ani.</p><ul><li><strong>Avantaje:</strong> Pret bun, performante solide, usor de gasit.</li><li><strong>Dezavantaje:</strong> Designul poate fi un pic mai simplu, iar uneori finisajele nu sunt la fel de premium ca la Bosch sau Electrolux.</li></ul><p>Am montat o plita Teka la o cunostinta acum 3 ani, si inca arata si functioneaza ca noua. Asta spune multe.</p><h3>Whirlpool - Varietate si Preturi Competitive</h3><p>Whirlpool ofera o gama larga de plite cu inductie, de la cele mai simple la cele mai complexe. Gasesti modele la preturi foarte bune, ceea ce e un plus major. Sunt destul de fiabile, si au si optiuni cu functii interesante, cum ar fi cea de topire a ciocolatei la foc mic.</p><ul><li><strong>Avantaje:</strong> Preturi accesibile, varietate mare de modele, functii utile.</li><li><strong>Dezavantaje:</strong> Unele modele mai ieftine pot avea o durabilitate mai mica in timp, si controlul temperaturii nu e mereu la fel de fin ca la brandurile premium.</li></ul><p>Am vazut cateva modele Whirlpool in locuinte de inchiriat, si s-au descurcat onorabil. Nu sunt de top, dar isi fac treaba.</p><p>Deci, inainte sa cumperi, verifica recenziile, compara preturile si vezi ce functii chiar ai nevoie. Nu plati in plus pentru chestii pe care nu le vei folosi niciodata.</p>
-      </section>
-
-      <section id="cum-alegi-plita-cu-inductie-potrivita-pentru-bucataria-ta-ghid-pas-cu-pas">
-        <h2>Cum Alegi Plita cu Inductie Potrivita Pentru Bucataria Ta: Ghid Pas Cu Pas</h2>
-        <p>Acum ca ti-am zis cateva branduri, hai sa vedem cum alegi exact ce-ti trebuie. O <strong>plita cu inductie pentru bucatarie</strong> nu e un fleac, deci merita sa te gandesti un pic. Uite la ce sa te uiti, ca sa nu dai cu bata-n baltă.</p><h3>Dimensiunea si Numarul de Zone</h3><p>Asta e prima chestie. Cat spatiu ai? Si cate persoane sunteti in casa, cam cate oale pui pe foc deodata? Majoritatea plitelor au 4 zone, dar gasesti si de 2, de 5 sau chiar mai multe. Daca stai singur sau in doi, o plita mica, de 2 zone, poate fi suficienta. Daca ai o familie mai mare sau iti place sa gatesti mult, mergi pe 4 sau 5 zone. Si atentie la dimensiunea zonelor – unele sunt mai mari, altele mai mici. Daca ai oale si tigai mari, ai nevoie de zone pe masura.</p><h3>Puterea (kW) si Controlul Temperaturii</h3><p>Asta e legat de cat de repede se gateste mancarea. O plita cu inductie cu putere mai mare (masurata in kW) va incalzi mai repede. Dar nu te uita doar la puterea totala. Conteaza si cum e distribuita pe zone. Si, la fel de important, cum poti regla temperatura. Cauta plite cu control fin, care iti permit sa setezi temperaturi precise, de la foc mic la foc mare. Asta te ajuta sa nu arzi mancarea si sa ai control total.</p><h3>Functii Suplimentare - Ai Nevoie De Ele?</h3><p>Astea sunt micile artificii care fac viata mai usoara. Vorbim de:</p><ul><li><strong>Booster:</strong> Da un impuls de putere <a href="/convector-electric-pentru-incalzire/" class="interlink">pentru incalzire</a> rapida (fierbere apa, prajire). E super util, dar consuma mai mult curent pe moment.</li><li><strong>Zone Flexibile:</strong> Se pot uni 2 zone pentru oala mare sau gratar. Excelent daca gatesti des chestii mai mari.</li><li><strong>Timer:</strong> Setezi cat timp sa stea pe foc o zona. Se opreste automat.</li><li><strong>Detectie Oala:</strong> Plita detecteaza daca ai pus oala pe zona de gatit. Daca nu e oala, nu se incalzeste. Siguranta in plus.</li><li><strong>Child Lock:</strong> Blocheaza panoul de comanda sa nu fie accesat de copii.</li></ul><p>Nu lua o plita doar pentru ca are multe functii. Gandeste-te la ce folosesti zilnic. Mai bine o plita cu mai putine functii, dar de calitate, decat una plina de optiuni pe care nu le atingi niciodata.</p><h3>Designul si Materialele</h3><p>Asta e mai mult partea estetica, dar conteaza. Majoritatea plitelor cu inductie sunt din sticla ceramica neagra. Arata elegant, dar trebuie sa ai grija la zgarieturi. Unele au margini finisate, altele nu. Daca ai un blat mai fragil, poate vrei o plita cu margini mai groase. Si culoarea butoanelor sau lumina afisajului conteaza pentru cum se integreaza in bucataria ta.</p><h3>Bugetul - Cat Esti Dispus Sa Dai?</h3><p>Na, asta e partea cea mai grea. O <strong>plita cu inductie pentru bucatarie</strong> de calitate, de la un brand bun, poate costa intre 1500 si 5000 de lei sau chiar mai mult. Modelele mai ieftine pot fi ok, dar s-ar putea sa nu aiba aceeasi fiabilitate pe termen lung sau aceleasi functii. Stabileste-ti un buget realist si cauta cea mai buna optiune in acel interval. Nu uita sa incluzi si costul oalelor noi, daca ai nevoie.</p><p>Daca ma intrebi pe mine, cea mai importanta e fiabilitatea si usurinta in utilizare. Restul sunt bonusuri.</p>
-      </section>
-
-      <section id="plita-pe-gaz-vs-inductie-vs-vitroceramica-marele-duel">
-        <h2>Plita pe Gaz vs. Inductie vs. Vitroceramica: Marele Duel</h2>
-        <p>Hai sa clarificam odata pentru totdeauna. Multe lume inca se intreaba: ce e mai bun? Gaz, inductie sau vitroceramica? Fiecare are avantajele si dezavantajele ei, si alegerea depinde mult de ce obisnuinte ai in bucatarie si ce buget ai. Uite o comparatie rapida, ca sa te ajuti sa decizi.</p><h3>Plita pe Gaz: Clasicul Nostru Iubit</h3><p>Asta e plita cu flacari, pe care o stie toata lumea. E pe gaz, deci ai nevoie de conexiune la gaz in casa. Foarte multi bucatari profesionisti o prefera pentru controlul precis al flacarii. Poti sa vezi exact cat de tare arde focul.</p><ul><li><strong>Avantaje:</strong> Control vizual excelent al flacarii, reactioneaza instant la schimbarea intensitatii, majoritatea oalelor merg pe ea, e cea mai ieftina la achizitie (de obicei).</li><li><strong>Dezavantaje:</strong> Mai putin sigura (risc de scurgeri de gaz, arsuri), mai greu de curatat (grilaje, arzatoare), mai putin eficienta energetic (o parte din caldura se pierde in aer).</li></ul><p>Am crescut cu plita pe gaz si inca imi place senzatia aia ca esti un bucatar adevarat cand ajustezi flacara. Dar recunosc, curatatul e o corvoada.</p><h3>Plita Vitroceramica (Electrică): Un Pas Inainte</h3><p>Asta e varianta electrica, cu elemente de incalzire sub o suprafata de sticla. Arata mai modern decat gazul si e mai usor de curatat. Incalzeste mai lent decat inductia si pierde si ea caldura in aer.</p><ul><li><strong>Avantaje:</strong> Suprafata neteda, usor de curatat, arata modern, nu necesita oale speciale, pret mai accesibil decat inductia.</li><li><strong>Dezavantaje:</strong> Se incalzeste mai greu si se raceste mai greu, suprafata devine fierbinte (risc de arsuri), consuma mai mult curent decat inductia, poate fi mai usor de zgariat daca nu esti atent.</li></ul><p>Am avut o plita vitroceramica la un <a href="/aer-conditionat-pentru-apartament-mic/" class="interlink">apartament</a> inchiriat, si a fost ok, dar am simtit mereu ca dureaza prea mult pana incepe sa fiarba ceva.</p><h3>Plita cu Inductie: Viitorul In Bucatarie</h3><p>Asta e tehnologia cea mai noua dintre cele trei. Foloseste campuri electromagnetice pentru a incalzi direct oala, nu suprafata plitei. Rezultatul? Incalzire super rapida, eficienta energetica mare si siguranta sporita.</p><ul><li><strong>Avantaje:</strong> Incalzire extrem de rapida, eficienta energetica mare (pierderi minime de caldura), suprafata plitei ramane relativ rece (siguranta), control precis al temperaturii, usor de curatat.</li><li><strong>Dezavantaje:</strong> Pret de achizitie mai mare, necesita oale si tigai speciale cu fund magnetic, poate fi mai sensibil la socuri puternice.</li></ul><p>Daca ma intrebi pe mine, pentru o <strong>plita cu inductie pentru bucatarie</strong>, avantajele depasesc cu mult dezavantajele. Investitia initiala e mai mare, dar pe termen lung castigi timp, siguranta si eficienta. Si daca tot iti iei o <strong>plita cu inductie pentru bucatarie</strong>, asigura-te ca ai si oale compatibile. Nu de alta, dar sa nu te trezesti ca ai cea mai tare plita din lume, dar nu poti gati nimic pe ea.</p>
-      </section>
-
-      <section id="secrete-si-sfaturi-de-insider-cum-sa-nu-dai-cu-pumnul-in-plita-cu-inductie">
-        <h2>Secrete si Sfaturi de Insider: Cum Sa Nu Dai cu Pumnul in Plita cu Inductie</h2>
-        <p>Ok, ai cumparat o <strong>plita cu inductie pentru bucatarie</strong>. Felicitari! Acum, ca sa te bucuri de ea cat mai mult timp si fara batai de cap, uite cateva chestii pe care le stiu eu si prietenii mei, ca sa eviti problemele comune.</p><h3>Nu Te Zgârci La Oale Si Tigai</h3><p>Asta e prima greseala pe care o fac multi. Se gandesc ca plita e scumpa, si la oale mai economisesc. Mare greseala! Oalele de proasta calitate, care nu au un fund gros si magnetic, nu se vor incalzi cum trebuie. Rezultatul? Mancare gatita neuniform, arsuri, si o plita care pare de vina. Ia-ti oale dedicate pentru inductie. Testeaza-le cu un magnet: daca se lipeste bine de fund, e ok.</p><h3>Curatarea Zilnica E Sfântă</h3><p>Sticla ceramica arata a dracu' cand e curata, dar se murdareste repede. Si, cel mai important, se zgarie usor. Nu folosi niciodata bureti de sarma, detergenti abrazivi sau produse de <a href="/robot-de-curatat-geamuri/">curatat geamuri</a> de proasta calitate. Ia o solutie speciala pentru plite vitroceramice/inductie si o laveta moale. Sterge imediat ce s-a racit un pic. Daca ai varsat ceva, curata cat mai repede, mai ales chestii dulci sau acide, ca pot lasa urme permanente.</p><h3>Atentie La Obiectele Metalice</h3><p>Plita cu inductie functioneaza pe baza de camp electromagnetic. Asta inseamna ca daca lasi pe ea o furculita, un cutit sau chiar capacul de la oala, se pot incalzi si ele destul de tare. Nu de mult am vazut un tutorial unde un nene a lasat un capac metalic pe plita si s-a incins atat de tare incat a lasat o urma pe sticla. Deci, tine departe de plita tot ce nu e mancare sau oala.</p><h3>Nu Porni Plita Goala</h3><p>Asta e o greseala clasica, mai ales cand esti grabit. Pui plita pe foc mare fara nicio oala. Sticla se poate supraincalzi, si chiar daca nu se sparge pe loc, ii scurtezi viata. Functionarea in gol nu face decat sa uzeze plita inutil.</p><h3>Foloseste Functiile Cu Cap</h3><p>Functia booster e grozava, dar nu o folosi la nesfarsit. E ca si cum ai forta motorul masinii la maxim tot timpul. Poate strica plita pe termen lung. La fel si cu timerul – e util, dar nu te baza 100% pe el. Mai bine stai cu ochii pe mancare. Si, daca ai zone flexibile, invata cum sa le folosesti eficient. Nu le activa daca nu ai nevoie, ca consuma mai mult curent.</p><h3>Instalarea Conteaza</h3><p>Daca nu ai mai avut plita cu inductie, probabil o instaleaza un mester. Asigura-te ca stie ce face. O instalare greșită poate duce la probleme de ventilatie, la suprasolicitarea circuitului electric sau la alte defectiuni. Nu te sfii sa pui intrebari si sa ceri explicatii.</p><p>Si inca un pont: daca ai o <strong>plita cu inductie pentru bucatarie</strong> cu control tactil, nu apasa cu unghia. Foloseste varful degetului. E mult mai precis si protejezi ecranul.</p><p>Pe scurt, o <strong>plita cu inductie pentru bucatarie</strong> e o investitie inteligenta daca o ingrijesti. Nu e SF, e doar o chestie de bun simt si atentie la detalii.</p>
-      </section>
-
-      <section id="verdictul-pe-bugete-ce-plita-cu-inductie-iti-permiti-si-ce-primesti">
-        <h2>Verdictul Pe Bugete: Ce Plita cu Inductie Iti Permiti Si Ce Primesti</h2>
-        <p>Bun, pana la urma, pretul conteaza. Si e normal sa vrei sa stii ce primesti pentru banii tai. Am impartit optiunile in trei categorii, ca sa-ti fie mai usor sa te orientezi. Fiecare are avantajele si dezavantajele ei, dar toate sunt <strong>plita cu inductie pentru bucatarie</strong> de calitate, daca alegi corect.</p><h3>Buget Mic (Sub 1800 Lei): Eficienta Bazica</h3><p>In acest interval, gasesti plite cu inductie de la branduri mai accesibile sau modele mai simple de la cele cunoscute. Vorbim de plite cu 2 sau 4 zone de gatit, fara prea multe functii smart sau zone flexibile. Performanta e buna, incalzirea e rapida, dar nu te astepta la finisaje premium sau la o durabilitate extraordinara peste 7-8 ani.</p><ul><li><strong>Ce primesti:</strong> O <strong>plita cu inductie pentru bucatarie</strong> functionala, rapida, sigura, ideala pentru cei care nu gatesc zilnic sau au un buget limitat.</li><li><strong>Minusuri:</strong> Pot fi mai zgomotoase (ventilatorul), controlul temperaturii nu e la fel de fin, designul e mai basic.</li><li><strong>Recomandare:</strong> Cauta modele de la Teka, Whirlpool sau chiar modele de baza de la Beko. Verifica recenziile pentru fiabilitate.</li></ul><h3>Buget Mediu (1800 - 3500 Lei): Echilibrul Perfect</h3><p>Aici incepe distractia. In acest interval, gasesti plite cu inductie de la branduri de top (Bosch, Electrolux, Siemens), cu 4 zone de gatit, functii utile ca booster, timer, child lock. Unele modele pot avea si zone flexibile sau un control al temperaturii mai precis. Durabilitatea e mult imbunatatita, iar finisajele sunt mai placute.</p><ul><li><strong>Ce primesti:</strong> O <strong>plita cu inductie pentru bucatarie</strong> performanta, fiabila, cu functii care chiar conteaza in bucatarie. E alegerea cea mai populara pentru majoritatea familiilor.</li><li><strong>Minusuri:</strong> Zonele flexibile pot fi mai putine sau mai putin performante decat la modelele de top, designul poate fi mai putin inovativ.</li><li><strong>Recomandare:</strong> Modele de la Bosch (seriile 4 sau 6), Electrolux sau Samsung. Uita-te la putere si la recenzii.</li></ul><h3>Buget Generos (Peste 3500 Lei): Lux si Tehnologie</h3><p>Daca bugetul nu e o problema, aici poti sa te rasfeti. Vorbim de plite cu inductie cu design spectaculos, zone flexibile extinse, control digital avansat, functii de gatire presetate, conectivitate smart (control prin aplicatie). Unele modele pot avea si design frameless (fara rama) sau finisaje speciale. Sunt cele mai rapide, cele mai precise si cele mai fiabile pe termen lung.</p><ul><li><strong>Ce primesti:</strong> O <strong>plita cu inductie pentru bucatarie</strong> de top, cu tot ce-ti doresti si ce nu stiai ca-ti doresti. O investitie pe termen lung.</li><li><strong>Minusuri:</strong> Pretul poate fi prohibitiv pentru multi, iar unele functii smart sunt mai mult un moft decat o necesitate reala.</li><li><strong>Recomandare:</strong> Modele premium de la Miele, Neff, sau cele mai noi de la Bosch si Electrolux.</li></ul><p>Deci, indiferent de buget, poti gasi o <strong>plita cu inductie pentru bucatarie</strong> care sa-ti faca viata mai usoara. Important e sa stii ce cauti si sa nu te lasi pacalit de marketing. O plita buna e o unealta, nu un ornament.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa o plita cu inductie pentru bucatarie
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O <strong>plita cu inductie pentru bucatarie</strong> costa in medie intre 1500 si 3500 de lei. Modelele mai simple, cu 2 zone, pot fi gasite si sub 1000 de lei, in timp ce cele premium, cu functii avansate, pot depasi 5000 de lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre plita cu inductie si cea vitroceramica
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Plita cu inductie incalzeste direct oala prin camp electromagnetic, suprafata ramanand rece, pe cand plita vitroceramica (electrica) incalzeste rezistenta de sub sticla, care apoi transfera caldura oalei, suprafata devenind fierbinte.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar o plita cu inductie
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca vrei gatire rapida, eficienta energetica crescuta si siguranta sporita. Incalzirea e mult mai rapida decat la cele electrice sau pe gaz, iar consumul de curent e mai mic.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce fel de oale se folosesc la plita cu inductie
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Se folosesc oale si tigai cu fundul gros si magnetic. Poti verifica compatibilitatea punand un magnet pe fundul vasului; daca se lipeste, este potrivit pentru plita cu inductie.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                de ce se zgaraie plita cu inductie
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Plita cu inductie se poate zgâria daca folosesti bureti abrazivi, obiecte metalice ascutite sau daca tragi vasele de pe suprafata in loc sa le ridici. Curatarea corecta cu lavete moi previne zgarieturile.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat curent consuma o plita cu inductie
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O <strong>plita cu inductie pentru bucatarie</strong> este eficienta energetic, consumand cu pana la 30-50% mai putin curent decat o plita electrica clasica. Consumul exact depinde de puterea utilizata si de durata gatirii.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cum se curata corect o plita cu inductie
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Se curata cu o solutie speciala pentru plite vitroceramice/inductie si o laveta moale, imediat ce suprafata s-a racit. Se evita produsele abrazive si bureti de sarma pentru a preveni zgarieturile.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc plite cu inductie ieftine si bune
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti gasi plite cu inductie la preturi bune in magazinele mari de electrocasnice (eMAG, Altex, Flanco) sau pe site-urile brandurilor. Cauta modele de la Teka, Whirlpool sau Beko pentru optiuni mai accesibile, dar verifica recenziile pentru fiabilitate.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cea mai vanduta plita cu inductie din selectie e <strong>Beko HII64200MT</strong>, iar la buget mic, <strong>Heinner cu 4 zone</strong> aduce inductia la sub 800 de lei. Cea mai bine notata e <strong>Samsung Bespoke</strong>, cu 15 trepte de putere, iar pentru libertate totala la vase, <strong>Whirlpool cu 8 zone</strong> are o zona flexibila.</p>
+      <p>Inductia e cea mai rapida, mai eficienta si mai sigura optiune de gatit, pentru ca incalzeste direct vasul, nu sticla. Cand alegi, conteaza <strong>numarul de zone</strong>, <strong>latimea</strong> care intra in blat, <strong>puterea</strong> si dotari ca <strong>boosterul</strong> sau <strong>zona flexibila</strong>. Mai jos gasesti direct recomandarile, pe trei segmente de pret, iar sub ele un ghid despre cum alegi si ce vase folosesti.</p>
+      <p>Am pornit de la plitele cu inductie incorporabile in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe numar de zone, latime, putere si dotari, si le-am impartit in accesibile, echilibrate si premium, ca sa gasesti repede modelul potrivit bucatariei si bugetului tau. Deasupra plitei, vezi <a href="/hota-pentru-bucatarie-puternica/">hotele de bucatarie puternice</a>, iar pentru mobilier, <a href="/cele-mai-bune-seturi-de-mobila-de-bucatarie/">seturile de mobila de bucatarie</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Accesibile, sub 900 de lei</a></li>
+        <li><a href="#ech">Echilibrate, 900-2000 de lei</a></li>
+        <li><a href="#prem">Premium, peste 2000 de lei</a></li>
+        <li><a href="#de-ce">De ce o plita cu inductie</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#vase">Ce vase folosesti</a></li>
+        <li><a href="#siguranta">Siguranta si curatare</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Zone</th><th>Latime</th><th>Putere</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.zone}</td>
+              <td>{x.latime}</td>
+              <td>{x.putere}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Accesibile, sub 900 de lei</h2>
+    <p>De la plite domino cu 2 zone, pentru spatii mici sau ca a doua plita, la modele cu 4 zone si latime standard de 60 cm. Aduc inductia in bucatarie la cel mai mic pret, cu comanda touch si functie booster.</p>
+    <div class="rd-grid">
+      {ACC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcc} alt="Plite accesibile cu inductie: Heinner, Starcrest" width="1200" height="675" loading="lazy" />
+
+    <h2 id="ech">Echilibrate, 900-2000 de lei</h2>
+    <p>Zona cu cel mai bun raport pret-brand: Arctic, Beko si Electrolux, cu 4 zone, latime standard si note bune. De aici alegi daca vrei un brand cunoscut, cu service la noi, fara sa treci in premium.</p>
+    <div class="rd-grid">
+      {ECH.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figEch} alt="Plite echilibrate cu inductie: Arctic, Beko, Electrolux" width="1200" height="675" loading="lazy" />
+
+    <h2 id="prem">Premium, peste 2000 de lei</h2>
+    <p>Cele mai bune la ce conteaza: control fin al puterii cu 14-15 trepte, booster puternic, zona flexibila si design deosebit, de la Electrolux, Samsung, AEG si Whirlpool. Pentru cine gateste mult si vrea tot.</p>
+    <div class="rd-grid">
+      {PREM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPrem} alt="Plite premium cu inductie: Electrolux, Samsung, AEG, Whirlpool" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-plita-inductie').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate plitele cu inductie la oferta</strong>
+        <span>Reducerile din acest moment la plite cu inductie incorporabile, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o plita cu inductie</h2>
+    <p>Inductia a schimbat modul in care gatim, si dintr-un motiv simplu: <strong>incalzeste direct vasul</strong>, nu suprafata plitei. Sub fiecare zona, o bobina creeaza un camp magnetic care genereaza caldura chiar in fundul oalei, deci energia ajunge fix acolo unde trebuie, fara pierderi. Rezultatul e o plita care gateste mai repede, consuma mai putin si raspunde instant la reglaje, ca la gaz, dar mai precis.</p>
+    <p>Fata de <strong>vitroceramica</strong>, care incalzeste intai sticla, inductia e mai rapida si mai eficienta. Fata de <strong>gaz</strong>, e mai curata, mai sigura si mai usor de curatat, fara flacara, fara miros si fara riscul scaparilor. In plus, sticla din jurul vasului ramane rece, deci nu te arzi si mancarea varsata nu se lipeste si nu se arde. Singurele conditii sunt sa ai vase compatibile cu inductia si o instalatie electrica potrivita, pentru ca plitele trag putere mare. Pentru o bucatarie moderna, inductia e cea mai buna alegere, iar preturile au coborat mult in ultimii ani.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua plite cu inductie:</p>
+    <ul>
+      <li><strong>Numarul de zone:</strong> 2 zone, format domino de 30 cm, pentru spatii mici sau a doua plita; 4 zone, 60 cm, pentru o familie; mai multe sau zona flexibila pentru cine gateste mult.</li>
+      <li><strong>Latimea:</strong> masoara decupajul din blat. 30 cm la domino, 58-60 cm la cele cu 4 zone, uneori 65 cm la modelele mari cu zona flexibila.</li>
+      <li><strong>Puterea si treptele:</strong> 7-7.4 kW la modelele cu 4 zone; mai multe trepte, 14-15, inseamna control mai fin al caldurii.</li>
+      <li><strong>Boosterul:</strong> putere suplimentara temporara pe o zona, pentru incalzire fulger. Util cand te grabesti.</li>
+      <li><strong>Zona flexibila:</strong> mai multe zone se combina intr-o suprafata mare, ca sa pui vase de orice forma oriunde.</li>
+      <li><strong>Comenzile si siguranta:</strong> panou touch, cu slider pentru control usor, plus blocare pentru copii, indicator de caldura reziduala si detectarea vasului.</li>
+    </ul>
+
+    <h2 id="vase">Ce vase folosesti</h2>
+    <p>Inductia are o singura cerinta care prinde des cumparatorii pe picior gresit: <strong>vasele trebuie sa fie compatibile cu inductia</strong>, adica sa aiba fund magnetic. Functioneaza vasele din fonta, otel emailat si inox magnetic, iar cele din aluminiu, cupru, sticla sau ceramica obisnuita, fara fund special, nu sunt detectate si nu incalzesc.</p>
+    <p>Testul e simplu: <strong>lipeste un magnet de fundul oalei</strong>. Daca se prinde, vasul e bun pentru inductie; daca nu, nu functioneaza. Multe seturi noi de oale si tigai sunt marcate clar ca fiind pentru inductie, deci verifica eticheta la cumparare. Important e si ca fundul vasului sa fie <strong>plat, neted si curat</strong>, ca sa faca un contact bun cu sticla si sa incalzeasca eficient. Daca treci la inductie de la gaz sau vitroceramica, verifica intai vasele pe care le ai; e posibil sa fie nevoie sa cumperi cateva noi, compatibile, un cost de care e bine sa tii cont in buget.</p>
+
+    <h2 id="siguranta">Siguranta si curatare</h2>
+    <p>Plitele cu inductie sunt printre cele mai sigure de pe piata. <strong>Detectarea vasului</strong> face ca o zona sa porneasca doar cand are un vas potrivit deasupra, deci nu ramane pornita degeaba. <strong>Blocarea pentru copii</strong> impiedica modificarea accidentala a setarilor, iar <strong>indicatorul de caldura reziduala</strong> arata ce zone sunt inca fierbinti, ca sa nu le atingi. In plus, protectia la supraincalzire opreste automat plita daca se incinge, iar sticla din jurul vasului ramane rece, deci riscul de arsuri e mult mai mic decat la gaz.</p>
+    <p>La curatare, inductia e un vis fata de gaz. Fiind o suprafata plana din sticla, o <strong>stergi cu o carpa umeda</strong> si o solutie blanda dupa fiecare folosire, iar pentru ca sticla ramane relativ rece, mancarea varsata nu se arde si se ia usor. Pentru pete uscate, foloseste un razuitor special pentru vitroceramica si o solutie dedicata, fara bureti abrazivi care zgarie. Sterge imediat zaharul varsat, cat plita e calda, cu grija sa nu te arzi, pentru ca se poate lipi. Cu aceasta grija simpla, sticla ramane ca noua ani la rand.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de numarul de zone, dotari si brand:</p>
+    <p><strong>Accesibile, sub 900 de lei:</strong> de la circa 460 de lei pentru un model domino cu 2 zone, ca Heinner, si pana spre 850 de lei pentru unul cu 4 zone si latime standard, ca Starcrest. Cea mai buna intrare in inductie.</p>
+    <p><strong>Echilibrate, 900-2000 de lei:</strong> Arctic, Beko si Electrolux, cu 4 zone, latime standard si branduri cunoscute cu service la noi. Cel mai bun raport pret-brand.</p>
+    <p><strong>Premium, peste 2000 de lei:</strong> Electrolux, Samsung, AEG si Whirlpool trec de 2000 si urca spre 3600 de lei, cu control mai fin, booster puternic, zona flexibila sau design deosebit.</p>
+    <p>Pe langa pret, alege dupa <strong>cum si cat gatesti</strong>: pentru un spatiu mic sau o gospodarie mica, o plita domino cu 2 zone ajunge; pentru o familie, 4 zone pe 60 cm de la un brand cunoscut sunt alegerea potrivita; iar daca gatesti mult si vrei control fin sau zona flexibila, un model premium merita banii. Nu uita sa pui in buget si eventuale vase noi, compatibile cu inductia. Pentru o bucatarie completa, vezi si <a href="/frigider-side-by-side-pentru-familie/">frigiderele side by side</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">CP</div>
       <div class="author-info">
-        <h4><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></h4>
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
         <p class="author-role">Specialist Electrocasnice</p>
-        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="plita-cu-inductie-pentru-bucatarie"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="plita-cu-inductie-pentru-bucatarie"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="plita-cu-inductie-pentru-bucatarie" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="plita-cu-inductie-pentru-bucatarie" currentCategory="electrocasnice-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

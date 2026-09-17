@@ -1,0 +1,297 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['cuptoare-micro'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Digitale, cel mai bun raport ---
+  { g: 'digital', id: 'D76C1JBBM', rol: 'Cel mai vandut', short: 'Samsung 23 l', cap: '23 l', putere: '800 W', ctrl: 'Digital', pret: '480 lei',
+    specs: ['23 litri, 800 W, control digital', 'Auto cook cu programe pentru feluri comune', 'Mod Eco, decongelare rapida, afisare ceas', 'blocare acces copii'],
+    pros: ['586 de pareri, de departe cel mai vandut din articol', '23 de litri, incape o farfurie mare', 'Programe automate si decongelare rapida', 'Mod Eco pentru consum redus in standby'],
+    cons: ['Fara grill, doar incalzire', 'Se gaseste mai ieftin in negru, la acelasi model'],
+    verdict: 'Samsung MS23K3513 e cel mai vandut cuptor cu microunde din articol, cu 586 de pareri, si e alegerea sigura pentru cine vrea un aparat bun fara sa se gandeasca prea mult. Are 23 de litri, in care incape o farfurie mare, 800 W pentru incalzire rapida si un control digital cu programe automate Auto cook, decongelare rapida, afisare ceas si Mod Eco, care taie consumul cand sta nefolosit. E un microunde simplu de folosit si dovedit de foarte multa lume. Un pont: acelasi model se gaseste in negru la un pret mai mic, pe care il recomandam mai jos. Il iei cand vrei cel mai popular si mai sigur microunde, cu programe si de la un brand mare.' },
+  { g: 'digital', id: 'D4Z53JBBM', rol: 'Nota cea mai mare, mai ieftin', short: 'Samsung 23 l negru', cap: '23 l', putere: '800 W', ctrl: 'Digital', pret: '433 lei',
+    specs: ['acelasi model ca varianta alba, in negru', '23 litri, 800 W, control digital', 'functie de memorie, elimina mirosurile', 'Mod Eco, Auto cook, afisare ceas'],
+    pros: ['Nota 4.81, cea mai mare din articol, pe 576 de pareri', 'Mai ieftin cu circa 50 de lei decat varianta alba', 'Aceleasi programe si dotari', 'Functie de eliminare a mirosurilor din interior'],
+    cons: ['Fara grill', 'Negrul arata amprentele mai usor decat albul'],
+    verdict: 'Samsung MS23K3513 in negru e, practic, acelasi cuptor ca varianta alba de mai sus, dar cu doua avantaje concrete: e mai ieftin, cu circa 50 de lei, si are nota 4.81 pe 576 de pareri, cea mai mare din tot articolul. Aceeasi capacitate de 23 de litri, aceiasi 800 W, aceleasi programe Auto cook, Mod Eco si afisare ceas, plus o functie de eliminare a mirosurilor din interior, utila dupa ce incalzesti mancare aromata. Practic, daca nu tii neaparat la culoarea alba, aceasta e alegerea mai buna: acelasi microunde, mai ieftin si mai bine notat. Negrul arata ceva mai usor amprentele, singurul compromis. Il iei cand vrei cel mai bine cotat microunde din articol, la un pret mai mic.' },
+  { g: 'digital', id: 'D8XS07BBM', rol: 'Design retro, foarte vandut', short: 'Daewoo 20 l', cap: '20 l', putere: '700 W', ctrl: 'Digital', pret: '356 lei',
+    specs: ['20 litri, 700 W, control digital', 'design retro, cu linii rotunjite', 'afisare ceas, blocare acces copii', 'se pune si in alb, negru sau rosu'],
+    pros: ['581 de pareri, printre cele mai vandute', 'Design retro, arata bine pe blat', 'Sub 360 de lei in varianta alba', 'Vine in mai multe culori'],
+    cons: ['700 W si 20 de litri, mai putin decat Samsung de 23', 'Fara grill'],
+    verdict: 'Daewoo KOR-6S2B e cuptorul care imbina un pret bun cu un aspect placut: are un design retro, cu linii rotunjite si un aer aparte, care il face sa arate bine lasat la vedere pe blat, nu ascuns. Cu 581 de pareri, e printre cele mai vandute din articol, semn ca nu e doar frumos, ci si de incredere. Are 20 de litri si 700 W, ceva mai putin decat Samsung de 23, deci incape o farfurie normala si incalzeste bine, fara sa fie cel mai rapid. Control digital cu ceas si blocare copii, plus mai multe culori, alb, negru sau rosu, ca sa il potrivesti cu bucataria. Il iei cand vrei un microunde ieftin, dovedit si cu un aspect care iese din comun.' },
+  { g: 'digital', id: 'E1YJKBBBM', rol: 'Cel mai compact', short: 'Hansa 17 l', cap: '17 l', putere: '700 W', ctrl: 'Digital', pret: '451 lei',
+    specs: ['17 litri, cel mai mic din articol', '700 W, adancime de doar 30.6 cm', 'temporizator si semnal la final', 'finisaj alb'],
+    pros: ['Cel mai compact, intra in spatii mici', 'Adancime de doar 30.6 cm, cea mai mica', '292 de pareri, bine verificat', 'Brand cunoscut, cu service'],
+    cons: ['17 litri, incape doar o farfurie mica', '700 W, incalzire mai lenta'],
+    verdict: 'Hansa AMG17M70VH e cel mai mic cuptor din articol, cu 17 litri, si alegerea cand spatiul conteaza mai mult decat capacitatea. Adancimea de doar 30.6 centimetri, cea mai mica din selectie, il face sa incapa pe un blat ingust sau intr-un colt unde un microunde normal de 37 cm nu are loc. Cu 700 W incalzeste corect, dar mai lent decat cele de 800, iar cei 17 litri primesc o farfurie mica spre medie, nu un vas mare. Cu 292 de pareri, e bine verificat, de la un brand cunoscut. Il iei cand ai un spatiu mic si vrei un microunde compact de la un producator de incredere, acceptand capacitatea si puterea mai mici.' },
+  // --- B. Mecanice, simple si ieftine ---
+  { g: 'mecanic', id: 'D65YQDMBM', rol: 'Cel mai vandut mecanic', short: 'Daewoo 20 l', cap: '20 l', putere: '700 W', ctrl: 'Mecanic', pret: '375 lei',
+    specs: ['20 litri, 700 W, doua butoane rotative', 'unul de putere, unul de timp', 'iluminare interioara', 'fara meniuri de invatat'],
+    pros: ['493 de pareri, cel mai vandut mecanic', 'Doua butoane, il rasucesti si merge', 'Simplu, potrivit si pentru varstnici', 'Iluminare interioara'],
+    cons: ['Fara programe automate', 'Fara afisaj sau ceas'],
+    verdict: 'Daewoo KOR-6S20K e cel mai vandut cuptor cu control mecanic din articol, cu 493 de pareri, si alegerea pentru cine vrea simplitate maxima. Are doua butoane rotative, unul pentru putere, unul pentru timp, si atat: le rasucesti, apesi si merge, fara meniuri de invatat si fara ecran de descifrat. E exact ce cauta cineva care vrea doar sa incalzeasca rapid, inclusiv o persoana in varsta care nu se descurca cu comenzile digitale. Cei 20 de litri si 700 W acopera incalzitul si decongelatul, iar iluminarea interioara te lasa sa vezi mancarea. Nu are programe automate sau ceas, dar nici nu are nevoie. Il iei cand vrei cel mai simplu si dovedit microunde cu butoane.' },
+  { g: 'mecanic', id: 'D97XP7MBM', rol: '800 W, control mecanic', short: 'Toshiba 20 l', cap: '20 l', putere: '800 W', ctrl: 'Mecanic', pret: '349 lei',
+    specs: ['20 litri, 800 W, control mecanic', 'temporizator si iluminare interioara', 'incalzire mai rapida decat modelele de 700 W', 'brand japonez cunoscut'],
+    pros: ['800 W la control mecanic, incalzire rapida', 'Sub 350 de lei', '201 pareri, bine verificat', 'Simplu, cu doua butoane'],
+    cons: ['Fara programe sau ceas', 'Fara grill'],
+    verdict: 'Toshiba MW-MM20P imbina simplitatea controlului mecanic cu o putere de 800 W, mai mare decat a majoritatii cuptoarelor cu butoane, care stau la 700. Diferenta se vede in viteza: incalzeste si decongeleaza mai repede, pastrand in acelasi timp folosirea simpla, cu doua butoane rotative, fara meniuri. La sub 350 de lei si cu 201 pareri, e o alegere solida pentru cine vrea un microunde rapid, dar fara complicatii digitale, de la un brand japonez cunoscut. Are temporizator si iluminare interioara, dar nu programe sau ceas. Il iei cand vrei control mecanic simplu, dar cu incalzire mai rapida decat la modelele obisnuite de 700 W.' },
+  { g: 'mecanic', id: 'DZL0P4YBM', rol: 'Accesibil, mecanic', short: 'Heinner 20 l', cap: '20 l', putere: '700 W', ctrl: 'Mecanic', pret: '286 lei',
+    specs: ['20 litri, 700 W, control mecanic', 'temporizator si semnal la final', 'finisaj argintiu', 'se pune si in alb sau negru'],
+    pros: ['Sub 290 de lei, printre cele mai ieftine', '153 de pareri, bine verificat pentru pret', 'Control mecanic simplu', 'Vine in alb, negru sau argintiu'],
+    cons: ['700 W, incalzire mai lenta', 'Dotari minime'],
+    verdict: 'Heinner HMW-MD20M e microundele mecanic ieftin si fara pretentii, sub 290 de lei, pentru cine vrea doar sa incalzeasca si sa decongeleze, fara sa cheltuie mult. Are 20 de litri, 700 W si doua butoane rotative, exact minimul necesar, plus semnal sonor la final. Cu 153 de pareri, e bine verificat pentru zona lui de pret, iar faptul ca vine in alb, negru sau argintiu il face usor de potrivit cu bucataria. Nu asteptata programe, ceas sau grill, e un aparat de baza care isi face treaba. Il iei cand vrei un microunde mecanic ieftin de la un brand cu service, pentru incalzit si decongelat, si nu ai nevoie de nimic in plus.' },
+  { g: 'mecanic', id: 'DHY65NMBM', rol: 'Cel mai ieftin din articol', short: 'Samus 20 l', cap: '20 l', putere: '700 W', ctrl: 'Mecanic', pret: '264 lei',
+    specs: ['20 litri, 700 W, 6 niveluri de putere', 'temporizator de 30 de minute', 'iluminare interioara', 'control mecanic'],
+    pros: ['Cel mai ieftin din articol, sub 270 de lei', 'Nota 4.79, printre cele mai mari', '6 niveluri de putere, mai mult reglaj decat pare', 'Vine in alb, negru sau argintiu'],
+    cons: ['Doar 94 de pareri', 'Dotari de baza'],
+    verdict: 'Samus SMC-20M e cel mai ieftin cuptor din articol, sub 270 de lei, si surprinde prin nota 4.79, printre cele mai mari, semn ca la pretul asta ofera mai mult decat te-ai astepta. Are 20 de litri, 700 W si, spre deosebire de multe mecanice simple, 6 niveluri de putere, deci controlezi mai fin cat de tare incalzesti, plus un temporizator de 30 de minute si iluminare interioara. E un microunde de baza, cu control mecanic, dar bine facut pentru bani putini, de la un brand romanesc. Are mai putine pareri, 94, decat modelele consacrate, dar nota buna. Il iei cand vrei cel mai mic pret posibil pe un microunde functional si bine notat.' },
+  // --- C. Cu grill sau mai mari ---
+  { g: 'grill', id: 'DC3QQSBBM', rol: 'Cel mai bine notat cu grill', short: 'Samsung grill 23 l', cap: '23 l', putere: '800 W + grill', ctrl: 'Digital', pret: '550 lei',
+    specs: ['23 litri, 800 W plus grill', 'Auto cook, mentinere la cald, Mod Eco', 'elimina mirosurile, afisare ceas', 'grill pentru rumenit si gratinat'],
+    pros: ['Nota 4.77 pe 161 de pareri, cel mai bine notat cu grill', 'Are grill, rumeneste si gratineaza', 'Programe Auto cook si mentinere la cald', 'Acelasi corp bun ca modelul fara grill'],
+    cons: ['Mai scump cu circa 100 de lei decat varianta fara grill', 'Grillul foloseste mai mult curent'],
+    verdict: 'Samsung MG23K3515 e varianta cu grill a celui mai vandut model, si cea mai buna alegere daca vrei sa faci mai mult decat sa incalzesti. Grillul adauga un element de incalzire care rumeneste si crocaneste, deci poti gratina cascaval, rumeni o bucata de pui sau da o crusta unei portii, lucruri pe care un microunde simplu nu le face. Sub el are aceeasi baza buna Samsung: 23 de litri, 800 W, programe Auto cook, mentinere la cald, Mod Eco si eliminarea mirosurilor. Cu nota 4.77 pe 161 de pareri, e cel mai bine cotat model cu grill din articol. Costa cu circa 100 de lei mai mult decat varianta fara grill. Il iei cand vrei un microunde care si rumeneste, de la un brand de incredere.' },
+  { g: 'grill', id: 'D04SGMMBM', rol: 'Grill accesibil', short: 'Toshiba grill 20 l', cap: '20 l', putere: '800 W + grill 1000 W', ctrl: 'Mecanic', pret: '412 lei',
+    specs: ['20 litri, 800 W plus grill de 1000 W', '5 niveluri de putere', 'iluminare interioara, temporizator', 'cel mai ieftin cu grill'],
+    pros: ['Cel mai ieftin cuptor cu grill din articol', 'Grill de 1000 W, rumeneste bine', '800 W pentru microunde, incalzire rapida', '114 pareri, bine verificat'],
+    cons: ['Control mecanic, fara programe automate', 'Nota 4.49, cea mai mica din grupa'],
+    verdict: 'Toshiba MW2-MG20 e cea mai ieftina cale de a avea un microunde cu grill, sub 415 lei, cu circa 135 mai putin decat Samsung-ul cu grill. Are 800 W pentru microunde si un grill de 1000 W care rumeneste si crocaneste, plus 5 niveluri de putere pentru reglaj. Diferenta fata de Samsung e controlul mecanic, cu butoane, in loc de digital cu programe, deci setezi manual, dar folosirea ramane simpla. Cu 114 pareri e bine verificat, iar nota 4.49, cea mai mica din grupa, arata experiente ceva mai amestecate, dar solide. Il iei cand vrei un microunde cu grill la cel mai mic pret si nu ai nevoie de programe automate.' },
+  { g: 'grill', id: 'DRL0P4YBM', rol: 'Cel mai mare si mai puternic', short: 'Heinner 25 l', cap: '25 l', putere: '900 W', ctrl: 'Digital', pret: '388 lei',
+    specs: ['25 litri, cel mai incapator din articol', '900 W, cea mai mare putere', 'control digital, incalzire rapida', 'blocare acces copii'],
+    pros: ['25 de litri, cel mai mult spatiu din articol', '900 W, cea mai mare putere, incalzire rapida', 'Sub 390 de lei pentru capacitate si putere', 'Control digital cu incalzire rapida'],
+    cons: ['Fara grill', 'Doar 91 de pareri'],
+    verdict: 'Heinner HMW-MD25D iese in fata prin doua cifre: 25 de litri, cea mai mare capacitate din articol, si 900 W, cea mai mare putere. Practic, e microundele pentru cine incalzeste vase mari sau portii multe si vrea sa se faca repede. Cei 25 de litri incap o farfurie mare sau un vas de caserola, iar cei 900 W scurteaza timpul fata de modelele de 700-800. Are control digital cu incalzire rapida si blocare copii, la sub 390 de lei, un pret foarte bun pentru ce ofera. Nu are grill si are doar 91 de pareri, mai putine decat modelele consacrate. Il iei cand vrei cel mai mult spatiu si cea mai mare putere, la un pret accesibil, fara sa ai nevoie de grill.' },
+  { g: 'grill', id: 'EWS6NBBBM', rol: 'Grill premium, de la brand', short: 'Samsung grill premium', cap: '23 l', putere: '800 W + grill 1100 W', ctrl: 'Digital', pret: '1400 lei',
+    specs: ['23 litri, 800 W plus grill de 1100 W', 'control digital cu Auto cook si Mod Eco', 'finisaj si constructie premium', 'grill de cea mai mare putere din articol'],
+    pros: ['Grill de 1100 W, cel mai puternic din articol', 'Constructie si finisaj premium Samsung', 'Programe Auto cook si Mod Eco', 'Elimina mirosurile din interior'],
+    cons: ['Cel mai scump din articol, peste 1400 de lei', 'Samsung MG23K3515 face aproape la fel la o treime din pret'],
+    verdict: 'Samsung MG23F301 e varful de gama din articol: 23 de litri, 800 W si un grill de 1100 W, cel mai puternic, cu finisaj si constructie premium. Are toate programele Samsung, Auto cook, Mod Eco, eliminarea mirosurilor, si arata scump. Trebuie spus insa foarte clar, ca sa nu platesti degeaba: la peste 1400 de lei, e de aproape trei ori mai scump decat Samsung MG23K3515, care are tot 23 de litri, tot 800 W, tot grill si o nota mai mare, 4.77, la 550 de lei. Diferenta o fac finisajul si cateva detalii, nu functia. Il iei doar daca pui pret pe varful de gama si pe aspectul premium al brandului; altfel, modelul de 550 de lei face aceeasi treaba mult mai ieftin.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const DIG = PICKS.filter(x => x.g === 'digital');
+const MEC = PICKS.filter(x => x.g === 'mecanic');
+const GRILL = PICKS.filter(x => x.g === 'grill');
+
+const hero = '/imagini/articole/cele-mai-bune-cuptoare-cu-microunde.webp';
+const figDig = '/imagini/articole/micro-digitale.webp';
+const figMec = '/imagini/articole/micro-mecanice.webp';
+const figGrill = '/imagini/articole/micro-grill.webp';
+const published = '2026-07-22T20:21:44+03:00';
+
+const faq = [
+  { question: 'Ce diferenta e intre un microunde de blat si unul incorporabil?', answer: 'Un microunde de blat, sau de sine statator, se aseaza pe blat, pe un raft sau pe o masa si merge bagat direct in priza, fara montaj. Il muti oricand si e mai ieftin. Unul incorporabil se monteaza ascuns intr-un corp de mobilier, in spatele unei rame, pentru un aspect uniform in bucatariile moderne, dar cere o nisa dedicata si costa mai mult. Daca vrei doar un microunde functional pe care il pui unde ai loc, ia unul de blat, ca cele din acest articol. Daca renovezi bucataria si vrei fronturi continue, uita-te la modelele incorporabile, care au articolul lor.' },
+  { question: 'De cati wati am nevoie la un microunde?', answer: 'Puterea, in wati, determina cat de repede se incalzeste mancarea. Modelele obisnuite au 700-800 W, iar cateva 900. Un minim rezonabil e 700 W; la atat, incalzirea e putin mai lenta, dar suficienta pentru uz casnic. La 800 W simti diferenta la viteza, mai ales pe portii mari, iar la 900, cum e Heinner de 25 de litri din articol, incalzesti si mai repede. Pentru majoritatea oamenilor, 700-800 W acopera tot ce fac cu un microunde: incalzit, decongelat, topit unt sau ciocolata. Nu are rost sa platesti mult in plus doar pentru wati.' },
+  { question: 'Control mecanic sau digital?', answer: 'Depinde de cat de simplu il vrei. Controlul mecanic are doua butoane rotative, unul de putere si unul de timp: le rasucesti, apesi si merge, fara meniuri, robust si potrivit pentru cine vrea zero complicatii, inclusiv pentru varstnici. Controlul digital are afisaj, ceas, programe automate care aleg singure timpul si puterea pentru feluri comune, decongelare rapida si adesea un mod economic. Daca vrei doar sa incalzesti simplu, ia mecanic, e si mai ieftin. Daca vrei programe, precizie si un aspect mai modern, ia digital. Ambele incalzesc la fel de bine; difera doar felul in care le comanzi.' },
+  { question: 'Am nevoie de grill la microunde?', answer: 'Doar daca vrei sa faci mai mult decat sa incalzesti. Un microunde simplu incalzeste si decongeleaza prin unde, dar nu rumeneste, deci pizza iese moale si pui nu se crocaneste. Unul cu grill are in plus un element de incalzire care rumeneste si crocaneste suprafata: gratineaza cascaval, da o crusta unei portii, rumeneste o bucata de pui. Multe au si un mod combinat, cu microunde si grill deodata. Daca folosesti aparatul strict pentru incalzit si decongelat, nu ai nevoie de grill si economisesti. Daca vrei sa si gratinezi ocazional, merita cei circa 100 de lei in plus.' },
+  { question: 'Cat de mare sa fie, in litri?', answer: 'Capacitatea uzuala e de 17-25 de litri, si conteaza la ce farfurie sau vas incape. Un model de 17-20 de litri primeste o farfurie normala si e potrivit pentru o persoana, un cuplu sau spatii mici. Unul de 23-25 de litri incape o farfurie mare sau un vas de caserola fara sa atinga peretii, si e mai comod pentru o familie sau cand incalzesti portii mari. Tine cont ca microundele mai mari sunt si mai late si mai adanci, asa ca masoara blatul unde il pui, mai ales adancimea, care la unele ajunge la 39 cm.' },
+  { question: 'Ce inseamna programele Auto cook si Mod Eco?', answer: 'Auto cook, sau gatire automata, e un set de programe care aleg singure puterea si timpul pentru feluri comune: incalzesti o portie, decongelezi o bucata de carne sau topesti ceva, iar aparatul stie cat sa dea, fara sa ghicesti tu. E util ca sa nu supraincalzesti sau sa lasi mancarea rece pe mijloc. Modul Eco reduce consumul de energie cand aparatul sta nefolosit, oprind afisajul si consumul din standby, care la un aparat lasat mereu in priza se aduna pe an. Sunt functii ale modelelor digitale, ca Samsung din articol; la cele mecanice nu exista, dar nici nu sunt esentiale.' },
+  { question: 'Un microunde poate inlocui cuptorul?', answer: 'Nu, sunt aparate diferite. Microundele incalzeste si decongeleaza rapid, prin unde care agita moleculele de apa din mancare, dar nu coace si nu rumeneste ca lumea, nici macar cele cu grill, care doar dau o crusta la suprafata. Un cuptor, electric sau incorporat, coace, frige si gratineaza cu aer cald, deci face preparate adevarate: prajituri, pui, pizza, legume la tava. Cele doua se completeaza: microundele pentru viteza, cuptorul pentru gatit. Daca nu ai cuptor, un cuptor electric de blat e solutia, nu un microunde cu grill.' },
+  { question: 'De ce sunt unele microunde de trei ori mai scumpe?', answer: 'Nu pentru ca incalzesc mai bine, ci pentru brand, finisaj si cateva detalii de constructie. In articol, de exemplu, un Samsung premium cu grill costa peste 1400 de lei, in timp ce un alt Samsung cu grill, cu 23 de litri, 800 W si nota mai mare, costa 550. Diferenta o fac aspectul, materialele si perceptia de gama, nu functia de baza, care e aceeasi. Regula practica: pentru un microunde obisnuit, rar merita sa treci de 500-550 de lei. Sumele mari se justifica doar daca vrei anume un aspect premium sau il asortezi cu alte electrocasnice scumpe de la acelasi brand.' },
+];
+
+const images = [hero, figDig, figMec, figGrill, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune cuptoare cu microunde in ${SEO_YEAR}: cu buton, digitale sau cu grill`}
+  description="12 cuptoare cu microunde de blat comparate pe capacitate, putere, control si grill, de la 264 la 1400 de lei. Cand iei unul cu buton, digital sau cu grill."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune cuptoare cu microunde' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune cuptoare cu microunde</span>
+    </nav>
+
+    <h1>Cele mai bune cuptoare cu microunde</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune cuptoare cu microunde de blat, de la modele simple cu buton la cele digitale cu grill" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Cuptorul cu microunde e electrocasnicul pe care il cumperi o data si nu te mai gandesti la el ani buni, asa ca merita luat unul dovedit de multa lume. Cel mai vandut din selectie, cu peste 580 de pareri, e <strong>Samsung MS23K3513</strong>, 23 de litri, in alb sau negru, de la 433 de lei. Daca vrei ceva si mai ieftin, <strong>Samus de 20 de litri</strong> porneste de la 264. Iar daca vrei sa si rumenesti, nu doar sa incalzesti, <strong>Samsung MG23K3515</strong> adauga un grill, la 550 de lei.</p>
+      <p>La un microunde, alegerea se face pe trei lucruri simple: <strong>control mecanic sau digital</strong>, cu buton sau cu programe; <strong>simplu sau cu grill</strong>, daca vrei si sa rumenesti; si <strong>capacitatea</strong>, 17-20 de litri pentru o persoana sau 23-25 pentru o familie. Puterea, 700-900 W, tine mai mult de viteza decat de rezultat.</p>
+      <p>Le-am grupat exact dupa asta: digitale cu cel mai bun raport, mecanice simple si ieftine, si cele cu grill sau mai mari. Toate sunt modele de blat, de sine statatoare; cele care se monteaza ascuns in mobilier, <strong>microundele incorporabile</strong>, au articolul lor separat. Un pont valabil peste tot: rar merita sa treci de 550 de lei pe un microunde.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#digital">Digitale, cel mai bun raport</a></li>
+        <li><a href="#mecanic">Mecanice, simple si ieftine</a></li>
+        <li><a href="#grill">Cu grill sau mai mari</a></li>
+        <li><a href="#control">Control mecanic sau digital</a></li>
+        <li><a href="#grill-info">Cu grill sau simplu</a></li>
+        <li><a href="#capacitate">Capacitate si putere</a></li>
+        <li><a href="#vs">Microunde, cuptor sau friteuza cu aer cald</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Putere</th><th>Control</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.putere}</td>
+              <td>{x.ctrl}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="digital">Digitale, cel mai bun raport</h2>
+    <p>Astea sunt microundele cu afisaj si programe, care fac cel mai mult sens pentru majoritatea: setezi timp si putere precis, ai programe automate si decongelare rapida. Aici sta cel mai vandut model din articol, in doua culori, plus un design retro si cel mai compact. Le-am asezat de la cel mai vandut la cel mai mic.</p>
+    {DIG.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figDig} alt="Cuptoare cu microunde digitale, Samsung 23 l, Daewoo 20 l retro si Hansa 17 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mecanic">Mecanice, simple si ieftine</h2>
+    <p>Cele cu doua butoane rotative, pentru cine vrea simplitate maxima si pretul cel mai mic. Le rasucesti, apesi si merg, fara meniuri, potrivite si pentru varstnici. Aici gasesti cel mai vandut model mecanic, unul cu 800 W pentru viteza si cel mai ieftin cuptor din articol.</p>
+    {MEC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMec} alt="Cuptoare cu microunde mecanice, Daewoo 20 l, Toshiba 20 l si Samus 20 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="grill">Cu grill sau mai mari</h2>
+    <p>Ultima grupa e pentru cine vrea ceva peste incalzitul simplu: un grill care rumeneste, mai multa capacitate sau mai multa putere. Aici intra cel mai bine notat model cu grill, cel mai ieftin cu grill, cel mai mare din articol si un premium pe care merita sa il privesti cu ochi critic.</p>
+    {GRILL.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figGrill} alt="Cuptoare cu microunde cu grill sau mai mari, Samsung 23 l grill, Toshiba 20 l grill si Heinner 25 l" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-cuptoare-micro').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate cuptoarele cu microunde la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="control">Control mecanic sau digital</h2>
+    <p>E prima decizie, si tine de cum vrei sa comanzi aparatul, nu de cat de bine incalzeste, pentru ca ambele fac la fel treaba de baza.</p>
+    <ul>
+      <li><strong>Mecanic.</strong> Doua butoane rotative, unul de putere, unul de timp. Le rasucesti, apesi si merge, fara meniuri de invatat. Robust, ieftin si simplu, potrivit pentru cine vrea zero complicatii, inclusiv pentru persoane in varsta. In articol, Daewoo, Toshiba, Heinner si Samus.</li>
+      <li><strong>Digital.</strong> Afisaj, ceas, reglaj precis, programe automate care aleg singure timpul si puterea, decongelare rapida si adesea un mod economic. Mai multe posibilitati si un aspect mai modern. Samsung, Daewoo digital si Heinner de 25 l.</li>
+    </ul>
+    <p>Nu exista o alegere gresita: daca vrei simplitate si pret mic, mecanic; daca vrei programe si precizie, digital. Decizi dupa cine il foloseste si cat de multe functii vrei.</p>
+
+    <h2 id="grill-info">Cu grill sau simplu</h2>
+    <p>A doua decizie: ai nevoie doar sa incalzesti, sau si sa rumenesti? De asta depinde daca iei un model cu grill sau unul simplu.</p>
+    <p>Un microunde <strong>simplu</strong> incalzeste si decongeleaza prin unde, dar nu rumeneste, deci pizza iese moale si pui nu se crocaneste. E tot ce ai nevoie daca folosesti aparatul strict pentru incalzit portii, decongelat si topit.</p>
+    <p>Un microunde <strong>cu grill</strong> are in plus un element de incalzire care rumeneste si da o crusta la suprafata: gratineaza cascaval, rumeneste pui, crocaneste o portie. Multe au si un mod combinat, cu microunde si grill in acelasi timp. Costa cu circa 100 de lei mai mult si foloseste ceva mai mult curent cand e pornit grillul. Il iei daca vrei sa si gratinezi ocazional; daca nu, un model simplu e mai ieftin si suficient.</p>
+
+    <h2 id="capacitate">Capacitate si putere</h2>
+    <p>Doua cifre spun cat de mare si cat de rapid e microundele.</p>
+    <p><strong>Capacitatea</strong>, in litri, arata ce vas incape. Un model de 17-20 de litri primeste o farfurie normala, potrivit pentru o persoana, un cuplu sau spatii mici. Unul de 23-25 de litri incape o farfurie mare sau un vas de caserola fara sa atinga peretii, mai comod pentru o familie. Retine ca microundele mai mari sunt si mai late si mai adanci, deci masoara blatul, mai ales adancimea, care ajunge la unele la 39 de centimetri.</p>
+    <p><strong>Puterea</strong>, in wati, tine de viteza. Modelele obisnuite au 700-800 W, cateva 900. La 700 W incalzesti corect, dar mai lent; la 800-900 se face mai repede, mai ales pe portii mari. Pentru majoritatea, 700-800 W acopera tot ce faci cu un microunde, deci nu are rost sa platesti mult in plus doar pentru wati.</p>
+
+    <h2 id="vs">Microunde, cuptor sau friteuza cu aer cald</h2>
+    <p>Sunt trei aparate confundate des, dar cu roluri diferite, si merita clarificat, ca sa nu cumperi ce nu iti trebuie.</p>
+    <p><strong>Microundele</strong> incalzeste si decongeleaza rapid, prin unde care agita apa din mancare. E pentru viteza. Nu coace si nu rumeneste ca lumea, nici cele cu grill, care doar dau o crusta la suprafata.</p>
+    <p><strong>Cuptorul</strong>, electric de blat sau incorporat, coace, frige si gratineaza cu aer cald, deci face preparate adevarate: prajituri, pui, pizza. Daca nu ai cuptor, un <a href="/cele-mai-bune-cuptoare-electrice-de-blat/">cuptor electric de blat</a> e solutia, nu un microunde.</p>
+    <p><strong>Friteuza cu aer cald</strong>, sau air fryer, circula aer foarte fierbinte ca sa iasa mancarea crocanta cu putin ulei, buna pentru cartofi si gustari. E <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o categorie aparte</a>. Cele trei se completeaza: microundele pentru viteza, cuptorul pentru gatit, friteuza pentru crocant.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Platesti mult pentru brand.</strong> Un microunde premium poate costa de trei ori cat unul care face la fel. Rar merita sa treci de 550 de lei.</li>
+      <li><strong>Iei cu grill fara sa ai nevoie.</strong> Daca doar incalzesti, grillul e bani in plus degeaba. Il vrei doar daca gratinezi.</li>
+      <li><strong>Alegi 17 litri pentru o familie.</strong> O farfurie mare sau un vas de caserola cer 23-25 de litri. Cel mic e pentru o persoana.</li>
+      <li><strong>Nu masori adancimea blatului.</strong> Microundele mai mari ajung la 39 cm adancime si nu incap oriunde. Masoara inainte.</li>
+      <li><strong>Astepti ca microundele sa coaca.</strong> Nu coace si nu rumeneste ca un cuptor. Pentru gatit real, ai nevoie de cuptor, nu de microunde cu grill.</li>
+      <li><strong>Iei mecanic cand vrei programe, sau invers.</strong> Decide intai daca vrei simplitatea butoanelor sau precizia meniurilor digitale.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la cuptoarele cu microunde de blat in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca acelasi microunde apare adesea in mai multe culori, cu coduri diferite si preturi apropiate. Samsung MS23K3513, de exemplu, apare in alb, negru si argintiu; l-am trecut o data si am semnalat ca varianta neagra e mai ieftina si mai bine notata.</p>
+    <p><strong>Le-am grupat dupa control si dotari</strong>, digitale, mecanice si cu grill, pentru ca astea sunt deciziile care conteaza la un microunde, urmate de capacitate. Am comparat specificatiile reale din fise, capacitatea, puterea, tipul de control, prezenta grillului si a programelor, dimensiunile, si am semnalat clar unde un pret mai mare nu aduce nimic in plus la functie, cum e la modelul premium de peste 1400 de lei fata de cel de 550.</p>
+    <p>Am acoperit doar modelele <strong>de blat</strong>; cele incorporabile, care se monteaza in mobilier, au articolul lor. Nu testam aparatele in laborator si nu pretindem asta: ne bazam pe pareri, specificatii de la producator si documentare. Un microunde sta bine langa restul electrocasnicelor de bucatarie, de la <a href="/cele-mai-bune-cuptoare-electrice-de-blat/">un cuptor electric</a> la <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o friteuza cu aer cald</a>.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 264 la peste 1400 de lei, dar adevarul e ca grosul valorii sta pana in 550.</p>
+    <p><strong>Sub 400 de lei</strong> gasesti modelele mecanice simple, Samus, Heinner, Toshiba, Daewoo, si chiar unele digitale, ca Daewoo retro sau Samsung de 23 l in negru. Fac tot ce trebuie un microunde: incalzesc, decongeleaza, unele au si programe.</p>
+    <p><strong>Intre 400 si 550 de lei</strong> e zona cu cel mai bun echilibru: Samsung de 23 l alb, cel mai vandut, Hansa compact, Heinner de 25 l cel mai mare, Toshiba cu grill si Samsung cu grill, cel mai bine notat cu grill. Aici alegi in functie de ce vrei in plus, grill, capacitate sau brand.</p>
+    <p><strong>Peste 550 de lei</strong> intri in premium, dar cu grija: un Samsung cu grill de peste 1400 de lei face aproape la fel ca cel de 550. Sumele mari se justifica doar pentru aspect si brand, nu pentru functie. Pentru un microunde obisnuit, nu ai motiv sa treci de 550 de lei.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-cuptoare-cu-microunde" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-cuptoare-cu-microunde" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

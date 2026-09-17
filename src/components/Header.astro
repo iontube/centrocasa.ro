@@ -1,11 +1,13 @@
 ---
-const categories = [
-  { name: 'Gradinarit', slug: 'gradinarit-unelte' },
-  { name: 'Mobilier Gradina', slug: 'mobilier-gradina' },
-  { name: 'Electrocasnice', slug: 'electrocasnice-casa' },
-  { name: 'Decoratiuni', slug: 'decoratiuni-casa' },
-  { name: 'Curatenie', slug: 'curatenie-intretinere' }
-];
+import { categories as allCategories } from '../lib/categories.mjs';
+import keywordsData from '../../keywords.json';
+import { visibleArticles } from '../lib/articles.mjs';
+
+// Aratam in nav doar categoriile care au macar un articol. O categorie noua apare
+// automat aici cand primeste primul articol — pana atunci n-o linkam sitewide,
+// ca sa nu trimitem crawlerul spre o pagina de listare goala.
+const _populated = new Set(visibleArticles(keywordsData.completed).map(a => a.categorySlug));
+const categories = allCategories.filter(c => _populated.has(c.slug));
 
 const currentPath = Astro.url.pathname;
 ---
@@ -18,10 +20,9 @@ const currentPath = Astro.url.pathname;
       </a>
 
       <nav class="nav-desktop">
-        <a href="/" class={`nav-link ${currentPath === '/' ? 'active' : ''}`}>Acasa</a>
         {categories.map(cat => (
           <a href={`/${cat.slug}/`} class={`nav-link ${currentPath.includes(cat.slug) ? 'active' : ''}`}>
-            {cat.name}
+            {cat.short || cat.name}
           </a>
         ))}
       </nav>
@@ -39,7 +40,7 @@ const currentPath = Astro.url.pathname;
   <nav class="mobile-nav" id="mobile-nav">
     <a href="/" class="mobile-nav-link">Acasa</a>
     {categories.map(cat => (
-      <a href={`/${cat.slug}/`} class="mobile-nav-link">{cat.name}</a>
+      <a href={`/${cat.slug}/`} class="mobile-nav-link">{cat.short || cat.name}</a>
     ))}
     <a href="/contact/" class="mobile-nav-link">Contact</a>
   </nav>

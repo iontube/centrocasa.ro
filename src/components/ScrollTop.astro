@@ -1,0 +1,94 @@
+---
+// Buton "inapoi sus". Articolele au 5000+ cuvinte, iar pe mobil derularea inapoi
+// pana la meniu dureaza. Apare abia dupa ce ai coborat destul cat sa fie util.
+---
+
+<button class="scroll-top" id="scroll-top" type="button" aria-label="Inapoi sus" hidden>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 19V5M5 12l7-7 7 7"/>
+  </svg>
+</button>
+
+<style>
+  .scroll-top {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 9998;            /* sub bannerul de cookies (9999), ca sa nu il acopere */
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-gray-200, #e7e5e4);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--color-primary-700, #15803d);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .14);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .scroll-top[hidden] { display: none; }
+  .scroll-top.is-visible { opacity: 1; transform: translateY(0); }
+  .scroll-top:hover { box-shadow: 0 6px 22px rgba(0, 0, 0, .2); }
+  .scroll-top:focus-visible { outline: 3px solid var(--color-primary-500, #22c55e); outline-offset: 2px; }
+
+  /* cand bannerul de cookies e afisat, ridicam butonul ca sa nu se suprapuna pe mobil */
+  .scroll-top.above-banner { bottom: calc(16px + var(--cookie-h, 76px)); }
+
+  @media (max-width: 640px) {
+    .scroll-top { right: 12px; bottom: 12px; width: 42px; height: 42px; }
+    .scroll-top.above-banner { bottom: calc(12px + var(--cookie-h, 92px)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-top { transition: none; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('scroll-top');
+    if (!btn) return;
+    var banner = document.getElementById('cookie-banner');
+    var PRAG = 700;
+
+    function pozitie() {
+      // bannerul de cookies e fixat jos si ar acoperi butonul pe ecrane mici;
+      // ii masuram inaltimea reala si ridicam butonul deasupra lui
+      var vizibil = banner && banner.classList.contains('show');
+      btn.classList.toggle('above-banner', !!vizibil);
+      if (vizibil) document.documentElement.style.setProperty('--cookie-h', banner.offsetHeight + 12 + 'px');
+    }
+
+    var tick = false;
+    function onScroll() {
+      if (tick) return;
+      tick = true;
+      requestAnimationFrame(function () {
+        var arata = window.scrollY > PRAG;
+        if (arata) { btn.hidden = false; requestAnimationFrame(function () { btn.classList.add('is-visible'); }); }
+        else { btn.classList.remove('is-visible'); }
+        if (arata) pozitie();
+        tick = false;
+      });
+    }
+
+    btn.addEventListener('transitionend', function (e) {
+      if (e.propertyName === 'opacity' && !btn.classList.contains('is-visible')) btn.hidden = true;
+    });
+
+    btn.addEventListener('click', function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      // dupa derulare, focusul se muta la inceputul paginii pentru navigare cu tastatura
+      var h1 = document.querySelector('h1');
+      if (h1) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); }
+    });
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', pozitie, { passive: true });
+    onScroll();
+  })();
+</script>

@@ -1,232 +1,342 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Masina de spalat rufe automata",
-  excerpt: "Salutare, dragi vecini pasionati de curatenie si confort! Astazi vorbim despre un subiect care ne da batai de cap la un moment dat: masina de spalat rufe automata. Cand vechiul aparat incepe sa faca figuri sau pur si simplu vrem o upgrade, ne trezim in fata unei alegeri deloc usoare. Eu am trecut prin asta de cateva ori si am invatat multe pe parcurs.",
-  image: "/images/articles/masina-de-spalat-rufe-automata.webp",
-  category: "Electrocasnice Casa",
-  categorySlug: "electrocasnice-casa",
-  date: "2026-01-16T14:24:12.842Z",
-  modifiedDate: "2026-01-30T14:24:12.947Z",
-  author: "Cristian Popa",
-  authorRole: "Specialist Electrocasnice",
-  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
-};
-
-const faq = [
-  { question: "Cat de des trebuie sa curat masina de spalat?", answer: "Recomand sa cureti masina de spalat cel putin o data pe luna. Acorda atentie sertarului de detergent, garniturii usii si ruleaza un program la temperatura inalta cu un detergent special sau otet pentru a preveni acumularea de bacterii si mirosuri neplacute." },
-  { question: "Ce inseamna viteza de stoarcere (rpm) si de ce e importanta?", answer: "Viteza de stoarcere, masurata in rotatii pe minut (rpm), indica cat de repede se invarte tamburul la finalul ciclului de spalare. O viteza mai mare stoarce hainele mai eficient, reducand timpul de uscare. 1200-1400 rpm sunt considerate optime pentru majoritatea tesaturilor." },
-  { question: "Pot folosi detergent normal de rufe la o masina automata?", answer: "Nu, este foarte important sa folosesti detergent special pentru masini de spalat automate. Acesta are o formula cu spuma redusa (low foam), esentiala pentru functionarea corecta a masinii. Detergentul normal poate produce prea multa spuma, afectand performanta si putand deteriora aparatul." },
-  { question: "Cat de importanta este clasa energetica?", answer: "Clasa energetica este foarte importanta deoarece indica eficienta masinii in consumul de energie electrica si apa. Modelele cu o clasa energetica superioara (A, B, C in noile clasificari) consuma mai putine resurse, ceea ce se traduce printr-o factura mai mica la utilitati pe termen lung." },
-  { question: "Ce fac daca masina de spalat scoate un miros neplacut?", answer: "Mirosurile neplacute apar de obicei din cauza acumularii de reziduuri, bacterii si mucegai. Incearca sa rulezi un program la temperatura inalta (60-90 grade Celsius) cu otet sau un detergent special pentru curatarea masinii. De asemenea, asigura-te ca usuci rufele imediat dupa spalare si lasi usa masinii intredeschisa intre utilizari." },
-  { question: "Ce capacitate ar trebui sa aleg pentru o familie de 4 persoane?", answer: "Pentru o familie de 4 persoane, este recomandat sa alegi o masina de spalat automata cu o capacitate de minim 8-9 kg. Acest lucru iti va permite sa speli cantitati mai mari de rufe o data, economisind timp si energie, fara a supraaglomera tamburul." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de o masina de spalat rufe automata?", id: "de-ce-ai-nevoie-de-o-masina-de-spalat-rufe-automata" },
-  { title: "Top recomandari - Masini de spalat rufe automata", id: "top-recomandari---masini-de-spalat-rufe-automata" },
-  { title: "Cum alegi corect masina de spalat rufe automata?", id: "cum-alegi-corect-masina-de-spalat-rufe-automata" },
-  { title: "Avantaje si dezavantaje ale masinii de spalat rufe automata", id: "avantaje-si-dezavantaje-ale-masinii-de-spalat-rufe-automata" },
-  { title: "Sfaturi practice din experienta mea cu masina de spalat automata", id: "sfaturi-practice-din-experienta-mea-cu-masina-de-spalat-automata" },
-  { title: "Parerea mea finala despre masina de spalat rufe automata", id: "parerea-mea-finala-despre-masina-de-spalat-rufe-automata" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['masina-spalat-rufe'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- 7-8 kg ---
+  { g: 'mica', id: 'DLGFKBYBM', badge: 'Cel mai bun raport', short: 'Heinner slim 8 kg', cap: '8 kg', rpm: '1400 rpm', ad: '47.5 cm (slim)',
+    specs: ['8 kg, adancime de doar 47.5 cm', '1400 rpm, clasa A, motor inverter', 'functie de abur (Steam)', 'cea mai vanduta gama, nota 4.71'],
+    pros: ['Cel mai mic pret din selectie pentru un inverter cu abur', 'Doar 47.5 cm adancime, incape in spatii stramte', 'Clasa A si motor inverter, consum si zgomot mici', 'Nota mare, 4.71, din sute de pareri pe gama'],
+    cons: ['Brand mai putin cunoscut decat Bosch sau Samsung', 'Fara WiFi sau functii inteligente'],
+    verdict: 'Cel mai bun punct de intrare intr-o masina de spalat moderna, buna si ieftina. Heinner slim are 8 kg, suficient pentru o familie de 2-3 persoane, si o adancime de doar 47.5 cm, adica intra unde un model standard de 60 cm nu are loc, pe un hol, intr-o baie mica sau sub un blat. Are 1400 rpm, deci rufele ies aproape gata de uscat, e clasa A pe noua scala si are motor inverter, care inseamna consum mic, zgomot redus si durata de viata mai mare. In plus, are functie de abur, utila pentru igienizare si pentru mai putine cute. E de la un brand mai putin sonor si nu are functii inteligente, dar la acest pret conteaza ce face, nu numele. O iei cand vrei cea mai accesibila masina buna, slim, pentru un spatiu mic.' },
+  { g: 'mica', id: 'DG88TPYBM', badge: 'Beko, cu abur', short: 'Beko 7 kg SteamCure', cap: '7 kg', rpm: '1400 rpm', ad: '49.6 cm',
+    specs: ['7 kg, potrivita pentru 1-2 persoane', '1400 rpm, clasa A, ProSmart Inverter', 'SteamCure, igienizare cu abur', 'AddXtra, adaugi rufe dupa pornire'],
+    pros: ['Beko, brand mare cu service extins la noi', 'SteamCure, igienizare cu abur, bun pentru alergii', 'AddXtra, mai poti adauga o haina uitata dupa pornire', 'Motor ProSmart Inverter, silentios si eficient'],
+    cons: ['7 kg, cea mai mica din selectie', 'Nota buna, 4.42, dar nu maxima'],
+    verdict: 'Alegerea daca esti singur sau in doi si vrei un brand mare, cu abur. Beko BM3WFSU are 7 kg, exact cat trebuie pentru 1-2 persoane care spala des si putin, si vine cu SteamCure, functia de abur care igienizeaza hainele fara temperaturi mari, elimina alergenii si reduce cutele, un plus real daca ai piele sensibila sau copii mici. Are 1400 rpm, e clasa A si foloseste motorul ProSmart Inverter, silentios si de durata. Un detaliu practic: AddXtra iti permite sa adaugi o haina uitata chiar dupa ce a pornit ciclul. E cea mai mica din selectie ca volum si are o nota buna, dar nu maxima. O iei cand vrei o masina compacta, cu abur, de la un brand mare cu service la indemana.' },
+  { g: 'mica', id: 'DGJ5KY2BM', badge: 'Bosch, silentioasa', short: 'Bosch WAN2826 8 kg', cap: '8 kg', rpm: '1400 rpm', ad: '59 cm',
+    specs: ['8 kg, 1400 rpm, clasa A', 'EcoSilence Drive, doar 52 dB la spalare', 'Iron Assist, mai putine cute', 'Speed Perfect, cicluri mai rapide'],
+    pros: ['EcoSilence Drive, printre cele mai silentioase, 52 dB', 'Bosch, fiabilitate si constructie de referinta', 'Iron Assist reduce cutele, calci mai putin', 'Speed Perfect scurteaza ciclurile cand te grabesti'],
+    cons: ['Pret de gama premium pentru 8 kg', 'Fara functii inteligente sau WiFi'],
+    verdict: 'Alegerea daca pui pret pe liniste si pe fiabilitate germana. Bosch WAN2826 are 8 kg si un nivel de zgomot de doar 52 dB la spalare, datorita motorului EcoSilence Drive, deci aproape n-o auzi, un avantaj real intr-un apartament sau daca o pornesti seara. Are 1400 rpm, e clasa A si vine cu Iron Assist, care abureste usor rufele la final ca sa ai mai putine cute si sa calci mai putin, plus Speed Perfect pentru cicluri mai scurte cand te grabesti. Bosch e un reper de constructie si durabilitate, iar asta se plateste: e in zona premium pentru 8 kg si nu are functii inteligente. O iei cand vrei o masina silentioasa, solida si de incredere, si esti dispus sa platesti pentru brand si liniste.' },
+  { g: 'mica', id: 'D1C6P3YBM', badge: 'Accesibila, cu abur', short: 'Daewoo 8 kg', cap: '8 kg', rpm: '1400 rpm', ad: '52.7 cm',
+    specs: ['8 kg, 1400 rpm, clasa A', 'motor inverter, Steam Wash', 'Drum Clean, curatare automata a tamburului', 'adancime moderata, 52.7 cm'],
+    pros: ['8 kg cu abur la un pret mic', 'Motor inverter, clasa A, consum redus', 'Steam Wash pentru igienizare fara temperaturi mari', 'Drum Clean, isi curata singura tamburul'],
+    cons: ['Nota 4.41, buna dar nu in top', 'Brand mai putin cunoscut'],
+    verdict: 'O alternativa accesibila la Heinner, tot cu 8 kg si abur. Daewoo DWD-FV5021 are 8 kg, motor inverter si clasa A, la un pret apropiat de modelele de intrare, si aduce Steam Wash, functia de abur pentru igienizare blanda, plus Drum Clean, un program care curata automat tamburul de reziduuri si miros, ca sa tina masina proaspata mai mult timp. Adancimea de 52.7 cm o face mai compacta decat un model standard, desi nu e chiar slim. Nota de la cumparatori e buna, 4.41, fara sa fie in varf, iar brandul e mai putin cunoscut la noi. O iei cand vrei 8 kg cu abur si autocuratare la un pret mic, ca a doua optiune dupa Heinner in zona accesibila.' },
+  // --- 9 kg ---
+  { g: 'noua', id: 'DCGFKBYBM', badge: 'Cel mai bun raport 9 kg', short: 'Heinner slim 9 kg', cap: '9 kg', rpm: '1400 rpm', ad: '49.5 cm (slim)',
+    specs: ['9 kg intr-un corp slim de 49.5 cm', '1400 rpm, clasa A, motor inverter', 'functie de abur (Steam)', 'combinatie rara: capacitate mare, adancime mica'],
+    pros: ['9 kg la doar 49.5 cm adancime, combinatie rara', 'Cel mai mic pret din selectie pentru 9 kg', 'Clasa A, motor inverter si abur', 'Nota mare, 4.71'],
+    cons: ['Fara functii inteligente', 'Brand mai putin cunoscut'],
+    verdict: 'Cea mai buna afacere daca vrei capacitate mare, dar ai spatiu putin. Heinner slim reuseste ceva rar: baga un tambur de 9 kg intr-un corp de doar 49.5 cm adancime, adica ai loc pentru rufele unei familii de 3-4 persoane fara sa cumperi o masina lata de 60 cm. Are 1400 rpm, clasa A, motor inverter si functie de abur, tot ce trebuie la o masina moderna, iar pretul e cel mai mic din selectie pentru 9 kg. Nu are WiFi sau functii inteligente si vine de la un brand mai discret, dar raportul intre capacitate, adancime si pret e greu de egalat. O iei cand vrei cei mai multi kilograme pe cel mai putin spatiu si cel mai mic pret.' },
+  { g: 'noua', id: 'DCLH27YBM', badge: 'Samsung, WiFi', short: 'Samsung 9 kg EcoBubble', cap: '9 kg', rpm: '1400 rpm', ad: '63.5 cm',
+    specs: ['9 kg, 1400 rpm, clasa A', 'Eco Bubble, spuma activa la rece', 'WiFi SmartThings, control din telefon', 'AI Energy, optimizare consum, nota 4.71'],
+    pros: ['Eco Bubble, spala eficient si la temperaturi mici', 'WiFi SmartThings, o pornesti si urmaresti din telefon', 'AI Energy optimizeaza consumul automat', 'Nota mare, 4.71, si design negru elegant'],
+    cons: ['Adancime standard, 63.5 cm', 'Mai scumpa decat Heinner de aceeasi capacitate'],
+    verdict: 'Alegerea daca vrei o masina conectata, de la un brand mare. Samsung WW90CGC are 9 kg si tehnologia Eco Bubble, care transforma detergentul in spuma activa inainte sa atinga rufele, asa ca spala bine si la temperaturi mici, protejand tesaturile si economisind energie. Se conecteaza la WiFi prin SmartThings, deci o pornesti, o programezi si primesti notificare cand a terminat, direct din telefon, iar AI Energy optimizeaza automat consumul. Are nota mare, 4.71, si un design negru placut. In schimb, are adancime standard de 63.5 cm si costa mai mult decat un Heinner de 9 kg. O iei cand vrei tehnologie Samsung, spalare eficienta la rece si control din telefon.' },
+  { g: 'noua', id: 'DJX282MBM', badge: 'Arctic, silentioasa', short: 'Arctic 9 kg', cap: '9 kg', rpm: '1200 rpm', ad: '64 cm',
+    specs: ['9 kg, 1200 rpm, clasa B', 'motor Silent Inverter', 'Antialergic+ si Eco Dose', 'una dintre cele mai vandute, 173 pareri'],
+    pros: ['Motor Silent Inverter, functionare linistita', 'Antialergic+, bun pentru familii cu alergii', 'Foarte bine vanduta, 173 de pareri', 'Arctic, brand din grupul Beko, cu service la noi'],
+    cons: ['1200 rpm, ceva mai putin decat 1400', 'Clasa B, nu A ca restul selectiei'],
+    verdict: 'O masina populara si linistita, pentru cine vrea simplu si de incredere. Arctic AB91223 are 9 kg si un motor Silent Inverter care o face sa mearga discret, plus programe utile ca Antialergic+, gandit pentru familii cu piele sensibila sau alergii. E una dintre cele mai vandute din selectie, cu 173 de pareri, semn ca lumea o cumpara si e multumita, iar Arctic face parte din grupul Beko, deci ai service la noi. Doua compromisuri: centrifugheaza la 1200 rpm, ceva mai putin decat cele de 1400, deci rufele raman un pic mai umede, si e clasa B, nu A ca restul selectiei, adica un consum ceva mai mare. O iei cand vrei o masina de 9 kg silentioasa si verificata, la un pret corect, si nu te deranjeaza clasa B.' },
+  { g: 'noua', id: 'D7MHTFYBM', badge: 'TCL, cu abur', short: 'TCL 9 kg', cap: '9 kg', rpm: '1400 rpm', ad: '56 cm',
+    specs: ['9 kg, 1400 rpm, clasa A', 'motor inverter, Steam Wash', 'Honeycomb Drum, protejeaza tesaturile', 'adancime moderata, 56 cm'],
+    pros: ['9 kg cu abur la un pret bun', 'Honeycomb Drum, tambur care menajeaza rufele', 'Motor inverter si clasa A', 'Adancime de 56 cm, mai compacta decat una standard'],
+    cons: ['Brand nou pe piata locala', 'Nota 4.42, buna fara sa fie in varf'],
+    verdict: 'O alternativa moderna cu abur, la un pret sub brandurile mari. TCL FF0914 are 9 kg, motor inverter si clasa A, plus Steam Wash pentru igienizare si un Honeycomb Drum, un tambur cu structura tip fagure care menajeaza tesaturile si reduce uzura hainelor la spalare. Adancimea de 56 cm o face mai compacta decat o masina standard de 60-64 cm, fara sa fie chiar slim. TCL e un brand relativ nou pe piata locala, in crestere, cu preturi agresive, iar nota de la cumparatori e buna, 4.42. O iei cand vrei 9 kg cu abur si un tambur bland cu hainele, la un pret mai mic decat al brandurilor consacrate.' },
+  // --- 10-11 kg ---
+  { g: 'mare', id: 'DZ0NQCYBM', badge: 'Cel mai vandut', short: 'Heinner 10 kg', cap: '10 kg', rpm: '1400 rpm', ad: '64 cm',
+    specs: ['10 kg, 1400 rpm, clasa A', 'motor inverter cu abur', 'Baby Care Steam, program pentru bebelusi', 'de departe cea mai vanduta, 228 de pareri'],
+    pros: ['De departe cea mai vanduta din selectie, 228 de pareri', '10 kg pentru familii mari, la un pret mic', 'Baby Care Steam, program cu abur pentru hainutele bebelusului', 'Clasa A, motor inverter, abur'],
+    cons: ['Adancime standard, 64 cm', 'Fara WiFi'],
+    verdict: 'Cea mai populara masina din selectie si cel mai mult volum pe banii dati. Heinner HWM-H1014 are 10 kg, deci acopera rufele unei familii mari sau ale cuiva care spala rar si mult, la un pret mult sub brandurile consacrate: e de departe cea mai vanduta din selectie, cu 228 de pareri si nota 4.65, cea mai buna dovada ca isi face treaba. Are 1400 rpm, clasa A, motor inverter si abur, inclusiv un program Baby Care Steam, gandit sa igienizeze cu abur hainutele bebelusilor. Are adancime standard de 64 cm si nu are WiFi, dar la acest pret si cu aceasta capacitate, e greu de batut. O iei cand vrei cel mai mult spatiu de spalare pe cel mai mic pret, pentru o familie mare.' },
+  { g: 'mare', id: 'DWH95PYBM', badge: 'Samsung 11 kg, WiFi', short: 'Samsung 11 kg', cap: '11 kg', rpm: '1400 rpm', ad: '64 cm',
+    specs: ['11 kg, 1400 rpm, clasa A', 'AI EcoBubble si Hygiene Steam', 'Super Speed, un ciclu in 39 de minute', 'WiFi SmartThings, nota 4.7'],
+    pros: ['11 kg, printre cele mai incapatoare din selectie', 'Super Speed spala un ciclu complet in 39 de minute', 'AI EcoBubble si Hygiene Steam, spalare eficienta si igienica', 'WiFi SmartThings si nota mare, 4.7'],
+    cons: ['Pret de brand mare', 'Adancime standard, 64 cm'],
+    verdict: 'Alegerea daca vrei mult spatiu, viteza si tehnologie Samsung. WW11DG5B are 11 kg, printre cele mai mari volume din selectie, si vine cu Super Speed, care spala un ciclu complet in doar 39 de minute cand te grabesti, plus AI EcoBubble pentru spalare eficienta la temperaturi mici si Hygiene Steam pentru igienizare cu abur. Se conecteaza la WiFi prin SmartThings, deci o comanzi si o urmaresti din telefon, si are nota mare, 4.7. Costa cat un brand mare si are adancime standard de 64 cm, deci ai nevoie de spatiu pentru ea. O iei cand vrei capacitate mare, cicluri rapide si tot pachetul de tehnologie Samsung, pentru o familie care spala mult.' },
+  { g: 'mare', id: 'D5YSGRYBM', badge: 'Cel mai mult spatiu, ieftin', short: 'TCL 11 kg', cap: '11 kg', rpm: '1400 rpm', ad: '65 cm',
+    specs: ['11 kg, 1400 rpm, clasa A', 'motor inverter, Steam Wash', 'AddGarment, adaugi rufe dupa pornire', 'Honeycomb Drum, bland cu tesaturile'],
+    pros: ['11 kg la cel mai mic pret pentru aceasta capacitate', 'AddGarment, mai adaugi o haina dupa ce a pornit', 'Motor inverter, clasa A, abur', 'Honeycomb Drum, menajeaza rufele'],
+    cons: ['Adancime mare, 65 cm, cere spatiu', 'Brand nou pe piata locala'],
+    verdict: 'Cea mai ieftina cale spre 11 kg, pentru familii mari cu buget atent. TCL FF1124 are 11 kg, cel mai mult volum din selectie la cel mai mic pret pentru aceasta capacitate, si vine cu motor inverter, clasa A si Steam Wash. Are functia AddGarment, care iti permite sa adaugi o haina uitata dupa ce ciclul a pornit, si un Honeycomb Drum care menajeaza tesaturile. Fiind facuta pentru volum mare, are o adancime de 65 cm, deci cere spatiu, iar TCL e un brand nou la noi, cu preturi mici. O iei cand ai o familie numeroasa si vrei cel mai mult spatiu de spalare posibil, fara sa platesti pretul unui brand consacrat.' },
+  { g: 'mare', id: 'DLFDFMYBM', badge: 'LG, cu AI Direct Drive', short: 'LG 10 kg AI DD', cap: '10 kg', rpm: '1400 rpm', ad: '56.5 cm',
+    specs: ['10 kg, 1400 rpm, clasa A', 'Inverter Direct Drive, motor pe tambur', 'AI DD, adapteaza spalarea la incarcatura', 'Steam si Smart Diagnosis, adancime 56.5 cm'],
+    pros: ['Inverter Direct Drive, motor fara curea, mai durabil si silentios', 'AI DD detecteaza incarcatura si adapteaza spalarea', 'Adancime de 56.5 cm, mai compacta decat multe de 10 kg', 'Steam si Smart Diagnosis, diagnoza din aplicatie'],
+    cons: ['Nota 4.56, buna dar mai putine pareri', 'Pret de gama superioara'],
+    verdict: 'Alegerea daca vrei tehnologia LG Direct Drive intr-o masina de 10 kg. LG F4WR510 foloseste motorul Inverter Direct Drive, montat direct pe tambur, fara curea de transmisie: asta inseamna mai putine piese care se uzeaza, functionare mai silentioasa si o garantie lunga a motorului, marca LG. AI DD detecteaza greutatea si tipul rufelor si adapteaza automat miscarile de spalare ca sa protejeze tesaturile, iar Smart Diagnosis iti spune din aplicatie daca ceva nu e in regula. Are 10 kg intr-un corp de doar 56.5 cm adancime, mai compact decat multe modele de aceeasi capacitate, plus abur. Are nota buna, 4.56, dar din mai putine pareri, si e in gama superioara ca pret. O iei cand vrei durabilitatea si inteligenta motorului Direct Drive, intr-un format relativ compact.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MICA = PICKS.filter(x => x.g === 'mica');
+const NOUA = PICKS.filter(x => x.g === 'noua');
+const MARE = PICKS.filter(x => x.g === 'mare');
+
+const hero = '/images/articles/masina-de-spalat-rufe-automata.webp';
+const figMica = '/imagini/articole/masina-spalat-compacte.webp';
+const figNoua = '/imagini/articole/masina-spalat-9kg.webp';
+const figMare = '/imagini/articole/masina-spalat-mari.webp';
+const published = '2026-07-18T18:14:26+03:00';
+
+const faq = [
+  { question: 'Cati kilograme sa aiba masina de spalat, in functie de cate persoane suntem?', answer: 'Regula se leaga direct de numarul de persoane din casa. O masina de 5-6 kg ajunge pentru 1-2 persoane sau un cuplu fara copii. Cea de 7-8 kg e recomandata pentru o familie de 2-3 membri si e cea mai populara alegere. Modelele de 9-10 kg sunt ideale pentru familii de 3-4 persoane sau pentru cine spala mai rar, dar incarcaturi mari. Peste 10 kg, mergi spre 11-12 kg pentru familii numeroase. Un truc: e mai bine sa iei cu un kilogram-doi peste nevoia curenta decat sub, ca sa nu speli mereu la maxim si sa poti baga si o plapuma sau o pilota.' },
+  { question: 'Ce inseamna turatia de centrifugare si cat sa aleg?', answer: 'Turatia, masurata in rotatii pe minut (rpm), arata cat de tare stoarce masina rufele la final: cu cat e mai mare, cu atat ies mai putin ude si se usuca mai repede. La 1000 rpm rufele raman destul de umede, 1200 rpm e un compromis bun intre pret si eficienta, iar 1400 rpm e standardul recomandat, la care rufele ies aproape gata de uscat. Peste, spre 1600 rpm, intri in zona premium. Aproape toate modelele din selectie au 1400 rpm; exceptia e Arctic, cu 1200 rpm, suficient, dar cu rufe ceva mai umede. Daca nu ai uscator, o turatie mai mare conteaza mai mult.' },
+  { question: 'Cat de importanta e clasa energetica si ce inseamna noua scala?', answer: 'Conteaza mult, pentru ca masina merge ani intregi si diferenta se aduna pe factura. Din martie 2021, etichetele au fost recalibrate de la vechea scala cu A+++ la o scala noua, de la A la G, mai stricta. Pe noua scala, majoritatea masinilor bune sunt clasa A sau B, iar clasa A e minimul rezonabil la o achizitie noua: inseamna consum redus si facturi mai mici. Toate modelele din selectie sunt clasa A, cu o singura exceptie, Arctic, care e clasa B. Nu confunda A-ul de pe noua scala cu vechiul A: sunt standarde diferite, iar A-ul de acum e mai greu de obtinut.' },
+  { question: 'Motorul inverter chiar face diferenta?', answer: 'Da, si e standardul recomandat in 2026. Un motor inverter nu foloseste perii care se uzeaza, ca motoarele clasice, ci un sistem electronic care controleaza precis rotatia. Rezultatul: functioneaza mai silentios, consuma mai putina energie si are o durata de viata mai mare, motiv pentru care producatorii dau adesea garantie extinsa pe el. Toate masinile din selectie au motor inverter, sub diverse denumiri comerciale, de la ProSmart la Silent Inverter sau Direct Drive. Daca vezi o masina foarte ieftina fara inverter, probabil economisesti la cumparare, dar platesti mai mult pe curent si o schimbi mai repede.' },
+  { question: 'Ce e o masina de spalat slim si cand merita?', answer: 'O masina slim are o adancime mai mica decat cei 60-64 cm standard, de obicei sub 50 cm, ca sa incapa in spatii inguste: un hol, o baie mica, sub un blat sau intr-o nisa. Compromisul clasic e ca modelele foarte inguste au si tambur mai mic, dar din selectie exista si exceptii notabile: modelele slim Heinner ofera 8 sau chiar 9 kg la doar 47.5-49.5 cm adancime, o combinatie rara de capacitate mare si adancime mica. Merita cand spatiul e limitat; daca ai unde, o masina standard costa de obicei mai putin la aceeasi capacitate. Masoara nisa, inclusiv usa si furtunele din spate, inainte sa comanzi.' },
+  { question: 'La ce foloseste functia de abur (Steam) si am nevoie de ea?', answer: 'Functia de abur aduce beneficii reale, mai ales pentru familii cu copii mici sau pentru cine are alergii. Aburul igienizeaza hainele fara sa fie nevoie de temperaturi foarte mari, elimina o buna parte din alergeni si acarieni si reduce cutele, ceea ce inseamna ca vei calca mai putin si tesaturile se uzeaza mai incet. Aproape toate modelele din selectie au o forma de abur, de la SteamCure la Hygiene Steam sau Baby Care Steam, ultimul gandit special pentru hainutele bebelusilor. Nu e obligatorie, dar daca ai copii, piele sensibila sau pur si simplu urasti calcatul, merita cautata.' },
+  { question: 'De cat spatiu am nevoie si ce verific inainte sa comand?', answer: 'O masina standard are in jur de 60 cm latime si 60-65 cm adancime, plus loc in spate pentru furtunele de apa si evacuare, care mai adauga cativa centimetri. Inainte sa comanzi, masoara nisa in care o pui, atat latimea si inaltimea, cat si adancimea reala cu furtunele montate, si verifica sa ai priza si racord de apa aproape. Daca spatiul e strans, alege un model slim, ca cele Heinner de 47.5-49.5 cm din selectie. Verifica si pe unde intra masina in casa, usile si coltul de scara, pentru ca la 60 cm latime nu trece oriunde.' },
+  { question: 'Ce buget imi trebuie pentru o masina de spalat buna?', answer: 'O masina buna nu inseamna neaparat scumpa. In selectie, un model accesibil, dar complet, cu inverter, clasa A si abur, porneste de la circa 1400 de lei, cazul modelelor slim Heinner. Brandurile mari, ca Beko, Samsung sau LG, cu tehnologii in plus, WiFi sau Direct Drive, sunt in general intre 2000 si 2600 de lei. Cele premium, ca Bosch sau Samsung de top, trec de 2600 de lei. Peste pretul de raft, tine cont de clasa energetica si de capacitate: o masina ceva mai scumpa, dar clasa A si potrivita ca volum, se poate dovedi mai ieftina in timp decat una ieftina, dar risipitoare sau prea mica.' },
+];
+
+const images = [hero, figMica, figNoua, figMare, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Masina de spalat rufe automata - CentroCasa"
-  description="Salutare, dragi vecini pasionati de curatenie si confort! Astazi vorbim despre un subiect care ne da batai de cap la un moment dat: masina de spalat rufe automata. Cand vechiul aparat incepe sa faca figuri sau pur si simplu vrem o upgrade, ne trezim in fata unei alegeri deloc usoare. Eu am trecut prin asta de cateva ori si am invatat multe pe parcurs."
-  image="/images/articles/masina-de-spalat-rufe-automata.webp"
+  title="Cele mai bune masini de spalat rufe automate in 2026: pe capacitate, clasa si buget"
+  description="Care sunt cele mai bune masini de spalat rufe automate in 2026, pe capacitate: compacte de 7-8 kg, modele de 9 kg pentru familie si masini mari de 10-11 kg, de la Heinner, Beko, Bosch, Samsung, Arctic, TCL si LG, comparate pe clasa energetica, turatii, adancime si abur. Plus cum alegi si de cat spatiu ai nevoie."
+  image={hero}
   type="article"
-  publishedTime="2026-01-16T14:24:12.842Z"
-  modifiedTime="2026-01-30T14:24:12.947Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Cristian Popa"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune masini de spalat rufe automate' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/electrocasnice-casa/">Electrocasnice Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Masina de spalat rufe automata</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune masini de spalat rufe automate</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/electrocasnice-casa/" class="article-category">Electrocasnice Casa</a>
-        <span class="article-date">28 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Masina de spalat rufe automata</h1>
-    </header>
+    <h1>Cele mai bune masini de spalat rufe automate</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/masina-de-spalat-rufe-automata.webp" alt="Masina de spalat rufe automata" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune masini de spalat rufe automate: compacte, de 9 kg si de familie mare" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-o-masina-de-spalat-rufe-automata">
-        <h2>De ce ai nevoie de o masina de spalat rufe automata?</h2>
-        <p>Sa fim sinceri, traiul modern fara o masina de spalat automata e aproape imposibil. E ca si cum te-ai intoarce in timp. Ganditi-va la timpul economisit. Inainte, spalam rufele la mana, frecam, stoarceam... si nu ieseau niciodata la fel de curate. Acum, apesi un buton si gata.</p><p>Masina de spalat automata rezolva problema murdariei si a timpului pierdut. E potrivita pentru oricine locuieste intr-o casa, fie ca e <a href="/aer-conditionat-pentru-apartament-mic/">apartament</a> sau casa cu curte. Familiile mari au nevoie de capacitate mai mare, cu siguranta. Dar si pentru o persoana singura e un ajutor de nadejde.</p><p>Copiii fac murdarie multa. Hainele se aduna repede. Fara o masina buna, casa arata mereu dezordonata din cauza rufelor la uscat. Eu am doi copii si fara masina de spalat automata, nu stiu cum m-as descurca. Hainele lor sunt mereu patate de iarba, de mancare, de tot felul de nebunii.</p><p>Chiar si pentru cei care stau la bloc si au spatii mici, exista solutii. Masinile slim sau cele cu incarcare verticala sunt perfecte. Important e sa alegi una care se potriveste nevoilor tale si spatiului pe care il ai la dispozitie. Nu are rost sa iei o masina uriasa daca abia ai loc sa intri in baie.</p><p>In plus, masinile moderne au tot felul de programe. De la lana, la bumbac, la delicate sau rapid. Asta inseamna ca hainele tale sunt ingrijite cum trebuie. Nu mai risti sa strici un pulover fin din lana bagandu-l la un program prea agresiv.</p><p>Deci, pe scurt, o masina de spalat automata inseamna mai mult timp liber, rufe curate si ingrijite, si mai putina bataie de cap. E o investitie in confortul tau zilnic.</p>
-      </section>
-
-      <section id="top-recomandari---masini-de-spalat-rufe-automata">
-        <h2>Top recomandari - Masini de spalat rufe automata</h2>
-        <p>Am testat si eu cateva modele de-a lungul timpului si am facut o lista scurta cu ce mi s-a parut bun. Preturi sunt orientative, mai ales ca depind de promotii.</p><p>1. <strong>Bosch Serie 6 WGA242X0BY</strong>. Asta e o masina robusta, fiabila. Am un prieten care o are de vreo 3 ani si e multumit. Capacitate 9 kg, 1200 rpm, clasa energetica A. Are programe bune pentru diverse tesaturi. Pretul ei e cam in jur de <strong>2700 RON</strong>.</p><p>   *   <strong>Pro:</strong> Foarte eficienta la stoarcere, rufele ies aproape uscate. Destul de silentioasa. Constructie solida.</p><p>   *   <strong>Contra:</strong> Poate fi putin mai scumpa decat alte optiuni. Interfata nu e cea mai intuitiva la prima vedere.</p><p>2. <strong>Samsung WW90T556AAX/LE</strong>. Samsung-ul asta e mai mult pe partea de tehnologie. Display mare, control prin Wi-Fi, si tehnologia EcoBubble care face spuma pentru o curatare mai buna la temperaturi joase. Capacitate 9 kg, 1400 rpm, clasa energetica A. O gasesti cam pe la <strong>2900 RON</strong>.</p><p>   *   <strong>Pro:</strong> Tehnologie inovatoare pentru spalat. Conectivitate smart. Design modern.</p><p>   *   <strong>Contra:</strong> Pretul poate fi un pic piperat. Durabilitatea pe termen foarte lung e inca o necunoscuta pentru mine personal.</p><p>3. <strong>LG F4WV709H1E</strong>. LG-ul asta are un motor cu tehnologie Direct Drive, adica mai putine piese in miscare, deci mai putine vibratii si zgomot. Capacitate 9 kg, 1400 rpm, clasa A. Varianta asta e cam pe la <strong>2600 RON</strong>.</p><p>   *   <strong>Pro:</strong> Foarte silentioasa, mai ales la stoarcere. Durabilitate motor promisa.</p><p>   *   <strong>Contra:</strong> Programele pot dura mai mult decat la alte modele. Unele functii smart pot fi inutile pentru unii.</p><p>4. <strong>Arctic EF10400A++</strong>. Daca bugetul e mai restrans, Arctic e o optiune buna. E un brand romanesc, gasesti piese usor. Capacitate 6 kg, 1000 rpm, clasa energetica A++. Pretul e mult mai accesibil, cam <strong>1500 RON</strong>.</p><p>   *   <strong>Pro:</strong> Pret foarte bun. Simplu de folosit. Bun pentru nevoi de baza.</p><p>   *   <strong>Contra:</strong> Capacitate mai mica. Viteza de stoarcere mai redusa. Nu are atatea programe speciale ca modelele mai scumpe.</p><p>5. <strong>Whirlpool FWDD107616WBV EU</strong>. Asta e o masina cu <a href="/uscator-de-rufe-cu-pompa-de-caldura/">uscator</a> incorporat. Daca spatiul e o problema mare, e o solutie. Capacitate spalare 10 kg, uscare 6 kg, 1200 rpm, clasa A. Costul e pe la <strong>3500 RON</strong>.</p><p>   *   <strong>Pro:</strong> Doua aparate intr-unul. Economie de spatiu.</p><p>   *   <strong>Contra:</strong> Programele de uscare pot fi mai lente si pot lasa hainele putin mai mototolite. Consum energetic mai mare.</p>
-      </section>
-
-      <section id="cum-alegi-corect-masina-de-spalat-rufe-automata">
-        <h2>Cum alegi corect masina de spalat rufe automata?</h2>
-        <p>Alegerea unei masini de spalat nu e chiar ca si cum ai lua o paine de la magazin. Trebuie sa te gandesti la cateva lucruri esentiale. Nu te lua doar dupa aspect sau brand. Eu cand am cumparat-o pe asta actuala, am stat vreo doua zile sa ma documentez.</p><p><strong>Capacitatea</strong> e primul criteriu. Daca locuiesti singur sau in cuplu, 5-6 kg sunt suficienti. Pentru o <a href="/frigider-side-by-side-pentru-familie/">familie</a> cu 1-2 copii, 7-8 kg e ideal. Daca ai o familie numeroasa sau speli mult, mergi pe 9-10 kg. Eu am 4 membri in familie si 9 kg mi se pare perfect. Nu trebuie sa fac doua ture pentru un cos mare de rufe.</p><p><strong>Viteza de stoarcere (rpm)</strong>. Asta inseamna cat de repede se invarte tamburul la stoarcere. Cu cat e mai mare, cu atat rufele ies mai stoarse, adica mai uscate. 1000 rpm e minimul decent. 1200-1400 rpm sunt deja foarte bune. Peste 1400 rpm deja risti sa deteriorezi tesaturile mai delicate.</p><p><strong>Clasa energetica</strong>. E important pentru factura la curent. A+++ este cel mai bun. Acum se folosesc clasele noi de la A la G, unde A e cel mai eficient. Cauta A, B sau C in noile clasificari. O masina eficienta consuma mai putina apa si energie.</p><p><strong>Programele de spalare</strong>. Gandeste-te ce tipuri de haine speli cel mai des. Ai nevoie de program pentru lana, matase, haine sportive, bebelusi? Multe masini au si programe rapide, de 15-30 minute, utile pentru hainele pe care le porti des.</p><p><strong>Dimensiunile</strong>. Masoara bine spatiul unde vrei sa o pui. Exista masini standard (60 cm latime), slim (40-45 cm latime) si cele cu incarcare verticala (40 cm latime). Ai grija si la adancime.</p><p><strong>Nivelul de zgomot</strong>. Daca locuiesti la bloc sau ai un copil mic, un model silentios e o binecuvantare. Se masoara in decibeli (dB). Sub 50 dB la spalare si sub 70 dB la stoarcere e considerat silentios.</p><p><strong>Functii suplimentare</strong>. Unele masini au functii smart (conectare la telefon), autodozare detergent, functii de igienizare cu abur. E bine sa te gandesti daca ai nevoie de ele sau doar complica lucrurile si cresc pretul.</p><p><strong>Bugetul</strong>. Stabileste-ti un buget realist. Masinile bune nu sunt cele mai ieftine, dar nici cele mai scumpe nu sunt neaparat cele mai bune pentru tine. Eu prefer sa dau un pic mai mult pe ceva fiabil.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ale-masinii-de-spalat-rufe-automata">
-        <h2>Avantaje si dezavantaje ale masinii de spalat rufe automata</h2>
-        <p>Ca orice electrocasnic, si masina de spalat automata vine cu plusuri si minusuri. Eu am invatat sa le accept pe ambele.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Economie de timp si efort</strong>. Asta e cel mai mare avantaj, clar. Nu mai stai cu orele sa freci rufe la chiuveta. Apesi butonul si iti vezi de treaba. Eu folosesc timpul asta sa citesc sau sa ma joc cu copiii.</li><li><strong>Curatenie superioara</strong>. Masinile automate, mai ales cele cu programe dedicate, curata mult mai bine decat spalatul manual. Petelor mai greu de scos le fac fata cu brio.</li><li><strong>Protejarea tesaturilor</strong>. Programele speciale asigura o ingrijire blanda pentru materiale delicate precum lana sau matasea. Nu mai risc sa-mi stric puloverul preferat.</li><li><strong>Varietate de programe</strong>. De la rufe albe, colorate, sintetice, pana la cele sportive sau de bebelusi, gasesti un program pentru aproape orice.</li><li><strong>Stoarcere eficienta</strong>. Hainele ies mult mai stoarse, ceea ce inseamna ca se usuca mai repede, fie pe uscat in casa, fie pe balcon.</li><li><strong>Reducerea consumului de apa si energie</strong>. Modelele moderne, cu clasa energetica buna, sunt proiectate sa foloseasca cat mai putina apa si curent.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Pretul initial</strong>. O masina de spalat automata de calitate nu e ieftina. Investitia initiala poate fi destul de mare.</li><li><strong>Consum de curent si apa</strong>. Chiar si modelele eficiente consuma resurse. Daca o folosesti prea des sau la temperaturi mari, factura poate creste.</li><li><strong>Necesita intretinere</strong>. Trebuie curatata periodic (filtru, sertar <a href="/detergent-ecologic-pentru-casa/" class="interlink">detergent</a>, garnitura usa) pentru a functiona optim si a evita mirosurile neplacute.</li><li><strong>Pot aparea defectiuni</strong>. Ca orice aparat complex, se poate strica. Reparatiile pot fi costisitoare, mai ales daca sunt piese electronice.</li><li><strong>Poate fi zgomotoasa</strong>. Unele modele, mai ales cele ieftine sau la stoarcerea la viteza mare, pot fi destul de galagioase.</li><li><strong>Ocupa spatiu</strong>. O masina de spalat standard are nevoie de un loc dedicat, ceea ce poate fi o problema in apartamentele mici.</li></ul><p>Parerea mea e ca avantajele depasesc cu mult dezavantajele, mai ales daca alegi un model potrivit pentru tine. E o unealta esentiala in casa moderna.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea-cu-masina-de-spalat-automata">
-        <h2>Sfaturi practice din experienta mea cu masina de spalat automata</h2>
-        <p>Am invatat multe din greseli si din sfaturi primite de la vecini. Sper sa te ajute si pe tine.</p><p><strong>Nu supraaglomera masina</strong>. Pare evident, dar multa lume o face. Rufele au nevoie de spatiu sa se miste in tambur pentru a fi curatate <a href="/cum-sa-cureti-eficient-casa/" class="interlink">eficient</a>. Daca o umpli la refuz, risti sa nu spele bine si sa suprasoliciti motorul.</p><p><strong>Foloseste detergentul potrivit</strong>. Pentru masinile automate, e obligatoriu detergentul cu putina spuma (low foam). Daca folosesti detergent normal, va face prea multa spuma si poate defecta masina. Citeste eticheta detergentului!</p><p><strong>Curata masina regulat</strong>. Eu fac asta o data pe luna. Curat sertarul de detergent, sterg garnitura de la usa de cauciuc (se aduna scame si mizerie acolo) si rulez un program la 90 de grade cu o pastila de curatare speciala sau cu otet. Asta previne mirosurile neplacute si prelungeste viata masinii.</p><p><strong>Verifica buzunarele inainte de spalare</strong>. Monede, chei, servetele... toate pot ajunge in tambur si pot face ravagii. Am patit-o cu un servetel care s-a sfaramat si a infundat filtrul.</p><p><strong>Foloseste programele corecte</strong>. Nu baga toate hainele la un singur program. Separa hainele albe de cele colorate, materialele delicate de cele rezistente. Asta protejeaza hainele si asigura o spalare optima.</p><p><strong>Nu folosi prea mult detergent</strong>. Mai mult detergent nu inseamna rufe mai curate. Dimpotriva, excesul de detergent poate lasa reziduuri pe haine si in masina.</p><p><strong>Verifica filtrul</strong>. Filtrul de la baza masinii se poate infunda cu scame, par, nasturi. Curata-l o data la 2-3 luni. E simplu de facut, dar te scapa de multe probleme.</p><p><strong>Atentie la calitatea apei</strong>. Daca ai apa foarte dura, depunerile de calcar pot afecta masina. Foloseste solutii anticalcar sau programe speciale, daca masina ta are.</p><p><strong>Nu lasa rufele ude in masina</strong>. Daca uiti rufele spalate in masina pentru prea mult timp, prind miros de mucegai. Scoate-le imediat ce s-a terminat ciclul.</p>
-      </section>
-
-      <section id="parerea-mea-finala-despre-masina-de-spalat-rufe-automata">
-        <h2>Parerea mea finala despre masina de spalat rufe automata</h2>
-        <p>Dupa atata vorba, pot sa zic ca masina de spalat automata e cel mai bun prieten al meu din casa. E un electrocasnic pe care nu as putea sa-l traiesc fara el. E adevarat, investitia initiala poate fi mare, dar beneficiile pe termen lung sunt incontestabile. Timpul pe care il castigi e aur curat, iar rufele curate si ingrijite iti dau un sentiment de bine.</p><p>Eu, personal, caut mereu un echilibru intre pret si performanta. Nu am nevoie de cele mai noi tehnologii smart daca nu le folosesc. Prefer o masina fiabila, cu programe eficiente si clasa energetica buna. Bosch si LG sunt printre marcile mele preferate pentru fiabilitate. Daca bugetul e mai mic, Arctic sau Beko pot fi optiuni decente, cu conditia sa alegi un model cu specificatiile potrivite.</p><p>Pentru familiile mari, recomand din suflet o masina cu o capacitate de minim 8-9 kg si o viteza de stoarcere de 1200 rpm. Pentru cupluri sau <a href="/balansoar-de-gradina-pentru-2-persoane/" class="interlink">persoane</a> singure, 6-7 kg sunt suficiente. Nu va zgarciti la clasa energetica, pentru ca pe termen lung se vede diferenta la facturi.</p><p>Daca spatiul e o problema, cautati modele slim sau cu incarcare verticala. Sau, daca bugetul permite si aveti nevoie, o masina cu uscator incorporat poate fi o solutie. Dar atentie, uscarea in masina consuma mai multa energie si poate lasa hainele mai mototolite.</p><p>Cel mai important e sa va documentati, sa cititi pareri si sa alegeti o masina care se potriveste stilului vostru de viata si nevoilor voastre. Nu va grabiti. E o achizitie pe care o veti folosi ani de zile. Eu sunt foarte multumit de alegerea facuta si nu regret niciun leu cheltuit. Sper ca sfaturile mele sa va fie de ajutor in marea decizie!</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie sa curat masina de spalat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Recomand sa cureti masina de spalat cel putin o data pe luna. Acorda atentie sertarului de detergent, garniturii usii si ruleaza un program la temperatura inalta cu un detergent special sau otet pentru a preveni acumularea de bacterii si mirosuri neplacute.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna viteza de stoarcere (rpm) si de ce e importanta?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Viteza de stoarcere, masurata in rotatii pe minut (rpm), indica cat de repede se invarte tamburul la finalul ciclului de spalare. O viteza mai mare stoarce hainele mai eficient, reducand timpul de uscare. 1200-1400 rpm sunt considerate optime pentru majoritatea tesaturilor.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi detergent normal de rufe la o masina automata?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nu, este foarte important sa folosesti detergent special pentru masini de spalat automate. Acesta are o formula cu spuma redusa (low foam), esentiala pentru functionarea corecta a masinii. Detergentul normal poate produce prea multa spuma, afectand performanta si putand deteriora aparatul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de importanta este clasa energetica?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Clasa energetica este foarte importanta deoarece indica eficienta masinii in consumul de energie electrica si apa. Modelele cu o clasa energetica superioara (A, B, C in noile clasificari) consuma mai putine resurse, ceea ce se traduce printr-o factura mai mica la utilitati pe termen lung.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fac daca masina de spalat scoate un miros neplacut?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Mirosurile neplacute apar de obicei din cauza acumularii de reziduuri, bacterii si mucegai. Incearca sa rulezi un program la temperatura inalta (60-90 grade Celsius) cu otet sau un detergent special pentru curatarea masinii. De asemenea, asigura-te ca usuci rufele imediat dupa spalare si lasi usa masinii intredeschisa intre utilizari.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce capacitate ar trebui sa aleg pentru o familie de 4 persoane?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru o familie de 4 persoane, este recomandat sa alegi o masina de spalat automata cu o capacitate de minim 8-9 kg. Acest lucru iti va permite sa speli cantitati mai mari de rufe o data, economisind timp si energie, fara a supraaglomera tamburul.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru cei mai multi, cel mai bun raport il da <strong>Heinner slim</strong>, cu motor inverter, clasa A si abur, la cel mai mic pret, in versiuni de 8 sau 9 kg si adancime sub 50 cm. Daca vrei un brand mare, <strong>Samsung EcoBubble</strong> spala eficient si la rece si are WiFi, iar <strong>Bosch WAN2826</strong> e printre cele mai silentioase. Pentru o familie mare, <strong>Heinner de 10 kg</strong> e de departe cel mai vandut, iar <strong>Samsung de 11 kg</strong> spala un ciclu in 39 de minute.</p>
+      <p>La o masina de spalat, patru lucruri decid alegerea: <strong>capacitatea</strong> in kilograme, potrivita cu numarul de persoane, <strong>turatia</strong> de centrifugare, <strong>clasa energetica</strong> si consumul, si, foarte practic, <strong>adancimea</strong> si locul din casa. Le luam pe rand mai jos, apoi trecem la modele, grupate pe capacitate.</p>
+      <p>Am pornit de la masinile de spalat rufe automate, cu incarcare frontala, in stoc pe eMAG, le-am verificat pe capacitate, clasa energetica, turatii, adancime si dotari, si le-am impartit in trei: compacte de 7-8 kg, modele de 9 kg pentru familie si masini mari de 10-11 kg. Pentru uscare, vezi <a href="/uscator-de-rufe-cu-pompa-de-caldura/">uscatoarele cu pompa de caldura</a>, iar pentru calcat, <a href="/statie-de-calcat-cu-aburi/">statiile de calcat cu aburi</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#capacitate">Capacitatea si numarul de persoane</a></li>
+        <li><a href="#turatii">Turatia de centrifugare</a></li>
+        <li><a href="#clasa">Clasa energetica si consumul</a></li>
+        <li><a href="#inverter">Motorul inverter si zgomotul</a></li>
+        <li><a href="#slim">Adancimea si masinile slim</a></li>
+        <li><a href="#abur">Aburul si functiile utile</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#mica">Compacte, 7-8 kg</a></li>
+        <li><a href="#noua">9 kg, pentru familie</a></li>
+        <li><a href="#mare">Mari, 10-11 kg</a></li>
+        <li><a href="#cat-costa">Cat costa o masina de spalat</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="capacitate">Capacitatea si numarul de persoane</h2>
+    <p>E prima decizie si cea mai importanta. Capacitatea, exprimata in kilograme, inseamna cat de multe rufe uscate incap intr-un ciclu, si se alege direct dupa <strong>cate persoane sunteti in casa</strong>:</p>
+    <ul>
+      <li><strong>5-6 kg:</strong> suficient pentru 1-2 persoane sau un cuplu fara copii.</li>
+      <li><strong>7-8 kg:</strong> recomandata pentru o familie de 2-3 membri; e cea mai populara alegere.</li>
+      <li><strong>9-10 kg:</strong> ideala pentru familii de 3-4 persoane sau pentru cine spala mai rar, dar incarcaturi mari.</li>
+      <li><strong>10-12 kg:</strong> pentru familii numeroase sau cine spala des lucruri voluminoase.</li>
+    </ul>
+    <p>Un sfat practic: e mai bine sa iei <strong>un kilogram-doi peste</strong> nevoia curenta decat sub. Nu ca sa incarci mereu la maxim, ci ca sa poti spala ocazional o plapuma, o pilota sau paturile, fara sa te chinui. In selectie acoperim tot spectrul, de la 7 kg pana la 11 kg, tocmai ca sa gasesti volumul potrivit gospodariei tale.</p>
+
+    <h2 id="turatii">Turatia de centrifugare</h2>
+    <p>Turatia, masurata in rotatii pe minut (rpm), arata cat de tare stoarce masina rufele la finalul spalarii. Cu cat e mai mare, cu atat rufele ies mai putin ude si se usuca mai repede, ceea ce conteaza mai ales daca <strong>nu ai uscator</strong> si intinzi rufele.</p>
+    <ul>
+      <li><strong>1000 rpm:</strong> nivel de baza, rufele raman destul de umede.</li>
+      <li><strong>1200 rpm:</strong> un compromis bun intre pret si eficienta.</li>
+      <li><strong>1400 rpm:</strong> standardul recomandat, rufele ies aproape gata de uscat.</li>
+      <li><strong>1600 rpm:</strong> nivel premium, pentru cine vrea maximul.</li>
+    </ul>
+    <p>Aproape toate modelele din selectie centrifugheaza la <strong>1400 rpm</strong>, exact nivelul recomandat. Singura exceptie e Arctic, la 1200 rpm, suficient pentru multi, dar cu rufe un pic mai umede la scoatere. Daca ai uscator, turatia conteaza mai putin, pentru ca oricum uscatorul preia treaba.</p>
+
+    <h2 id="clasa">Clasa energetica si consumul</h2>
+    <p>O masina de spalat merge de sute de ori pe an, deci consumul se simte pe factura. Aici e o capcana pe care multi o rateaza: din <strong>martie 2021</strong>, etichetele energetice au fost recalibrate, de la vechea scala cu A+++ la o scala noua, de la <strong>A la G</strong>, mai stricta. Pe noua scala, majoritatea masinilor bune se incadreaza in <strong>clasa A sau B</strong>, iar clasa A e minimul rezonabil la o achizitie noua.</p>
+    <p>Atentie sa nu confunzi noul A cu vechiul A+++: sunt standarde diferite, iar A-ul de acum e mult mai greu de obtinut si semnaleaza un consum cu adevarat mic. Toate modelele din selectie sunt <strong>clasa A</strong>, cu o singura exceptie, Arctic, care e clasa B, adica un consum ceva mai mare. Dincolo de litera, daca vrei sa compari corect, uita-te si la consumul in kWh de pe eticheta.</p>
+
+    <h2 id="inverter">Motorul inverter si zgomotul</h2>
+    <p>Motorul inverter e <strong>standardul recomandat</strong> in 2026 si un motiv real pentru care o masina rezista mai mult. Spre deosebire de motoarele clasice, cu perii care se uzeaza, inverterul foloseste un control electronic precis al rotatiei. Rezultatul e triplu: <strong>functioneaza mai silentios, consuma mai putina energie si tine mai mult</strong>, motiv pentru care producatorii dau adesea garantie extinsa pe motor.</p>
+    <p>Toate masinile din selectie au motor inverter, sub diferite denumiri comerciale: ProSmart Inverter la Beko, Silent Inverter la Arctic, EcoSilence Drive la Bosch sau Inverter Direct Drive la LG, ultimul montat direct pe tambur, fara curea, deci si mai durabil. Daca liniste iti trebuie in mod special, Bosch WAN2826 din selectie coboara la doar <strong>52 dB</strong> la spalare, aproape imperceptibil intr-o casa.</p>
+
+    <h2 id="slim">Adancimea si masinile slim</h2>
+    <p>Latimea unei masini de spalat e aproape mereu aceeasi, in jur de 60 cm, dar <strong>adancimea variaza mult</strong> si ea decide daca incape unde vrei. O masina standard are 60-65 cm adancime; una <strong>slim</strong> coboara sub 50 cm, ca sa intre pe un hol, intr-o baie mica, sub un blat sau intr-o nisa ingusta.</p>
+    <p>Compromisul obisnuit e ca modelele foarte inguste au si tambur mai mic. Din selectie exista insa exceptii care merita stiute: modelele <strong>slim Heinner</strong> ofera 8 sau chiar 9 kg la doar 47.5-49.5 cm adancime, o combinatie rara de capacitate mare si adancime mica. Daca ai spatiu, o masina standard costa de obicei mai putin la aceeasi capacitate; daca nu ai, slim-ul iti rezolva problema. In ambele cazuri, <strong>masoara nisa</strong> inainte sa comanzi, inclusiv locul din spate pentru furtune.</p>
+
+    <h2 id="abur">Aburul si functiile utile</h2>
+    <p>Dincolo de datele de baza, cateva functii chiar schimba experienta:</p>
+    <ul>
+      <li><strong>Aburul (Steam):</strong> igienizeaza hainele fara temperaturi mari, elimina o buna parte din alergeni si reduce cutele, deci calci mai putin. E util mai ales pentru familii cu copii mici sau pentru cine are alergii. Apare in selectie de la SteamCure la Hygiene Steam sau Baby Care Steam, gandit pentru hainutele bebelusilor.</li>
+      <li><strong>Adaugarea de rufe dupa pornire</strong> (AddXtra la Beko, AddGarment la TCL): mai bagi o haina uitata dupa ce ciclul a inceput.</li>
+      <li><strong>Programele rapide</strong> (Super Speed la Samsung, Speed Perfect la Bosch): un ciclu complet in 39 de minute cand te grabesti.</li>
+      <li><strong>Conectivitatea WiFi</strong> (SmartThings la Samsung, Smart Diagnosis la LG): pornesti, programezi si primesti notificari din telefon.</li>
+      <li><strong>Autocuratarea tamburului</strong> (Drum Clean): masina isi curata singura tamburul de reziduuri si miros.</li>
+    </ul>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Centrifugare</th><th>Adancime</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.rpm}</td>
+              <td>{x.ad}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mica">Compacte, 7-8 kg</h2>
+    <p>Pentru 1-3 persoane si pentru spatii mici: modele slim care intra oriunde, un Beko cu abur, un Bosch silentios si un Daewoo accesibil. Toate cu motor inverter si clasa A.</p>
+    <div class="rd-grid">
+      {MICA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMica} alt="Masini de spalat rufe compacte de 7-8 kg: Heinner slim, Beko, Bosch, Daewoo" width="1200" height="675" loading="lazy" />
+
+    <h2 id="noua">9 kg, pentru familie</h2>
+    <p>Volumul potrivit pentru o familie de 3-4 persoane: de la modelul slim Heinner, cel mai accesibil, la Samsung cu WiFi, Arctic silentios si TCL cu abur. Un echilibru bun intre capacitate si pret.</p>
+    <div class="rd-grid">
+      {NOUA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figNoua} alt="Masini de spalat rufe de 9 kg: Heinner slim, Samsung, Arctic, TCL" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mare">Mari, 10-11 kg</h2>
+    <p>Pentru familii numeroase sau cine spala rar si mult: cel mai vandut Heinner de 10 kg, un Samsung de 11 kg cu cicluri rapide, cel mai ieftin 11 kg de la TCL si un LG cu motor Direct Drive.</p>
+    <div class="rd-grid">
+      {MARE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMare} alt="Masini de spalat rufe mari de 10-11 kg: Heinner, Samsung, TCL, LG" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-masina-spalat-rufe').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate masinile de spalat rufe la oferta</strong>
+        <span>Reducerile din acest moment la masini de spalat rufe automate, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa o masina de spalat</h2>
+    <p>Vestea buna e ca o masina buna nu inseamna neaparat una scumpa. Preturile depind de capacitate, brand si dotari:</p>
+    <p><strong>Accesibile:</strong> de la circa 1400 de lei pentru un model complet, cu motor inverter, clasa A si abur, cazul masinilor slim Heinner de 8-9 kg. Aici gasesti cel mai bun raport intre pret si ce primesti.</p>
+    <p><strong>Branduri mari:</strong> in general 2000-2600 de lei pentru Beko, Samsung, Arctic, TCL sau LG, cu tehnologii in plus, WiFi, EcoBubble sau Direct Drive.</p>
+    <p><strong>Premium:</strong> peste 2600 de lei, pentru Bosch sau Samsung de top, cu silentiozitate si dotari suplimentare.</p>
+    <p>Dincolo de pretul de raft, gandeste-te la <strong>consum si capacitate</strong>: o masina clasa A si potrivita ca volum se poate dovedi in timp mai ieftina decat una ieftina, dar risipitoare sau prea mica pentru nevoile tale. Socoteste costul pe cativa ani de folosire, nu doar eticheta. Vezi si <a href="/cele-mai-bune-uscatoare-de-rufe/">comparatia mai larga de uscatoare de rufe</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">CP</div>
       <div class="author-info">
-        <h4><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></h4>
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
         <p class="author-role">Specialist Electrocasnice</p>
-        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="masina-de-spalat-rufe-automata"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="masina-de-spalat-rufe-automata"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="masina-de-spalat-rufe-automata" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="masina-de-spalat-rufe-automata" currentCategory="electrocasnice-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

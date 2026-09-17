@@ -1,0 +1,289 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['tuns-iarba'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { g: 'electrice', id: 'D74RVGYBM', badge: 'Cea mai vanduta',
+    specs: ['electrica 1300 W', 'latime taiere 35 cm', 'inaltime 25-70 mm', 'sac colector 40 L'],
+    pros: ['Cea mai vanduta din top, 945 de pareri', 'Maner Ergoflex, mai usor de impins, menajeaza spatele', 'Reglaj inaltime 25-70 mm dintr-un buton', 'Sac colector de 40 L, golesti mai rar'],
+    cons: ['Electrica cu cablu, raza limitata de priza', 'Pentru gazon mic si mediu, pana la ~450 mp', 'Nu e autopropulsata, o impingi'],
+    verdict: 'Cea mai vanduta masina de tuns din selectie si alegerea sigura pentru un gazon mic sau mediu de langa casa. Are motor de 1300 W, latime de taiere de 35 cm si un maner Ergoflex care o face usor de impins si iti menajeaza spatele. Reglezi inaltimea de taiere intre 25 si 70 mm dintr-un singur buton, iar sacul de 40 L inseamna ca golesti mai rar. Cele 945 de pareri o fac de departe cea mai testata de aici. Fiind electrica cu cablu, esti legat de priza, deci e pentru gazoane pana in ~450 mp, aproape de casa. O iei daca ai un gazon obisnuit si vrei o masina simpla, silentioasa, care nu cere intretinere.' },
+  { g: 'electrice', id: 'D34RVGYBM', badge: 'Compacta, pentru gazon mic',
+    specs: ['electrica Bosch', 'compacta si usoara', 'reglaj inaltime', 'gazon mic'],
+    pros: ['Bosch la pret mic, sub 400 de lei', 'Compacta si usoara, se manevreaza simplu', 'Reglaj al inaltimii de taiere', 'Peste 120 de pareri'],
+    cons: ['Latime mica, mai lenta pe suprafete mari', 'Cu cablu, legata de priza', 'Sac colector mic'],
+    verdict: 'Alegerea daca vrei un Bosch pentru un gazon mic, fara sa dai mult. EasyRotak e compacta si usoara, deci o manevreaza usor si cineva mai in varsta sau care nu a mai folosit o masina de tuns. Are reglaj al inaltimii de taiere si constructia de calitate cu care vine numele Bosch, la un pret sub 400 de lei. Cele peste 120 de pareri arata clienti multumiti. Latimea de taiere si sacul sunt mici, deci pe o suprafata mare ai lucra mult, iar cablul te tine langa priza. O iei cand ai un gazon mic, vrei un brand de incredere si un pret cat mai bun, fara sa treci la un model mai mare si mai scump.' },
+  { g: 'electrice', id: 'DB873KMBM', badge: 'Cea mai ieftina',
+    specs: ['electrica', 'cel mai mic pret', 'usoara', 'gazon mic'],
+    pros: ['Cel mai mic pret din top, sub 260 de lei', 'Usoara, se manevreaza simplu', 'Buna pentru un gazon mic, langa casa', 'Nota buna, 4.55'],
+    cons: ['Latime mica, dureaza mai mult pe suprafete mari', 'Sac colector mic', 'Doar pentru gazoane mici'],
+    verdict: 'Cel mai mic pret pentru o masina de tuns electrica pe un gazon mic. Einhell GC-EM costa sub 260 de lei, e usoara si se manevreaza simplu, chiar si de cineva care nu a mai folosit una. Nota de 4.55 arata clienti multumiti pentru ce costa. Latimea de taiere si sacul colector sunt mici, deci pe o suprafata mare ai lucra mult, dar pentru o curte de bloc sau o gradina de casa mica isi face treaba. O alegi cand ai un gazon mic si vrei sa dai cat mai putin, fara pretentii de putere sau viteza.' },
+  { g: 'electrice', id: 'DL10DZBBM', badge: 'Electrica de brand, mai lata',
+    specs: ['electrica Makita', 'latime mai mare', 'gazon mediu', 'robusta'],
+    pros: ['Brand de scule cunoscut, Makita', 'Latime de taiere mai mare, tunzi mai repede', 'Construita solid, rezista in timp', 'Buna pentru gazon mediu'],
+    cons: ['Mai scumpa decat modelele de intrare', 'Tot cu cablu, legata de priza'],
+    verdict: 'Alegerea daca vrei o masina electrica de la un brand de scule serios, pentru un gazon mediu. Makita ELM3720 are o latime de taiere mai mare decat modelele de intrare, deci acoperi suprafata mai repede, si o constructie solida, care rezista la folosire regulata. E cu cablu, ca toate electricele, deci ramai legat de priza, si costa mai mult decat un model de intrare. Nota de 4.32 e buna. O iei cand ai un gazon mediu, vrei un brand de incredere si nu te deranjeaza sa lucrezi cu prelungitor, pentru un rezultat mai rapid si mai durabil.' },
+  { g: 'benzina', id: 'DWPLF7MBM', badge: 'Cea mai apreciata pe benzina',
+    specs: ['benzina, autopropulsata', 'gazon mare, 500+ mp', 'fara cablu', 'putere mare'],
+    pros: ['Autopropulsata, merge singura, tu doar o ghidezi', 'Cea mai apreciata pe benzina, 165 de pareri', 'Fara cablu, acopera un gazon mare', 'Putere pentru iarba deasa si inalta'],
+    cons: ['Mai grea si mai zgomotoasa decat cele electrice', 'Cere intretinere: ulei, bujie, benzina', 'Pret mai mare'],
+    verdict: 'Cea mai apreciata masina pe benzina din top si alegerea cand gazonul e mare si un cablu nu mai are sens. Fiind autopropulsata, se deplaseaza singura, iar tu doar o ghidezi, ceea ce ajuta enorm pe suprafete intinse sau in panta. Nu are cablu, deci acoperi un gazon de peste 500 mp fara sa cauti priza, si are putere sa taie iarba deasa si inalta pe care o electrica mica s-ar chinui. Cele 165 de pareri o fac cea mai testata benzina de aici. In schimb e mai grea, mai zgomotoasa si cere intretinere: schimbi uleiul, verifici bujia si pui benzina. O iei pentru un gazon mare, cand vrei putere si sa nu impingi din greu.' },
+  { g: 'benzina', id: 'DYCS9WBBM', badge: 'Pe benzina, raport bun',
+    specs: ['benzina RURIS', 'gazon mare', 'putere buna', 'pret echilibrat'],
+    pros: ['Pe benzina la un pret echilibrat', 'Putere buna pentru gazon mare', 'Brand romanesc cunoscut, RURIS', 'Fara cablu, libertate de miscare'],
+    cons: ['Cere intretinere periodica', 'Mai grea decat o electrica', 'Zgomotoasa'],
+    verdict: 'Cel mai bun raport pe segmentul benzina, de la RURIS, un brand romanesc bine cunoscut pentru utilaje de gradina. RX200S iti da putere de motor termic la un pret echilibrat, buna pentru un gazon mare unde o electrica cu cablu nu ajunge. Nu esti legat de priza, deci te misti liber prin toata curtea, si taie fara efort iarba mai deasa. Ca la orice motor pe benzina, cere intretinere: ulei, bujie, filtru, si e mai grea si mai zgomotoasa decat o electrica. O alegi cand ai un gazon mare, vrei benzina la un pret corect si preferi un brand cu piese si service usor de gasit.' },
+  { g: 'benzina', id: 'D2X1DLBBM', badge: 'Premium, pentru gazon foarte mare',
+    specs: ['benzina Ruris DAC 120XL', 'gazon foarte mare', 'latime mare', 'robusta'],
+    pros: ['Robusta, pentru suprafete foarte mari', 'Latime de taiere mare, tunzi repede', 'Motor puternic pentru iarba grea', 'Construita pentru folosire intensa'],
+    cons: ['Cea mai scumpa din top', 'Grea, cere spatiu de depozitare', 'Intretinere periodica obligatorie'],
+    verdict: 'Cea mai puternica pe benzina din selectie, pentru un teren foarte mare sau pentru cine tunde des si mult. DAC 120XL e robusta, cu o latime de taiere mare care acopera repede suprafetele intinse, si un motor puternic care trece prin iarba grea, umeda sau inalta, unde modelele mici se blocheaza. E construita pentru folosire intensa, deci tine ani buni. In schimb e cea mai scumpa din top, e grea si cere spatiu de depozitare, plus intretinere periodica: ulei, bujie, ascutit cutit. O iei cand ai un gazon de peste 1000 mp sau un teren mare de intretinut si vrei o masina care sa faca fata la efort sustinut.' },
+  { g: 'robot', id: 'DY12C5MBM', badge: 'Robot, fara efort',
+    specs: ['robot de tuns', 'pana la 2500 mp', 'control din aplicatie', 'tunde singur'],
+    pros: ['Tunde singur, nu misti un deget', 'Acopera pana la 2500 mp', 'Se programeaza din aplicatie', 'Tine gazonul mereu la aceeasi inaltime'],
+    cons: ['Investitie mare in comparatie cu o masina clasica', 'Cere instalarea unui cablu de delimitare', 'Nota mai mica, 4.18'],
+    verdict: 'Alegerea daca vrei sa nu mai tunzi niciodata manual. Robotul iHunt lucreaza singur: il programezi din aplicatie, iese la ore stabilite, tunde putin si des si tine gazonul mereu la aceeasi inaltime, fara sa misti un deget. Acopera pana la 2500 mp, deci se descurca si pe o curte mare. Fiind foarte silentios, poate lucra si seara. Compromisurile sunt reale: e o investitie mai mare decat o masina clasica, cere instalarea unui cablu de delimitare la inceput, iar nota de 4.18 e mai mica decat la masinile bune. Il iei cand vrei gazon mereu ingrijit fara efort si esti dispus sa platesti pentru confortul asta.' },
+  { g: 'robot', id: 'DTCPLJBBM', badge: 'Manuala, pentru gazon mic ecologic',
+    specs: ['manuala cu tambur', 'fara motor', 'silentioasa', 'gazon mic'],
+    pros: ['Cea mai buna nota din top, 4.79', 'Fara motor, fara cablu, fara benzina', 'Silentioasa, tunzi si dimineata devreme', 'Cost zero de folosire, e ecologica'],
+    cons: ['Doar pentru gazon mic si iarba nu foarte inalta', 'Ceri putin efort fizic', 'Nu are sac colector mare'],
+    verdict: 'Alegerea pentru un gazon mic, de cineva care vrea simplu, ieftin si ecologic. Masina manuala Einhell nu are motor: o impingi, iar tamburul cu lame taie iarba mecanic, ca o foarfeca. E complet silentioasa, deci tunzi si dimineata devreme fara sa deranjezi, nu consuma nimic si nu polueaza. Are cea mai buna nota din tot topul, 4.79. Fiind fara motor, cere putin efort fizic si se descurca doar pe gazon mic si iarba nu foarte inalta, altfel o lasi in urma. O iei pentru o curte mica, cand vrei o solutie simpla, fara curent sau benzina, si nu te deranjeaza sa impingi.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ELECTRICE = PICKS.filter(x => x.g === 'electrice');
+const BENZINA = PICKS.filter(x => x.g === 'benzina');
+const ROBOT = PICKS.filter(x => x.g === 'robot');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/tuns-iarba.webp';
+const figElectrice = '/imagini/articole/tuns-iarba-electrice.webp';
+const figBenzina = '/imagini/articole/tuns-iarba-benzina.webp';
+const figRobot = '/imagini/articole/tuns-iarba-robot.webp';
+const published = '2026-07-17T23:40:00+03:00';
+
+const faq = [
+  { question: 'Ce masina de tuns aleg dupa marimea gazonului?', answer: 'Pentru un gazon mic, pana in 200 mp, o masina electrica compacta cu latime de 30-40 cm e suficienta. Pentru 200-500 mp, o electrica mai lata, de 40-50 cm, taie mai repede. Peste 500 mp, unde cablul devine incomod, treci pe benzina, iar peste 1000-1500 mp vrei o masina robusta pe benzina, ideal autopropulsata. Pentru orice suprafata, daca nu vrei sa tunzi deloc, un robot face treaba singur.' },
+  { question: 'Electrica sau pe benzina?', answer: 'Electrica e silentioasa, usoara, nu cere intretinere si e mai ieftina, dar te leaga de priza printr-un cablu, deci e pentru gazoane mici si medii, aproape de casa. Pe benzina e mai puternica, nu are cablu si merge pe suprafete mari, dar e mai grea, mai zgomotoasa si cere intretinere: ulei, bujie, benzina. Alege electrica pentru gazon mic-mediu si benzina pentru gazon mare sau teren departe de o priza.' },
+  { question: 'Ce inseamna mulcire si cand o folosesc?', answer: 'La mulcire, in loc de sacul colector pui un capac, iar masina toaca iarba marunt si o imprastie inapoi pe gazon. Firele tocate se descompun si actioneaza ca ingrasamant natural, ajutand solul sa tina umezeala. Se recomanda cam la a treia tundere, cand iarba nu e prea inalta. Pentru iarba mare sau cand vrei un gazon curat, folosesti sacul colector; mulcirea e pentru intretinere si un gazon sanatos.' },
+  { question: 'La ce inaltime tund iarba?', answer: 'Majoritatea masinilor regleaza inaltimea intre 20 si 80 mm. Vara si pe seceta, lasa iarba mai inalta, spre 50-70 mm, ca sa tina umezeala si sa nu se arda. Primavara si toamna poti tunde mai scurt, spre 30-40 mm. Nu taia niciodata mai mult de o treime din inaltimea firului la o tundere, altfel slabesti gazonul. Un reglaj centralizat, dintr-o singura maneta, e mult mai comod decat unul separat pe fiecare roata.' },
+  { question: 'Cat de des se ascute cutitul?', answer: 'Cutitul se ascute cam la fiecare 15-20 de folosiri, sau mai devreme daca observi ca iarba e smulsa si zdrentuita la varf in loc de taiata curat. Un cutit tocit rupe firul, il ingalbeneste la varf si obliga motorul sa traga mai greu. Il poti ascuti singur cu o pila sau un ascutitor, ori il duci la un service. La masinile pe benzina, ascutirea cutitului face parte din intretinerea de sezon, alaturi de schimbul de ulei.' },
+  { question: 'Cat de greu se intretine o masina de tuns?', answer: 'O masina electrica cere foarte putin: cureti carcasa si cutitul de iarba dupa folosire si ascuti lama din cand in cand, atat. Una pe benzina cere mai mult: schimbi uleiul o data pe sezon, verifici si cureti bujia si filtrul de aer, golesti benzina inainte de iarna si ascuti cutitul. Robotul aproape ca nu cere nimic, doar curatare si schimbul lamelor mici. Curata mereu masina dupa folosire, iarba umeda lasata pe cutit prinde rugina si infunda evacuarea.' },
+];
+
+const images = [hero, figElectrice, figBenzina, figRobot, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune masini de tuns iarba in 2026: electrice, pe benzina, robot si manuala"
+  description="Ce masina de tuns iarba sa iti iei in 2026: modele electrice, pe benzina, robot si manuala, comparate cu pareri reale. Plus ce masina alegi dupa marimea gazonului si latimea de taiere."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Andrei Marinescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cele mai bune masini de tuns iarba' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune masini de tuns iarba</span>
+    </nav>
+
+    <h1>Cele mai bune masini de tuns iarba in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune masini de tuns iarba: electrice, pe benzina, robot si manuala" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru un gazon obisnuit de langa casa, cea mai buna masina de tuns este <strong>Bosch UniversalRotak</strong>: electrica, silentioasa, cu cele mai multe pareri. Daca ai un gazon mare, o masina pe benzina ca <strong>Steinhaus autopropulsata</strong> merge fara cablu si taie mai usor. Daca nu vrei sa tunzi deloc, robotul <strong>iHunt</strong> o face singur, iar pentru cel mai mic pret, <strong>Einhell</strong> costa sub 260 de lei.</p>
+      <p>Alegerea nu incepe de la brand, ci de la marimea gazonului. De ea depinde ce tip iei: electrica pentru suprafete mici si medii, benzina pentru cele mari, robot daca vrei sa nu misti un deget. Mai jos ai intai ce masina se potriveste pentru ce gazon, apoi modelele grupate pe tip, cu parerile reale ale cumparatorilor.</p>
+      <p>Am pornit de la cele mai vandute masini de tuns de pe eMAG, le-am verificat puterea, latimea de taiere si tipul de colectare si le-am asezat dupa suprafata si bugetul pentru care se potrivesc. Vezi si <a href="/masina-de-tuns-gazonul-electrica/">masinile electrice pe roti</a>, <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">tractorasele</a> pentru gazon mare si <a href="/cel-mai-bun-robot-de-tuns-iarba/">robotii de tuns iarba</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#gazon">Ce masina pentru ce gazon</a></li>
+        <li><a href="#electrice">Masini electrice</a></li>
+        <li><a href="#benzina">Masini pe benzina</a></li>
+        <li><a href="#robot">Robot si manuala</a></li>
+        <li><a href="#colectare">Colectare, mulcire sau evacuare</a></li>
+        <li><a href="#reglaj">Latimea de taiere si reglajul inaltimii</a></li>
+        <li><a href="#intretinere">Cum ai grija de masina</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="gazon">Ce masina pentru ce gazon</h2>
+    <p>Marimea gazonului decide ce tip de masina iti trebuie si ce latime de taiere. Iata cum se traduce:</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Suprafata</th><th>Tip potrivit</th><th>Latime de taiere</th></tr></thead>
+        <tbody>
+          <tr><td>pana la 200 mp</td><td>electrica compacta sau manuala</td><td>30-38 cm</td></tr>
+          <tr><td>200-500 mp</td><td>electrica mai lata</td><td>38-46 cm</td></tr>
+          <tr><td>500-1000 mp</td><td>benzina, ideal autopropulsata</td><td>46-51 cm</td></tr>
+          <tr><td>peste 1000 mp</td><td>benzina robusta sau robot</td><td>peste 51 cm</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Latimea de taiere conteaza pentru viteza: una mai mare acopera repede suprafetele mari, una mica da precizie printre obstacole si pe spatii inguste. Regula simpla ramane: cablul de la electrica e comod pana in ~450-500 mp; peste, benzina sau robotul iti scutesc timp si efort. Daca nu vrei sa tunzi deloc, un robot merge pe aproape orice suprafata din raza lui.</p>
+
+    <h2 id="electrice">Masini electrice</h2>
+    <p>Silentioase, usoare si fara intretinere, sunt alegerea pentru gazoane mici si medii, aproape de o priza. Le-am aranjat de la cea mai vanduta la cea de brand, mai lata.</p>
+    <div class="rd-grid">
+      {ELECTRICE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figElectrice} alt="Masini de tuns electrice: Bosch UniversalRotak, Einhell si Makita" width="1200" height="675" loading="lazy" />
+
+    <h2 id="benzina">Masini pe benzina</h2>
+    <p>Puternice si fara cablu, sunt facute pentru gazoane mari. Autopropulsate, merg aproape singure. In schimb cer intretinere si sunt mai grele si mai zgomotoase.</p>
+    <div class="rd-grid">
+      {BENZINA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBenzina} alt="Masini de tuns pe benzina: Steinhaus autopropulsata si Ruris" width="1200" height="675" loading="lazy" />
+
+    <h2 id="robot">Robot si manuala</h2>
+    <p>La cele doua capete ale efortului: robotul care tunde singur, fara sa misti un deget, si masina manuala, fara motor, pentru un gazon mic si o solutie ecologica.</p>
+    <div class="rd-grid">
+      {ROBOT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <h2 id="colectare">Colectare, mulcire sau evacuare</h2>
+    <p>Ce se intampla cu iarba taiata conteaza pentru cat de curat ramane gazonul si cat de des golesti. Sunt trei sisteme:</p>
+    <ul>
+      <li><strong>Sac colector:</strong> iarba se strange intr-un sac, iar gazonul ramane curat. Golesti sacul cand se umple. E cel mai comun si cel mai comod pentru un aspect ingrijit.</li>
+      <li><strong>Mulcire:</strong> in loc de sac pui un capac, iar masina toaca iarba marunt si o imprastie inapoi. Firele se descompun si hranesc solul, ca un ingrasamant natural. Se face cam la a treia tundere, pe iarba nu prea inalta.</li>
+      <li><strong>Evacuare laterala:</strong> iarba e aruncata in lateral. E utila pentru iarba inalta si deasa, dar o aduni pe urma daca vrei gazon curat.</li>
+    </ul>
+    <p>Cele mai multe masini bune ofera cel putin sac colector si mulcire; alege dupa cum vrei sa arate gazonul si cat efort pui la strans.</p>
+
+    <h2 id="reglaj">Latimea de taiere si reglajul inaltimii</h2>
+    <p>Doua detalii care schimba mult experienta:</p>
+    <p><strong>Latimea de taiere</strong> spune cat de repede tunzi. Una de 32-38 cm e buna pentru gazon mic si pentru precizie printre flori si obstacole; una de 46 cm sau mai mult acopera repede o suprafata mare, dar e mai greu de manevrat pe spatii inguste.</p>
+    <p><strong>Reglajul inaltimii</strong> iti lasa sa alegi cat de scurt tunzi, de obicei intre 20 si 80 mm. Cel mai comod e reglajul centralizat, dintr-o singura maneta, care ridica sau coboara toata masina; la modelele ieftine, reglezi fiecare roata separat, ceea ce dureaza. Vara lasa iarba mai inalta ca sa tina umezeala, iar primavara si toamna poti tunde mai scurt.</p>
+
+    <img class="rd-fig" src={figRobot} alt="Robot de tuns iHunt si masina manuala Einhell pentru gazon mic" width="1200" height="675" loading="lazy" />
+
+    <h2 id="intretinere">Cum ai grija de masina</h2>
+    <p>O masina curata si cu cutitul ascutit taie frumos si tine ani buni; una neglijata rupe iarba si se strica repede. Ce sa faci:</p>
+    <ul>
+      <li><strong>Dupa fiecare folosire:</strong> curata carcasa si cutitul de iarba, mai ales daca a fost umeda, ca sa nu prinda rugina si sa nu se infunde evacuarea.</li>
+      <li><strong>Cutitul:</strong> ascute-l la fiecare 15-20 de folosiri, sau cand vezi ca iarba e smulsa si ingalbenita la varf in loc de taiata curat.</li>
+      <li><strong>La cele pe benzina:</strong> schimba uleiul o data pe sezon, verifica bujia si filtrul de aer, iar inainte de iarna goleste benzina veche din rezervor.</li>
+    </ul>
+    <p>Depoziteaza masina la loc uscat, sub acoperis, iar la cele electrice nu lasa cablul in soare sau in apa. Un pic de intretinere iti scuteste reparatiile si tine masina ca noua mult mai mult timp.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-tuns-iarba')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate masinile de tuns iarba la oferta</strong>
+        <span>Reducerile din acest moment la masini de tuns, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">AM</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
+        <p class="author-role">Expert Gradinarit</p>
+        <p class="author-bio">Andrei are peste 10 ani de experienta in amenajarea gradinilor si a testat sute de unelte si utilaje de gradinarit, de la masini de tuns la motocoase si roboti.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-masini-de-tuns-iarba" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-masini-de-tuns-iarba" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

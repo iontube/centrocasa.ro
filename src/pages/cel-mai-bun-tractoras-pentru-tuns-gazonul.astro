@@ -1,275 +1,301 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Cel mai bun tractoras pentru tuns gazonul",
-  excerpt: "Daca ai o curte mai mare si te gandesti sa faci treaba asta cu tunsul gazonului mai usor, un tractoras e o investitie care merita discutata. Nu e doar o unealta, ci mai degraba un partener in ingrijirea spatiului verde, transformand o sarcina anevoioasa intr-una chiar placuta. Hai sa vedem ce inseamna asta mai exact si cum poti gasi modelul potrivit pentru tine.",
-  image: "/images/articles/cel-mai-bun-tractoras-pentru-tuns-gazonul.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-01-09T10:42:06.421Z",
-  modifiedDate: "2026-01-28T10:42:06.473Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "Cat de des trebuie sa fac intretinere la un tractoras de gazon?", answer: "Intretinerea depinde de cat de des il folosesti, dar in general, pentru un uz normal (cam o data pe saptamana in sezonul de crestere), ar trebui sa verifici nivelul de ulei si sa cureti filtrul de aer dupa fiecare utilizare. Schimbul de ulei si filtre se face de obicei la 50 de ore de functionare sau cel putin o data pe an. Lamele trebuie verificate si ascutite periodic, iar sistemul de taiere trebuie curatat dupa fiecare tuns." },
-  { question: "Pot folosi un tractoras pe gazon umed?", answer: "Nu este recomandat. Tunsul gazonului umed poate duce la o taiere neuniforma, iarba se poate lipi de puntea de taiere si de caroserie, ingreunand munca si favorizand aparitia bolilor fungice. De asemenea, pe gazon umed, tractorasul poate derapa mai usor, mai ales pe pante, crescand riscul de accidente." },
-  { question: "Ce inseamna transmisie hidrostatica si de ce e importanta?", answer: "Transmisia hidrostatica iti permite sa controlezi viteza tractorasului prin intermediul unei pedale sau a unui levier, fara a fi nevoie sa schimbi vitezele. Acest lucru face manevrarea mult mai fluida si mai precisa, mai ales in curtile cu multe obstacole, unde trebuie sa schimbi frecvent viteza sau sa faci viraje strânse. E mult mai comod decat o transmisie manuala cu trepte." },
-  { question: "Cat de zgomotoase sunt tractorasele de gazon?", answer: "Sunt, in general, zgomotoase, la fel ca orice motor cu ardere interna. Nivelul de zgomot poate varia in functie de model si de puterea motorului, dar este recomandat sa folosesti protectie auditiva (casti sau dopuri de urechi) in timp ce le operezi. Modelele mai noi tind sa fie putin mai silentioase decat cele vechi, dar tot se incadreaza in categoria de zgomot ridicat." },
-  { question: "Pot sa las tractorasul afara peste iarna?", answer: "Nu, in niciun caz. Tractorasul trebuie depozitat intr-un loc uscat si ferit de intemperii, cum ar fi un garaj, un sopron sau o magazie. Umiditatea, inghetul si soarele pot deteriora componentele, vopseaua si pot cauza coroziunea. O depozitare corecta ii va prelungi durata de viata considerabil." },
-  { question: "Ce inseamna mulching la tractorasele de gazon?", answer: "Mulching-ul este procesul de tocare foarte fina a ierbii taiate si reimprastiarea ei pe gazon. Aceasta iarba tocata se descompune rapid, actionand ca un ingrasamant natural, bogat in nutrienti, care hraneste gazonul si il ajuta sa fie mai des si mai sanatos. Este o metoda ecologica si benefica pentru gazon, eliminand necesitatea de a colecta si a arunca resturile de iarba." }
-];
-
-const toc = [
-  { title: "De ce ai avea nevoie de un tractoras pentru gazon?", id: "de-ce-ai-avea-nevoie-de-un-tractoras-pentru-gazon" },
-  { title: "Top 3 tractorase de gazon pe care le-as recomanda", id: "top-3-tractorase-de-gazon-pe-care-le-as-recomanda" },
-  { title: "Cum alegi tractorasul potrivit pentru curtea ta?", id: "cum-alegi-tractorasul-potrivit-pentru-curtea-ta" },
-  { title: "Avantaje si dezavantaje – merita investitia?", id: "avantaje-si-dezavantaje--merita-investitia" },
-  { title: "Sfaturi practice de la un 'vechi' gradinar", id: "sfaturi-practice-de-la-un-vechi-gradinar" },
-  { title: "Parerea mea: Cand tractorasul devine cel mai bun prieten al tau", id: "parerea-mea-cand-tractorasul-devine-cel-mai-bun-prieten-al-tau" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['tractoras-gazon'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Gazon mediu / buget ---
+  { g: 'buget', id: 'DCSTBX2BM', badge: 'Cel mai ieftin', short: 'Powermat PM-OTS-6HPM', latime: '66 cm', motor: 'benzina', transm: 'manuala', supraf: 'mediu',
+    specs: ['tractoras pe benzina', 'latime de taiere 66 cm', 'cos de colectare 150 l', 'pentru gazon mediu'],
+    pros: ['Cel mai mic pret din selectie pentru un tractoras', 'Latime de taiere de 66 cm, buna pentru un gazon mediu', 'Vine cu cos de colectare de 150 l', 'Simplu, fara dotari care sa se strice'],
+    cons: ['Brand mai putin cunoscut, service greu de gasit', 'Transmisie manuala, cu trepte'],
+    verdict: 'Cel mai accesibil mod de a trece de la masina impinsa la un tractoras pe care stai. Powermat PM-OTS-6HPM are o latime de taiere de 66 cm, potrivita pentru un gazon mediu, si un cos de colectare de 150 l in care aduna iarba. E un model simplu, fara dotari sofisticate care sa se defecteze, exact ce vrei la primul tractoras. In schimb, e un brand mai putin cunoscut la noi, deci gaseste-i din timp piese si service. Transmisia e manuala, cu trepte, deci schimbi viteza cu ambreiaj. Il iei cand vrei sa treci pe un tractoras la cel mai mic pret, pentru un gazon de dimensiune medie.' },
+  { g: 'buget', id: 'D71X5HMBM', badge: 'Electric, pentru gazon mic', short: 'Villager VTR 650', latime: '61 cm', motor: 'electric', transm: 'manuala', supraf: '350-1000 mp',
+    specs: ['tractoras electric, la retea', 'latime de taiere 61 cm', 'pentru 350-1000 mp', 'fara benzina, fara ulei'],
+    pros: ['Electric, fara benzina, ulei sau fum de esapament', 'Villager, brand cunoscut pe piata din RO', 'Silentios fata de un motor pe benzina', 'Are pareri de la cumparatori, rar la tractorase'],
+    cons: ['Merge la retea, deci depinzi de un cablu si de o priza aproape', 'Nota de la cumparatori e modesta, in jur de 3 din 5'],
+    verdict: 'Alegerea daca ai un gazon mic spre mediu si vrei un tractoras fara batai de cap cu benzina si uleiul. Villager VTR 650 e electric, cu alimentare la retea, deci nu torni combustibil, nu schimbi ulei si nu ai fum de esapament, doar il pornesti si tunzi. Are 61 cm latime si e gandit pentru suprafete de 350 pana la 1000 mp. Villager e un brand cunoscut la noi, cu service accesibil. Fiind la retea, depinzi de un cablu si de o priza in apropiere, ceea ce il limiteaza la gazoane nu foarte mari. Nota de la cumparatori e modesta, in jur de 3 din 5, deci asteptari realiste. Il iei cand vrei un tractoras electric, silentios, pentru un gazon mic.' },
+  { g: 'buget', id: 'DF05GB3BM', badge: 'Cel mai dotat mini', short: 'Blackstone Raven', latime: '61 cm', motor: '5.9 CP', transm: '5 viteze', supraf: 'mediu',
+    specs: ['mini tractoras, 5.9 CP', 'latime de taiere 61 cm, mulching', 'pornire electrica, 5 viteze', 'faruri LED, inaltime 35-75 mm'],
+    pros: ['Bine dotat pentru pretul lui: mulching, faruri LED, pornire electrica', '5 viteze, pornire la cheie, nu la sfoara', 'Functie de mulching, tocare fina a ierbii', 'Compact, bun pentru un gazon mediu'],
+    cons: ['Latime de doar 61 cm, tunzi in mai multe treceri pe suprafete mari', 'Brand de buget, verifica service-ul'],
+    verdict: 'Un mini tractoras surprinzator de bine dotat pentru pretul lui. Blackstone Raven are motor de 5.9 CP, pornire electrica la cheie, cinci viteze, faruri LED si, important, functie de mulching, care toaca iarba fin si o lasa pe gazon ca ingrasamant, fara sa mai golesti un cos. Latimea de 61 cm e potrivita pentru un gazon mediu; pe suprafete mari o sa faci mai multe treceri. E un brand de buget, deci verifica disponibilitatea pieselor inainte. Pentru cineva care vrea confortul unui tractoras mic, cu pornire usoara si mulching, la un pret rezonabil, e o alegere buna. Il iei cand vrei cele mai multe dotari pe un mini tractoras accesibil.' },
+  // --- Gazon mare / raport bun ---
+  { g: 'mare', id: 'DNJDKTMBM', badge: 'Cel mai bun raport', short: 'O-Mac TG 13000', latime: '72 cm', motor: '9 CP', transm: '6 trepte', supraf: 'peste 1000 mp',
+    specs: ['benzina, 9 CP, 352 cc', 'latime de taiere 72 cm', 'cos colector 170 l, 6 trepte', 'pentru suprafete peste 1000 mp'],
+    pros: ['Are pareri bune de la cumparatori, cu nota mare', 'Latime de 72 cm si 9 CP, pentru gazoane peste 1000 mp', 'Cos colector generos, de 170 l', 'Raport bun putere-pret'],
+    cons: ['Brand mai putin cunoscut international', 'Transmisie manuala cu 6 trepte, nu hidrostatica'],
+    verdict: 'Alegerea echilibrata pentru un gazon mare, la un pret care ramane rezonabil. O-Mac TG 13000 are motor pe benzina de 9 CP, 72 cm latime de taiere si un cos colector de 170 l, deci acopera repede suprafete de peste 1000 mp. E unul dintre putinele tractorase din selectie cu pareri de la cumparatori, iar nota e mare, un semn bun intr-o categorie unde recenziile lipsesc. Are sase trepte de viteza, transmisie manuala cu ambreiaj, nu hidrostatica, deci schimbi vitezele. Brandul nu e la fel de cunoscut ca Husqvarna sau Stiga, dar raportul putere-pret e bun. Il iei cand vrei cel mai bun echilibru intre putere, latime si pret, pentru un gazon mare.' },
+  { g: 'mare', id: 'DCJPC5MBM', badge: 'Cu transmisie automata', short: 'Stiga Combi 166', latime: '66 cm', motor: '7.5 CP', transm: 'automata', supraf: 'mare',
+    specs: ['Stiga, 7.5 CP', 'latime de taiere 66 cm', 'cutie automata (fara ambreiaj)', 'combi: colectare si mulching'],
+    pros: ['Cutie automata, conduci fara ambreiaj si schimbat trepte', 'Stiga, unul dintre cele mai serioase branduri de gazon', 'Combi: colecteaza sau face mulching', 'Mai comod de manevrat printre obstacole'],
+    cons: ['Latime de 66 cm, nu cea mai mare', 'Mai scump decat modelele buget de aceeasi latime'],
+    verdict: 'Alegerea daca vrei confort la condus, fara sa te chinui cu ambreiajul si treptele. Stiga Combi 166 are o cutie automata, adica accelerezi si franezi ca la o masina cu transmisie automata, foarte comod cand ai multe obstacole de ocolit, pomi, straturi de flori, alei. Stiga e unul dintre cele mai serioase branduri de echipamente de gazon, cu piese si service usor de gasit. E un model combi, deci fie colecteaza iarba in cos, fie o toaca prin mulching. Latimea de 66 cm il tine potrivit pentru un gazon mediu spre mare, iar pretul e peste modelele buget, justificat de cutia automata si de brand. Il iei cand vrei manevrare usoara si un brand de incredere.' },
+  { g: 'mare', id: 'D2598WMBM', badge: 'Mai mult motor', short: 'Alpina AT2 72', latime: '72 cm', motor: '11.5 CP', transm: '5 viteze', supraf: 'mare',
+    specs: ['Alpina, 11.5 CP', 'latime de taiere 72 cm', 'inaltime reglabila 30-80 mm', '5 viteze'],
+    pros: ['Motor mai puternic, 11.5 CP, pentru iarba deasa', 'Alpina, brand serios, parte din grupul Stiga', 'Latime de 72 cm, acopera repede gazonul', 'Reglaj bun al inaltimii, 30-80 mm'],
+    cons: ['Fara pareri inca, categorie de nisa', 'Transmisie manuala cu 5 viteze'],
+    verdict: 'Alegerea cand ai un gazon mare si iarba care creste repede sau deasa, unde conteaza motorul. Alpina AT2 72 are 11.5 CP, printre cele mai puternice din selectia accesibila, si o latime de 72 cm, deci trece prin iarba inalta fara sa se inece si acopera repede suprafata. Alpina face parte din grupul Stiga, deci beneficiezi de un brand serios, cu piese la indemana. Inaltimea de taiere se regleaza intre 30 si 80 mm, cat sa potrivesti gazonul dupa sezon. Nu are inca pareri, normal la un tractoras de nisa. Are transmisie manuala cu cinci viteze. Il iei cand vrei mai mult motor pentru un gazon mare cu iarba viguroasa, de la un brand de incredere.' },
+  // --- Gazon foarte mare / premium ---
+  { g: 'premium', id: 'DHT6JTYBM', badge: 'Premium, pentru gazon foarte mare', short: 'Husqvarna TC 138', latime: '102 cm', motor: 'benzina', transm: 'hidrostatica', supraf: 'foarte mare',
+    specs: ['Husqvarna, benzina', 'latime de taiere 102 cm', 'transmisie hidrostatica', 'pentru gazoane foarte mari'],
+    pros: ['Latime de 102 cm, acopera cel mai repede suprafete mari', 'Transmisie hidrostatica, cea mai comoda, ca o cutie automata', 'Husqvarna, referinta in echipamente de gazon', 'Construit pentru folosire intensa, pe suprafete mari'],
+    cons: ['Cea mai scumpa din selectie, peste 23000 de lei', 'Prea mult pentru un gazon mic sau mediu'],
+    verdict: 'In varful gamei, pentru cine are un gazon foarte mare si vrea sa termine repede si comod. Husqvarna TC 138 are o latime de taiere de 102 cm, deci acopera suprafata in cele mai putine treceri, si o transmisie hidrostatica, cea mai comoda dintre toate: controlezi viteza continuu, dintr-o pedala, fara ambreiaj si fara trepte, ca la o masina automata. Husqvarna e o referinta in echipamente de gazon, construite pentru folosire intensa si de durata, cu retea de service solida. E cea mai scumpa din selectie, peste 23000 de lei, si ar fi prea mult pentru un gazon mic. Il iei cand ai o suprafata mare de intretinut des si vrei un tractoras serios, comod si durabil.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const BUGET = PICKS.filter(x => x.g === 'buget');
+const MARE = PICKS.filter(x => x.g === 'mare');
+const PREMIUM = PICKS.filter(x => x.g === 'premium');
+
+const site = 'https://centrocasa.ro';
+const hero = '/images/articles/cel-mai-bun-tractoras-pentru-tuns-gazonul.webp';
+const figBuget = '/imagini/articole/tractoras-buget.webp';
+const figMare = '/imagini/articole/tractoras-mare.webp';
+const figPremium = '/imagini/articole/tractoras-premium.webp';
+const published = '2026-07-18T10:31:16+03:00';
+
+const faq = [
+  { question: 'Ce marime de tractoras imi trebuie pentru gazonul meu?', answer: 'Alege dupa suprafata gazonului si dupa latimea de taiere. Pentru un gazon de pana la circa 2000 mp, un tractoras compact, cu latime de 60-72 cm si o transmisie usoara, e suficient. Pentru suprafete mari, peste 5000 mp, cauta o latime de taiere de peste 100 cm si o transmisie hidrostatica, ca sa termini in cat mai putine treceri. Latimea de taiere influenteaza direct cat de repede tunzi, deci pe un gazon mare merita o latime cat mai mare.' },
+  { question: 'Transmisie manuala, automata sau hidrostatica?', answer: 'Transmisia manuala are trepte si ambreiaj, ca la o masina cu cutie manuala: e cea mai ieftina, dar mai obositoare cand ai multe obstacole de ocolit. Cutia automata iti permite sa accelerezi si sa franezi fara sa schimbi trepte. Transmisia hidrostatica e cea mai comoda: controlezi viteza continuu, dintr-o pedala, fara ambreiaj, e durabila si cere mai putina intretinere, dar costa mai mult. Pentru o curte cu multe obstacole sau un gazon mare, hidrostatica merita banii in plus.' },
+  { question: 'Ce fac cu iarba taiata: cos, mulching sau evacuare laterala?', answer: 'Sunt trei optiuni. Cosul de colectare aduna iarba si e ideal pentru un gazon ingrijit, dar trebuie golit des, cam la 15-20 de minute la cosurile de 240-320 l. Mulchingul toaca iarba foarte fin si o lasa pe gazon ca ingrasamant natural, cea mai buna alegere pentru o intretinere regulata, saptamanala. Evacuarea laterala arunca iarba in lateral si e utila la iarba inalta, cand cosul s-ar infunda repede. Multe tractorase, numite combi, fac colectare si mulching, la alegere.' },
+  { question: 'De ce au tractorasele atat de putine pareri online?', answer: 'Pentru ca sunt o cumparatura scumpa si de nisa, pe care putini oameni o fac, si mai rar online. De aceea, la tractorase, aproape niciun model nu are pareri, iar cand exista, sunt cateva. Cand alegi, uita-te la suprafata pentru care e recomandat, la latimea de taiere, la putere, la transmisie si la brand, nu la numarul de note, pentru ca acestea spun cel mai mult despre ce primesti. Un brand cunoscut, ca Husqvarna, Stiga sau Alpina, e un reper de incredere in lipsa parerilor.' },
+  { question: 'Cat de mult conteaza puterea motorului, in CP?', answer: 'Puterea, masurata in cai putere, conteaza mai ales daca ai iarba deasa, viguroasa, sau un teren cu denivelari si pante. Un motor mai puternic, de 11-17 CP, trece prin iarba inalta fara sa se inece si urca mai usor pantele. Pentru un gazon plat, intretinut regulat, un motor de 6-9 CP e suficient. Nu lua putere multa doar de dragul cifrei: un motor mare consuma mai mult si e mai scump; potriveste-l cu marimea si starea gazonului tau.' },
+  { question: 'Cat de des fac intretinere la un tractoras?', answer: 'Verifica nivelul de ulei si curata filtrul de aer regulat, iar schimbul de ulei si de filtre se face de obicei la circa 50 de ore de functionare sau macar o data pe an, la inceputul sezonului. Lamele trebuie verificate si ascutite periodic, ca sa taie curat, nu sa rupa iarba. Curata puntea de taiere de resturile de iarba dupa fiecare tuns. Iarna, depoziteaza tractorasul intr-un loc uscat si ferit. O intretinere corecta ii prelungeste mult viata.' },
+  { question: 'Un tractoras electric e o alternativa buna?', answer: 'Da, pentru un gazon mic spre mediu. Un tractoras electric, cum e Villager VTR 650, nu are nevoie de benzina si ulei, e mai silentios si nu scoate fum de esapament, deci porneste imediat si e mai comod de intretinut. Dezavantajul modelelor la retea e ca depinzi de un cablu si de o priza in apropiere, ceea ce il limiteaza la suprafete nu foarte mari. Pentru un gazon mare, un model pe benzina ramane alegerea practica, prin autonomie si putere.' },
+];
+
+const images = [hero, figBuget, figMare, figPremium, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
 ---
 
 <Layout
-  title="Cel mai bun tractoras pentru tuns gazonul - CentroCasa"
-  description="Daca ai o curte mai mare si te gandesti sa faci treaba asta cu tunsul gazonului mai usor, un tractoras e o investitie care merita discutata. Nu e doar o unealta, ci mai degraba un partener in ingrijirea spatiului verde, transformand o sarcina anevoioasa intr-una chiar placuta. Hai sa vedem ce inseamna asta mai exact si cum poti gasi modelul potrivit pentru tine."
-  image="/images/articles/cel-mai-bun-tractoras-pentru-tuns-gazonul.webp"
+  title="Cel mai bun tractoras pentru tuns gazonul in 2026: pe suprafata gazonului"
+  description="Ce tractoras de tuns gazonul sa iei in 2026, ales pe suprafata gazonului: modele de buget, pentru gazon mare si premium cu transmisie hidrostatica, de la Villager, Stiga, Alpina si Husqvarna. Plus latime de taiere, transmisie si mulching vs cos."
+  image={hero}
   type="article"
-  publishedTime="2026-01-09T10:42:06.421Z"
-  modifiedTime="2026-01-28T10:42:06.473Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cel mai bun tractoras pentru tuns gazonul' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
       <span>Cel mai bun tractoras pentru tuns gazonul</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">24 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Cel mai bun tractoras pentru tuns gazonul</h1>
-    </header>
+    <h1>Cel mai bun tractoras pentru tuns gazonul in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/cel-mai-bun-tractoras-pentru-tuns-gazonul.webp" alt="Cel mai bun tractoras pentru tuns gazonul" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cel mai bun tractoras pentru tuns gazonul, pe gazon" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-avea-nevoie-de-un-tractoras-pentru-gazon">
-        <h2>De ce ai avea nevoie de un tractoras pentru gazon?</h2>
-        <p>In primul rand, sa fim sinceri, tunsul gazonului pe o suprafata generoasa cu o masina de tuns clasica poate fi epuizant. Daca ai peste 500-700 de metri patrati de gazon, sau daca ai multe obstacole, pante sau pur si simplu vrei sa economisesti timp si energie, un tractoras devine o solutie excelenta. Mi se pare ca e ideal pentru proprietarii de case cu curti mai mari, pentru cei care nu vor sa se mai complice cu impingerea unei masini, dar si pentru cei care vor un finisaj impecabil, fara efort.</p>
-        <p>Gandeste-te la el ca la un upgrade major in rutina de ingrijire a gradinii. Nu mai alergi dupa o masina, ci te asezi confortabil si 'calaresti' catre rezultatul dorit. Este o investitie, desigur, dar daca timpul si confortul tau conteaza, impactul se vede in timp.</p>
-        <p>Am vazut si oameni care pur si simplu se bucura de experienta condusului, transformand tunsul gazonului intr-o activitate relaxanta, mai ales in zilele insorite de weekend. Pentru mine, principalul argument a fost intotdeauna reducerea efortului fizic si castigul de timp. Daca ai de tuns o suprafata mica, gen 200 de metri patrati, probabil ca nu merita efortul financiar si spatiul <a href="/cutii-de-depozitare-pentru-debara/" class="interlink">de depozitare</a>.</p>
-        <p>Dar daca suprafata creste, si mai ales daca e neregulata, cu pomi, straturi de flori sau chiar mici denivelari, tractorasul iti face viata mult mai usoara. Practic, iti preia munca grea si ti-o face intr-un timp mult mai scurt. Si sa nu uitam de aspectul estetic; un gazon tuns uniform si ingrijit transforma complet aspectul curtii tale, facand-o mai primitoare si mai placuta.</p>
-      </section>
-
-      <section id="top-3-tractorase-de-gazon-pe-care-le-as-recomanda">
-        <h2>Top 3 tractorase de gazon pe care le-as recomanda</h2>
-        <p>Am testat si am comparat destul de multe modele de-a lungul timpului si pot spune ca exista cateva optiuni care ies in evidenta, mai ales prin fiabilitate si performanta in raport cu pretul.  Mi se pare ca pentru majoritatea gradinilor de dimensiuni medii spre mari, primele trei locuri ar fi ocupate de urmatoarele:</p>
-        <p>1.  <strong>Husqvarna TS242XD:</strong> Acesta este un model robust, cu un motor puternic (de obicei in jur de 20 CP) si o latime de taiere de 42 de inch (aproximativ 107 cm). Ce imi place la el este sistemul de transmisie hidrostatica, care iti permite sa controlezi viteza fluid, fara trepte, la fel ca la o masina <a href="/sistem-de-irigare-automata-pentru-gradina/">automata</a>. E ideal pentru manevre in jurul obstacolelor si pe terenuri cu pante usoare.</p>
-        <p>Are si o constructie solida, din otel, ceea ce ii confera durabilitate. Pretul poate varia, dar te poti astepta la ceva in jur de 20.000 - 25.000 RON, in functie de promotii.</p>
-        <p>2.  <strong>Cub Cadet XT2 Enduro Series:</strong> Cub Cadet e un nume de traditie in domeniu, iar seria XT2 este o alegere excelenta pentru cei care cauta o combinatie buna intre performanta si confort. Modelele din aceasta serie vin cu motoare puternice (adesea peste 22 CP) si latimi de taiere similare, de 42 sau 46 de inch (107-117 cm). Sistemul de directie e foarte precis, iar scaunul e proiectat pentru confort pe perioade mai lungi.</p>
-        <p>Mi se pare ca au un sistem de evacuare a ierbii (mulching sau colectare) foarte eficient. Pretul se situeaza undeva intre 18.000 si 22.000 RON.</p>
-        <p>3.  <strong>John Deere X350:</strong> John Deere este sinonim cu calitatea in agricultura si <a href="/motosapa-electrica-pentru-gradina-mica/">gradina</a>rit, iar tractorasele lor nu fac exceptie. Modelul X350 e un entry-level in gama lor premium, dar ofera o experienta de utilizare deosebita. Motorul e de obicei in jur de 18 CP, iar latimea de taiere e de 42 de inch (107 cm).</p>
-        <p>Ceea ce il diferentiaza este calitatea constructiei, sistemul de amortizare a vibratiilor si precizia taieturii. Este construit sa dureze si sa ofere o experienta de condus foarte placuta. Pretul este, in general, mai ridicat, incepand de la aproximativ 23.000 - 28.000 RON.</p>
-        <p>Acestea sunt doar cateva exemple, dar mi se pare ca acopera o gama larga de nevoi si bugete, oferind in acelasi timp performante si fiabilitate pe care te poti baza.</p>
-      </section>
-
-      <section id="cum-alegi-tractorasul-potrivit-pentru-curtea-ta">
-        <h2>Cum alegi tractorasul potrivit pentru curtea ta?</h2>
-        <p>Alegerea unui tractoras de gazon nu e chiar ca si cum ai cumpara o pereche de pantofi; e o decizie mai importanta, care implica o investitie pe termen lung. Asa ca, hai sa vedem la ce ar trebui sa te uiti:</p>
-        <p><strong>Dimensiunea curtii:</strong> Acesta e cel mai important factor. Pentru suprafete sub 500 mp, probabil ca nu ai nevoie de un tractoras. Daca ai intre 500 si 1500 mp, un model entry-level sau de mijloc cu o latime de taiere de 30-42 inch (76-107 cm) e suficient. Pentru suprafete peste 1500 mp, vei vrea ceva mai puternic, cu o latime de taiere de 42-50 inch (107-127 cm) sau chiar mai mult.</p>
-        <p><strong>Motorul:</strong> Puterea motorului se masoara in cai putere (CP). Un motor mai puternic inseamna ca tractorasul va face fata mai usor ierbii dese, terenurilor in panta sau incarcaturilor mari (daca folosesti un sistem de colectare sau un remorcher mic). Cauta motoare de la producatori renumiti precum Briggs & Stratton, Kohler sau Kawasaki. Pentru curti medii, 18-20 CP sunt de obicei suficienți. Pentru suprafete mari sau terenuri dificile, 20-25 CP sau mai mult sunt recomandati.</p>
-        <p><strong>Transmisia:</strong> Ai doua optiuni principale: manuala (cu viteze, ca la o masina) sau hidrostatica (variabila, fara trepte). Transmisia hidrostatica e mult mai comoda, permitandu-ti sa ajustezi viteza fin, fara a schimba vitezele. E ideala pentru manevre si pentru un control mai bun, mai ales in jurul obstacolelor. Majoritatea tractoraselor mai noi vin cu transmisie hidrostatica.</p>
-        <p><strong>Latimea de taiere:</strong> Cu cat latimea de taiere e mai mare, cu atat vei termina treaba mai repede. Un tractoras cu o latime de 107 cm va acoperi mai mult teren intr-o singura trecere decat unul cu 76 cm. Totusi, o latime mai mare poate face tractorasul mai greu de manevrat in spatii inguste.</p>
-        <p><strong>Sistemul de taiere:</strong> Majoritatea tractoraselor permit fie colectarea ierbii intr-un sac, fie mulching-ul (tocarea fina a ierbii si reimprastiarea ei pe gazon, ca ingrasamant natural). Unele modele ofera si evacuare laterala. Gandeste-te ce preferi: sa aduni iarba sau sa o lasi pe gazon?</p>
-        <p><strong>Confortul:</strong> Daca vei petrece mult timp pe tractoras, confortul e esential. Cauta un scaun reglabil, cu o buna sustinere, un volan ergonomic si un panou de control usor de accesat. Vibratiile reduse sunt, de asemenea, un plus.</p>
-        <p><strong>Sistemul de directie:</strong> Un sistem de directie precis, cu raza de bracaj mica, te va ajuta enorm sa manevrezi tractorasul in jurul copacilor, tufelor sau altor elemente din curte. Unele modele au sisteme de directie asistata, ceea ce face virajele mult mai usoare.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje--merita-investitia">
-        <h2>Avantaje si dezavantaje – merita investitia?</h2>
-        <p>Ca orice achizitie importanta, si un tractoras de gazon vine la pachet cu plusuri si minusuri. Hai sa le luam pe rand, ca sa stii la ce sa te astepti:</p>
-        <p><strong>Avantaje:</strong></p>
-        <p><strong>Economie de timp si efort:</strong> Acesta e, probabil, cel mai mare avantaj. Ce cu o masina de tuns clasica ar dura ore, cu un tractoras se poate rezolva in jumatate de timp sau chiar mai putin, si cu mult mai putina oboseala. Mi se pare ca e ideal pentru persoanele cu probleme de sanatate sau pur si simplu pentru cei care vor sa se bucure de timpul liber.</p>
-        <p><strong>Performanta pe suprafete mari:</strong> Daca ai o curte generoasa, un tractoras este aproape indispensabil. Acopera rapid suprafete mari si poate face fata si ierbii mai inalte sau mai dese.</p>
-        <p><strong>Versatilitate:</strong> Multe tractorase pot fi echipate cu accesorii suplimentare, transformandu-le in adevarate ajutoare in curte. Poti atasa un plug pentru deszapezire, un tavalug pentru aerificare, o remorca mica pentru transportul pamantului sau a frunzelor, sau un imprastietor de ingrasaminte. Astfel, investitia devine si mai rentabila.</p>
-        <p><strong>Confort sporit:</strong> Cum spuneam, confortul la bord este mult mai mare decat la o masina de tuns clasica. Scaune confortabile, manevre usoare, control intuitiv – toate contribuie la o experienta placuta.</p>
-        <p><strong>Finisaj <a href="/blender-profesional-pentru-smoothie/" class="interlink">profesional</a>:</strong> Tractorasele, mai ales cele de calitate, ofera un tuns uniform si precis, lasand gazonul cu un aspect ingrijit, ca de teren de golf.</p>
-        <p><strong>Dezavantaje:</strong></p>
-        <p><strong>Costul initial:</strong> Acesta este, probabil, principalul obstacol. Un tractoras bun poate costa de la 15.000 RON in sus, iar modelele mai performante pot ajunge si la 30.000 RON sau chiar mai mult. E o investitie considerabila.</p>
-        <p><strong>Spatiul de depozitare:</strong> Tractorasele ocupa mult mai mult spatiu decat o masina de tuns clasica. Ai nevoie de un garaj, un sopron sau un spatiu dedicat pentru a-l depozita in siguranta, ferit de intemperii.</p>
-        <p><strong>Intretinerea:</strong> Ca orice vehicul, si tractorasul necesita intretinere regulata: schimb de ulei, filtre, verificarea lamelor, ungere etc. Aceste operatiuni pot adauga costuri suplimentare si timp dedicat.</p>
-        <p><strong>Manevrabilitate in spatii inguste:</strong> Desi sunt mai agile decat par, tractorasele pot avea dificultati in a naviga prin curti foarte inguste, cu multe obstacole mici, sau cu alei foarte strâmte. Pentru aceste cazuri, o masina de tuns mai mica sau un robot de tuns ar putea fi mai potrivite.</p>
-        <p><strong>Consumul de combustibil:</strong> Daca ai o curte mare si il folosesti des, consumul de <a href="/motocoasa-electrica-sau-pe-benzina/">benzina</a> poate deveni un factor de luat in calcul in costurile de operare.</p>
-      </section>
-
-      <section id="sfaturi-practice-de-la-un-vechi-gradinar">
-        <h2>Sfaturi practice de la un 'vechi' gradinar</h2>
-        <p>Dupa ani de zile in care am pus mana pe tot felul de unelte <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">de gradina</a>, am acumulat cateva secrete si sfaturi pe care le impartasesc cu drag. Sper sa iti fie de folos si tie:</p>
-        <p><strong>Citeste manualul!</strong> Stiu, pare banal, dar manualul de utilizare contine informatii esentiale despre cum sa folosesti corect tractorasul, cum sa il intretii si ce sa faci in caz de probleme. Nu il arunca pur si simplu.</p>
-        <p><strong>Siguranta pe primul loc:</strong> Poarta intotdeauna incaltaminte rezistenta, pantaloni lungi si, daca e posibil, ochelari de protectie. Tractorasul e o masina <a href="/bormasina-cu-acumulator-puternica/" class="interlink">puternica</a> si trebuie tratat cu respect. Nu lasa niciodata copiii sa se apropie in timp ce motorul functioneaza.</p>
-        <p><strong>Verifica gazonul inainte:</strong> Inainte sa pornesti la tuns, da o tura prin curte si aduna crengutele, pietrele sau jucariile care ar putea deteriora lamele sau, si mai rau, ar putea fi proiectate si cauza accidente.</p>
-        <p><strong>Regleaza inaltimea de taiere corect:</strong> Nu taia gazonul prea scurt dintr-o data. Regula de aur e sa nu tai mai mult de o treime din lungimea firului de iarba. Ajusteaza inaltimea in functie de sezon si de cum arata gazonul. Vara, o inaltime mai mare ajuta iarba sa retina mai bine apa.</p>
-        <p><strong>Manevreaza cu grija pe pante:</strong> Daca ai pante, nu urca sau cobori perpendicular pe ele, ci pe curbe, in zig-zag. Nu face viraje bruste pe panta. La fel, ai grija sa nu calci pe zone unde iarba e foarte umeda, pentru ca tractorasul poate derapa.</p>
-        <p><strong>Intretinerea regulata e cheia:</strong> Nu astepta sa se strice ceva. Schimba uleiul la intervalele recomandate (de obicei la 50 de ore de functionare sau anual), curata filtrul de aer, verifica nivelul de ulei din transmisie, si tine lamele ascutite. Lamele tocite nu taie, ci rup iarba, lasand-o vulnerabila la boli.</p>
-        <p><strong>Foloseste-l si pentru alte sarcini:</strong> Daca ai un model care permite atasarea de accesorii, nu ezita sa le folosesti. O remorca mica te poate scuti de caratul sacilor grei de pamant sau compost. Un plug mic poate fi util iarna.</p>
-        <p><strong>Curata-l dupa fiecare utilizare:</strong> Dupa ce ai terminat de tuns, curata resturile de iarba de sub puntea de taiere, de pe caroserie si de pe motor. Acumularea de iarba umeda poate duce la coroziune si poate afecta performanta.</p>
-        <p><strong>Depozitare corecta:</strong> Iarna, curata-l bine, schimba uleiul si filtrele, alimenteaza rezervorul cu benzina proaspata (sau foloseste un stabilizator de combustibil) si depoziteaza-l intr-un loc uscat si ferit. Inainte de prima utilizare primavara, verifica bateria si presiunea in anvelope.</p>
-      </section>
-
-      <section id="parerea-mea-cand-tractorasul-devine-cel-mai-bun-prieten-al-tau">
-        <h2>Parerea mea: Cand tractorasul devine cel mai bun prieten al tau</h2>
-        <p>Din experienta mea, cand vine vorba de ingrijirea unui spatiu verde mai generos, un tractoras de gazon nu e doar o unealta, ci o extensie a dorintei tale de a avea o curte frumoasa, fara sa te epuizezi. Mi se pare ca momentul in care realizezi ca nu mai trebuie sa te chinui cu impingerea unei masini pe o suprafata mare e un moment de pura eliberare. Am testat modele de la diferiti producatori si pot spune cu mana pe inima ca un tractoras de calitate, ales corect, isi merita fiecare banut.</p>
-        <p>Ce imi place cel mai mult la un tractoras bun este echilibrul pe care il ofera intre performanta si confort. Nu mai e vorba doar de a taia iarba, ci de a transforma o sarcina in ceva aproape placut. M-am regasit de multe ori savurand o cafea la mine pe tractoras, ascultand muzica in casti, in timp ce gazonul capata forma. E o senzatie de control si de eficienta greu de egalat.</p>
-        <p>Recomandarea mea finala este sa nu te grăbești în alegere. Analizeaza-ti curtea, nevoile, bugetul. Nu te lua doar dupa cel mai ieftin model, pentru ca s-ar putea sa te trezesti cu un produs de slabă calitate, greu de manevrat si care se defecteaza repede.</p>
-        <p>Investeste intr-un brand de renume, cu piese de schimb usor de gasit si cu o retea de service buna in Romania. Daca ai posibilitatea, incearca un model inainte sa il cumperi. O tura scurta prin curte iti poate spune multe despre cum se simte, cum manevreaza si daca e potrivit pentru tine.</p>
-        <p>Am vazut multe tractorase care ajungeau sa fie folosite si pentru alte activitati, de la carat lemne la tractat seminte. Versatilitatea asta e un atu major. Deci, daca ai o curte mai mare de jumatate de hectar, sau daca ai multe obstacole si teren accidentat, si mai ales daca vrei sa iti faci viata mai usoara, un tractoras de gazon este, din punctul meu de vedere, cea mai buna investitie pe care o poti face in ingrijirea spatiului tau verde.</p>
-        <p>E o unealta care iti va aduce satisfactie ani de zile.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie sa fac intretinere la un tractoras de gazon?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Intretinerea depinde de cat de des il folosesti, dar in general, pentru un uz normal (cam o data pe saptamana in sezonul de crestere), ar trebui sa verifici nivelul de ulei si sa cureti filtrul de aer dupa fiecare utilizare. Schimbul de ulei si filtre se face de obicei la 50 de ore de functionare sau cel putin o data pe an. Lamele trebuie verificate si ascutite periodic, iar sistemul de taiere trebuie curatat dupa fiecare tuns.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi un tractoras pe gazon umed?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nu este recomandat. Tunsul gazonului umed poate duce la o taiere neuniforma, iarba se poate lipi de puntea de taiere si de caroserie, ingreunand munca si favorizand aparitia bolilor fungice. De asemenea, pe gazon umed, tractorasul poate derapa mai usor, mai ales pe pante, crescand riscul de accidente.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna transmisie hidrostatica si de ce e importanta?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Transmisia hidrostatica iti permite sa controlezi viteza tractorasului prin intermediul unei pedale sau a unui levier, fara a fi nevoie sa schimbi vitezele. Acest lucru face manevrarea mult mai fluida si mai precisa, mai ales in curtile cu multe obstacole, unde trebuie sa schimbi frecvent viteza sau sa faci viraje strânse. E mult mai comod decat o transmisie manuala cu trepte.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de zgomotoase sunt tractorasele de gazon?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Sunt, in general, zgomotoase, la fel ca orice motor cu ardere interna. Nivelul de zgomot poate varia in functie de model si de puterea motorului, dar este recomandat sa folosesti protectie auditiva (casti sau dopuri de urechi) in timp ce le operezi. Modelele mai noi tind sa fie putin mai silentioase decat cele vechi, dar tot se incadreaza in categoria de zgomot ridicat.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot sa las tractorasul afara peste iarna?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nu, in niciun caz. Tractorasul trebuie depozitat intr-un loc uscat si ferit de intemperii, cum ar fi un garaj, un sopron sau o magazie. Umiditatea, inghetul si soarele pot deteriora componentele, vopseaua si pot cauza coroziunea. O depozitare corecta ii va prelungi durata de viata considerabil.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna mulching la tractorasele de gazon?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Mulching-ul este procesul de tocare foarte fina a ierbii taiate si reimprastiarea ei pe gazon. Aceasta iarba tocata se descompune rapid, actionand ca un ingrasamant natural, bogat in nutrienti, care hraneste gazonul si il ajuta sa fie mai des si mai sanatos. Este o metoda ecologica si benefica pentru gazon, eliminand necesitatea de a colecta si a arunca resturile de iarba.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru un gazon mare, cel mai bun echilibru il da <strong>O-Mac TG 13000</strong>: 72 cm latime, 9 CP si, rar la tractorase, pareri bune. Daca vrei confort maxim pe o suprafata foarte mare, <strong>Husqvarna TC 138</strong> are 102 cm si transmisie hidrostatica. Pentru un gazon mediu la pret mic, <strong>Powermat PM-OTS-6HPM</strong> porneste selectia, iar daca vrei un tractoras fara benzina, <strong>Villager VTR 650</strong> merge electric.</p>
+      <p>La un tractoras, totul pleaca de la <strong>suprafata gazonului</strong>: ea decide ce latime de taiere si ce putere iti trebuie. Apoi conteaza <strong>transmisia</strong>, cat de comod conduci, si <strong>ce faci cu iarba</strong>, o aduni in cos sau o toci prin mulching. Un lucru de stiut: tractorasele sunt o cumparatura scumpa, de nisa, deci aproape niciun model nu are pareri online, asa ca ne-am uitat mai ales la suprafata, latime, motor si brand.</p>
+      <p>Am pornit de la tractorasele vandute pe eMAG, le-am verificat suprafata recomandata, latimea de taiere, motorul si transmisia, si le-am grupat pe buget (gazon mediu), gazon mare si premium. Pentru gazon mai mic, vezi si <a href="/cele-mai-bune-masini-de-tuns-iarba/">masinile de tuns iarba</a> si <a href="/cel-mai-bun-robot-de-tuns-iarba/">robotii de tuns iarba</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#suprafata">De ce marime ai nevoie</a></li>
+        <li><a href="#transmisie">Transmisie: manuala, automata sau hidrostatica</a></li>
+        <li><a href="#iarba">Ce faci cu iarba: cos, mulching sau evacuare</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#buget">Tractorase de buget (gazon mediu)</a></li>
+        <li><a href="#mare">Tractorase pentru gazon mare</a></li>
+        <li><a href="#premium">Premium, pentru gazon foarte mare</a></li>
+        <li><a href="#motor">Motor si intretinere</a></li>
+        <li><a href="#cat-costa">Cat costa un tractoras</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="suprafata">De ce marime ai nevoie</h2>
+    <p>Prima si cea mai importanta decizie e sa potrivesti tractorasul cu suprafata gazonului. Latimea de taiere influenteaza direct cat de repede termini:</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Suprafata gazon</th><th>Latime de taiere</th><th>Putere motor</th><th>Transmisie</th></tr></thead>
+        <tbody>
+          <tr><td>Pana in ~2000 mp</td><td>60 - 72 cm</td><td>5 - 9 CP</td><td>Manuala sau automata</td></tr>
+          <tr><td>~2000 - 5000 mp</td><td>72 - 92 cm</td><td>9 - 14 CP</td><td>Automata sau hidrostatica</td></tr>
+          <tr><td>Peste 5000 mp</td><td>peste 100 cm</td><td>14 CP si peste</td><td>Hidrostatica</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Ce trebuie sa retii: pe o suprafata mare, o latime de taiere cat mai mare inseamna mai putine treceri si un timp de lucru mult mai scurt. Dar nu lua un tractoras urias pentru un gazon mic, unde nici nu ai loc sa il manevrezi si platesti degeaba pentru putere si latime pe care nu le folosesti.</p>
+
+    <h2 id="transmisie">Transmisie: manuala, automata sau hidrostatica</h2>
+    <p>Modul in care controlezi viteza schimba mult confortul, mai ales pe un teren cu obstacole:</p>
+    <ul>
+      <li><strong>Manuala (cu trepte):</strong> ai un ambreiaj si schimbi vitezele, ca la o masina cu cutie manuala. E cea mai ieftina, dar mai obositoare cand ocolesti des pomi, straturi sau alei.</li>
+      <li><strong>Automata:</strong> accelerezi si franezi fara sa schimbi trepte. Mai comoda, buna pentru curti cu multe obstacole.</li>
+      <li><strong>Hidrostatica:</strong> controlezi viteza continuu, dintr-o pedala, fara ambreiaj. Cea mai comoda, durabila si cu intretinere redusa, dar si cea mai scumpa.</li>
+    </ul>
+    <p>Pentru un gazon mic si plat, manuala e suficienta. Pentru un gazon mare sau o curte cu multe obstacole, hidrostatica isi merita banii in plus.</p>
+
+    <h2 id="iarba">Ce faci cu iarba: cos, mulching sau evacuare</h2>
+    <p>Tractorasele scapa de iarba taiata in trei feluri, iar unele, numite combi, le combina:</p>
+    <ul>
+      <li><strong>Cos de colectare:</strong> aduna iarba, pentru un gazon ingrijit. Trebuie golit des, cam la 15-20 de minute la cosurile mari de 240-320 l.</li>
+      <li><strong>Mulching:</strong> toaca iarba foarte fin si o lasa pe gazon ca ingrasamant natural. Cea mai buna alegere pentru o intretinere regulata, saptamanala.</li>
+      <li><strong>Evacuare laterala:</strong> arunca iarba in lateral. Utila la iarba inalta, cand cosul s-ar infunda repede.</li>
+    </ul>
+    <p>Daca tunzi des si nu vrei sa golesti un cos, alege un model cu mulching. Daca vrei un gazon curat, cu iarba stransa, mergi pe cos.</p>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Latime</th><th>Motor</th><th>Transmisie</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (<tr><td>{x.short}</td><td>{x.latime}</td><td>{x.motor}</td><td>{x.transm}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="buget">Tractorase de buget, pentru gazon mediu</h2>
+    <p>Cea mai accesibila cale de a trece de la masina impinsa la un tractoras pe care stai. Latimi de 61-66 cm, potrivite pentru un gazon mediu, inclusiv o varianta electrica.</p>
+    <div class="rd-grid">
+      {BUGET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Tractorase de buget pentru gazon mediu: Powermat, Villager si Blackstone" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mare">Tractorase pentru gazon mare</h2>
+    <p>Mai mult motor, latime mai mare si transmisii mai comode, pentru suprafete de peste 1000 mp. Aici intra si branduri serioase, ca Stiga si Alpina.</p>
+    <div class="rd-grid">
+      {MARE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMare} alt="Tractorase pentru gazon mare: O-Mac, Stiga si Alpina" width="1200" height="675" loading="lazy" />
+
+    <h2 id="premium">Premium, pentru gazon foarte mare</h2>
+    <p>Cand ai o suprafata mare de intretinut des si vrei sa termini repede si comod: latime peste 100 cm si transmisie hidrostatica, de la un brand de referinta.</p>
+    <div class="rd-grid">
+      {PREMIUM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPremium} alt="Tractoras premium Husqvarna TC 138 cu transmisie hidrostatica" width="1200" height="675" loading="lazy" />
+
+    <h2 id="motor">Motor si intretinere</h2>
+    <p>Doua lucruri de care depinde cat de bine si cat timp merge tractorasul:</p>
+    <p><strong>Motorul si puterea:</strong> puterea in cai putere conteaza mai ales la iarba deasa, viguroasa, sau pe teren cu pante. Un motor de 11-17 CP trece prin iarba inalta fara sa se inece; pentru un gazon plat, intretinut regulat, 6-9 CP ajung. Nu lua putere multa doar de dragul cifrei: consuma mai mult si costa mai mult.</p>
+    <p><strong>Intretinerea:</strong> verifica uleiul si curata filtrul de aer regulat, cu schimb de ulei si filtre cam la 50 de ore de functionare sau macar o data pe an. Ascute lamele periodic, ca sa taie curat, si curata puntea de resturi dupa fiecare tuns. Iarna, depoziteaza tractorasul la adapost, intr-un loc uscat. La un utilaj pe care il tii ani intregi, service-ul si piesele disponibile conteaza, deci un brand cunoscut ajuta.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-tractoras-gazon')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate tractorasele la oferta</strong>
+        <span>Reducerile din acest moment la tractorase de tuns gazon, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa un tractoras de tuns gazonul</h2>
+    <p>Preturile pornesc de la cateva mii de lei si urca in functie de latime, putere si transmisie:</p>
+    <p><strong>Buget, pentru gazon mediu:</strong> in general 7000-11000 de lei pentru un tractoras cu latime de 61-66 cm si transmisie manuala. Aici intra si variantele electrice, la retea.</p>
+    <p><strong>Gazon mare, raport bun:</strong> circa 12000-16000 de lei pentru 72 cm latime, motor mai puternic si, la unele, cutie automata, de la branduri ca Stiga si Alpina.</p>
+    <p><strong>Premium, gazon foarte mare:</strong> de la circa 23000 de lei in sus pentru o latime peste 100 cm si transmisie hidrostatica, de la Husqvarna. Modelele profesionale, de tip zero-turn, urca mult peste.</p>
+    <p>Pe langa pretul tractorasului, pune la buget benzina si uleiul, lamele de schimb si eventual accesorii ca un cos mai mare sau un kit de mulching. E o investitie pe multi ani, deci merita sa alegi bine de la inceput, potrivit cu marimea reala a gazonului. Pentru suprafete mai mici, o <a href="/masina-de-tuns-gazonul-electrica/">masina electrica de tuns gazonul</a> e mai potrivita si mai ieftina.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
         <p class="author-role">Expert Gradinarit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="cel-mai-bun-tractoras-pentru-tuns-gazonul"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="cel-mai-bun-tractoras-pentru-tuns-gazonul"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="cel-mai-bun-tractoras-pentru-tuns-gazonul" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cel-mai-bun-tractoras-pentru-tuns-gazonul" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

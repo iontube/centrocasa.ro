@@ -1,613 +1,321 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
 import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Aparat de curatat cu aburi",
-  excerpt: "Daca cauti o solutie eficienta si ecologica pentru igienizarea locuintei, fara a folosi substante chimice agresive, un aparat de curatat cu aburi este exact ceea ce ai nevoie. Aceste dispozitive transforma apa in vapori la temperaturi inalte, capabili sa dizolve grasimea, sa elimine bacteriile, virusurile si acarienii, lasand suprafetele curate si sterilizate.",
-  image: "/images/articles/aparat-de-curatat-cu-aburi.webp",
-  category: "Curatenie si Intretinere",
-  categorySlug: "curatenie-intretinere",
-  date: "2026-03-05T07:58:33.848Z",
-  modifiedDate: "2026-03-05T07:58:33.848Z",
-  author: "Elena Dragomir",
-  authorRole: "Consultant Amenajari",
-  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
-};
-
-const faq = [
-  { question: "Cat costa un aparat de curatat cu aburi bun?", answer: "Preturile pentru un aparat de curatat cu aburi bun variaza intre 250 lei pentru modele portabile simple si 950 lei pentru aparate verticale premium. Modelele cu raport calitate-pret excelent se situeaza intre 400 si 700 lei, oferind o buna combinatie de functii si performanta." },
-  { question: "Care este diferenta intre un aparat de curatat cu aburi vertical si unul cu boiler?", answer: "Aparatele verticale (mopuri cu aburi) sunt compacte, rapide la incalzire si ideale pentru pardoseli. Aparatele cu boiler genereaza abur la presiune mai mare, sunt mai versatile datorita accesoriilor si pot curata o gama mai larga de suprafete, dar au un timp de incalzire mai lung." },
-  { question: "Merita sa cumpar un aparat de curatat cu aburi pentru apartamentul meu?", answer: "Da, merita. Un aparat de curatat cu aburi este excelent pentru igienizarea rapida a baiilor, bucatariilor, rosturilor si altor zone. Modelele portabile sau cele verticale compacte sunt perfecte pentru apartamente, ajutand la eliminarea bacteriilor si a murdariei fara chimicale." },
-  { question: "Ce suprafete pot curata cu un aparat de curatat cu aburi?", answer: "Aparatele de curatat cu aburi pot curata o varietate mare de suprafete: pardoseli dure (gresie, faianta, linoleum, parchet laminat), blaturi, cuptoare, aragazuri, chiuvete, baterii, geamuri, oglinzi, tapiterii, saltele si chiar haine. Verificati mereu recomandarile producatorului pentru materialele sensibile." },
-  { question: "Cat de des pot folosi un aparat de curatat cu aburi?", answer: "Un aparat de curatat cu aburi poate fi folosit ori de cate ori este necesara igienizarea. Pentru curatenia zilnica, puteti folosi un model compact. Pentru o curatenie in profunzime, il puteti utiliza saptamanal sau la nevoie. Curatarea regulata previne acumularea murdariei si protejeaza sanatatea familiei." }
-];
-
-const toc = [
-  { title: "Karcher SC 3 EasyFix", id: "karcher-sc-3-easyfix" },
-  { title: "Polti Vaporetto Smart 30 S", id: "polti-vaporetto-smart-30-s" },
-  { title: "Taurus Handy 1000", id: "taurus-handy-1000" },
-  { title: "Cleanmaxx Steam Cleaner 10-in-1", id: "cleanmaxx-steam-cleaner-10-in-1" },
-  { title: "Philips SteamCleaner FC7020/01", id: "philips-steamcleaner-fc702001" },
-  { title: "Ariete Steam Mop 1000W", id: "ariete-steam-mop-1000w" },
-  { title: "Comparatie", id: "comparatie" },
-  { title: "Cum sa alegi cel mai bun aparat de curatat cu aburi pentru casa ta?", id: "ghid" },
-  { title: "Intrebari Frecvente", id: "faq" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['aparat-abur'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Multifunctionale, cu accesorii ---
+  { g: 'multi', id: 'DPS6622BM', badge: 'Cel mai bine notat', short: 'SeveShop SC-06', tip: 'Multifunctional', putere: '1200 W', rezervor: '400 ml',
+    specs: ['nota 4.87 din 191 de pareri, printre cele mai bune', 'multifunctional, cu multe accesorii', '1200 W, rezervor de 400 ml', 'curata multiple suprafete'],
+    pros: ['Nota excelenta, 4.87 din 191 de pareri', 'Multifunctional, cu multe accesorii incluse', 'Curata pardoseli, gresie, geamuri, tapiterie', 'Foarte testat, unul dintre cele mai apreciate'],
+    cons: ['Rezervor mic, 400 ml, il umpli des', 'Putere de 1200 W, medie'],
+    verdict: 'Cel mai bine notat aparat cu abur din selectie si cea mai sigura alegere multifunctionala, cu o nota impresionanta de 4.87 din 191 de pareri, un scor rar la un volum asa mare. SeveShop SC-06 vine cu multe accesorii, care il transforma dintr-un simplu curatator intr-o unealta pentru toata casa: pardoseli, gresie, rosturi, geamuri, tapiterie sau baie, totul cu abur, fara detergenti. Are 1200 W si un rezervor de 400 ml. Cu 191 de pareri, printre cele mai multe din selectie, si nota aproape perfecta, e clar preferatul cumparatorilor, un semn puternic de fiabilitate. Rezervorul de 400 ml e mic, deci il umpli mai des la sesiuni lungi, iar puterea de 1200 W e medie. Il iei cand vrei cel mai apreciat aparat multifunctional cu abur din selectie, cu accesorii pentru toata casa, si nu te deranjeaza sa reumpli rezervorul mai des.' },
+  { g: 'multi', id: 'D54CNTYBM', badge: 'Karcher, premium', short: 'Karcher SC3', tip: 'Multifunctional', putere: '1900 W', rezervor: '1 l',
+    specs: ['Karcher SC3 EasyFix, 1900 W', 'rezervor de 1 litru, autonomie buna', '2 trepte de putere', 'brand premium de curatenie'],
+    pros: ['Karcher, brand premium specializat in curatenie', 'Putere mare, 1900 W, abur rapid', 'Rezervor de 1 litru, sesiuni mai lungi', 'Sistem EasyFix, accesorii usor de schimbat'],
+    cons: ['Pret premium', 'Mai greu decat modelele compacte'],
+    verdict: 'Alegerea premium multifunctionala, de la Karcher, un brand specializat in aparate de curatenie. SC3 EasyFix are 1900 W, printre cele mai mari puteri din selectie, deci produce abur rapid si din belsug, si un rezervor de 1 litru, care iti da autonomie pentru sesiuni mai lungi fara reumplere, plus 2 trepte de putere si sistemul EasyFix, cu care schimbi accesoriile usor. Cu 70 de pareri si nota 4.44 e bine testat si apreciat, iar Karcher inseamna calitate si durabilitate dovedite in curatenie. E o alegere premium, cu un pret pe masura, si mai greu decat modelele compacte. Il iei cand vrei un aparat multifunctional cu abur de la un brand premium, cu putere mare si rezervor generos, pentru curatenie serioasa in toata casa, si esti dispus la un pret mai ridicat pentru calitatea Karcher.' },
+  { g: 'multi', id: 'DYRZBL3BM', badge: 'Presiune mare, 5 bar', short: 'Ariete XvaporDeluxe', tip: 'Multifunctional', putere: '1500 W', rezervor: '1.6 l',
+    specs: ['presiune mare, 5 bar', 'rezervor generos, 1.6 litri', '1500 W, multifunctional', 'de la Ariete, brand italian'],
+    pros: ['Presiune mare, 5 bar, abur care patrunde in murdarie', 'Cel mai mare rezervor, 1.6 litri', 'Ariete, brand italian de electrocasnice', '1500 W, multifunctional cu accesorii'],
+    cons: ['Nota 4.49, buna dar nu maxima', 'Mai greu, cu rezervor mare'],
+    verdict: 'Aparatul de ales daca vrei presiune mare si autonomie lunga. Ariete XvaporDeluxe are o presiune a aburului de 5 bar, printre cele mai mari din selectie, ceea ce inseamna un abur care patrunde mai adanc in murdarie si dizolva mai usor grasimea si petele intarite, si cel mai mare rezervor de aici, 1.6 litri, deci lucrezi mult fara sa reumpli. Are 1500 W, e multifunctional, cu accesorii pentru diverse suprafete, si vine de la Ariete, un brand italian cunoscut de electrocasnice. Cu 47 de pareri si nota 4.49 e bine cotat. Fiind cu rezervor mare, e si mai greu de manevrat. Il iei cand vrei cea mai mare presiune si cel mai mare rezervor din selectie, pentru murdarie mai grea si sesiuni lungi de curatenie, si nu te deranjeaza greutatea in plus a unui rezervor generos.' },
+  { g: 'multi', id: 'D2SVCPYBM', badge: 'Cel mai puternic, 14 in 1', short: 'STEAM-IT Pro', tip: 'Multifunctional', putere: '2000 W', rezervor: '1.5 l',
+    specs: ['cea mai mare putere, 2000 W', '14 in 1, cu abur de mana detasabil', 'rezervor de 1.5 litri', 'nota 4.61 din 66 de pareri'],
+    pros: ['Cea mai mare putere din selectie, 2000 W', '14 in 1, foarte versatil, cu abur de mana detasabil', 'Rezervor mare, 1.5 litri', 'Nota buna, 4.61, bine testat'],
+    cons: ['Mai greu, cu multe accesorii', 'Pret spre mijlocul segmentului'],
+    verdict: 'Cel mai puternic aparat din selectie si unul dintre cele mai versatile, pentru cine vrea sa faca totul cu abur. STEAM-IT Pro are 2000 W, cea mai mare putere de aici, deci produce abur multa si rapid, e un sistem 14 in 1, cu accesorii pentru aproape orice suprafata, si are un abur de mana detasabil, pe care il folosesti separat pentru locuri greu accesibile, geamuri sau tapiterie. Rezervorul de 1.5 litri iti da autonomie buna. Cu 66 de pareri si nota 4.61 e bine testat si apreciat. Fiind bogat in accesorii si puternic, e mai greu de manevrat. Il iei cand vrei cel mai puternic si mai versatil aparat cu abur din selectie, 14 in 1, cu abur de mana detasabil pentru locuri greu accesibile, pentru o curatenie completa in toata casa.' },
+  { g: 'multi', id: 'DRVJNHMBM', badge: 'H.Koenig, accesibil', short: 'H.Koenig NV680', tip: 'Multifunctional', putere: '1200 W', rezervor: '400 ml',
+    specs: ['H.Koenig NV680, pentru toate suprafetele', '1200 W, presiune 3.5 bar', 'rezervor de 400 ml', 'bine testat, 69 de pareri'],
+    pros: ['Presiune buna, 3.5 bar, la un pret accesibil', 'Pentru toate suprafetele, multifunctional', 'H.Koenig, brand cunoscut de electrocasnice', 'Bine testat, 69 de pareri'],
+    cons: ['Nota 4.14, mai modesta', 'Rezervor mic, 400 ml'],
+    verdict: 'Un aparat multifunctional accesibil, cu presiune buna, de la un brand cunoscut. H.Koenig NV680 are 1200 W si o presiune a aburului de 3.5 bar, buna pentru pretul lui, si e gandit pentru toate suprafetele, cu accesorii care il fac util in bucatarie, baie sau pe pardoseli. H.Koenig e un brand cunoscut de electrocasnice, un plus de incredere. Cu 69 de pareri e bine testat, chiar daca nota, 4.14, e mai modesta decat la varful selectiei, deci merita sa citesti recenziile. Rezervorul de 400 ml e mic, deci il umpli mai des. Il iei cand vrei un aparat multifunctional cu abur accesibil, cu presiune decenta si accesorii pentru toate suprafetele, de la un brand cunoscut, si accepti un rezervor mai mic si o nota ceva mai jos in schimbul pretului bun.' },
+  // --- Mopuri cu aburi, pentru pardoseli ---
+  { g: 'mop', id: 'DNBVS9BBM', badge: 'Cel mai vandut', short: 'Rowenta Steam', tip: 'Mop cu abur', putere: '1200 W', rezervor: '0.6 l',
+    specs: ['de departe cel mai vandut, 255 pareri', 'mop vertical pentru pardoseli', '1200 W, incalzire in 30 de secunde', 'filtru anticalcar, 3 trepte'],
+    pros: ['De departe cel mai vandut din selectie, 255 pareri', 'Incalzire rapida, in doar 30 de secunde', 'Filtru anticalcar, protejeaza aparatul', 'Rowenta, brand de incredere, 3 trepte de abur'],
+    cons: ['Doar pentru pardoseli, nu multifunctional', 'Rezervor de 0.6 litri'],
+    verdict: 'Cel mai vandut aparat cu abur din tot articolul si cea mai simpla alegere daca vrei sa igienizezi pardoselile. Rowenta Steam Power e un mop vertical cu abur, care curata si dezinfecteaza gresia, parchetul sigilat sau faianta doar cu abur, fara detergenti, si se incalzeste rapid, in doar 30 de secunde, deci nu astepti. Are 1200 W, 3 trepte de abur, pentru diferite tipuri de pardoseli, si un filtru anticalcar, care protejeaza aparatul de depunerile din apa dura, prelungindu-i viata. Cu 255 de pareri, de departe cele mai multe din selectie, si nota 4.29, e clar preferatul cumparatorilor, iar Rowenta e un brand de incredere. E un mop, deci doar pentru pardoseli, nu multifunctional. Il iei cand vrei cel mai vandut si mai verificat mop cu abur, pentru a igieniza rapid pardoselile fara chimicale, de la un brand de incredere.' },
+  { g: 'mop', id: 'DS4CNTYBM', badge: 'Karcher, pardoseli', short: 'Karcher Upright', tip: 'Mop cu abur', putere: '1600 W', rezervor: '0.5 l',
+    specs: ['Karcher SC3 Upright EasyFix', '1600 W, mop vertical pentru pardoseli', 'reglare a aburului, sistem EasyFix', 'brand premium'],
+    pros: ['Karcher, brand premium de curatenie', 'Putere mare pentru un mop, 1600 W', 'Sistem EasyFix, laveta se prinde usor', 'Reglare a aburului pe trepte'],
+    cons: ['Pret premium pentru un mop', 'Inca 30 de pareri'],
+    verdict: 'Mopul cu abur premium, de la Karcher, pentru cine vrea sa igienizeze pardoselile cu un aparat de calitate. SC3 Upright EasyFix are 1600 W, o putere mare pentru un mop, deci abur rapid si din belsug pe gresie sau parchet sigilat, si sistemul EasyFix, cu care prinzi si desprinzi laveta fara sa te apleci sau sa o atingi murdara. Reglarea aburului pe trepte iti da control in functie de pardoseala. Karcher inseamna calitate si durabilitate in curatenie. Cu 30 de pareri si nota 4.1 e o alegere corecta, chiar daca are inca putine recenzii, iar pretul e premium pentru un mop. Il iei cand vrei un mop cu abur de la Karcher, cu putere mare si sistem comod de prindere a lavetei, pentru pardoseli igienizate fara chimicale, si esti dispus la un pret premium pentru brand.' },
+  { g: 'mop', id: 'DHHFFNYBM', badge: 'Cu 10 accesorii', short: 'STEAM-IT mop', tip: 'Mop cu abur', putere: '1300 W', rezervor: '280 ml',
+    specs: ['mop cu abur cu 10 accesorii', 'incalzire rapida, presiune 10 bar', '1300 W, versatil pentru pret', 'bine testat, 95 de pareri'],
+    pros: ['Vine cu 10 accesorii, mai versatil ca un mop simplu', 'Presiune mare pentru clasa, 10 bar', 'Incalzire rapida, 1300 W', 'Foarte testat, 95 de pareri'],
+    cons: ['Nota 3.8, mai modesta, verifica recenziile', 'Rezervor mic, 280 ml'],
+    verdict: 'Un mop cu abur mai versatil decat de obicei, cu 10 accesorii, la un pret accesibil. STEAM-IT are 1300 W si vine cu 10 accesorii, care il fac mai mult decat un simplu mop de pardoseli, util si pe alte suprafete, si se incalzeste rapid. Presiunea declarata, de 10 bar, e mare pentru clasa lui, ceea ce ajuta la dizolvarea murdariei. Cu 95 de pareri e foarte testat, printre cele mai multe din selectie, deci verificat de multa lume, chiar daca nota, 3.8, e mai modesta, asa ca uita-te la recenzii inainte. Rezervorul de 280 ml e mic, deci il umpli des. Il iei cand vrei un mop cu abur versatil, cu multe accesorii si presiune mare, la un pret accesibil, si accepti o nota ceva mai jos si un rezervor mic in schimbul versatilitatii.' },
+  // --- Compacte, de mana ---
+  { g: 'mana', id: 'DN7L18YBM', badge: 'Puternic, cu afisaj', short: 'Folixs 2500W', tip: 'De mana', putere: '2500 W', rezervor: '1.6 l',
+    specs: ['putere mare, 2500 W', 'rezervor de 1600 ml, cu afisaj', 'presiune 3 bar, 3 trepte', 'bine testat, 64 de pareri'],
+    pros: ['Putere foarte mare, 2500 W', 'Rezervor generos, 1600 ml', 'Afisaj si 3 trepte de reglaj', 'Bine testat, 64 de pareri'],
+    cons: ['Mai greu, cu rezervor mare', 'Brand mai putin cunoscut'],
+    verdict: 'Un aparat compact dar puternic, pentru cine vrea multa putere la un pret accesibil. Folixs are 2500 W, cea mai mare putere din selectie alaturi de STEAM-IT Pro, deci abur din belsug si rapid, si un rezervor generos de 1600 ml, care iti da autonomie lunga. Are un afisaj, care iti arata setarile, si 3 trepte de reglaj al aburului, plus o presiune de 3 bar. Cu 64 de pareri si nota 4.39 e bine testat si apreciat. Fiind cu rezervor mare si putere mare, e mai greu de manevrat, iar brandul e mai putin cunoscut. Il iei cand vrei un aparat cu abur puternic, cu rezervor mare si afisaj, la un pret accesibil, pentru curatenie serioasa, si nu te deranjeaza greutatea mai mare sau un brand mai putin cunoscut.' },
+  { g: 'mana', id: 'DHH9RFYBM', badge: 'Cu ecran tactil', short: 'Excitat 2500W', tip: 'De mana', putere: '2500 W', rezervor: '1.1 l',
+    specs: ['multifunctional, 2500 W', 'ecran tactil pentru control', 'rezervor de 1100 ml', 'nota 4.66 din 29 de pareri'],
+    pros: ['Putere mare, 2500 W', 'Ecran tactil, control modern si usor', 'Rezervor bun, 1100 ml', 'Nota mare, 4.66'],
+    cons: ['Inca 29 de pareri', 'Brand mai putin cunoscut'],
+    verdict: 'Un aparat cu abur modern, cu ecran tactil, pentru cine vrea control usor si putere mare. Excitat are 2500 W, multa putere pentru abur rapid, si un ecran tactil, cu care reglezi setarile modern si comod, o dotare mai rara la acest pret. Rezervorul de 1100 ml iti da autonomie buna, iar aparatul e multifunctional, util pe mai multe suprafete. Cu 29 de pareri si nota 4.66 e bine cotat, printre cele mai apreciate, chiar daca are inca putine recenzii, si vine de la un brand mai putin cunoscut. Il iei cand vrei un aparat cu abur puternic, cu ecran tactil pentru control usor si un rezervor bun, la un pret accesibil, si nu te deranjeaza ca brandul e mai putin cunoscut, in schimbul unei note bune.' },
+  { g: 'mana', id: 'DSN602YBM', badge: 'Cel mai ieftin', short: 'Cecotec Hydro', tip: 'De mana', putere: '1000 W', rezervor: '350 ml',
+    specs: ['cel mai ieftin din selectie', 'Cecotec HydroSteam, 1000 W', 'presiune 3 bar, rezervor 350 ml', 'compact si usor'],
+    pros: ['Cel mai ieftin aparat cu abur din selectie', 'Cecotec, brand cunoscut de electrocasnice', 'Compact si usor de manevrat', 'Presiune decenta, 3 bar'],
+    cons: ['Putere mica, 1000 W', 'Rezervor mic, 350 ml'],
+    verdict: 'Cel mai ieftin aparat cu abur din selectie, pentru cine vrea sa incerce curatenia cu abur cu buget minim. Cecotec HydroSteam are 1000 W si o presiune de 3 bar, decenta pentru clasa lui, intr-un corp compact si usor de manevrat, potrivit pentru curatenie punctuala, in bucatarie, baie sau pe suprafete mici. Cecotec e un brand cunoscut de electrocasnice, un plus de incredere la acest pret. Cu 35 de pareri si nota 4.26 e o alegere corecta la banii ei. Puterea de 1000 W e cea mai mica din selectie, iar rezervorul de 350 ml e mic, deci il iei pentru curatenie usoara si punctuala, nu pentru sesiuni lungi. Il iei cand vrei cel mai ieftin aparat cu abur din selectie, compact, pentru curatenie punctuala si igienizare rapida, si nu ai nevoie de putere mare sau rezervor generos.' },
+  { g: 'mana', id: 'DMN573MBM', badge: 'Foarte testat, clasa A', short: 'Deerma ZQ610', tip: 'De mana', putere: '1700 W', rezervor: 'compact',
+    specs: ['foarte testat, 105 pareri', 'Deerma ZQ610, clasa A, 1700 W', 'compact, alb, de mana', 'igienizare rapida'],
+    pros: ['Foarte testat, 105 pareri', 'Putere buna, 1700 W', 'Clasa A de eficienta', 'Compact si usor de folosit'],
+    cons: ['Nota 3.83, mai modesta, verifica recenziile', 'Rezervor mic'],
+    verdict: 'Un aparat compact foarte testat, pentru cine vrea igienizare rapida cu un aparat de mana. Deerma ZQ610 are 1700 W, o putere buna pentru un aparat compact, e clasa A de eficienta si vine intr-un corp alb, usor de manevrat, potrivit pentru curatenie punctuala si igienizarea suprafetelor din bucatarie sau baie. Cu 105 pareri e printre cele mai testate din selectie, deci verificat de multa lume, chiar daca nota, 3.83, e mai modesta, asa ca merita sa citesti recenziile inainte de a comanda. Rezervorul e mic, deci il iei pentru curatenie punctuala, nu pentru sesiuni lungi. Il iei cand vrei un aparat cu abur compact, foarte testat, cu putere buna si clasa A, pentru igienizare rapida in casa, si accepti o nota ceva mai jos si un rezervor mic in schimbul portabilitatii.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MULTI = PICKS.filter(x => x.g === 'multi');
+const MOP = PICKS.filter(x => x.g === 'mop');
+const MANA = PICKS.filter(x => x.g === 'mana');
+
+const hero = '/images/articles/aparat-de-curatat-cu-aburi.webp';
+const figMulti = '/imagini/articole/aparat-multi.webp';
+const figMop = '/imagini/articole/aparat-mop.webp';
+const figMana = '/imagini/articole/aparat-mana.webp';
+const published = '2026-07-19T15:39:12+03:00';
+
+const faq = [
+  { question: 'Cum functioneaza un aparat de curatat cu abur?', answer: 'Un aparat cu abur incalzeste apa din rezervor pana la fierbere si o transforma in abur sub presiune, pe care il elibereaza printr-o duza sau un accesoriu. Aburul fierbinte dizolva grasimea, murdaria si petele si, foarte important, igienizeaza suprafata, distrugand o mare parte din bacterii si acarieni, totul fara detergenti sau substante chimice, doar cu apa. E o metoda de curatenie ecologica si potrivita in casele cu copii, animale sau persoane alergice, tocmai pentru ca nu foloseste chimicale. Dupa curatare, suprafata se usuca repede, pentru ca aburul contine putina apa. Practic, transformi apa de la robinet intr-un agent de curatare si dezinfectare, fara sa cumperi solutii.' },
+  { question: 'De ce sa aleg curatenia cu abur?', answer: 'Principalul avantaj e ca igienizeaza fara chimicale: aburul fierbinte curata si dezinfecteaza doar cu apa, ideal daca vrei o casa curata fara solutii agresive, mai ales cu copii, animale sau alergii. Apoi, e versatil: cu accesoriile potrivite, un aparat multifunctional curata pardoseli, gresie, rosturi, geamuri, tapiterie, saltele, aragazul sau baia, inlocuind mai multe produse de curatenie. E si eficient pe murdaria grea, pentru ca aburul patrunde si dizolva grasimea intarita mai bine decat o carpa umeda. In plus, suprafetele se usuca repede. Singura conditie e sa ai grija ce suprafete cureti, pentru ca aburul fierbinte nu e potrivit peste tot, si sa golesti calcarul periodic. Pentru o curatenie sanatoasa si completa, aburul e o alegere foarte buna.' },
+  { question: 'Aparat multifunctional, mop sau de mana?', answer: 'Depinde de ce vrei sa cureti. Un aparat multifunctional, de obicei tip canistra cu furtun si multe accesorii, e cel mai versatil: curata pardoseli, dar si geamuri, tapiterie, rosturi, bucatarie sau baie, inlocuind mai multe unelte. Un mop cu abur, vertical, e specializat pe pardoseli, gresie si parchet sigilat, comod si rapid pentru igienizarea podelelor, dar limitat la ele. Un aparat de mana, compact, e portabil si bun pentru curatenie punctuala, suprafete mici si locuri greu accesibile. Alege multifunctionalul daca vrei sa faci totul cu un singur aparat, mopul daca te intereseaza mai ales pardoselile, si cel de mana pentru curatenie usoara si portabila.' },
+  { question: 'Ce conteaza cel mai mult la un aparat cu abur?', answer: 'Cateva lucruri: puterea, presiunea, rezervorul si accesoriile. Puterea, in wati, arata cat de repede se incalzeste si cat abur produce; modelele din selectie merg de la 1000 la 2500 W. Presiunea, in bari, arata cu ce forta iese aburul: mai mare inseamna ca patrunde mai adanc in murdarie, iar valori de 3-5 bari sunt bune pentru uz casnic. Rezervorul de apa determina cat lucrezi fara reumplere; unul mic, de 300-400 ml, il umpli des, unul de 1-1.6 litri iti da autonomie mai lunga. Accesoriile fac diferenta la versatilitate: cu cat sunt mai multe si mai variate, cu atat cureti mai multe suprafete. Alege in functie de cat de des si pe ce suprafete vrei sa il folosesti.' },
+  { question: 'Pe ce suprafete pot folosi aparatul cu abur?', answer: 'Aburul e potrivit pe multe suprafete rezistente la caldura: gresie, faianta, rosturi, aragaz, chiuvete, robineti, sticla si geamuri, dar si tapiterie, saltele, canapele si covoare, cu accesoriul potrivit. Pe pardoseli, e excelent pe gresie si pe parchetul sigilat, cu abur reglat pe treapta mica. Atentie insa la suprafetele sensibile la caldura si umezeala: parchetul nesigilat, laminatul de slaba calitate, lemnul netratat, unele plastice subtiri sau suprafetele lacuite delicat se pot deteriora de la aburul fierbinte, asa ca verifica intai pe o portiune ascunsa si respecta indicatiile producatorului. Regula e simpla: aburul merge pe ce rezista la caldura si umezeala; pentru restul, foloseste-l cu prudenta sau deloc.' },
+  { question: 'Cum intretin un aparat cu abur si de ce conteaza calcarul?', answer: 'Cel mai important e sa lupti cu calcarul, pentru ca aparatul fierbe apa, iar in Romania apa e des dura, bogata in minerale care se depun in interior. Calcarul infunda in timp sistemul, reduce presiunea aburului si poate strica aparatul. De aceea, foloseste apa distilata sau un filtru anticalcar daca aparatul are, ca modelul Rowenta din selectie, si fa detartrarea periodic, conform manualului. Dupa fiecare folosire, goleste rezervorul de apa ramasa, ca sa nu stea si sa formeze depuneri, si lasa aparatul sa se raceasca inainte de a-l depozita. Curata si accesoriile de resturi si spala lavetele. Cu aceasta grija simpla, mai ales impotriva calcarului, un aparat cu abur functioneaza bine si isi pastreaza presiunea ani buni.' },
+  { question: 'Aburul chiar dezinfecteaza?', answer: 'Da, aburul fierbinte, la temperaturi mari, distruge o mare parte din bacterii, virusi si acarieni de pe suprafete, motiv pentru care curatenia cu abur e considerata o metoda buna de igienizare, nu doar de curatare. E deosebit de utila pe suprafetele care intra in contact cu mancarea, in baie, pe saltele si tapiterie, unde se aduna acarieni, sau in casele cu copii mici si persoane alergice, tocmai pentru ca dezinfecteaza fara chimicale. Pentru un efect bun de igienizare, trece incet cu aburul peste suprafata, ca sa aiba timp sa actioneze, si foloseste o putere suficienta. Aburul nu inlocuieste complet toate produsele specializate in orice situatie, dar pentru curatenia si dezinfectarea zilnica a casei e o solutie eficienta si sanatoasa.' },
+  { question: 'Cat costa un aparat de curatat cu abur?', answer: 'In selectie, aparatele accesibile pornesc de la circa 160 de lei pentru un model compact de mana, ca Cecotec, si merg spre 300 de lei pentru unele puternice, ca Folixs sau Excitat. Mopurile cu abur pentru pardoseli sunt in general intre 260 si 800 de lei, de la STEAM-IT pana la Rowenta si Karcher. Aparatele multifunctionale, cu multe accesorii, se aseaza intre circa 290 si 870 de lei, in functie de putere, rezervor si brand, cele premium de la Karcher fiind spre limita de sus. Cel mai bun raport il gasesti alegand tipul potrivit, multifunctional, mop sau de mana, si puterea si rezervorul pe masura cat de des si pe ce suprafete vrei sa cureti, nu neaparat cel mai scump model.' },
+];
+
+const images = [hero, figMulti, figMop, figMana, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Aparat de curatat cu aburi - CentroCasa"
-  description="Daca cauti o solutie eficienta si ecologica pentru igienizarea locuintei, fara a folosi substante chimice agresive, un aparat de curatat cu aburi este exact ceea ce ai nevoie. Aceste dispozitive transforma apa in vapori la temperaturi inalte, capabili sa dizolve grasimea, sa elimine bacteriile, virusurile si acarienii, lasand suprafetele curate si sterilizate."
-  image="/images/articles/aparat-de-curatat-cu-aburi.webp"
+  title="Cele mai bune aparate de curatat cu aburi in 2026: multifunctionale, mopuri si de mana"
+  description="Care sunt cele mai bune aparate de curatat cu aburi in 2026: modele multifunctionale de la SeveShop, Karcher si Ariete, mopuri cu abur pentru pardoseli de la Rowenta, si aparate compacte de mana, comparate pe putere, rezervor si tip. Plus cum functioneaza aburul, pe ce suprafete si intretinerea anticalcar."
+  image={hero}
   type="article"
-  publishedTime="2026-03-05T07:58:33.848Z"
-  modifiedTime="2026-03-05T07:58:33.848Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Elena Dragomir"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cele mai bune aparate de curatat cu aburi' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Aparat de curatat cu aburi</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune aparate de curatat cu aburi</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/curatenie-intretinere/" class="article-category">Curatenie si Intretinere</a>
-        <span class="article-date">5 martie 2026</span>
-      </div>
-      <h1 class="article-title">Aparat de curatat cu aburi</h1>
-    </header>
+    <h1>Cele mai bune aparate de curatat cu aburi</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/aparat-de-curatat-cu-aburi.webp" alt="Aparat de curatat cu aburi" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune aparate de curatat cu aburi: multifunctionale, mopuri si de mana" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list" id="toc-desktop-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
-        ))}
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      <section id="intro">
-        <p>Daca cauti o solutie eficienta si ecologica pentru igienizarea locuintei, fara a folosi substante chimice agresive, un <strong>aparat de curatat cu aburi</strong> este exact ceea ce ai nevoie. Aceste dispozitive transforma apa in vapori la temperaturi inalte, capabili sa dizolve grasimea, sa elimine bacteriile, virusurile si acarienii, lasand suprafetele curate si sterilizate. De la pardoseli si faianta, la aragaz, cuptor, geamuri, tapiterii sau chiar saltele, versatilitatea unui <strong>aparat de curatat cu aburi</strong> il face un aliat de nadejde in orice gospodarie moderna.</p><p>Ce face un <strong>aparat de curatat cu aburi</strong> sa fie diferit de un mop obisnuit sau de un aspirator? Puterea sa de a curata in profunzime si de a dezinfecta fara detergenti. Incalzirea rapida a apei la peste 100 de grade Celsius permite vaporilor sa penetreze murdaria incrustata, sa lichefieze grasimea si sa distruga microorganismele patogene. Acest proces nu doar ca asigura o curatenie impecabila, dar contribuie si la un aer mai sanatos in casa, un aspect important mai ales pentru persoanele cu alergii sau pentru familiile cu copii mici. Alegerea modelului potrivit depinde de nevoile specifice ale locuintei tale, de suprafetele pe care le vei curata cel mai des si de bugetul disponibil.</p><p>Cum alegi cel mai bun <strong>aparat de curatat cu aburi</strong> pentru nevoile tale? Raspunsul se gaseste in compararea atentă a specificațiilor tehnice, a accesoriilor incluse si a raportului calitate-pret. Analizam in continuare cateva modele de top disponibile pe piata romaneasca, pentru a te ajuta sa iei cea mai informata decizie de cumparare. Fiecare produs este evaluat pentru performanta, durabilitate si usurinta in utilizare, oferindu-ti informatiile necesare pentru a investi inteligent.</p>
-      </section>
-
-
-          <article class="product-review" id="karcher-sc-3-easyfix">
-            <div class="product-review__header">
-              <span class="section-tag">Alegerea Noastra</span>
-              <h3>Karcher SC 3 EasyFix</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Aparat de curatat cu aburi vertical
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>1900 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>pana la 75 mp
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>sistem de prindere EasyFix, rezervor detasabil pentru realimentare continua, controlul debitului de abur pe 2 nivele, sistem de filtrare apa
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>plastic ABS de inalta calitate
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Modelul Karcher SC 3 EasyFix se distinge prin eficienta si usurinta in utilizare, fiind o optiune excelenta pentru curatenia generala a casei. Cu o putere de 1900 W, acest <strong>aparat de curatat cu aburi</strong> ajunge la temperatura de operare in doar 30 de secunde, ceea ce inseamna ca poti incepe curatenia aproape imediat. Functia de realimentare continua, datorita rezervorului detasabil, permite operarea pe perioade lungi fara intreruperi, acoperind suprafete extinse de pana la 75 mp.</p><p>Ce diferentiaza acest model este sistemul de prindere EasyFix pentru lavetele de podea. Acesta permite atasarea si detasarea rapida a lavetei, fara a fi nevoie sa te apleci, si asigura o fixare sigura in timpul utilizarii. Controlul debitului de abur pe doua nivele permite adaptarea puterii de curatare la tipul de murdarie si la suprafata tratata – un nivel mai scazut pentru geamuri sau oglinzi, si unul mai intens pentru pardoseli sau bai. Sistemul de filtrare integrat protejeaza aparatul de depunerile de calcar, extinzand durata de viata a acestuia.</p><p>In comparatie cu alte aparate de curatat cu aburi, Karcher SC 3 EasyFix exceleaza prin rapiditatea incalzirii si prin confortul utilizarii. Dezavantajele sunt legate in principal de pretul sau, care se situeaza in segmentul mediu-superior, si de faptul ca, desi este vertical, nu este la fel de agil ca un aparat cu furtun pentru zone greu accesibile. Totusi, pentru curatarea pardoselilor, a faiantei din baie sau bucatarie, si chiar a geamurilor, este o solutie robusta.</p><p>Acest <strong>aparat de curatat cu aburi</strong> este potrivit pentru proprietarii de case care cauta o solutie fiabila si rapida pentru igienizarea zilnica sau saptamanala a suprafetelor dure. Daca vrei sa reduci timpul petrecut cu curatenia si sa obtii rezultate profesionale, Karcher SC 3 EasyFix este o investitie pe termen lung. Pretul sau se invarte in jurul sumei de 750-850 lei, fiind disponibil in majoritatea magazinelor de electrocasnice mari si online.</p><p>Recomandarea noastra pentru Karcher SC 3 EasyFix: Este ideal pentru cei care au suprafete mari de curatat si apreciaza viteza si usurinta in utilizare. Achizitioneaza-l daca prioritizezi un brand de incredere si o performanta constanta.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Incalzire foarte rapida (30 secunde)</li>
-              <li>Realimentare continua cu apa</li>
-              <li>Sistem EasyFix pentru lavete</li>
-              <li>Controlul debitului de abur</li>
-              <li>Filtru anti-calcar integrat</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Pret mai ridicat comparativ cu modelele de baza</li>
-              <li>Nu include un set foarte extins de accesorii pentru toate tipurile de suprafete</li>
-              <li>Poate fi un pic greoi pentru a fi manevrat in spatii foarte inguste</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="polti-vaporetto-smart-30-s">
-            <div class="product-review__header">
-              <span class="section-tag">Raport Calitate-Pret</span>
-              <h3>Polti Vaporetto Smart 30 S</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Aparat de curatat cu aburi cu boiler
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>1700 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>pana la 100 mp
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>boiler din aluminiu, control debit abur, sistem de siguranta pentru capac, indicator luminos pentru abur gata, accesorii multiple
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>plastic rezistent, boiler din aluminiu
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Polti Vaporetto Smart 30 S este un <strong>aparat de curatat cu aburi</strong> care promite o curatenie in profunzime, fiind echipat cu un boiler din aluminiu ce genereaza presiune constanta de abur. Cu o putere de 1700 W, acest model este capabil sa acopere suprafete extinse, pana la 100 mp, fiind ideal pentru case mari sau apartamente spațioase. Boilerul din aluminiu este un avantaj, asigurand o distributie uniforma a caldurii si o durabilitate sporita.</p><p>Ce face acest model deosebit este setul bogat de accesorii incluse, care permit curatarea unei varietati impresionante de suprafete: de la pardoseli, faianta, rosturi, la cuptor, aragaz, chiuveta, geamuri, oglinzi, tapiterii, saltele si chiar si haine. Sistemul de control al debitului de abur permite ajustarea intensitatii in functie de necesitate, de la o actiune delicata la una mai puternica pentru murdarii persistente. Indicatorul luminos care semnaleaza ca aparatul este gata de utilizare este un plus pentru eficienta.</p><p>Comparativ cu alte aparate din segmentul sau de pret, Polti Vaporetto Smart 30 S ofera un raport calitate-pret foarte bun, datorita boilerului durabil si gamei extinse de accesorii. Un dezavantaj ar putea fi timpul de incalzire, care poate dura pana la 5 minute, mai mult decat la modelele cu incalzire instantanee. De asemenea, fiind un aparat cu boiler, poate fi mai voluminos si necesita golirea boilerului la finalul fiecarei utilizari pentru a preveni acumularea de calcar si pentru a asigura o functionare optima.</p><p>Acest <strong>aparat de curatat cu aburi</strong> este recomandat familiilor care cauta o solutie versatila pentru igienizarea intregii case, de la cele mai murdare suprafete din bucatarie si baie, pana la curatarea textilelor sau a geamurilor. Daca esti dispus sa acorzi cateva minute in plus pentru incalzire, in schimbul unei flexibilitati maxime in curatare, Smart 30 S este o alegere inspirata. Pretul acestuia se situeaza in general intre 600 si 700 lei, oferind o valoare excelenta pentru banii investiti.</p><p>Concluzia pentru Polti Vaporetto Smart 30 S: Este un aparat robust, cu un set complet de accesorii, ideal pentru cei care doresc sa acopere o plaja larga de sarcini de curatenie. Achizitioneaza-l daca vrei un echilibru perfect intre performanta, versatilitate si pret.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Boiler din aluminiu pentru durabilitate si presiune constanta</li>
-              <li>Set bogat de accesorii pentru diverse utilizari</li>
-              <li>Acoperire mare a suprafetei de curatat</li>
-              <li>Controlul debitului de abur</li>
-              <li>Indicator luminos pentru pregatire</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Timp de incalzire mai lung (aprox. 5 minute)</li>
-              <li>Necesita golirea boilerului la final</li>
-              <li>Poate fi mai greu de depozitat datorita dimensiunilor</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="taurus-handy-1000">
-            <div class="product-review__header">
-              <span class="section-tag">Pentru Buget Mic</span>
-              <h3>Taurus Handy 1000</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Aparat de curatat cu aburi portabil
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>1000 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>ideal pentru suprafete mici si punctuale
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>compact, usor, rezervor integrat, accesorii pentru diverse utilizari, sistem de siguranta
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>plastic ABS
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Pentru cei care au nevoie de o solutie rapida si la indemana pentru mici sarcini de curatenie, Taurus Handy 1000 este un <strong>aparat de curatat cu aburi</strong> portabil si eficient. Cu o putere de 1000 W, acest dispozitiv compact este perfect pentru a curata si dezinfecta zone restranse, cum ar fi chiuveta, aragazul, cuptorul, rosturile de faianta, bateriile sau chiar tapiteria masinii. Rezervorul integrat, cu o capacitate de aproximativ 250 ml, ofera suficient abur pentru cateva minute de utilizare continua, fiind ideal pentru interventii punctuale.</p><p>Ce face acest <strong>aparat de curatat cu aburi</strong> sa fie o alegere buna pentru un buget redus este simplitatea sa. Nu are componente complexe, ceea ce il face usor de utilizat si de intretinut. In ciuda dimensiunilor sale mici, vine cu o serie de accesorii utile: o perie rotunda, un duza pentru jet concentrat, o racleta pentru geamuri si o extensie de furtun, permitandu-i sa abordeze diverse tipuri de murdarie. Sistemul de siguranta al capacului previne deschiderea accidentala in timpul functionarii.</p><p>Comparativ cu aparatele verticale sau cu boiler, Taurus Handy 1000 are o putere de abur mai mica si o autonomie limitata. Nu este potrivit pentru curatarea pe termen lung a suprafetelor mari precum pardoselile. Totusi, pentru pretul sau, ofera o functionalitate impresionanta. Dezavantajele principale sunt autonomia redusa a rezervorului si faptul ca aburul nu este la fel de puternic ca la modelele mai mari, deci murdaria foarte incrustata poate necesita mai multe treceri.</p><p>Acest <strong>aparat de curatat cu aburi</strong> este perfect pentru persoanele care locuiesc in apartamente mici, pentru cei care au nevoie de un aparat secundar pentru sarcini specifice, sau pentru oricine cauta o solutie de curatenie ecologica si accesibila. Daca nu ai nevoie sa cureti toata casa cu abur, ci doar sa dezinfectezi anumite zone rapid, Taurus Handy 1000 este o alegere excelenta. Pretul sau este de obicei sub 250 lei, fiind una dintre cele mai economice optiuni de pe piata.</p><p>Recomandarea pentru Taurus Handy 1000: Este alegerea potrivita daca bugetul este limitat si ai nevoie de un aparat compact pentru sarcini de curatenie punctuale si dezinfectare rapida. Achizitioneaza-l daca vrei un aparat usor de folosit si depozitat, pentru igienizarea zonelor critice.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Pret foarte accesibil</li>
-              <li>Compact si usor de manevrat</li>
-              <li>Ideal pentru curatenie punctuala</li>
-              <li>Set de accesorii decent pentru dimensiunea sa</li>
-              <li>Usor de depozitat</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Autonomie limitata a rezervorului</li>
-              <li>Putere de abur mai mica comparativ cu aparatele mari</li>
-              <li>Nu este potrivit pentru curatarea suprafetelor mari</li>
-              <li>Rezervorul nu poate fi realimentat in timpul functionarii</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="cleanmaxx-steam-cleaner-10-in-1">
-            <div class="product-review__header">
-              <span class="section-tag">Best Buy 2026</span>
-              <h3>Cleanmaxx Steam Cleaner 10-in-1</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Aparat de curatat cu aburi multifunctional (vertical si portabil)
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>1500 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>potrivit pentru diverse suprafete, inclusiv pardoseli
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>2 in 1 (vertical si portabil), set complet de accesorii, rezervor detasabil, controlul debitului de abur
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>plastic ABS rezistent
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Modelul Cleanmaxx Steam Cleaner 10-in-1 se pozitioneaza ca o solutie versatila, combinand functionalitatea unui aparat vertical cu cea a unui aparat portabil. Cu o putere de 1500 W, acesta este capabil sa genereze suficient abur pentru a curata eficient o varietate de suprafete, de la pardoseli dure, la blaturi, cuptoare, bai, geamuri si chiar tapiterii. Designul 2 in 1 il face adaptabil, permitandu-ti sa cureti atat podelele extinse, cat si zonele greu accesibile sau obiectele mici.</p><p>Ce ofera acest <strong>aparat de curatat cu aburi</strong> este flexibilitatea. Poate fi folosit ca un mop cu abur pentru pardoseli, iar apoi unitatea portabila poate fi detasata pentru a curata plita, chiuveta, rosturile sau chiar a reimprospata perdelele. Setul de accesorii este generos, incluzand perii de diferite dimensiuni, o racleta pentru geamuri, un adaptor pentru duza si alte piese care acopera majoritatea nevoilor de curatenie. Rezervorul detasabil simplifica procesul de umplere si golire.</p><p>Comparativ cu un aparat dedicat doar pentru pardoseli sau doar portabil, acest model 10-in-1 oferă o soluție integrată. Dezavantajele ar putea fi legate de greutatea sa combinată în modul vertical, care poate fi mai mare decât a unui mop cu abur dedicat, sau de durabilitatea pe termen lung a mecanismului de cuplare/decuplare între cele două componente. De asemenea, puterea aburului, deși suficientă pentru curățarea obișnuită, s-ar putea să nu fie la fel de intensă ca la aparatele cu boiler de înaltă presiune.</p><p>Acest <strong>aparat de curatat cu aburi</strong> este ideal pentru familiile care caută o singură unealtă capabilă să gestioneze o mare varietate de sarcini de curățenie în casă. Daca vrei să renunți la multiple produse de curățenie și să optezi pentru o soluție all-in-one, Cleanmaxx Steam Cleaner 10-in-1 merită luat în considerare. Prețul său se situează de obicei între 450 și 550 lei, oferind o valoare excelentă pentru un aparat multifuncțional.</p><p>Recomandarea pentru Cleanmaxx Steam Cleaner 10-in-1: Este o alegere excelentă pentru cei care doresc versatilitate maximă și doresc să simplifice procesul de curățenie. Achiziționează-l dacă apreciezi un aparat care poate face aproape orice, de la pardoseli la zone greu accesibile.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>2 in 1: vertical si portabil</li>
-              <li>Set extins de accesorii</li>
-              <li>Rezervor detasabil pentru umplere usoara</li>
-              <li>Controlul debitului de abur</li>
-              <li>Bun raport calitate-pret pentru multifunctionalitate</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Poate fi mai greu in modul vertical</li>
-              <li>Durabilitatea mecanismului de cuplare poate fi o preocupare pe termen lung</li>
-              <li>Puterea aburului poate fi inferioara modelelor dedicate cu boiler</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="philips-steamcleaner-fc702001">
-            <div class="product-review__header">
-              <span class="section-tag">Premium</span>
-              <h3>Philips SteamCleaner FC7020/01</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Aparat de curatat cu aburi vertical
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>1500 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>pana la 50 mp
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>incalzire rapida (sub 20 secunde), sistem anti-calcar, rezervor detasabil, filtru microfibra, design ergonomic
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>plastic ABS de inalta calitate
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Philips SteamCleaner FC7020/01 se impune ca o optiune premium in segmentul aparatelor de curatat cu aburi verticale, fiind proiectat pentru eficienta si confort. Cu o putere de 1500 W, acest <strong>aparat de curatat cu aburi</strong> incalzeste apa in mai putin de 20 de secunde, permitand o curatenie rapida si fara intreruperi. Este conceput pentru a igieniza pardoselile dure, indepartand eficient 99.9% dintre bacteriile si virusurile comune, fara a necesita utilizarea de substante chimice. Capacitatea rezervorului este de 0.4 litri, suficient pentru a curata aproximativ 50 mp.</p><p>Ce il recomanda ca produs premium este atentia la detalii si tehnologia integrata. Sistemul anti-calcar protejeaza elementele de incalzire, prelungind durata de viata a aparatului, in timp ce filtrul de microfibra integrat capteaza praful si murdaria, lasand podelele curate si stralucitoare. Rezervorul detasabil permite umplerea si golirea usoara, iar designul ergonomic face manevrarea sa placuta, chiar si pe perioade mai lungi. Aparatul dispune de un singur nivel de abur, optimizat pentru pardoseli.</p><p>In comparatie cu alte aparate verticale, Philips FC7020/01 se diferentiaza prin viteza de incalzire si prin sistemul de filtrare eficient. Dezavantajele ar putea fi legate de pretul mai ridicat fata de modelele entry-level si de faptul ca este dedicat exclusiv curatarii pardoselilor, neavand accesorii pentru alte suprafete. De asemenea, lipsa controlului asupra debitului de abur poate fi un minus pentru utilizatorii care doresc sa ajusteze intensitatea pentru diferite tipuri de suprafete.</p><p>Acest <strong>aparat de curatat cu aburi</strong> este ideal pentru proprietarii de case care acorda prioritate igienei, in special familiilor cu copii mici sau persoane cu alergii, si care doresc o solutie eficienta pentru pardoselile dure. Daca apreciezi un brand de renume, performanta constanta si un design elegant, Philips SteamCleaner FC7020/01 este o investitie justificata. Pretul sau se situeaza in general intre 800 si 950 lei.</p><p>Recomandarea pentru Philips SteamCleaner FC7020/01: Este alegerea perfecta pentru cei care cauta un aparat de curatat cu aburi vertical de inalta calitate, eficient si rapid. Achizitioneaza-l daca vrei sa obtii pardoseli impecabil de curate si igienizate, cu minim de efort.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Incalzire extrem de rapida (sub 20 secunde)</li>
-              <li>Elimina 99.9% din bacterii si virusuri</li>
-              <li>Sistem anti-calcar pentru durabilitate</li>
-              <li>Filtru de microfibra integrat</li>
-              <li>Design ergonomic si usor de manevrat</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Pret mai ridicat</li>
-              <li>Dedicat doar pardoselilor</li>
-              <li>Lipsa controlului debitului de abur</li>
-              <li>Autonomie limitata de 50 mp per umplere</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="ariete-steam-mop-1000w">
-            <div class="product-review__header">
-              <span class="section-tag">Raport Calitate-Pret</span>
-              <h3>Ariete Steam Mop 1000W</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Aparat de curatat cu aburi vertical
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>1000 W
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>potrivit pentru pardoseli dure
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>incalzire rapida, rezervor detasabil, filtru anti-calcar, cablu lung de alimentare, accesorii pentru curatare verticala
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>plastic ABS
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Ariete Steam Mop 1000W este o optiune accesibila si eficienta pentru cei care doresc sa beneficieze de avantajele curateniei cu aburi pentru pardoselile dure. Cu o putere de 1000 W, acest <strong>aparat de curatat cu aburi</strong> incalzeste apa rapid, permitand igienizarea zonelor murdare in scurt timp. Este ideal pentru indepartarea murdariei, grasimii si bacteriilor de pe faianta, linoleum, parchet laminat sau alte suprafete similare, lasand in urma un finisaj curat si igienizat.</p><p>Ce face acest model atractiv este rezervorul sau detasabil, care permite o umplere si golire facila, precum si un filtru anti-calcar integrat ce protejeaza aparatul si ii prelungeste durata de viata, mai ales in zonele cu apa dura. Cablul de alimentare lung ofera libertate de miscare in timpul curateniei, iar greutatea redusa il face usor de manevrat. In plus, vine cu accesorii care permit utilizarea sa si pentru curatarea verticala a anumitor suprafete, cum ar fi usile de dus sau blaturile.</p><p>Comparativ cu aparatele cu o putere mai mare, Ariete Steam Mop 1000W are o presiune a aburului mai mica, ceea ce inseamna ca murdaria foarte veche sau incrustata ar putea necesita mai multe treceri. Totusi, pentru curatenia zilnica sau saptamanala, performanta sa este satisfacatoare. Dezavantajele sunt legate de autonomia rezervorului, care poate fi mai mica decat la alte modele, si de faptul ca nu este la fel de robust ca aparatele din gamele superioare.</p><p>Acest <strong>aparat de curatat cu aburi</strong> este perfect pentru cei care cauta o solutie simpla si eficienta pentru igienizarea pardoselilor, fara a investi o suma mare de bani. Daca locuiesti intr-un apartament sau o casa cu suprafete predominant dure si vrei sa renunti la chimicale, Ariete Steam Mop 1000W este o alegere inspirata. Pretul sau se situeaza in general intre 300 si 400 lei, fiind o optiune foarte accesibila.</p><p>Recomandarea pentru Ariete Steam Mop 1000W: Este modelul ideal pentru cei cu un buget limitat, care doresc un aparat de curatat cu aburi vertical simplu, dar eficient. Achizitioneaza-l daca prioritizezi un pret mic si o curatenie rapida a pardoselilor.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Pret accesibil</li>
-              <li>Incalzire rapida</li>
-              <li>Rezervor detasabil</li>
-              <li>Filtru anti-calcar</li>
-              <li>Cablu lung de alimentare</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Putere de abur mai mica</li>
-              <li>Autonomie limitata a rezervorului</li>
-              <li>Nu este la fel de robust ca modelele premium</li>
-              <li>Accesoriile pentru curatare verticala sunt de baza</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-
-          <section id="comparatie">
-            <h2>Comparatie</h2>
-            <p>Comparatia rapida a celor mai populare aparate de curatat cu aburi disponibile pe piata te va ajuta sa identifici modelul care se potriveste cel mai bine nevoilor tale specifice. Fiecare produs are avantaje distincte, fie ca este vorba de versatilitate, putere, pret sau usurinta in utilizare.</p>
-            <div class="comparison-outer">
-              <div class="comparison-hint">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                Gliseaza pentru a vedea tot tabelul
-              </div>
-              <div class="comparison-wrap">
-                <table class="comparison-table">
-                  <thead>
-                    <tr>
-                      <th>Produs</th>
-                      <th>Tip</th>
-                      <th>Putere</th>
-                      <th>Suprafata</th>
-                      <th>Functii</th>
-                      <th>PotrivitPentru</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-              <tr>
-                <td><strong>Karcher SC 3 EasyFix</strong></td>
-                <td>Vertical</td>
-                <td>1900 W</td>
-                <td>75 mp</td>
-                <td>EasyFix, realimentare continua, control abur</td>
-                <td>Curatenie rapida, suprafete mari</td>
-              </tr>
-
-              <tr>
-                <td><strong>Polti Vaporetto Smart 30 S</strong></td>
-                <td>Cu boiler</td>
-                <td>1700 W</td>
-                <td>100 mp</td>
-                <td>Boiler aluminiu, set accesorii extins</td>
-                <td>Curatenie generala, versatilitate</td>
-              </tr>
-
-              <tr>
-                <td><strong>Taurus Handy 1000</strong></td>
-                <td>Portabil</td>
-                <td>1000 W</td>
-                <td>Punctual</td>
-                <td>Compact, usor, accesorii de baza</td>
-                <td>Sarcini mici, buget redus</td>
-              </tr>
-
-              <tr>
-                <td><strong>Cleanmaxx Steam Cleaner 10-in-1</strong></td>
-                <td>Vertical/Portabil</td>
-                <td>1500 W</td>
-                <td>Diverse</td>
-                <td>2 in 1, set accesorii generos</td>
-                <td>Multifunctionalitate, adaptabilitate</td>
-              </tr>
-
-              <tr>
-                <td><strong>Philips SteamCleaner FC7020/01</strong></td>
-                <td>Vertical</td>
-                <td>1500 W</td>
-                <td>50 mp</td>
-                <td>Incalzire rapida, anti-calcar, filtru microfibra</td>
-                <td>Igienizare pardoseli, calitate premium</td>
-              </tr>
-
-              <tr>
-                <td><strong>Ariete Steam Mop 1000W</strong></td>
-                <td>Vertical</td>
-                <td>1000 W</td>
-                <td>Pardoseli dure</td>
-                <td>Rezervor detasabil, anti-calcar, cablu lung</td>
-                <td>Buget redus, pardoseli</td>
-              </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-
-          <section id="ghid">
-            <h2>Cum sa alegi cel mai bun aparat de curatat cu aburi pentru casa ta?</h2>
-            <div class="guide">
-              <p>Cum poti alege aparatul de curatat cu aburi potrivit pentru tine? Gandeste-te la suprafetele pe care le vei curata cel mai des. Daca principalul tau scop este igienizarea pardoselilor, un aparat vertical precum Karcher SC 3 EasyFix sau Philips SteamCleaner FC7020/01 este o alegere excelenta. Acestea sunt concepute pentru a acoperi rapid suprafete mari si a le lasa curate si stralucitoare. Daca ai nevoie de versatilitate si vrei sa cureti si alte zone, cum ar fi blaturi, cuptoare, bai sau chiar tapiterii, atunci un aparat multifuncțional precum Cleanmaxx Steam Cleaner 10-in-1 sau Polti Vaporetto Smart 30 S, cu setul lor bogat de accesorii, se potriveste mai bine.</p><h4>Am nevoie de un aparat pentru curatenie generala sau pentru sarcini specifice?</h4><p>Raspunsul la aceasta intrebare defineste tipul de aparat de curatat cu aburi pe care il vei achizitiona. Daca vrei sa igienizezi intreaga casa, de la podele la bai si bucatarii, si chiar si textile, atunci un model cu boiler si multiple accesorii, cum este Polti Vaporetto Smart 30 S, este indicat. In schimb, daca ai nevoie doar sa dezinfectezi rapid chiuveta, aragazul sau sa cureti geamurile, un aparat portabil si compact precum Taurus Handy 1000 sau accesorii dedicate ale unui model 2 in 1 sunt mai potrivite si mai economice. Acest tip de aparat este un excelent complement pentru un aspirator robot, despre care poti afla mai multe in articolul nostru <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">Cel mai bun aspirator robot pentru casa</a>.</p><h4>Ce putere si ce autonomie sunt necesare?</h4><p>Puterea (masurata in W) influenteaza viteza de incalzire si intensitatea aburului. Un aparat cu putere mai mare (peste 1500W) va incalzi apa mai repede si va genera un abur mai puternic, eficient pentru murdarii incrustate. Autonomia, fie ca este data de capacitatea rezervorului sau de posibilitatea realimentarii continue, este cruciala pentru suprafetele mari. Daca ai o locuinta extinsa, cauta modele cu realimentare continua (Karcher SC 3 EasyFix) sau cu rezervoare mari (Polti Vaporetto Smart 30 S). Pentru apartamente mici, autonomia de 5-10 minute a unui aparat portabil poate fi suficienta.</p><h4>Ce accesorii sunt esentiale si ce buget am?</h4><p>Verifica intotdeauna ce accesorii sunt incluse in pachet. Perii de diferite dimensiuni, duze pentru jet concentrat, raclete pentru geamuri, si adaptoare pentru zone greu accesibile sunt cele mai utile. Pentru cei cu un buget redus, modele precum Taurus Handy 1000 sau Ariete Steam Mop 1000W ofera solutii eficiente fara a depasi 400 lei. Daca vrei o performanta superioara si functii premium, pregateste-te sa investesti intre 700 si 950 lei pentru modele precum Karcher sau Philips. Alegerea finala depinde de prioritatile tale: buget, tipul de curatenie, suprafetele de tratat si frecventa utilizarii.</p>
-            </div>
-          </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat costa un aparat de curatat cu aburi bun?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Preturile pentru un aparat de curatat cu aburi bun variaza intre 250 lei pentru modele portabile simple si 950 lei pentru aparate verticale premium. Modelele cu raport calitate-pret excelent se situeaza intre 400 si 700 lei, oferind o buna combinatie de functii si performanta.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Care este diferenta intre un aparat de curatat cu aburi vertical si unul cu boiler?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Aparatele verticale (mopuri cu aburi) sunt compacte, rapide la incalzire si ideale pentru pardoseli. Aparatele cu boiler genereaza abur la presiune mai mare, sunt mai versatile datorita accesoriilor si pot curata o gama mai larga de suprafete, dar au un timp de incalzire mai lung.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar un aparat de curatat cu aburi pentru apartamentul meu?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita. Un aparat de curatat cu aburi este excelent pentru igienizarea rapida a baiilor, bucatariilor, rosturilor si altor zone. Modelele portabile sau cele verticale compacte sunt perfecte pentru apartamente, ajutand la eliminarea bacteriilor si a murdariei fara chimicale.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce suprafete pot curata cu un aparat de curatat cu aburi?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Aparatele de curatat cu aburi pot curata o varietate mare de suprafete: pardoseli dure (gresie, faianta, linoleum, parchet laminat), blaturi, cuptoare, aragazuri, chiuvete, baterii, geamuri, oglinzi, tapiterii, saltele si chiar haine. Verificati mereu recomandarile producatorului pentru materialele sensibile.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des pot folosi un aparat de curatat cu aburi?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un aparat de curatat cu aburi poate fi folosit ori de cate ori este necesara igienizarea. Pentru curatenia zilnica, puteti folosi un model compact. Pentru o curatenie in profunzime, il puteti utiliza saptamanal sau la nevoie. Curatarea regulata previne acumularea murdariei si protejeaza sanatatea familiei.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cel mai vandut aparat cu abur din selectie e mopul <strong>Rowenta Steam Power</strong>, iar cel mai bine notat, multifunctionalul <strong>SeveShop SC-06</strong>, cu 4.87 din 191 de pareri. Pentru cea mai mare putere, <strong>STEAM-IT Pro</strong> are 2000 W si e 14 in 1, iar la buget mic, <strong>Cecotec HydroSteam</strong> e cel mai accesibil.</p>
+      <p>Un aparat cu abur curata si <strong>igienizeaza fara chimicale</strong>, doar cu apa fiarta, iar cand alegi conteaza <strong>tipul</strong>, multifunctional, mop sau de mana, <strong>puterea</strong>, <strong>rezervorul</strong> si <strong>accesoriile</strong>. Mai jos gasesti direct recomandarile, grupate pe tipuri, iar sub ele un ghid despre cum alegi si pe ce suprafete il folosesti.</p>
+      <p>Am pornit de la aparatele de curatat cu abur in stoc pe eMAG, cu cele mai multe pareri, si le-am impartit in multifunctionale, cu multe accesorii, mopuri cu abur pentru pardoseli, si aparate compacte de mana, ca sa gasesti repede tipul potrivit pentru ce ai de curatat. Pentru pardoseli, vezi <a href="/mop-cu-aburi-pentru-podele/">mopurile cu aburi</a>, iar pentru haine, <a href="/statie-de-calcat-cu-aburi/">statiile de calcat cu aburi</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#multi">Multifunctionale, cu accesorii</a></li>
+        <li><a href="#mop">Mopuri cu aburi, pentru pardoseli</a></li>
+        <li><a href="#mana">Compacte, de mana</a></li>
+        <li><a href="#de-ce">De ce curatenia cu abur</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#suprafete">Pe ce suprafete il folosesti</a></li>
+        <li><a href="#intretinere">Intretinere si calcar</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Putere</th><th>Rezervor</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.putere}</td>
+              <td>{x.rezervor}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="multi">Multifunctionale, cu accesorii</h2>
+    <p>Tip canistra, cu furtun si multe accesorii, curata aproape orice suprafata: pardoseli, geamuri, tapiterie, rosturi, bucatarie sau baie. Cea mai versatila alegere, care inlocuieste mai multe unelte de curatenie.</p>
+    <div class="rd-grid">
+      {MULTI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMulti} alt="Aparate multifunctionale cu abur: SeveShop, Karcher, Ariete, STEAM-IT" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mop">Mopuri cu aburi, pentru pardoseli</h2>
+    <p>Verticale, specializate pe pardoseli: igienizeaza gresia, faianta si parchetul sigilat doar cu abur, comod si rapid. Alegerea daca te intereseaza mai ales podelele curate si dezinfectate, fara chimicale.</p>
+    <div class="rd-grid">
+      {MOP.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMop} alt="Mopuri cu aburi pentru pardoseli: Rowenta, Karcher, STEAM-IT" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mana">Compacte, de mana</h2>
+    <p>Portabile si usoare, pentru curatenie punctuala si locuri greu accesibile: bucatarie, baie, suprafete mici. Unele au putere mare si rezervor generos, la un pret accesibil, pentru cine vrea flexibilitate.</p>
+    <div class="rd-grid">
+      {MANA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMana} alt="Aparate cu abur compacte, de mana: Folixs, Excitat, Cecotec, Deerma" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-aparat-aburi').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate aparatele cu abur la oferta</strong>
+        <span>Reducerile din acest moment la aparate de curatat cu aburi, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce curatenia cu abur</h2>
+    <p>Curatenia cu abur are un avantaj pe care putine metode il au: <strong>igienizeaza doar cu apa</strong>, fara detergenti sau substante chimice. Aburul fierbinte, produs prin fierberea apei din rezervor, dizolva grasimea si murdaria si, in acelasi timp, distruge o mare parte din bacterii si acarieni, curatand si dezinfectand deodata.</p>
+    <p>Asta il face ideal in <strong>casele cu copii, animale sau persoane alergice</strong>, unde vrei o curatenie temeinica fara solutii agresive care lasa reziduuri sau mirosuri. Pe langa aspectul sanatos, un aparat cu abur e si <strong>versatil si economic</strong>: cu accesoriile potrivite, un model multifunctional inlocuieste mai multe produse de curatenie, de la solutii de pardoseli la cele de geamuri sau de baie, iar singurul consumabil e apa. Aburul e eficient si pe murdaria grea, pentru ca patrunde si dizolva grasimea intarita mai bine decat o carpa umeda, iar suprafetele se usuca repede. Pentru o casa curata, sanatoasa si fara chimicale, aburul e una dintre cele mai bune solutii.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua aparate cu abur:</p>
+    <ul>
+      <li><strong>Tipul:</strong> multifunctional, cu multe accesorii, pentru toate suprafetele; mop, pentru pardoseli; de mana, pentru curatenie punctuala.</li>
+      <li><strong>Puterea:</strong> in wati, arata cat de repede se incalzeste si cat abur produce. Modelele din selectie au intre 1000 si 2500 W.</li>
+      <li><strong>Presiunea:</strong> in bari, arata cu ce forta iese aburul. Mai mare inseamna ca patrunde mai adanc in murdarie; 3-5 bari sunt buni pentru casa.</li>
+      <li><strong>Rezervorul de apa:</strong> unul mic, de 300-400 ml, il umpli des; unul de 1-1.6 litri iti da autonomie mai lunga.</li>
+      <li><strong>Accesoriile:</strong> cu cat sunt mai multe si mai variate, cu atat cureti mai multe suprafete, de la rosturi la tapiterie.</li>
+      <li><strong>Anticalcarul:</strong> un filtru sau un sistem anticalcar protejeaza aparatul de depunerile din apa dura, foarte utile la noi.</li>
+    </ul>
+
+    <h2 id="suprafete">Pe ce suprafete il folosesti</h2>
+    <p>Aburul e potrivit pe multe suprafete rezistente la caldura. Curata excelent <strong>gresia, faianta, rosturile, aragazul, chiuvetele si robinetii</strong>, unde dizolva grasimea si depunerile, dar si <strong>geamurile, sticla, tapiteria, saltelele, canapelele si covoarele</strong>, cu accesoriul potrivit. Pe pardoseli, merge foarte bine pe gresie si pe parchetul sigilat, cu aburul reglat pe treapta mica.</p>
+    <p>E important, insa, sa stii si <strong>unde sa nu il folosesti</strong>. Suprafetele sensibile la caldura si umezeala, ca parchetul nesigilat, laminatul de slaba calitate, lemnul netratat, unele plastice subtiri sau finisajele lacuite delicat, se pot deteriora, umfla sau decolora de la aburul fierbinte. Regula e simpla: aburul merge pe ce rezista la caldura si umezeala, iar pentru restul il folosesti cu prudenta sau deloc. Cel mai sigur e sa incerci intai pe o portiune ascunsa si sa respecti indicatiile producatorului atat pentru aparat, cat si pentru suprafata. Asa profiti de puterea aburului fara sa strici nimic.</p>
+
+    <h2 id="intretinere">Intretinere si calcar</h2>
+    <p>Cel mai important lucru la un aparat cu abur e <strong>lupta cu calcarul</strong>. Aparatul fierbe apa, iar in Romania apa de la robinet e des dura, bogata in minerale care se depun in interior si, in timp, infunda sistemul, reduc presiunea aburului si pot strica aparatul. Ca sa eviti asta, foloseste apa distilata sau un aparat cu filtru anticalcar, ca modelul Rowenta din selectie, si fa detartrarea periodic, conform manualului.</p>
+    <p>Dupa fiecare folosire, <strong>goleste rezervorul</strong> de apa ramasa, ca sa nu stea si sa formeze depuneri, si lasa aparatul sa se raceasca inainte de a-l depozita. Curata accesoriile de resturi si spala lavetele mopului, ca sa nu ramana murdare si sa miroasa. Verifica periodic duzele si orificiile de abur si desfunda-le daca s-au blocat. Cu aceasta grija simpla, mai ales impotriva calcarului, un aparat cu abur isi pastreaza presiunea si functioneaza bine ani la rand, in timp ce unul neglijat isi pierde puterea si se strica mai repede.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tip, putere si accesorii:</p>
+    <p><strong>Compacte, de mana:</strong> de la circa 160 de lei pentru un model accesibil, ca Cecotec, si spre 300 de lei pentru unele puternice, cu rezervor mare, ca Folixs sau Excitat.</p>
+    <p><strong>Mopuri cu aburi:</strong> in general intre 260 si 800 de lei, de la STEAM-IT pana la Rowenta si Karcher, pentru igienizarea pardoselilor.</p>
+    <p><strong>Multifunctionale:</strong> intre circa 290 si 870 de lei, in functie de putere, rezervor si accesorii, cele premium de la Karcher fiind spre limita de sus.</p>
+    <p>Pe langa pret, alege dupa <strong>ce vrei sa cureti</strong>: un multifunctional daca vrei sa faci totul cu un aparat, un mop daca te intereseaza pardoselile, sau unul de mana pentru curatenie punctuala. Potriveste puterea, rezervorul si accesoriile cu cat de des si pe ce suprafete il folosesti, si cauta un sistem anticalcar daca ai apa dura. Cel mai bun raport il gasesti alegand aparatul potrivit nevoii, nu neaparat cel mai scump. Pentru un plan de curatenie, vezi si ghidul <a href="/cum-sa-cureti-eficient-casa/">cum sa cureti eficient casa</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">ED</div>
       <div class="author-info">
-        <h4><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></h4>
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
         <p class="author-role">Consultant Amenajari</p>
-        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+        <p class="author-bio">Elena scrie despre curatenie si intretinerea casei. Cauta aparatele care chiar usureaza treaba, nu pe cele cu cele mai multe functii pe cutie.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="aparat-de-curatat-cu-aburi"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <!-- Prev/Next Navigation -->
-    <PrevNextNav
-      currentSlug="aparat-de-curatat-cu-aburi"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="aparat-de-curatat-cu-aburi" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="aparat-de-curatat-cu-aburi" currentCategory="curatenie-intretinere" articles={relatedArticles} />
   </article>
-
-  <script>
-    document.querySelectorAll('.comparison-outer').forEach(outer => {
-      const wrap = outer.querySelector('.comparison-wrap');
-      if (!wrap) return;
-      function checkScroll() {
-        const canScroll = wrap.scrollWidth > wrap.clientWidth;
-        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
-        outer.classList.toggle('can-scroll', canScroll && !atEnd);
-      }
-      checkScroll();
-      wrap.addEventListener('scroll', checkScroll, { passive: true });
-      window.addEventListener('resize', checkScroll, { passive: true });
-    });
-
-    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
-    if (tocLinks.length > 0) {
-      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
-      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              tocLinks.forEach(a => a.classList.remove('active'));
-              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
-              match?.classList.add('active');
-            }
-          }
-        },
-        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
-      );
-      sections.forEach(s => observer.observe(s));
-    }
-  </script>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

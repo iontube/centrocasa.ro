@@ -1,254 +1,319 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Sistem de irigare automata pentru gradina",
-  excerpt: "Cel mai bun sistem de irigare automata pentru gradina pentru majoritatea oamenilor este un kit de la Gardena sau Rain Bird, care ofera un echilibru excelent intre pret, fiabilitate si usurinta in utilizare. Acestea iti scutesc timp pretios si asigura ca plantele tale primesc apa necesara, fara risipa.",
-  image: "/images/articles/sistem-de-irigare-automata-pentru-gradina.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-02-09T13:17:41.710Z",
-  modifiedDate: "2026-02-09T13:17:41.710Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "cat costa un sistem de irigare automata pentru gradina", answer: "Un sistem de irigare automata pentru gradina costa intre 150 lei pentru un kit simplu de picurare si poate ajunge pana la 5000 lei sau chiar mai mult pentru sisteme profesionale cu aspersoare ingropate. Un kit mediu, echilibrat, cu functii smart, se invarte in jurul a 800-1500 lei." },
-  { question: "care e diferenta intre irigare prin picurare si aspersoare", answer: "Irigarea prin picurare livreaza apa incet, direct la radacina plantelor, fiind ideala pentru legume si flori, economisind apa. Aspersoarele stropesc apa pe o suprafata mai larga, fiind potrivite pentru gazon si suprafete mari, dar pot irosi mai multa apa prin evaporare." },
-  { question: "merita sa cumpar un sistem de irigare automata pentru gradina mica", answer: "Da, merita chiar si pentru o gradina mica. Un sistem de irigare automata te scapa de grija zilnica a udarii, asigura ca plantele primesc apa necesara constant si previne suprasolicitarea sau uscarea lor. Kiturile de picurare sunt perfecte pentru suprafete restranse." },
-  { question: "ce sistem de irigare automata pentru gradina e mai bun", answer: "Cel mai bun sistem de irigare automata pentru gradina depinde de nevoile tale. Pentru fiabilitate si functii smart, Gardena si Rain Bird sunt optiuni de top. Pentru gradini mici, un kit de picurare de calitate este suficient. Pentru gazon, aspersoarele Rain Bird sau Hunter sunt excelente." },
-  { question: "de ce se infunda picuratoarele la sistemul de irigare", answer: "Picuratoarele se pot infunda din cauza depunerilor de calcar din apa, a nisipului sau a altor sedimente. Este recomandat sa folosesti un filtru la intrarea apei in sistem si sa cureti periodic picuratoarele, cel putin o data pe sezon, pentru a asigura functionarea lor optima." },
-  { question: "cum sa instalez un sistem de irigare automata pentru gradina", answer: "Instalarea unui sistem de irigare automata implica conectarea unui temporizator la robinet, intinderea furtunului principal, montarea picuratoarelor sau aspersoarelor in locurile dorite si conectarea la furtunul principal. Multe kituri vin cu instructiuni detaliate si sunt concepute pentru o instalare DIY simpla." },
-  { question: "unde gasesc un sistem de irigare automata pentru gradina de calitate", answer: "Poti gasi sisteme de irigare automata de calitate in magazine specializate de bricolaj precum Dedeman, Leroy Merlin, Hornbach, precum si online pe platforme ca Emag sau direct pe site-urile producatorilor precum Gardena sau Rain Bird. Verifica recenziile pentru a te asigura de calitatea produsului." },
-  { question: "cat de des trebuie sa ud cu sistemul de irigare automata", answer: "Frecventa udarii depinde de tipul plantelor, de sol si de conditiile meteo. Cu un sistem automat, poti seta udari zilnice, la doua zile sau saptamanale, dimineata devreme sau seara. Sistemele smart pot ajusta automat programul in functie de umiditatea solului si prognoza meteo." }
-];
-
-const toc = [
-  { title: "Solutia inteligenta pentru gradina ta: Alege sistemul potrivit de irigare automata", id: "solutia-inteligenta-pentru-gradina-ta-alege-sistemul-potrivit-de-irigare-automata" },
-  { title: "Top recomandari: Sisteme de irigare automata pentru gradina, cu bune si rele", id: "top-recomandari-sisteme-de-irigare-automata-pentru-gradina-cu-bune-si-rele" },
-  { title: "Cum sa alegi sistemul de irigare automata potrivit pentru gradina ta", id: "cum-sa-alegi-sistemul-de-irigare-automata-potrivit-pentru-gradina-ta" },
-  { title: "Sistem de irigare automata: Picurare vs. Aspersoare - Ce alegi?", id: "sistem-de-irigare-automata-picurare-vs-aspersoare---ce-alegi" },
-  { title: "Greseli de evitat la instalarea si utilizarea sistemului de irigare automata", id: "greseli-de-evitat-la-instalarea-si-utilizarea-sistemului-de-irigare-automata" },
-  { title: "Recomandari de sistem de irigare automata pentru gradina, pe categorii de buget", id: "recomandari-de-sistem-de-irigare-automata-pentru-gradina-pe-categorii-de-buget" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['sistem-irigare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Kituri de irigare prin picurare ---
+  { g: 'kit', id: 'DY2ZY5MBM', badge: 'Cel mai vandut', short: 'OEM 2x15m', tip: 'Kit picurare', acoperire: '2 x 15 m', pentru: 'Gradina, straturi',
+    specs: ['cel mai vandut kit din selectie, 23 pareri', '2 x 15 m de furtun, pentru straturi si ghivece', 'plastic, montaj simplu fara scule', 'pret accesibil de intrare'],
+    pros: ['Cel mai vandut kit din selectie, 23 de pareri', 'Doua linii de 15 m, acoperi mai multe straturi', 'Montaj simplu, fara scule', 'Pret mic de intrare in irigarea automata'],
+    cons: ['Nota 4.17, buna dar nu maxima', 'Fara programator, il pornesti manual la robinet'],
+    verdict: 'Cel mai vandut kit de irigare din selectie si cea mai simpla cale de a incepe udarea prin picurare. Sistemul OEM vine cu doua linii de 15 m de furtun, deci acoperi mai multe straturi sau un rand lung de ghivece, si se monteaza fara scule, prin imbinarea pieselor. Cu 23 de pareri e de departe cel mai testat din aceasta categorie mica, iar nota 4.17 arata cumparatori multumiti la un pret de intrare. Nu are un programator, deci il conectezi la robinet si il pornesti manual, sau il combini cu un timer separat pentru udare cu adevarat automata. E un kit de baza, bun pentru cine vrea sa incerce picurarea fara sa investeasca mult. Il iei cand vrei cel mai popular kit accesibil, cu doua linii de furtun, pentru a uda straturi si ghivece prin picurare, fara batai de cap la montaj.' },
+  { g: 'kit', id: 'DLFCZBYBM', badge: 'Cel mai complet', short: '4U 236 piese', tip: 'Picurare + pulverizare', acoperire: '25 m, 236 piese', pentru: 'Gradina, ghivece, sera',
+    specs: ['set complet, 236 de piese, 25 m', 'picurare si pulverizare, doua moduri', 'pentru gradina, ghivece si sera', 'nota 4.4, cea mai buna dintre kituri'],
+    pros: ['Cel mai complet kit, 236 de piese si 25 m', 'Doua moduri: picurare si pulverizare', 'Acopera gradina, ghivece si sera', 'Nota buna, 4.4, cea mai mare dintre kituri'],
+    cons: ['Doar 5 pareri deocamdata', 'Multe piese, montaj mai laborios'],
+    verdict: 'Kitul de ales daca vrei un sistem complet, cu care sa acoperi diverse tipuri de plante. 4U are 236 de piese si 25 m de furtun, plus doua moduri de udare, picurare pentru radacini si pulverizare pentru un strop fin, deci il potrivesti pentru straturi, ghivece si chiar sera, dupa nevoie. Cu nota 4.4 e cel mai bine cotat dintre kituri, chiar daca deocamdata din 5 pareri, asa ca te bazezi si pe continutul generos. Numarul mare de piese inseamna flexibilitate, dar si un montaj ceva mai laborios la inceput, pana pui la punct traseul. Il iei cand vrei cel mai versatil kit din selectie, cu picurare si pulverizare si multe piese, ca sa acoperi o gradina cu plante diferite, si nu te sperie un montaj initial ceva mai lung.' },
+  { g: 'kit', id: 'DYP4RWMBM', badge: 'Multifunctional', short: 'Senmase', tip: 'Kit picurare', acoperire: 'Kit complet', pentru: 'Gradina',
+    specs: ['sistem multifunctional de irigare', 'plastic, kit complet de pornire', 'pentru gradina si straturi', 'nota 4 din 5 pareri'],
+    pros: ['Sistem multifunctional, mai multe tipuri de duze', 'Kit complet de pornire', 'Plastic usor, montaj fara scule', 'Alternativa la kiturile de baza'],
+    cons: ['Doar 5 pareri, nota 4', 'Fara programator inclus'],
+    verdict: 'O alternativa multifunctionala pentru cine vrea mai multe tipuri de udare intr-un singur kit. Senmase e un sistem de irigare cu mai multe duze si accesorii, care iti permite sa alegi intre picurare si stropire, potrivit pentru o gradina cu plante variate. Vine ca un kit complet de pornire, din plastic usor, si se monteaza fara scule. Cu 5 pareri si nota 4 e o alegere de mijloc, verificata de primii cumparatori, fara sa iasa in evidenta nici in bine, nici in rau. Nu are programator, deci pentru automatizare completa il combini cu un timer. Il iei cand vrei un kit multifunctional accesibil, cu mai multe moduri de udare, si preferi sa incerci un sistem flexibil fara sa dai multi bani, constient ca are inca putine recenzii.' },
+  { g: 'kit', id: 'DYP777YBM', badge: 'Pentru randuri lungi', short: 'Agronomat banda', tip: 'Banda picurare', acoperire: '100 m banda', pentru: 'Legume, randuri',
+    specs: ['banda de picurare de 100 m', '10 robineti, pentru randuri lungi', 'ideal pentru gradina de legume', 'polietilena, kit economic'],
+    pros: ['Banda de picurare de 100 m, pentru randuri lungi', '10 robineti, controlezi fiecare linie', 'Ideal pentru o gradina de legume', 'Pret economic pentru lungimea oferita'],
+    cons: ['Nota 3.5, cea mai modesta, din 4 pareri', 'Banda mai putin durabila decat furtunul gros'],
+    verdict: 'Kitul de ales daca ai o gradina de legume cu randuri lungi de udat. Agronomat vine cu 100 m de banda de picurare de 17 mm si 10 robineti, deci acoperi mai multe randuri de rosii, ardei sau alte legume si controlezi fiecare linie separat, exact ce trebuie pentru o cultura in aer liber. E un kit economic, cu un pret bun pentru lungimea oferita, potrivit pentru cine gandeste practic, nu estetic. Cu 4 pareri si nota 3.5 e cel mai modest cotat din selectie, iar banda de picurare e mai subtire si mai putin durabila decat un furtun gros, deci o manevrezi cu grija. Il iei cand ai o gradina de legume cu randuri lungi si vrei sa le uzi economic prin picurare, cu banda si robineti pe fiecare linie, si accepti ca banda cere ceva atentie.' },
+  { g: 'kit', id: 'D313PCYBM', badge: 'Ajustabil', short: 'Momcbebe 25m', tip: 'Kit picurare', acoperire: '25 m', pentru: 'Gradina, ghivece',
+    specs: ['kit ajustabil de 25 m', 'PVC, debit reglabil la duze', 'pentru gradina si ghivece', 'nota 4.33 din 3 pareri'],
+    pros: ['Kit de 25 m, acoperire buna', 'Duze ajustabile, reglezi debitul', 'Nota decenta, 4.33', 'Pentru gradina si ghivece deopotriva'],
+    cons: ['Doar 3 pareri deocamdata', 'Fara programator inclus'],
+    verdict: 'Un kit ajustabil de dimensiune medie, pentru cine vrea sa regleze debitul la fiecare planta. Momcbebe are 25 m de furtun din PVC si duze ajustabile, deci dai mai multa apa plantelor insetate si mai putina celor delicate, un plus fata de kiturile fixe. Acopera atat straturi de gradina, cat si un rand de ghivece, si se monteaza simplu. Cu 3 pareri si nota 4.33 e o alegere decenta la banii ei, chiar daca inca putin testata. Ca la majoritatea kiturilor din aceasta categorie, nu are programator, deci pentru udare automata il combini cu un timer la robinet. Il iei cand vrei un kit de 25 m cu debit reglabil la fiecare duza, ca sa potrivesti udarea pe tipuri de plante, si nu te deranjeaza ca are inca putine pareri.' },
+  // --- Aspersoare si dispozitive de udare ---
+  { g: 'udare', id: 'DHHW6X3BM', badge: 'Cel mai bine notat aspersor', short: 'Nextly rotativ', tip: 'Aspersor', acoperire: '3 capete rotative', pentru: 'Gazon',
+    specs: ['aspersor rotativ cu 3 capete', 'stropeste in cerc, pentru gazon', 'ABS rezistent', 'nota 4.67, cea mai buna din grup'],
+    pros: ['Aspersor rotativ cu 3 capete, acoperire buna', 'Cea mai buna nota din grup, 4.67', 'ABS rezistent la exterior', 'Ideal pentru udat gazonul'],
+    cons: ['Doar 6 pareri deocamdata', 'Pentru gazon, nu pentru straturi cu picurare'],
+    verdict: 'Cel mai bine notat aspersor din selectie si alegerea daca ai gazon de udat, nu straturi. Nextly are un cap rotativ cu trei brate care stropesc in cerc pe masura ce se invart, deci acopera o suprafata buna de iarba dintr-o pozitie, si e facut din ABS rezistent la conditiile de afara. Cu nota 4.67 din 6 pareri e cel mai apreciat dispozitiv de udare din grup, un semn bun chiar daca numarul de recenzii e inca mic. Spre deosebire de kiturile de picurare, un aspersor uda de sus, ca ploaia, potrivit pentru gazon si suprafete deschise, nu pentru radacinile plantelor din straturi. Il iei cand vrei sa uzi gazonul sau o suprafata deschisa cu un aspersor rotativ bine cotat, si il muti dintr-o zona in alta pe masura ce termina.' },
+  { g: 'udare', id: 'DRZRSCYBM', badge: 'Set de 2, ieftin', short: 'Momcbebe 2 buc', tip: 'Aspersoare', acoperire: 'Rotire 360°', pentru: 'Gazon, straturi',
+    specs: ['set de 2 aspersoare, rotire 360 grade', 'cu tija de infipt in pamant', 'pret mic pentru doua bucati', 'nota 3, marcata onest'],
+    pros: ['Doua aspersoare la un pret mic', 'Rotire 360 de grade, acoperire circulara', 'Cu tija, le infigi usor in pamant', 'Bune pentru doua zone deodata'],
+    cons: ['Nota 3 din doar 2 pareri, verifica recenziile', 'Constructie simpla, din plastic'],
+    verdict: 'Un set de doua aspersoare ieftine, pentru cine vrea sa acopere doua zone deodata cu buget mic. Momcbebe include doua aspersoare cu rotire de 360 de grade si tija de infipt in pamant, deci le pozitionezi rapid in gazon sau langa straturi si stropesc circular in jur. Pretul mic pentru doua bucati e principalul argument, util daca vrei sa uzi doua colturi de gradina in acelasi timp. Cu nota 3 din doar 2 pareri e cel mai slab cotat din selectie, asa ca te uiti atent la recenzii inainte de a comanda, iar constructia din plastic e simpla. Il iei cand vrei doua aspersoare la cel mai mic pret, pentru a acoperi doua zone deodata, si accepti o constructie simpla si o nota inca incerta, cu putine pareri.' },
+  { g: 'udare', id: 'DP3BMSYBM', badge: 'Globuri pentru ghivece', short: 'Jenuos globuri', tip: 'Globuri de udare', acoperire: 'Set 3 buc', pentru: 'Ghivece, plante',
+    specs: ['set de 3 globuri de apa autoadezive', 'elibereaza apa treptat in ghiveci', 'ideal cand pleci cateva zile', 'nota 4.67 din 3 pareri'],
+    pros: ['Udare automata a ghivecelor cateva zile', 'Set de 3, pentru mai multe plante', 'Nota buna, 4.67', 'Nu are nevoie de robinet sau furtun'],
+    cons: ['Doar pentru ghivece, nu pentru gradina', 'Doar 3 pareri deocamdata'],
+    verdict: 'Solutia simpla daca vrei sa uzi automat ghivecele cat esti plecat cateva zile. Jenuos e un set de 3 globuri de apa pe care le umpli si le infigi in pamantul din ghiveci, iar acestea elibereaza apa treptat, pe masura ce solul se usuca, deci plantele de interior sau de pe balcon nu raman fara apa cat lipsesti. Nu au nevoie de robinet, furtun sau curent, functioneaza doar prin gravitatie si presiunea solului, si cu nota 4.67 din 3 pareri sunt bine primite. E o solutie doar pentru ghivece, nu pentru o gradina intreaga, si acopera cateva plante, nu zeci. Il iei cand vrei sa uzi automat cateva ghivece cat esti plecat un weekend sau in concediu scurt, fara instalatie si fara robinet.' },
+  { g: 'udare', id: 'D9P1KXYBM', badge: 'Globuri, alternativa', short: 'OEM globuri', tip: 'Globuri de udare', acoperire: 'Set 3 buc', pentru: 'Ghivece, plante',
+    specs: ['set de 3 globuri de apa pentru plante', 'elibereaza apa treptat in ghiveci', 'nota maxima, 5 din 5', 'pentru plante de interior si balcon'],
+    pros: ['Nota maxima, 5 din 5', 'Set de 3 globuri pentru mai multe plante', 'Udare automata fara robinet sau curent', 'Ieftin, pentru plante de interior si balcon'],
+    cons: ['Doar 2 pareri deocamdata', 'Doar pentru ghivece, capacitate mica'],
+    verdict: 'O alternativa la fel de simpla pentru udarea automata a ghivecelor, cu cea mai buna nota din grup. OEM ofera tot un set de 3 globuri de apa care se infig in pamantul din ghiveci si elibereaza apa treptat, mentinand solul umed cateva zile fara sa faci nimic. Functioneaza fara robinet, furtun sau curent, doar prin gravitatie, si e ideal pentru plantele de interior sau de pe balcon cat esti plecat. Cu nota maxima, 5 din 5, chiar daca din doar 2 pareri, primii cumparatori sunt multumiti. Ca orice glob de acest fel, are o capacitate mica si e doar pentru ghivece, nu pentru gradina. Il iei cand vrei cea mai bine notata solutie de udat ghivecele in lipsa ta, simpla si ieftina, si nu ai nevoie sa uzi o suprafata mare.' },
+  // --- Distribuitoare si accesorii ---
+  { g: 'acc', id: 'D2MN6NMBM', badge: 'Distribuitor de brand', short: 'Cellfast 4 cai', tip: 'Distribuitor', acoperire: '4 cai', pentru: 'Robinet, mai multe linii',
+    specs: ['distribuitor cu 4 cai, marca Cellfast', 'compatibil cu robinete de 3/4 si 1 tol', 'conectezi 4 furtune la un robinet', 'nota maxima, 5 din 5'],
+    pros: ['De la Cellfast, brand cunoscut de irigare', 'Patru cai, conectezi 4 furtune la un robinet', 'Compatibil cu robinete de 3/4 si 1 tol', 'Nota maxima, 5 din 5'],
+    cons: ['Doar 3 pareri deocamdata', 'E un accesoriu, nu un sistem complet'],
+    verdict: 'Accesoriul de brand cu care iti organizezi mai multe linii de udare de la un singur robinet. Distribuitorul Cellfast IDEAL are 4 cai, deci conectezi patru furtune sau kituri diferite la aceeasi sursa de apa si le controlezi separat, foarte util daca ai o gradina cu mai multe zone. E compatibil cu robinete de 3/4 si 1 tol, standardele obisnuite, iar Cellfast e un brand cunoscut si apreciat pentru accesorii de irigare, un plus de calitate fata de piesele generice. Cu nota maxima, 5 din 5, din 3 pareri, primii cumparatori sunt multumiti. Nu e un sistem complet, ci o piesa care completeaza instalatia. Il iei cand ai mai multe linii de udare si vrei sa le distribui ordonat de la un robinet, cu un accesoriu de brand fiabil.' },
+  { g: 'acc', id: 'DLVQKMMBM', badge: 'Cele mai multe picuratoare', short: 'EvoTools 50 buc', tip: 'Picuratoare', acoperire: 'Set 50 buc, 0-70 l/h', pentru: 'Extindere sistem',
+    specs: ['set de 50 de picuratoare reglabile', 'debit ajustabil, 0-70 l/h fiecare', 'extinzi sau repari orice sistem', 'nota 4.7 din 10 pareri'],
+    pros: ['Set generos de 50 de picuratoare', 'Debit reglabil, 0-70 l/h la fiecare', 'Extinzi sau repari orice sistem de picurare', 'Nota mare, 4.7, din 10 pareri'],
+    cons: ['Sunt doar picuratoarele, nu un kit complet', 'Ai nevoie de furtun si conectori separati'],
+    verdict: 'Accesoriul de baza daca vrei sa extinzi sau sa iti construiesti singur un sistem de picurare. EvoTools ofera un set de 50 de picuratoare reglabile, fiecare cu debit ajustabil intre 0 si 70 de litri pe ora, deci dozezi exact apa pentru fiecare planta, de la un strop pentru cele delicate la un debit mai mare pentru cele insetate. Cu 50 de bucati acoperi o gradina intreaga sau completezi un kit existent la care nu ti-au ajuns piesele. Cu nota 4.7 din 10 pareri e printre cele mai bine cotate din selectie. Sunt doar picuratoarele, deci ai nevoie de furtun si conectori separati ca sa faci un sistem complet. Il iei cand vrei sa extinzi un sistem, sa il repari sau sa ti-l construiesti pe gustul tau, cu picuratoare reglabile din belsug.' },
+  { g: 'acc', id: 'D9H46YBBM', badge: 'Tije de fixare', short: 'Plast tije', tip: 'Suporturi', acoperire: 'Set tije', pentru: 'Fixare furtun',
+    specs: ['set de tije pentru fixarea furtunului', 'tin linia de picurare la sol', 'usor de infipt in pamant', 'nota 4.7 din 10 pareri'],
+    pros: ['Fixeaza furtunul de picurare exact unde vrei', 'Usor de infipt in pamant', 'Nota mare, 4.7, din 10 pareri', 'Completeaza orice kit de picurare'],
+    cons: ['Accesoriu, nu functioneaza singur', 'Din plastic, constructie simpla'],
+    verdict: 'Accesoriul mic care face diferenta la un sistem de picurare ordonat. Plast Project ofera un set de tije de fixare cu care prinzi furtunul sau linia de picurare exact langa fiecare planta, ca sa nu se miste si sa ude unde trebuie. Le infigi usor in pamant si tin traseul la locul lui, un detaliu care conteaza cand vrei ca apa sa ajunga la radacina, nu alaturi. Cu nota 4.7 din 10 pareri sunt bine cotate si apreciate ca piesa de completare. Sunt un accesoriu, nu functioneaza singure, ci alaturi de un kit de picurare. Il iei cand ai deja un sistem de picurare si vrei sa il fixezi ordonat langa plante, cu tije simple si eficiente, ca furtunul sa stea exact unde l-ai pus.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const KIT = PICKS.filter(x => x.g === 'kit');
+const UDARE = PICKS.filter(x => x.g === 'udare');
+const ACC = PICKS.filter(x => x.g === 'acc');
+
+const hero = '/images/articles/sistem-de-irigare-automata-pentru-gradina.webp';
+const figKit = '/imagini/articole/irigare-kituri.webp';
+const figUdare = '/imagini/articole/irigare-udare.webp';
+const figAcc = '/imagini/articole/irigare-accesorii.webp';
+const published = '2026-07-19T12:32:07+03:00';
+
+const faq = [
+  { question: 'Ce inseamna un sistem de irigare automata?', answer: 'Un sistem de irigare duce apa direct la plante printr-un furtun cu picuratoare, o banda de picurare sau aspersoare, in loc sa uzi manual cu stropitoarea sau furtunul. Devine cu adevarat automat cand adaugi un programator, sau timer, la robinet: acesta porneste si opreste apa la orele setate, deci gradina se uda singura, chiar si cand nu esti acasa. Kiturile din selectie contin partea de distributie a apei, furtun, picuratoare, duze; pentru automatizarea completa le combini cu un programator, care se cumpara de obicei separat. Chiar si fara timer, un kit de picurare economiseste apa si timp fata de udatul manual.' },
+  { question: 'Irigare prin picurare sau cu aspersoare?', answer: 'Depinde de ce uzi. Picurarea duce apa incet, direct la radacina fiecarei plante, deci e ideala pentru straturi de legume, flori si ghivece: consuma putina apa, uda tintit si nu uda frunzele, ceea ce previne bolile. Aspersoarele stropesc de sus, ca ploaia, si acopera o suprafata mare deodata, deci sunt facute pentru gazon si suprafete deschise de iarba. Pe scurt, pentru plante in straturi si ghivece alege picurarea, pentru gazon alege un aspersor. Multi le combina: picurare pentru gradina de legume si flori, aspersor pentru peluza.' },
+  { question: 'Am nevoie de un programator pentru udare automata?', answer: 'Pentru automatizare completa, da. Kiturile de irigare din selectie duc apa la plante, dar tu deschizi si inchizi robinetul. Un programator, sau timer de udare, se monteaza intre robinet si sistem si porneste apa la orele si pe durata setate, de exemplu dimineata devreme si seara, chiar daca esti plecat. Asa gradina se uda singura, la momentul optim, si economisesti apa. Programatorul se cumpara de obicei separat de kit. Daca esti mereu acasa si nu te deranjeaza sa pornesti manual udarea, poti folosi kitul si fara timer; daca vrei sa pleci linistit sau sa uzi la ore fixe, programatorul e piesa care lipseste.' },
+  { question: 'Cum uzi plantele cat esti plecat in concediu?', answer: 'Pentru cateva zile si pentru ghivece, cea mai simpla solutie sunt globurile de apa, ca seturile Jenuos sau OEM din selectie: le umpli, le infigi in pamant si elibereaza apa treptat, mentinand solul umed fara robinet sau curent. Pentru o gradina intreaga sau pentru absente mai lungi, ai nevoie de un sistem de picurare conectat la robinet, cu un programator care sa porneasca apa automat in fiecare zi. Alege in functie de scara: globurile pentru cateva plante de interior sau de balcon, un sistem cu timer pentru o gradina care trebuie udata zilnic cat esti plecat mai mult timp.' },
+  { question: 'Cat de greu e de montat un sistem de irigare?', answer: 'Kiturile de baza sunt usor de montat, fara scule: imbini furtunul cu conectorii si picuratoarele, il asezi pe langa plante si il legi la robinet. Un kit mic il pui in una-doua ore. Cele complete, cu multe piese, ca sistemul 4U de 236 de piese, cer mai multa rabdare la inceput, pana pui la punct traseul si pozitionezi fiecare picurator, dar dupa aceea functioneaza singur. Accesoriile ajuta: tijele de fixare tin furtunul la locul lui, iar un distribuitor cu mai multe cai organizeaza liniile de la robinet. Nu ai nevoie de cunostinte speciale, doar de putina rabdare la primul montaj.' },
+  { question: 'Cat costa un sistem de irigare pentru gradina?', answer: 'In selectie, un kit de irigare prin picurare porneste de la circa 70 de lei, ca sistemul OEM de doua linii, si urca spre 130 de lei pentru unul complet cu multe piese si doua moduri de udare. O banda de picurare de 100 m pentru randuri lungi de legume e in jur de 80 de lei. Aspersoarele pentru gazon costa intre 30 si 50 de lei, iar globurile de udat ghivecele, in jur de 35-40 de lei setul de 3. Accesoriile, ca picuratoarele reglabile sau distribuitoarele, sunt intre 10 si 60 de lei. La toate acestea se adauga, optional, un programator pentru udare cu adevarat automata. E o categorie accesibila, unde cu bani putini economisesti apa si timp.' },
+];
+
+const images = [hero, figKit, figUdare, figAcc, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Sistem de irigare automata pentru gradina - CentroCasa"
-  description="Cel mai bun sistem de irigare automata pentru gradina pentru majoritatea oamenilor este un kit de la Gardena sau Rain Bird, care ofera un echilibru excelent intre pret, fiabilitate si usurinta in utilizare. Acestea iti scutesc timp pretios si asigura ca plantele tale primesc apa necesara, fara risipa."
-  image="/images/articles/sistem-de-irigare-automata-pentru-gradina.webp"
+  title="Cel mai bun sistem de irigare automata pentru gradina in 2026: kituri, aspersoare si accesorii"
+  description="Care e cel mai bun sistem de irigare automata pentru gradina in 2026: kituri de picurare, aspersoare pentru gazon, globuri de udat ghivecele si accesorii, comparate pe tip, acoperire si utilizare. Plus cum alegi, picurare vs aspersoare si de ce ai nevoie de un programator."
+  image={hero}
   type="article"
-  publishedTime="2026-02-09T13:17:41.710Z"
-  modifiedTime="2026-02-09T13:17:41.710Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cel mai bun sistem de irigare automata pentru gradina' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Sistem de irigare automata pentru gradina</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cel mai bun sistem de irigare automata pentru gradina</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">9 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Sistem de irigare automata pentru gradina</h1>
-    </header>
+    <h1>Cel mai bun sistem de irigare automata pentru gradina</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/sistem-de-irigare-automata-pentru-gradina.webp" alt="Sistem de irigare automata pentru gradina" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cel mai bun sistem de irigare automata pentru gradina: kituri de picurare, aspersoare si accesorii" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="solutia-inteligenta-pentru-gradina-ta-alege-sistemul-potrivit-de-irigare-automata">
-        <h2>Solutia inteligenta pentru gradina ta: Alege sistemul potrivit de irigare automata</h2>
-        <p>Bon, stai putin. Daca ai ajuns aici, probabil ca ai de-a face cu o <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a> si te gandesti serios la un <strong>sistem de irigare automata pentru gradina</strong>. Si pe buna dreptate! Sa uzi manual fiecare plantuta, mai ales cand e soare cu dinti sau cand pleci in concediu, e o corvoada. Sincer, am trecut si eu prin asta. Am avut un furtun lung si greu de manevrat, si tot imi scapau colturi intregi.</p><p>Asa ca, daca ma intrebi pe mine, raspunsul e simplu: da, merita sa investesti intr-un <strong>sistem de irigare automata pentru gradina</strong>. Nu vorbim de chestii SF, ci de solutii practice care iti fac viata mai usoara. Gandeste-te la asta ca la o mana de ajutor in plus, care lucreaza discret, dar eficient, cat timp tu stai la umbra sau te ocupi cu altceva.</p><p>Variantele de baza, cele pe care le gasesti mai usor si sunt mai accesibile, de obicei vin sub forma de kituri. Astea sunt gandite sa fie plug-and-play, pe cat posibil. Ai un temporizator pe care il conectezi la robinet, un furtun principal si cateva furtunase mai subtiri cu picuratori sau duze care ajung la fiecare planta. E genul de sistem pe care il poti monta si tu, fara sa fii inginer horticol.</p><p>Marci precum Gardena, Rain Bird, sau chiar si Karcher au optiuni bune. Gardena, de exemplu, e un clasic. Au un ecosistem destul de dezvoltat, poti cumpara piese separat daca ai nevoie, si sistemele lor sunt destul de intuitive. Rain Bird sunt mai mult pe zona profesionala, dar au si kituri pentru acasa care sunt super fiabile, dar pot fi un pic mai scumpe. Karcher, pe langa aspiratoare, fac si chestii faine pentru gradina, inclusiv sisteme de irigare.</p><p>Cand alegi un <strong>sistem de irigare automata pentru gradina</strong>, cel mai important e sa te gandesti la ce ai tu nevoie. Ai o <a href="/motosapa-electrica-pentru-gradina-mica/">gradina mica</a> cu cateva flori si legume? Sau ai o livada si gazon pe care vrei sa-l tii verde? Asta face diferenta. Un sistem cu picurare e perfect pentru straturi de legume sau ghivece, pentru ca duce apa direct la radacina, fara sa iroseasca pe frunze. Un sistem cu aspersoare e mai bun pentru gazon sau suprafete mai mari.</p><p>Ce am observat eu, din experienta si din discutiile cu alti pasionati, e ca sistemele cu temporizator inteligent, care se pot conecta la wifi si pe care le controlezi din aplicatie, sunt cele mai comode. Poti seta orele de udare, durata, chiar si sa le opresti din mers daca ploua. E un pic mai scump la inceput, dar pe termen lung, economisesti apa si ai control total. Na, asta e viitorul, zic si eu.</p><p>Deci, pe scurt: daca vrei sa scapi de grija udarii, un <strong>sistem de irigare automata pentru gradina</strong> e o investitie inteligenta. Nu te arunca la cel mai scump produs din prima, dar nici la cel mai ieftin, ca s-ar putea sa te trezesti cu el stricat dupa un sezon. Cauta un echilibru, uita-te la ce ai tu in gradina si citeste pareri.</p>
-      </section>
-
-      <section id="top-recomandari-sisteme-de-irigare-automata-pentru-gradina-cu-bune-si-rele">
-        <h2>Top recomandari: Sisteme de irigare automata pentru gradina, cu bune si rele</h2>
-        <p>Hai sa fim directi. Nu toti avem aceleasi nevoi sau acelasi buget, asa ca am selectat cateva optiuni care mie mi se par de luat in calcul, cu tot cu plusuri si minusuri, ca sa stii la ce sa te astepti.</p><h3>Gardena Smart System (Kit de baza)</h3><p>Asta e o optiune populara si pe buna dreptate. Gardena a facut treaba buna cu sistemul lor smart. Kitul de baza vine de obicei cu un controler inteligent care se conecteaza la internet, un senzor de umiditate (sau de ploaie, depinde de pachet) si capul de control pentru irigare.</p><ul><li><strong>Avantaje:</strong> Foarte usor de instalat si configurat prin aplicatie. Poti programa udarea din orice colt al lumii. Se integreaza bine cu alte produse Gardena. Senzorii ajuta la economisirea apei.</li><li><strong>Dezavantaje:</strong> Pretul poate fi un pic mai ridicat fata de sistemele simple, non-smart. Uneori, conexiunea la internet poate fi capricioasa daca semnalul e slab.</li><li><strong>Pret estimat:</strong> 800 - 1500 lei, in functie de kit.</li></ul><h3>Rain Bird (Seria 3500/5000 <a href="/scarificator-pentru-gazon/" class="interlink">pentru gazon</a>)</h3><p>Rain Bird e un nume greu in domeniu, mai ales pentru sistemele profesionale, dar au si solutii pentru gradinile mai mari, cum ar fi aspersoarele lor pentru gazon. Daca ai o suprafata intinsa de iarba, astea sunt o optiune serioasa.</p><ul><li><strong>Avantaje:</strong> Durabilitate excelenta, sunt facute sa reziste ani de zile. Distributie uniforma a apei. Modelele cu duze reglabile sunt foarte versatile.</li><li><strong>Dezavantaje:</strong> Instalarea poate fi mai complexa, uneori necesitand ingroparea tubulaturii. Nu sunt cele mai potrivite pentru gradini mici sau straturi de legume. Pretul poate fi considerabil.</li><li><strong>Pret estimat:</strong> 100 - 300 lei/aspersor, plus costuri de instalare si controler. Un sistem complet poate ajunge la 2000 - 5000 lei.</li></ul><h3>Sisteme de irigare prin picurare (kituri generice)</h3><p>Astea sunt cele mai accesibile si se gasesc pe multe site-uri de bricolaj sau online. Sunt perfecte pentru straturi de legume, flori in ghivece sau gard viu.</p><ul><li><strong>Avantaje:</strong> Foarte ieftine. Usor de instalat, le poti adapta cum vrei. Economisesc apa, ducand-o direct la radacina.</li><li><strong>Dezavantaje:</strong> Durabilitatea e uneori indoielnica, piesele se pot uza sau sparge mai repede. Nu au functii smart, totul e manual sau pe un temporizator simplu. Pot fi mai greu de curatat.</li><li><strong>Pret estimat:</strong> 150 - 400 lei/kit.</li></ul><p>Am avut un prieten care si-a luat un kit generic de picurare si a fost multumit vreo 2 ani, dupa care a inceput sa curga pe la imbinari. Dar pentru pretul platit, a zis ca a meritat. Deci, depinde mult si de noroc.</p><p>Daca ai o gradina mai mare si vrei ceva fiabil pe termen lung, as merge pe Gardena smart sau Rain Bird, dar pregateste-te sa investesti. Daca ai un buget limitat si vrei doar sa uzi straturile de rosii, un kit de picurare e o solutie buna.</p>
-      </section>
-
-      <section id="cum-sa-alegi-sistemul-de-irigare-automata-potrivit-pentru-gradina-ta">
-        <h2>Cum sa alegi sistemul de irigare automata potrivit pentru gradina ta</h2>
-        <p>Ok, hai sa vedem ce te ajuta sa iei cea mai buna decizie cand vine vorba de un <strong>sistem de irigare automata <a href="/motosapa-electrica-pentru-gradina-mica/" class="interlink">pentru gradina</a></strong>. Nu e rocket science, dar cateva puncte cheie te pot scuti de batai de cap.</p><p>Primul lucru: <strong>Dimensiunea si tipul gradinii</strong>. Ai gazon? Flori? Legume? Copaci? Fiecare are nevoie de altceva. Pentru gazon, aspersoarele sunt cele mai eficiente. Pentru straturi de legume sau flori, sistemul de picurare e rege. Duce apa direct la radacina, reduce evaporarea si previne bolile fungice.</p><p>Apoi, <strong>sursa de apa</strong>. Ai presiune buna la robinet? Daca nu, s-ar putea sa ai nevoie de o pompa suplimentara, mai ales pentru sistemele mai complexe sau cu aspersoare.</p><p><strong>Tipul de controler</strong> e iarasi important. Vrei ceva simplu, cu butoane, pe care il setezi si-l uiti? Sau vrei sa poti controla totul din telefon, sa primesti notificari, sa ajustezi programul in functie de vreme? Astea smart sunt mai scumpe, dar mult mai comode pe termen lung. Gandeste-te ca un sistem smart te poate scuti de plata unor facturi mari la apa, pentru ca nu uda inutil.</p><p><strong>Durabilitatea si calitatea materialelor</strong>. Aici nu prea te joci. Un sistem ieftin, de plastic subțire, s-ar putea sa crape la prima iarna sau sa se usuce in soare. Cauta marci recunoscute, cu garantie, si citeste pareri despre cat de rezistente sunt.</p><p><strong>Extensibilitatea sistemului</strong>. Poate anul asta ai doar cateva ghivece, dar anul viitor vrei sa extinzi sistemul la toata gradina. Un sistem modular, unde poti adauga piese usor, e o investitie mai buna pe termen lung. Gardena, de exemplu, exceleaza la capitolul asta.</p><ul><li><strong>Buget:</strong> Stabileste-ti cat vrei sa cheltui. Un sistem simplu de picurare poate fi 200 lei, unul smart de la Gardena 1000 lei, iar unul profesional cu aspersoare ingropate poate ajunge la mii de lei.</li><li><strong>Usor de instalat:</strong> Daca nu esti genul tehnic, cauta kituri care vin cu instructiuni clare si piese pre-asamblate.</li><li><strong>Intretinerea:</strong> Unele sisteme necesita curatare periodica a filtrelor sau a duzelor. Ia in calcul si asta.</li></ul><p>Am avut un coleg care si-a luat un sistem de irigare automata si a montat duzele prea aproape una de alta. Apoi s-a mirat ca ii putrezeau florile de la prea multa apa. Deci, planificarea e cheia. Masoara-ti gradina, deseneaza-ti o schita, vezi unde vrei sa pui picuratoarele sau aspersoarele.</p><p>Na, pana la urma, cel mai bun <strong>sistem de irigare automata pentru gradina</strong> e cel care se potriveste nevoilor tale si pe care il vei folosi. Nu te complica prea tare, dar nici nu lua cea mai ieftina varianta doar ca sa fie ieftina.</p>
-      </section>
-
-      <section id="sistem-de-irigare-automata-picurare-vs-aspersoare---ce-alegi">
-        <h2>Sistem de irigare automata: Picurare vs. Aspersoare - Ce alegi?</h2>
-        <p>Asta e una dintre cele mai mari dileme cand vine vorba de <strong>sistem de irigare automata pentru gradina</strong>: picurare sau aspersoare? Fiecare are rolul lui bine definit, si alegerea depinde 100% de ce ai tu in curte.</p><p><strong>Irigarea prin picurare</strong> e ca o perfuzie pentru plante. Apa e livrata incet, direct la nivelul radacinii, prin mici orificii sau picuratori. E super eficienta pentru ca:</p><ul><li><strong>Economiseste apa:</strong> Nu se iroseste apa prin evaporare sau prin udarea frunzelor.</li><li><strong>Previne bolile:</strong> Frunzele raman uscate, reducand riscul de boli fungice.</li><li><strong>Ideala pentru:</strong> Straturi de legume, flori, arbusti, gard viu, pomi fructiferi, ghivece.</li><li><strong>Dezavantaje:</strong> Poate fi mai greu de instalat pe suprafete foarte mari, si presiunea apei trebuie sa fie constanta. Daca ai multe buruieni, s-ar putea sa le uzi si pe ele.</li></ul><p>Pe de alta parte, <strong>aspersoarele</strong> sunt ca o ploaie artificiala. Ele stropesc apa pe o suprafata mai larga. Sunt cele mai bune pentru:</p><ul><li><strong>Gazon:</strong> Acoperirea uniforma e esentiala pentru un gazon sanatos.</li><li><strong>Suprafete mari:</strong> Daca ai o livada sau o peluza generoasa, aspersoarele sunt solutia rapida.</li><li><strong>Dezavantaje:</strong> Irosesc mai multa apa prin evaporare, mai ales pe vreme calda si vantoasa. Pot uda si zone unde nu e nevoie. Pot favoriza aparitia bolilor fungice pe frunzele plantelor sensibile.</li></ul><p>Am avut un prieten care a vrut sa ude <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">gazonul</a> cu un sistem de picurare. A iesit un dezastru. Apa stagna, iarba nu crestea uniform. Apoi a trecut la aspersoare si s-a rezolvat.</p><p><strong>Cum le combini?</strong> Multe sisteme de irigare permit combinarea. Poti avea o zona cu aspersoare pentru gazon si alta cu picurare pentru straturile de legume sau ghivece. Controlerul principal poate gestiona ambele zone separat, setand programe diferite pentru fiecare.</p><p><strong>Ce preturi sa te astepti?</strong></p><ul><li>Un kit de baza pentru irigare prin picurare (furtun, picuratori, conectori) incepe de la 150-200 lei si poate ajunge la 500-600 lei pentru unul mai complex.</li><li>Aspersoarele individuale costa intre 50 si 200 lei, in functie de marca si tehnologie (rotative, statice, reglabile).</li><li>Un sistem complet cu aspersoare ingropate, cu tot cu tubulatura si controler, poate sari de 2000-3000 lei.</li></ul><p>Deci, daca ai gazon, mergi pe aspersoare. Daca ai legume, flori sau arbusti, picurarea e alegerea logica. Poti chiar sa le combini pentru un <strong>sistem de irigare automata pentru gradina</strong> complet optimizat.</p>
-      </section>
-
-      <section id="greseli-de-evitat-la-instalarea-si-utilizarea-sistemului-de-irigare-automata">
-        <h2>Greseli de evitat la instalarea si utilizarea sistemului de irigare automata</h2>
-        <p>Am vazut destui oameni care s-au chinuit cu sistemele de irigare, asa ca am sa-ti zic sincer ce nu merge si ce ar trebui sa faci. Nu vrei sa investesti bani si timp intr-un sistem care apoi te scoate din sarite, nu?</p><p><strong>1. Nu planifici corect</strong>. Asta e cea mai mare greseala. Cumperi un kit si te apuci sa tragi furtunuri fara sa te gandesti unde ajunge apa, ce plante ai, ce presiune ai la robinet. Rezultatul? Unele plante primesc prea multa apa, altele prea putina. Sau, si mai rau, sistemul nu functioneaza cum trebuie din cauza presiunii.</p><p><strong>2. Ignori calitatea pieselor</strong>. Na, asta e tentant. Vezi un kit la 100 de lei si zici: "ce mare branza?". Dar plasticul ala slab, furtunurile subtiri care crapa la soare, picuratoarele care se infunda usor... nu fac casa buna cu gradina ta. Eu am avut o experienta proasta cu un sistem ieftin, s-a dezintegrat in mai putin de un an. A trebuit sa cumpar altul, de calitate.</p><p><strong>3. Nu cureti filtrele si picuratoarele</strong>. Daca ai apa mai calcaroasa sau daca intra pamant in sistem, picuratoarele se pot infunda. Daca nu le cureti periodic (macar o data pe sezon), eficienta scade drastic. Cei de la Gardena au niste kituri de curatare, dar de obicei e suficient sa le desfaci si sa le clatesti.</p><p><strong>4. Setezi programul gresit</strong>. Nu uda gradina la pranz, cand soarele e cel mai puternic. Apa se evapora instant. Cel mai bun moment e dimineata devreme sau seara, cand e mai racoare. Daca ai un sistem smart, seteaza-l sa se adapteze la prognoza meteo. Nu are rost sa uzi daca a plouat deja sau daca ploua.</p><p><strong>5. Nu testezi sistemul dupa instalare</strong>. Dupa ce ai montat tot, da-i drumul la apa si verifica fiecare picurator, fiecare aspersor. Vezi daca sunt scurgeri pe la imbinari, daca presiunea e uniforma. Ajusteaza unde e nevoie. E mai usor sa repari acum decat dupa ce ai ingropat furtunurile, daca e cazul.</p><p><strong>6. Uiti de iarna</strong>. Daca locuiesti intr-o zona unde ingheata apa, trebuie sa golesti complet sistemul inainte de venirea frigului. Apa inghetata poate sparge furtunurile si componentele. Majoritatea sistemelor au un dop de golire.</p><p>Un <strong>sistem de irigare automata <a href="/lampa-solara-pentru-gradina/" class="interlink">pentru gradina</a></strong> e o unealta grozava, dar ca orice unealta, trebuie folosita corect. Nu te grabi la instalare, citeste instructiunile si, cel mai important, invata-ti gradina. Fiecare planta are nevoile ei.</p>
-      </section>
-
-      <section id="recomandari-de-sistem-de-irigare-automata-pentru-gradina-pe-categorii-de-buget">
-        <h2>Recomandari de sistem de irigare automata pentru gradina, pe categorii de buget</h2>
-        <p>Hai sa zicem lucrurilor pe nume. Bugetul conteaza, si e normal sa fie asa. Nu toata lumea are mii de lei de aruncat pe un sistem de irigare. Asa ca, am impartit recomandarile in trei categorii, ca sa fie mai usor de digerat.</p><h3>Buget Mic (Sub 300 lei)</h3><p>Pentru gradinile mici, balcoane sau cei care vor sa testeze apele cu irigarea automata. Aici vorbim de:</p><ul><li><strong>Kituri de irigare prin picurare generice:</strong> Le gasesti pe Emag, Dedeman, Leroy Merlin. Sunt cu furtunase subtiri, picuratori simpli si un temporizator mecanic pe robinet.</li><li><strong>Avantaje:</strong> Foarte accesibile, usor de montat.</li><li><strong>Dezavantaje:</strong> Durabilitate limitata, lipsa functiilor smart, control rudimentar.</li><li><strong>Exemplu concret:</strong> Un kit de la diverse branduri no-name, cu 15-20 metri de furtun si 10-15 picuratori, plus un temporizator mecanic.</li></ul><h3>Buget Mediu (300 - 1000 lei)</h3><p>Aici incepe distractia serioasa. Ai optiuni mai bune, mai fiabile si chiar cu un strop de tehnologie.</p><ul><li><strong>Sisteme Gardena de baza:</strong> Kituri de irigare prin picurare mai elaborate, cu furtunuri de calitate mai buna, picuratori ajustabili si temporizatoare digitale simple.</li><li><strong>Kituri cu aspersoare simple:</strong> Pentru suprafete mici de gazon sau curti.</li><li><strong>Avantaje:</strong> Calitate mai buna a materialelor, control mai precis (temporizatoare digitale), extensibilitate.</li><li><strong>Dezavantaje:</strong> Inca nu ai functii smart avansate, dar sunt mult peste optiunile ieftine.</li><li><strong>Exemplu concret:</strong> Un kit Gardena pentru terase sau straturi, cu temporizator digital si furtun de 15m, sau un set de 3-4 aspersoare de impact cu conexiune rapida.</li></ul><h3>Buget Mare (Peste 1000 lei)</h3><p>Daca vrei ce-i mai bun, un sistem care sa-ti faca gradina fericita si pe tine sa te scuteasca de orice grija.</p><ul><li><strong>Sisteme Gardena Smart:</strong> Cu controler wifi, aplicatie mobila, senzori de umiditate/ploaie. Poti controla totul din telefon.</li><li><strong>Sisteme cu aspersoare ingropate (Rain Bird, Hunter):</strong> Pentru gazon si suprafete mari. Sunt integrate in sol, ies la suprafata doar cand uda.</li><li><strong>Avantaje:</strong> Control total, eficienta maxima, fiabilitate pe termen lung, economie de apa, confort maxim.</li><li><strong>Dezavantaje:</strong> Pretul initial poate fi destul de mare, iar instalarea (mai ales la cele ingropate) poate necesita un specialist.</li><li><strong>Exemplu concret:</strong> Un kit Gardena Smart Controler + Senzor de Ploaie + 2-3 valve pentru zone diferite, sau un sistem de aspersoare ingropate pentru o suprafata de 100-200 mp.</li></ul><p>Gandeste-te la asta ca la o investitie. Un <strong>sistem de irigare automata <a href="/set-masa-si-scaune-pentru-gradina/" class="interlink">pentru gradina</a></strong> bun te scapa de grija udarii, iti mentine plantele sanatoase si, pe termen lung, poate chiar te ajuta sa economisesti apa. Alege ce ti se potriveste si bucura-te de o gradina superba fara efort.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa un sistem de irigare automata pentru gradina
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un sistem de irigare automata pentru gradina costa intre 150 lei pentru un kit simplu de picurare si poate ajunge pana la 5000 lei sau chiar mai mult pentru sisteme profesionale cu aspersoare ingropate. Un kit mediu, echilibrat, cu functii smart, se invarte in jurul a 800-1500 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre irigare prin picurare si aspersoare
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Irigarea prin picurare livreaza apa incet, direct la radacina plantelor, fiind ideala pentru legume si flori, economisind apa. Aspersoarele stropesc apa pe o suprafata mai larga, fiind potrivite pentru gazon si suprafete mari, dar pot irosi mai multa apa prin evaporare.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar un sistem de irigare automata pentru gradina mica
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita chiar si pentru o gradina mica. Un sistem de irigare automata te scapa de grija zilnica a udarii, asigura ca plantele primesc apa necesara constant si previne suprasolicitarea sau uscarea lor. Kiturile de picurare sunt perfecte pentru suprafete restranse.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce sistem de irigare automata pentru gradina e mai bun
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Cel mai bun sistem de irigare automata pentru gradina depinde de nevoile tale. Pentru fiabilitate si functii smart, Gardena si Rain Bird sunt optiuni de top. Pentru gradini mici, un kit de picurare de calitate este suficient. Pentru gazon, aspersoarele Rain Bird sau Hunter sunt excelente.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                de ce se infunda picuratoarele la sistemul de irigare
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Picuratoarele se pot infunda din cauza depunerilor de calcar din apa, a nisipului sau a altor sedimente. Este recomandat sa folosesti un filtru la intrarea apei in sistem si sa cureti periodic picuratoarele, cel putin o data pe sezon, pentru a asigura functionarea lor optima.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cum sa instalez un sistem de irigare automata pentru gradina
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Instalarea unui sistem de irigare automata implica conectarea unui temporizator la robinet, intinderea furtunului principal, montarea picuratoarelor sau aspersoarelor in locurile dorite si conectarea la furtunul principal. Multe kituri vin cu instructiuni detaliate si sunt concepute pentru o instalare DIY simpla.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc un sistem de irigare automata pentru gradina de calitate
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti gasi sisteme de irigare automata de calitate in magazine specializate de bricolaj precum Dedeman, Leroy Merlin, Hornbach, precum si online pe platforme ca Emag sau direct pe site-urile producatorilor precum Gardena sau Rain Bird. Verifica recenziile pentru a te asigura de calitatea produsului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat de des trebuie sa ud cu sistemul de irigare automata
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Frecventa udarii depinde de tipul plantelor, de sol si de conditiile meteo. Cu un sistem automat, poti seta udari zilnice, la doua zile sau saptamanale, dimineata devreme sau seara. Sistemele smart pot ajusta automat programul in functie de umiditatea solului si prognoza meteo.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru irigare prin picurare, cel mai vandut e kitul <strong>OEM de doua linii</strong>, iar cel mai complet, <strong>4U cu 236 de piese</strong>, are si picurare, si pulverizare. Pentru gazon, cel mai bine notat aspersor e <strong>Nextly rotativ</strong>, iar pentru ghivecele udate cat esti plecat, globurile de apa <strong>Jenuos</strong> sunt solutia simpla.</p>
+      <p>La un sistem de irigare conteaza <strong>tipul</strong> (picurare pentru straturi, aspersor pentru gazon, globuri pentru ghivece), <strong>acoperirea</strong> pe care o oferi si accesoriile care il completeaza. Mai jos gasesti direct recomandarile, pe cele trei tipuri, iar sub ele un ghid despre cum alegi si de ce ai nevoie de un programator pentru udare cu adevarat automata.</p>
+      <p>Am pornit de la sistemele de irigare in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe tip, acoperire si utilizare, si le-am impartit in kituri de picurare, aspersoare si dispozitive de udare, si accesorii. E o categorie mica, cu produse inca putin recenzate, asa ca am fost onesti si am notat clar unde parerile sau notele sunt slabe. Pentru ingrijirea completa a gazonului, vezi si <a href="/scarificator-pentru-gazon/">scarificatoarele</a> si <a href="/masina-de-tuns-gazonul-electrica/">masinile de tuns gazonul</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#kit">Kituri de irigare prin picurare</a></li>
+        <li><a href="#udare">Aspersoare si dispozitive de udare</a></li>
+        <li><a href="#acc">Distribuitoare si accesorii</a></li>
+        <li><a href="#de-ce">De ce un sistem de irigare</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#programator">Rolul programatorului</a></li>
+        <li><a href="#montare">Montare si intretinere</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Acoperire</th><th>Pentru</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.acoperire}</td>
+              <td>{x.pentru}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="kit">Kituri de irigare prin picurare</h2>
+    <p>Duc apa incet, direct la radacina, prin furtun cu picuratoare sau banda. Consuma putina apa, uda tintit si sunt ideale pentru straturi de legume, flori si ghivece. Aici e si cel mai vandut sistem din selectie.</p>
+    <div class="rd-grid">
+      {KIT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figKit} alt="Kituri de irigare prin picurare: OEM, 4U, Senmase, Agronomat" width="1200" height="675" loading="lazy" />
+
+    <h2 id="udare">Aspersoare si dispozitive de udare</h2>
+    <p>Aspersoarele stropesc de sus, ca ploaia, pentru gazon si suprafete deschise. Globurile de apa udare treptat ghivecele cat esti plecat. Doua moduri simple de a uda ce nu se preteaza la picurare.</p>
+    <div class="rd-grid">
+      {UDARE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figUdare} alt="Aspersoare si globuri de udare: Nextly, Momcbebe, Jenuos" width="1200" height="675" loading="lazy" />
+
+    <h2 id="acc">Distribuitoare si accesorii</h2>
+    <p>Piesele care completeaza sau extind sistemul: un distribuitor imparte apa la mai multe linii, picuratoarele reglabile dozeaza apa la fiecare planta, iar tijele fixeaza furtunul exact unde vrei.</p>
+    <div class="rd-grid">
+      {ACC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcc} alt="Distribuitoare si accesorii de irigare: Cellfast, EvoTools, Plast Project" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-irigare').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate sistemele de irigare la oferta</strong>
+        <span>Reducerile din acest moment la sisteme de irigare pentru gradina, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce un sistem de irigare</h2>
+    <p>Udatul manual, cu stropitoarea sau furtunul, cere timp zi de zi si, pe caldura, e usor sa uiti sau sa uzi neuniform. Un sistem de irigare rezolva exact asta: <strong>duce apa direct la plante</strong>, controlat, si iti scuteste corvoada zilnica. Prin picurare, apa ajunge fix la radacina, cu risipa minima.</p>
+    <p>Avantajele se simt repede. <strong>Economisesti apa</strong>, pentru ca uzi tintit, nu imprastiat, si <strong>economisesti timp</strong>, mai ales cand adaugi un programator si gradina se uda singura. Plantele o duc mai bine, pentru ca primesc apa constant, la radacina, nu in valuri, iar udatul la baza, nu pe frunze, previne bolile. In plus, poti pleca linistit cateva zile: cu un sistem cu timer sau cu globuri de apa pentru ghivece, plantele nu raman nesudate. E una dintre cele mai practice imbunatatiri pentru o gradina sau un balcon cu multe plante.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta intre doua sisteme de irigare:</p>
+    <ul>
+      <li><strong>Tipul de udare:</strong> picurare pentru straturi, flori si ghivece; aspersor pentru gazon si suprafete deschise; globuri de apa pentru ghivece, cat esti plecat.</li>
+      <li><strong>Acoperirea:</strong> lungimea furtunului sau a benzii si numarul de picuratoare arata cat teren uzi. Masoara gradina inainte, ca sa iei destul.</li>
+      <li><strong>Debitul reglabil:</strong> picuratoarele ajustabile lasa sa dai mai multa apa plantelor insetate si mai putina celor delicate.</li>
+      <li><strong>Programatorul:</strong> pentru udare cu adevarat automata, ai nevoie de un timer la robinet, care se cumpara de obicei separat.</li>
+      <li><strong>Accesoriile:</strong> un distribuitor imparte apa la mai multe linii, iar tijele fixeaza furtunul exact langa plante.</li>
+      <li><strong>Numarul de pareri:</strong> in aceasta categorie, multe produse au inca putine recenzii, deci citeste-le cu atentie inainte de a comanda.</li>
+    </ul>
+
+    <h2 id="programator">Rolul programatorului</h2>
+    <p>E important de stiut de la inceput: <strong>kiturile de irigare duc apa la plante, dar nu o pornesc singure</strong>. Ele contin partea de distributie, furtun, picuratoare, duze, iar tu deschizi si inchizi robinetul. Ce transforma sistemul in unul cu adevarat automat e <strong>programatorul</strong>, sau timerul de udare, o piesa mica pe care o montezi intre robinet si sistem.</p>
+    <p>Programatorul porneste si opreste apa la orele si pe durata pe care le setezi, de exemplu dimineata devreme si seara tarziu, cand evaporarea e mica, chiar daca esti plecat sau uiti. Asa gradina se uda singura, la momentul optim, si economisesti si apa, si grija. In selectia de fata nu am inclus programatoare, ci kituri si accesorii de distributie, dar merita sa stii ca, daca vrei automatizare completa, mai adaugi un timer, care se cumpara separat. Pana atunci, un kit de picurare ramane util chiar si pornit manual, pentru ca uda tintit si economic.</p>
+
+    <h2 id="montare">Montare si intretinere</h2>
+    <p>Montajul unui kit de baza e simplu si <strong>nu cere scule</strong>: imbini furtunul cu conectorii si picuratoarele, il asezi pe langa plante, il fixezi cu tije ca sa stea la locul lui si il legi la robinet. Un sistem cu multe piese cere mai multa rabdare la inceput, pana pui la punct traseul, dar dupa aceea functioneaza fara batai de cap. Foloseste un distribuitor daca ai mai multe linii de la acelasi robinet.</p>
+    <p>La intretinere, cel mai important e sa previi <strong>infundarea picuratoarelor</strong>, mai ales daca ai apa cu multe impuritati sau calcar: verifica periodic ca apa curge din fiecare picurator si curata-le sau inlocuieste-le pe cele blocate. Iarna, goleste furtunele si adu piesele sensibile la adapost, ca sa nu crape de la inghet. Un sistem de irigare simplu, curatat din cand in cand, tine mai multe sezoane si iti uda gradina fidel an de an.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile sunt mici in aceasta categorie:</p>
+    <p><strong>Kituri de picurare:</strong> de la circa 70 de lei pentru un kit de doua linii, ca OEM, si pana spre 130 de lei pentru unul complet, cu multe piese si doua moduri de udare. O banda de picurare de 100 m pentru randuri de legume e in jur de 80 de lei.</p>
+    <p><strong>Aspersoare si globuri:</strong> aspersoarele pentru gazon costa intre 30 si 50 de lei, iar globurile de udat ghivecele, in jur de 35-40 de lei setul de 3.</p>
+    <p><strong>Accesorii:</strong> picuratoarele reglabile, distribuitoarele si tijele de fixare sunt intre 10 si 60 de lei, in functie de tip si de numarul de bucati.</p>
+    <p>La toate acestea se adauga, optional, un <strong>programator</strong> pentru udare automata, cumparat separat. Chiar si asa, e o categorie accesibila: cu bani putini economisesti apa si timp, iar cel mai bun raport il gasesti alegand tipul potrivit plantelor tale, picurare pentru straturi, aspersor pentru gazon, globuri pentru ghivece. Inainte de irigare, un teren sapat cu o <a href="/motosapa-electrica-pentru-gradina-mica/">motosapa electrica</a> retine mai bine apa.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
         <p class="author-role">Expert Gradinarit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="sistem-de-irigare-automata-pentru-gradina"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="sistem-de-irigare-automata-pentru-gradina"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="sistem-de-irigare-automata-pentru-gradina" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="sistem-de-irigare-automata-pentru-gradina" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

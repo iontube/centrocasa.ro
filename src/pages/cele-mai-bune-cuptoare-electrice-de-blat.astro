@@ -1,0 +1,303 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['cuptoare-elec'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Compacte (18-35 l) ---
+  { g: 'compact', id: 'DQ110NBBM', rol: 'Cel mai mic, cu convectie', short: 'Esperanza 18 l', cap: '18 l', putere: '1400 W', extra: 'Convectie', pret: '293 lei',
+    specs: ['18 litri, cu ventilator de convectie', '1400 W, pana la 250 de grade', 'corp foarte mic, 33 x 38 cm', 'perete transparent, vezi mancarea'],
+    pros: ['93 de pareri, cel mai verificat din grupa compacta', 'Are convectie, incalzire uniforma rara la modelele mici', 'Ajunge la 250 de grade, mai mult decat multe de 35 l', 'Foarte mic, incape oriunde'],
+    cons: ['18 litri, doar pentru portii mici sau o farfurie', 'Nu incape o tava standard'],
+    verdict: 'Esperanza de 18 litri e cel mai mic din articol, dar are un atu pe care putine modele compacte il ofera: convectia, adica un ventilator care plimba aerul cald si coace uniform, fara zone mai reci. Cu 1400 W si pana la 250 de grade, incalzeste bine pentru gabaritul lui, iar peretele transparent te lasa sa vezi mancarea fara sa deschizi usa. Cei 18 litri sunt insa exact cat sunt: incape o farfurie, cateva chifle sau o portie de gratinat, nu o tava standard si nu un pui. Il iei ca aparat de completare, intr-un birou, o garsoniera sau pentru o persoana, cand vrei convectie intr-un corp minuscul. E cel mai bine cotat din grupa, cu 93 de pareri.' },
+  { g: 'compact', id: 'DRQPC3BBM', rol: 'Cel mai ieftin', short: 'Albatros 23 l', cap: '23 l', putere: '1380 W', extra: 'Static', pret: '244 lei',
+    specs: ['23 litri, 1380 W, pana la 230 de grade', 'temporizator cu oprire', 'corp compact, negru', 'incalzire clasica, fara ventilator'],
+    pros: ['Cel mai ieftin din articol, sub 250 de lei', '23 de litri, ceva mai mult decat cele de 18', 'Temporizator cu oprire automata', 'Simplu de folosit'],
+    cons: ['Fara convectie, incalzire mai putin uniforma', 'Fara rotisor'],
+    verdict: 'Albatros A23B2 e cel mai ieftin cuptor din articol, sub 250 de lei, si e alegerea de baza pentru cine vrea un cuptor electric fara sa cheltuie mult. Cu 23 de litri, incape o farfurie sau un vas mic, iar temporizatorul cu oprire il face sigur, sa nu il uiti pornit. Nu are convectie, deci caldura vine doar de la rezistente si e ceva mai putin uniforma decat la modelele cu ventilator, si nu are rotisor. Dar pentru incalzit, gratinat sau o portie mica, la 39 de pareri si nota buna, isi face treaba. Il iei cand bugetul e prima grija si ai nevoie de un cuptor simplu, pentru portii mici.' },
+  { g: 'compact', id: 'DW2992MBM', rol: 'Forma rotunda, aparte', short: 'Floria rotund', cap: '40 l', putere: '1300 W', extra: 'Rotund', pret: '436 lei',
+    specs: ['circa 40 litri, forma rotunda', '1300 W, pana la 250 de grade', 'finisaj visiniu, aspect diferit', 'corp de 47 x 47 cm'],
+    pros: ['Forma rotunda, aspect aparte pe blat', 'Ajunge la 250 de grade', 'Capacitate decenta pentru forma lui', 'Culoare visinie, iese din comun'],
+    cons: ['Nota 4.03, cea mai mica din grupa', 'Forma rotunda nu se potriveste cu tavi dreptunghiulare'],
+    verdict: 'Floria ZLN-9553 e cuptorul aparte din grupa compacta, prin forma rotunda si culoarea visinie, care il fac mai degraba un obiect decorativ pe blat decat un aparat obisnuit. Are in jur de 40 de litri si ajunge la 250 de grade, deci pentru gatit sta bine. Forma rotunda are insa si un revers practic: tavile obisnuite, dreptunghiulare, nu se potrivesc la fel de bine ca intr-un cuptor clasic, iar accesoriile sunt de obicei rotunde, dedicate. Nota, 4.03, e cea mai mica din grupa, semn de experiente amestecate. Il iei cand vrei ceva cu aspect diferit, care sa se remarce in bucatarie, si esti dispus la compromisul formei rotunde.' },
+  { g: 'compact', id: 'D539SYBBM', rol: '35 litri, nota mare', short: 'Albatros 35 l', cap: '35 l', putere: '1500 W', extra: 'Static', pret: '262 lei',
+    specs: ['35 litri, 1500 W, pana la 230 de grade', 'semnal acustic la final', 'finisaj alb', 'cel mai incapator din grupa compacta'],
+    pros: ['Nota 4.69, cea mai mare din grupa compacta', '35 de litri, incape o tava mica', 'Sub 270 de lei', 'Finisaj alb, luminos'],
+    cons: ['Fara convectie si fara rotisor', 'Doar semnal acustic, fara functii avansate'],
+    verdict: 'Albatros A35W2 e puntea intre grupa compacta si cea medie: 35 de litri, cea mai mare capacitate dintre cele mici, la sub 270 de lei si cu nota 4.69, cea mai buna din grupa. La 35 de litri incape deja o tava mica, deci poti coace niste chifle, o portie de legume sau gratina ceva pentru doua persoane, nu doar o farfurie. Finisajul alb il face luminos, potrivit pentru o bucatarie simpla. Nu are convectie sau rotisor, deci ramane un cuptor de baza, dar bine notat si echilibrat pe pret. Il iei cand vrei cel mai mult spatiu dintr-un cuptor compact ieftin, cu o nota buna in spate.' },
+  // --- B. Medii (38-50 l) ---
+  { g: 'mediu', id: 'DXSV27BBM', rol: 'Cel mai vandut din articol', short: 'Samus 45 l', cap: '45 l', putere: '2000 W', extra: 'Rotisor + convectie', pret: '484 lei',
+    specs: ['45 litri, 2000 W, rotisor si convectie', 'programe pentru pui, friptura, pizza, prajituri', 'afisaj digital cu control temperatura', 'incalzire uniforma prin ventilator'],
+    pros: ['128 de pareri, de departe cel mai vandut din articol', 'Are si rotisor, si convectie, rar la pret', 'Programe automate pentru feluri comune', 'Afisaj digital, control precis'],
+    cons: ['Corp mai inalt, 56 cm, ocupa spatiu pe verticala', 'Nota 4.56, foarte buna, nu perfecta'],
+    verdict: 'Samus CSD-45BRC2 e cel mai vandut cuptor din articol, cu 128 de pareri, si nu intamplator: aduna intr-un singur aparat ce se gaseste de obicei separat. Are 45 de litri, 2000 W, rotisor pentru pui intreg si convectie cu ventilator pentru coacere uniforma, plus un afisaj digital cu programe automate pentru pui, friptura, kebab, peste, pizza si prajituri. Practic, e cel mai aproape de un cuptor adevarat dintre cele medii, la 484 de lei. Singurul lucru de masurat inainte e inaltimea, 56 de centimetri, mai mult decat modelele latite, deci verifica spatiul pe verticala. Il iei cand vrei un cuptor de blat complet, cu rotisor, convectie si programe, dovedit de cei mai multi cumparatori.' },
+  { g: 'mediu', id: 'DQP1B8BBM', rol: 'Temperatura mare, pentru pizza', short: 'Zilan 38 l', cap: '38 l', putere: '1500 W', extra: '320 grade', pret: '322 lei',
+    specs: ['38 litri, 1500 W, pana la 320 de grade', 'doua tavi incluse', 'termostat si oprire automata', 'temperatura cea mai mare din articol'],
+    pros: ['Ajunge la 320 de grade, cea mai mare din articol', 'Ideal pentru pizza si paine, care cer caldura mare', 'Vine cu doua tavi', '114 pareri, foarte verificat'],
+    cons: ['Nota 4.4, buna, nu de varf', '1500 W la 38 l, incalzeste ceva mai lent la maxim'],
+    verdict: 'Zilan Gusto iese in fata printr-o cifra pe care restul articolului nu o atinge: ajunge la 320 de grade, cu mult peste cele 230-250 ale majoritatii. Conteaza concret daca faci pizza sau paine, care ies bine doar la temperaturi mari, cu crusta rumena si interior copt. Are 38 de litri, doua tavi incluse, termostat si oprire automata, la un pret accesibil, sub 330 de lei, si cu 114 pareri in spate. Puterea de 1500 W inseamna ca la temperatura maxima incalzeste ceva mai lent decat un 2000 W, dar ajunge acolo. Il iei cand faci des pizza sau paine si vrei un cuptor care chiar urca la temperatura de care au nevoie.' },
+  { g: 'mediu', id: 'D7VQG3BBM', rol: '45 litri bine notat, mai ieftin', short: 'Samus 45 l basic', cap: '45 l', putere: '2000 W', extra: 'Static', pret: '318 lei',
+    specs: ['45 litri, 2000 W', 'control clasic, cu butoane', 'semnal acustic la final', 'incalzire prin rezistente'],
+    pros: ['Nota 4.66, printre cele mai mari din grupa', '45 de litri la sub 320 de lei, raport foarte bun', '2000 W, incalzire rapida', '98 de pareri, bine verificat'],
+    cons: ['Fara convectie si fara rotisor', 'Control simplu, fara programe'],
+    verdict: 'Samus CS-45B2 e varianta de baza, si mai ieftina, a celui mai vandut model: aceeasi capacitate de 45 de litri si aceeasi putere de 2000 W, dar fara rotisor, convectie si afisaj digital, la sub 320 de lei, cu circa 160 de lei mai putin. E alegerea pentru cine vrea un cuptor mediu incapator si puternic, dar nu are nevoie de rotisor si programe si prefera sa economiseasca. Cu 98 de pareri si nota 4.66, e printre cele mai bine cotate din grupa. Ramane un cuptor cu control clasic, cu butoane, care incalzeste rapid datorita celor 2000 W. Il iei cand vrei 45 de litri si putere mare, la cel mai bun pret, fara dotari in plus.' },
+  { g: 'mediu', id: 'D6RPKVBBM', rol: '50 de litri, spatios', short: 'Albatros 50 l', cap: '50 l', putere: '2000 W', extra: 'Static', pret: '388 lei',
+    specs: ['50 litri, 2000 W, pana la 230 de grade', 'corp latit, 55 cm', 'semnal acustic la final', 'finisaj negru'],
+    pros: ['50 de litri, cel mai incapator din grupa medie', '2000 W, incalzire rapida', 'Corp latit, mai stabil pe blat', '71 de pareri, bine verificat'],
+    cons: ['Fara convectie si fara rotisor', 'Latime de 55 cm, ocupa mai mult blat'],
+    verdict: 'Albatros A50BRCL2 imparte grupa medie de cea mare, cu 50 de litri, in care incape lejer o tava standard si portii pentru toata familia. Cu 2000 W incalzeste rapid, iar corpul latit, de 55 de centimetri, il face stabil pe blat si usor de incarcat. E un cuptor simplu, fara convectie sau rotisor, dar bine dimensionat si bine notat, cu 71 de pareri, la sub 390 de lei. Latimea mai mare inseamna ca ocupa mai mult spatiu pe blat, deci masoara unde il pui. Il iei cand vrei maximum de spatiu dintr-un cuptor mediu, incape o tava intreaga si nu ai nevoie de dotari speciale.' },
+  // --- C. Mari (60-70 l) ---
+  { g: 'mare', id: 'D34ZB7BBM', rol: '60 de litri, nota mare', short: 'Samus 60 l', cap: '60 l', putere: '2200 W', extra: 'Rotisor', pret: '496 lei',
+    specs: ['60 litri, 2200 W, termostat reglabil', 'rotisor pentru pui intreg', 'corp latit, 62.5 cm', 'pana la 230 de grade'],
+    pros: ['Nota 4.69, cea mai mare din grupa mare', '60 de litri, aproape cat un cuptor incorporat mic', '2200 W, incalzire puternica', 'Are rotisor'],
+    cons: ['Latime 62.5 cm, cere mult blat', 'Fara programe automate'],
+    verdict: 'Samus CS-60BRC2 e cel mai bine notat cuptor din grupa mare, cu 4.69, si incepe sa se apropie de un cuptor adevarat: 60 de litri, in care incap doua tavi sau un vas mare, si 2200 W pentru incalzire puternica. Are rotisor pentru pui intreg si termostat reglabil, deci acopera gatitul serios, nu doar incalzitul. Fiind latit, 62.5 de centimetri, cere spatiu pe blat, asa ca masoara inainte. Nu are programe automate ca modelul de 45 de litri, dar are capacitatea si puterea in plus. Il iei cand vrei un cuptor de blat care sa inlocuiasca aproape complet unul incorporat, cu rotisor si nota de top.' },
+  { g: 'mare', id: 'DKG1R3BBM', rol: 'Sase functii, rotisor si convectie', short: 'Albatros 63 l', cap: '63 l', putere: '2200 W', extra: 'Rotisor + convectie', pret: '474 lei',
+    specs: ['63 litri, 2200 W, 6 functii de gatire', 'rotisor si convectie', 'timer si functie Stay On', 'corp latit, 62 cm'],
+    pros: ['63 de litri plus 6 functii de gatire', 'Are si rotisor, si convectie', 'Functie Stay On pentru gatit prelungit', 'Cel mai ieftin de 63 l cu dotari complete'],
+    cons: ['Latime 62 cm', 'Nota 4.51, buna, nu de varf'],
+    verdict: 'Albatros A63BRC2 e cuptorul mare cu cele mai multe dotari la pret mic: 63 de litri, 6 functii de gatire, rotisor si convectie, la sub 480 de lei. Combinatia de rotisor, pentru pui, si convectie, pentru coacere uniforma, il face versatil, iar cele 6 functii lasa sa alegi cum se distribuie caldura, de sus, de jos sau combinat. Functia Stay On mentine cuptorul pornit pentru preparate care cer timp lung. E latit, 62 de centimetri, deci cere blat, si are nota 4.51 pe 72 de pareri, solida. Il iei cand vrei un cuptor mare cu dotari complete, rotisor si convectie, fara sa treci de 500 de lei.' },
+  { g: 'mare', id: 'D8QPC3BBM', rol: 'Cu doua plite deasupra', short: 'Albatros cu plite', cap: '63 l', putere: 'Cuptor + plite', extra: 'Cu plite', pret: '514 lei',
+    specs: ['63 litri, cu doua plite electrice deasupra', 'rotisor si convectie', 'ca o mini-bucatarie intr-un aparat', 'corp latit, 62 cm'],
+    pros: ['Are doua plite deasupra, gatesti si la oala', 'Rotisor si convectie, ca varianta fara plite', 'Inlocuieste si aragazul, si cuptorul, intr-un corp', 'Ideal unde nu ai plita separata'],
+    cons: ['Mai scump decat varianta fara plite', 'Latime 62 cm plus inaltimea plitelor'],
+    verdict: 'Albatros A63BPRC2 e varianta care rezolva doua nevoi deodata: peste cuptorul de 63 de litri cu rotisor si convectie, are doua plite electrice deasupra, deci poti fierbe sau praji la oala in acelasi timp in care coci in cuptor. E, practic, o mini-bucatarie intr-un singur aparat, exact ce cauti intr-o garsoniera, o casa de vacanta, un spatiu inchiriat sau oriunde nu ai o plita separata. Fata de varianta fara plite, costa cu vreo 40 de lei mai mult, un adaos mic pentru ce aduce. Ocupa mai mult, prin plitele de deasupra. Il iei cand nu ai aragaz sau plita si vrei un singur aparat care le face pe amandoua.' },
+  { g: 'mare', id: 'DKQBYYYBM', rol: 'Cel mai mare, 70 de litri', short: 'Kumtel 70 l', cap: '70 l', putere: '2500 W', extra: 'Pizza + rotisor', pret: '800 lei',
+    specs: ['70 litri, 2500 W, cel mai mare si mai puternic', 'rotisor, iluminare interioara, mentinere la cald', 'oprire automata, dezghetare', 'corp XXL, 68 cm latime'],
+    pros: ['70 de litri, cel mai mare din articol', '2500 W, cea mai mare putere, incalzire rapida', 'Rotisor, iluminare, mentinere la cald, dezghetare', '76 de pareri, bine verificat'],
+    cons: ['Cel mai scump din articol, 800 de lei', 'Corp XXL, 68 cm, cere mult spatiu'],
+    verdict: 'Kumtel LX-9645FA e varful de capacitate din articol: 70 de litri si 2500 W, cel mai mare si mai puternic, gandit sa inlocuiasca un cuptor incorporat cap-coada. La 70 de litri incap doua tavi mari, o pizza sau un pui la rotisor cu garnitura dedesubt, iar cei 2500 W il fac sa ajunga rapid la temperatura. Are iluminare interioara, ca sa vezi mancarea, mentinere la cald, dezghetare si oprire automata, dotari de cuptor serios. E cel mai scump din articol, 800 de lei, si cel mai voluminos, 68 de centimetri latime, deci ai nevoie de spatiu real. Il iei cand gatesti mult, pentru o familie, si vrei un cuptor de blat care nu compromite nimic la capacitate.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const COMP = PICKS.filter(x => x.g === 'compact');
+const MED = PICKS.filter(x => x.g === 'mediu');
+const MARE = PICKS.filter(x => x.g === 'mare');
+
+const hero = '/imagini/articole/cele-mai-bune-cuptoare-electrice-de-blat.webp';
+const figComp = '/imagini/articole/cuptor-elec-compacte.webp';
+const figMed = '/imagini/articole/cuptor-elec-medii.webp';
+const figMare = '/imagini/articole/cuptor-elec-mari.webp';
+const published = '2026-07-22T20:01:57+03:00';
+
+const faq = [
+  { question: 'Ce e un cuptor electric de blat si prin ce difera de unul incorporat?', answer: 'E un cuptor electric de sine statator, care se aseaza pe blat sau pe o masa si merge bagat direct in priza, fara montaj si fara mobilier facut pe masura. Un cuptor incorporat se monteaza fix intr-o coloana de mobilier si cere instalare. Cel de blat e mai mic, mai ieftin si il muti oricand, ceea ce il face potrivit pentru chirie, bucatarii mici, case de vacanta, birouri sau ca al doilea cuptor. In schimb, are de obicei mai putina capacitate si mai putine functii decat unul incorporat mare. Daca vrei unul incastrat in mobilier, e o categorie separata, cu articol propriu.' },
+  { question: 'De cati litri am nevoie?', answer: 'Depinde ce si pentru cati gatesti. Sub 30 de litri, un model compact e pentru o persoana, portii mici sau incalzit, si de multe ori nu incape o tava standard. Intre 35 si 50 de litri intra deja o tava, deci poti coace, gratina si gati pentru doua-patru persoane, e zona cea mai echilibrata. Peste 60 de litri intri in teritoriul care inlocuieste aproape un cuptor incorporat: doua tavi, un pui la rotisor, portii pentru toata familia. Tine cont ca un cuptor mai mare ocupa mult blat, asa ca masoara spatiul inainte, mai ales pe latime.' },
+  { question: 'Ce inseamna convectie la un cuptor electric?', answer: 'Convectia inseamna ca aparatul are un ventilator care plimba aerul cald in interior, in loc sa lase caldura sa urce natural de la rezistente. Efectul e ca temperatura e uniforma peste tot, mancarea se coace egal, fara zone mai reci sau mai fierbinti, se rumeneste mai bine si adesea mai repede. La un cuptor fara convectie, static, caldura e ceva mai neuniforma, si poate fi nevoie sa intorci tava. Pentru copt prajituri, paine sau mai multe lucruri deodata, convectia face o diferenta reala. In articol, Esperanza, Samus de 45 l cu rotisor si Albatros de 63 l o au.' },
+  { question: 'La ce foloseste rotisorul?', answer: 'Rotisorul e o frigare care se roteste incet in cuptor, cu un motoras, si e facut in principal pentru puiul intreg: se invarte deasupra unei tavi, se rumeneste uniform pe toate partile si isi lasa grasimea sa se scurga, iesind crocant afara si suculent inauntru. Il poti folosi si pentru bucati mari de carne. E o dotare care aduce un tip de preparat greu de facut altfel intr-un cuptor obisnuit. Daca faci des pui la rotisor, cauta un model care il are, marcat de obicei prin literele RC sau BRC in denumire, ca la Samus si Albatros din articol.' },
+  { question: 'De cati wati si cate grade am nevoie?', answer: 'Puterea, in wati, spune cat de repede ajunge cuptorul la temperatura si cat de bine o mentine. Modelele mici au 1300-1500 W, cele medii si mari 2000-2500 W; pentru un cuptor de la 40 de litri in sus, 2000 W e un reper bun. Temperatura maxima conteaza in functie de ce gatesti: majoritatea ajung la 230 de grade, suficient pentru fripturi, gratinat si copt obisnuit. Daca faci insa pizza sau paine, care ies bine doar la caldura mare, cauta un model care urca la 250 de grade sau mai mult, cum e Zilan din articol, care ajunge la 320.' },
+  { question: 'Un cuptor de blat poate inlocui unul incorporat?', answer: 'Pentru multe gospodarii, da, mai ales modelele de 60-70 de litri cu convectie si rotisor, care se apropie de un cuptor incorporat mic ca spatiu si dotari. Coci, frigi, faci pui la rotisor si gratinezi, fara montaj. Diferentele care raman sunt capacitatea, un incorporat mare are 65-75 de litri utili si incape mai comod tavi mari, si integrarea, cel incorporat dispare in mobilier, cel de blat ocupa spatiu de lucru. Pentru o persoana, un cuplu sau o familie mica, un cuptor de blat de 50-70 de litri acopera nevoile fara sa investesti in mobilier si montaj.' },
+  { question: 'Ce diferenta e intre cuptor electric, microunde si friteuza cu aer cald?', answer: 'Sunt trei aparate cu roluri diferite. Cuptorul electric coace, frige si gratineaza cu aer cald de la rezistente, deci face preparate adevarate: pui, prajituri, pizza, legume la tava. Microundele incalzeste si decongeleaza rapid, prin unde, dar nu coace si nu rumeneste ca lumea. Friteuza cu aer cald, sau air fryer, circula aer foarte fierbinte in jurul mancarii ca sa iasa crocanta cu putin sau deloc ulei, buna pentru cartofi, pui si gustari, dar cu spatiu mic. Multi au si un cuptor, si un microunde; friteuza cu aer cald e un al treilea aparat, pentru crocant rapid.' },
+  { question: 'Cat consuma un cuptor electric de blat?', answer: 'Consuma cat spune puterea lui, cat timp e pornit: un cuptor de 2000 W tinut o ora foloseste in jur de 2 kWh, mai putin daca nu sta pornit tot timpul, pentru ca termostatul opreste si porneste rezistentele ca sa mentina temperatura. E un consum real, mai mare decat al unui microunde folosit cateva minute, dar normal pentru gatit adevarat. Ca sa economisesti, alege o capacitate potrivita cu ce gatesti, un cuptor de 70 de litri incalzit pentru o singura farfurie risipeste energie, foloseste convectia acolo unde exista, pentru ca scurteaza timpul, si nu preincalzi mai mult decat e nevoie.' },
+];
+
+const images = [hero, figComp, figMed, figMare, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune cuptoare electrice de blat in ${SEO_YEAR}: cand inlocuiesc cuptorul incorporat`}
+  description="12 cuptoare electrice de blat comparate pe capacitate, convectie, rotisor si putere, de la 18 la 70 de litri. Cand inlocuiesc un cuptor incorporat, de la 244 de lei."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune cuptoare electrice de blat' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune cuptoare electrice de blat</span>
+    </nav>
+
+    <h1>Cele mai bune cuptoare electrice de blat</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune cuptoare electrice de blat, de la modele compacte la 70 de litri cu rotisor si convectie" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Nu orice bucatarie are un cuptor incorporat, si nu orice gospodarie are nevoie de unul. Un cuptor electric de blat se aseaza pe masa, il bagi in priza si gateste, coace si frige fara montaj si fara mobilier pe comanda, motiv pentru care e alegerea pentru chirie, bucatarii mici, case de vacanta sau ca al doilea cuptor. Cel mai vandut din selectie, cu 128 de pareri, e <strong>Samus CSD-45BRC2</strong>, 45 de litri cu rotisor si convectie, la 484 de lei. Daca vrei ceva mic si ieftin, <strong>Albatros de 23 de litri</strong> porneste de la 244. Iar pentru o familie, <strong>Kumtel de 70 de litri</strong> inlocuieste aproape un cuptor incorporat, la 800 de lei.</p>
+      <p>Dupa capacitate, care e primul filtru, conteaza cateva dotari: <strong>convectia</strong>, un ventilator care coace uniform; <strong>rotisorul</strong>, pentru pui intreg; <strong>puterea si temperatura</strong>, mai ales daca faci pizza sau paine. Nu toate sunt necesare, iar unele modele ieftine le au deja, altele premium nu.</p>
+      <p>Le-am grupat dupa capacitate: compacte de 18-35 de litri pentru portii mici, medii de 38-50 pentru majoritatea si mari de 60-70 pentru cine vrea sa inlocuiasca un cuptor mare. Daca vrei totusi unul incastrat in mobilier, nu de blat, e o categorie separata; iar pentru crocant rapid cu putin ulei, alternativa e <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o friteuza cu aer cald</a>.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#compact">Compacte (18-35 l)</a></li>
+        <li><a href="#mediu">Medii (38-50 l)</a></li>
+        <li><a href="#mare">Mari (60-70 l)</a></li>
+        <li><a href="#capacitate">De cati litri ai nevoie</a></li>
+        <li><a href="#convectie">Convectie, rotisor si celelalte dotari</a></li>
+        <li><a href="#putere">Puterea si temperatura</a></li>
+        <li><a href="#vs">Cuptor, microunde sau friteuza cu aer cald</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Putere</th><th>Dotare</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.putere}</td>
+              <td>{x.extra}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="compact">Compacte (18-35 l)</h2>
+    <p>Astea sunt cuptoarele mici, pentru o persoana, portii reduse sau ca aparat de completare, cu 18-35 de litri. Multe nu incap o tava standard, dar ocupa putin loc si costa cel mai putin. Le-am asezat de la cel mai mic la cel mai incapator.</p>
+    {COMP.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figComp} alt="Cuptoare electrice de blat compacte, Esperanza 18 l, Albatros 23 l si Albatros 35 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mediu">Medii (38-50 l)</h2>
+    <p>Zona cea mai echilibrata si cea mai cautata: 38-50 de litri, in care incape o tava standard si poti gati pentru o familie mica. Aici sta cel mai vandut cuptor din articol, unul cu temperatura de 320 de grade pentru pizza si doua modele simple, dar puternice, cu cel mai bun raport.</p>
+    {MED.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMed} alt="Cuptoare electrice de blat medii, Samus 45 l, Zilan 38 l si Albatros 50 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mare">Mari (60-70 l)</h2>
+    <p>Peste 60 de litri intri in teritoriul care inlocuieste aproape un cuptor incorporat: doua tavi, un pui la rotisor, portii pentru toata familia. Aici gasesti si un model cu doua plite deasupra, ca o mini-bucatarie, si pe cel mai mare din articol, de 70 de litri. Cer insa mult spatiu pe blat.</p>
+    {MARE.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMare} alt="Cuptoare electrice de blat mari, Samus 60 l, Albatros 63 l cu plite si Kumtel 70 l" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-cuptoare-elec').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate cuptoarele electrice la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="capacitate">De cati litri ai nevoie</h2>
+    <p>Capacitatea e primul filtru, si greseala frecventa e sa iei prea mic ca sa economisesti spatiu, apoi sa constati ca nu incape o tava. Uite pe categorii:</p>
+    <ul>
+      <li><strong>Sub 30 de litri.</strong> Pentru o persoana, portii mici sau incalzit. Adesea nu incape o tava standard si nici un pui. Bun ca aparat de completare.</li>
+      <li><strong>35-50 de litri.</strong> Zona echilibrata: incape o tava, deci coci, gratinezi si gatesti pentru doua-patru persoane. Cea mai cautata si cu cel mai bun raport.</li>
+      <li><strong>60-70 de litri.</strong> Inlocuieste aproape un cuptor incorporat: doua tavi, un pui la rotisor, portii pentru toata familia. Cere insa mult spatiu pe blat.</li>
+    </ul>
+    <p>Tine cont ca latimea creste odata cu litrii: un compact are 33-45 cm, unul mediu-mare ajunge la 55-68. Masoara blatul unde il pui, pentru ca la modelele mari latimea, nu capacitatea, e cea care surprinde.</p>
+
+    <h2 id="convectie">Convectie, rotisor si celelalte dotari</h2>
+    <p>Dupa capacitate, dotarile fac diferenta intre un cuptor de baza si unul care gateste serios. Cele care conteaza:</p>
+    <ul>
+      <li><strong>Convectia.</strong> Un ventilator plimba aerul cald, deci temperatura e uniforma, mancarea se coace egal si se rumeneste mai bine, adesea mai repede. Diferenta reala la copt prajituri, paine sau mai multe lucruri deodata.</li>
+      <li><strong>Rotisorul.</strong> O frigare care se roteste, facuta pentru pui intreg: se rumeneste uniform si isi scurge grasimea. Marcat de obicei prin RC sau BRC in denumire.</li>
+      <li><strong>Plitele deasupra.</strong> Cateva modele mari, ca Albatros A63BPRC2, au doua plite electrice pe capac, deci gatesti si la oala, nu doar la cuptor. O mini-bucatarie intr-un aparat, utila unde nu ai plita.</li>
+      <li><strong>Programele si functiile.</strong> Modelele digitale, ca Samus de 45 l, au programe automate pentru pui, pizza sau prajituri, si mai multe functii de incalzire, de sus, de jos sau combinat.</li>
+    </ul>
+    <p>Nu ai nevoie de toate. Daca doar incalzesti si gratinezi ocazional, un model simplu ajunge. Daca gatesti serios, cauta convectie si rotisor, si le au si cateva modele accesibile.</p>
+
+    <h2 id="putere">Puterea si temperatura</h2>
+    <p>Doua cifre spun cat de bine gateste cuptorul: puterea si temperatura maxima.</p>
+    <p><strong>Puterea</strong>, in wati, arata cat de repede ajunge la temperatura si cat de bine o tine. Modelele mici au 1300-1500 W, cele medii si mari 2000-2500. Pentru un cuptor de la 40 de litri in sus, 2000 W e reperul bun; sub atat, la o capacitate mare, incalzirea e vizibil mai lenta.</p>
+    <p><strong>Temperatura maxima</strong> conteaza in functie de ce gatesti. Majoritatea ajung la 230 de grade, suficient pentru fripturi, gratinat si copt obisnuit. Daca faci insa <strong>pizza sau paine</strong>, care ies bine doar la caldura mare, cu crusta rumena, cauta un model care urca la 250 de grade sau mai mult. In articol, Zilan ajunge la 320, cel mai mult, iar Esperanza si Floria la 250.</p>
+
+    <h2 id="vs">Cuptor, microunde sau friteuza cu aer cald</h2>
+    <p>Sunt trei aparate confundate des, dar cu roluri diferite, si merita clarificat inainte sa cumperi ce nu iti trebuie.</p>
+    <p><strong>Cuptorul electric</strong> coace, frige si gratineaza cu aer cald de la rezistente, deci face preparate adevarate: pui, prajituri, pizza, legume la tava. E aparatul de gatit propriu-zis.</p>
+    <p><strong>Microundele</strong> incalzeste si decongeleaza rapid, prin unde, dar nu coace si nu rumeneste ca un cuptor. E pentru viteza, nu pentru gatit.</p>
+    <p><strong>Friteuza cu aer cald</strong>, sau air fryer, circula aer foarte fierbinte in jurul mancarii, ca sa iasa crocanta cu putin sau deloc ulei, buna pentru cartofi, pui si gustari, dar cu spatiu mic. Daca vrei crocant rapid cu mai putin ulei, e <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o categorie aparte</a>. Multi au si cuptor, si microunde; friteuza cu aer cald e un al treilea aparat, complementar, nu inlocuitor.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Iei prea mic si nu incape o tava.</strong> Sub 30 de litri, multe modele nu primesc o tava standard. Daca vrei sa coci, ia de la 35 de litri in sus.</li>
+      <li><strong>Nu masori latimea blatului.</strong> La modelele mari, latimea de 55-68 cm surprinde mai mult decat capacitatea. Masoara inainte.</li>
+      <li><strong>Platesti pentru rotisor si convectie de care nu ai nevoie.</strong> Daca doar incalzesti, un model simplu e mai ieftin. Dar daca gatesti, le vrei, si le au si cuptoare accesibile.</li>
+      <li><strong>Vrei pizza dintr-un cuptor de 230 de grade.</strong> Pizza si painea cer caldura mare. Pentru ele, cauta 250 de grade sau mai mult.</li>
+      <li><strong>Confunzi cuptorul cu microundele sau air fryer-ul.</strong> Sunt aparate diferite. Cuptorul coace si frige, microundele incalzeste, friteuza cu aer cald face crocant.</li>
+      <li><strong>Iei un cuptor de 70 de litri pentru o farfurie.</strong> Un cuptor mare incalzit pentru portii mici risipeste energie. Potriveste capacitatea cu ce gatesti de obicei.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la cuptoarele electrice de blat in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca acelasi cuptor apare adesea in mai multe variante de finisaj, cu coduri diferite si acelasi pret.</p>
+    <p><strong>Le-am grupat dupa capacitate</strong>, pentru ca la un cuptor de blat marimea e prima decizie, urmata de convectie, rotisor si putere. Am comparat specificatiile reale din fise, capacitatea, puterea, temperatura maxima, prezenta convectiei si a rotisorului, dimensiunile, si am semnalat unde un pret mai mare aduce dotari concrete, ca rotisorul sau plitele, si unde nu.</p>
+    <p>Am lasat deoparte doua categorii care se strecoara la aceeasi cautare, dar au rolul si articolul lor: <strong>friteuzele cu aer cald</strong>, care sunt air fryere, nu cuptoare, si cuptoarele electrice <strong>incorporabile</strong>, care se monteaza in mobilier. Nu testam aparatele in laborator si nu pretindem asta: ne bazam pe pareri, specificatii de la producator si documentare. Un cuptor de blat sta bine langa restul electrocasnicelor de bucatarie, de la <a href="/cele-mai-bune-cuptoare-cu-microunde-incorporabile/">un cuptor cu microunde</a> la <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o friteuza cu aer cald</a>.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 244 la 800 de lei, iar pretul urmeaza capacitatea si dotarile.</p>
+    <p><strong>Sub 300 de lei</strong> stau modelele compacte si accesibile: Albatros de 23 si 35 de litri, Esperanza cu convectie, plus Samus de 45 de litri in varianta de baza. Bune pentru portii mici sau ca prim cuptor ieftin.</p>
+    <p><strong>Intre 300 si 500 de lei</strong> e grosul pietei si cel mai bun raport: Zilan de 38 l cu temperatura mare, Samus de 45 l cel mai vandut, cu rotisor si convectie, Albatros de 50, 60 si 63 de litri. Aici gasesti capacitate reala si dotari serioase la pret rezonabil.</p>
+    <p><strong>Peste 500 de lei</strong> intra modelele mari si complete: Albatros de 63 l cu plite deasupra si Kumtel de 70 l, cel mai mare, la 800 de lei. Platesti pentru capacitate maxima si dotari de cuptor serios, cand vrei sa inlocuiesti complet unul incorporat.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-cuptoare-electrice-de-blat" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-cuptoare-electrice-de-blat" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

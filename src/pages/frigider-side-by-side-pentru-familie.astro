@@ -1,232 +1,307 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Frigider side by side pentru familie",
-  excerpt: "Stai sa vezi, am tot auzit vorbindu-se despre frigiderele alea mari, side by side, si m-am gandit sa va povestesc si voua, ca intre prieteni. Mai ales daca aveti o familie mai numeroasa, stiti cat de greu e sa tii totul in frau in bucatarie cand vine vorba de alimente proaspete si congelate. Eu am trecut prin asta si am gasit solutia perfecta. ",
-  image: "/images/articles/frigider-side-by-side-pentru-familie.webp",
-  category: "Electrocasnice Casa",
-  categorySlug: "electrocasnice-casa",
-  date: "2026-01-13T19:33:39.631Z",
-  modifiedDate: "2026-01-29T19:33:39.210Z",
-  author: "Cristian Popa",
-  authorRole: "Specialist Electrocasnice",
-  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
-};
-
-const faq = [
-  { question: "Cat de mult curent consuma un frigider side by side?", answer: "Consumul variaza in functie de model, clasa energetica si dimensiuni. Modelele noi, cu clasa A++ sau A+++, sunt destul de eficiente. Un model mediu poate consuma intre 300 si 500 kWh pe an. E important sa verifici specificatiile tehnice ale modelului vizat." },
-  { question: "Este greu de instalat un frigider side by side?", answer: "Instalarea standard, adica asezarea in locul destinat si conectarea la priza, nu e complicata. Daca modelul are dozator de apa, atunci e nevoie de conectare la o sursa de apa, ceea ce poate necesita un instalator. Asigura-te ca ai spatiu si ca poti transporta frigiderul in bucatarie." },
-  { question: "Merita sa iau un model cu dozator de apa si gheata?", answer: "Daca bei multa apa rece si folosesti gheata frecvent, da, merita. E mult mai comod decat sa cumperi pungi de gheata sau sa tii sticle in frigider. Totusi, verifica daca ai o sursa de apa in apropiere si tine cont ca poate creste putin pretul modelului." },
-  { question: "Cat de des trebuie curatat un frigider side by side?", answer: "Chiar daca majoritatea au sistem No Frost, o curatare generala o data la 3-4 luni este recomandata. Sterge rafturile, sertarele si garniturile usilor. Asta asigura igiena si o functionare optima a aparatului." },
-  { question: "Pot sa pun un frigider side by side intr-o bucatarie mica?", answer: "Depinde cat de mica e bucataria. Frigiderele side by side sunt voluminoase. Trebuie sa masori cu atentie spatiul si sa te asiguri ca usile se pot deschide complet fara a lovi alte piese de mobilier. De asemenea, lasa spatiu pentru ventilatie." },
-  { question: "Care e diferenta intre No Frost si alte sisteme de racire?", answer: "Sistemul No Frost previne formarea ghetii in frigider si congelator, eliminand nevoia de dezghetare manuala. Alte sisteme pot necesita dezghetare periodica. No Frost e mult mai convenabil si igienic." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un frigider side by side pentru familie", id: "de-ce-ai-nevoie-de-un-frigider-side-by-side-pentru-familie" },
-  { title: "Top recomandari de frigidere side by side pe care le-am testat", id: "top-recomandari-de-frigidere-side-by-side-pe-care-le-am-testat" },
-  { title: "Cum alegi corect un frigider side by side pentru familia ta", id: "cum-alegi-corect-un-frigider-side-by-side-pentru-familia-ta" },
-  { title: "Avantaje si dezavantaje ale frigiderelor side by side", id: "avantaje-si-dezavantaje-ale-frigiderelor-side-by-side" },
-  { title: "Sfaturi practice din experienta mea cu frigiderul side by side", id: "sfaturi-practice-din-experienta-mea-cu-frigiderul-side-by-side" },
-  { title: "Parerea mea finala despre frigiderul side by side", id: "parerea-mea-finala-despre-frigiderul-side-by-side" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['frigidere-sbs'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Accesibile ---
+  { g: 'buget', id: 'DW4Q17MBM', badge: 'Cel mai bun raport', short: 'Heinner HSBS-H442', capacitate: '442 l', clasa: 'E, 287 kWh/an', latime: '90.5 cm',
+    specs: ['442 litri, Full No Frost', 'clasa E, consum 287 kWh/an', 'latime 90.5 cm, 39 dB', 'cel mai vandut din selectie'],
+    pros: ['Cel mai mic pret din selectie pentru un side by side', 'De departe cel mai vandut, cu multe pareri si nota buna', 'Full No Frost, fara dezghetare manuala', 'Consum rezonabil pentru clasa, 287 kWh/an'],
+    cons: ['Clasa E, ca majoritatea side by side-urilor', 'Fara dozator de apa la acest cod'],
+    verdict: 'Cel mai bun punct de intrare intr-un side by side, si de departe cel mai vandut din selectie. Heinner HSBS-H442 are 442 de litri, destul pentru o familie, si tehnologie Full No Frost, deci nu mai dezgheti niciodata manual congelatorul, gheata nu se mai formeaza. Consuma 287 kWh pe an, un nivel rezonabil, iar zgomotul de 39 dB e discret. E clasa E, normal pentru un aparat atat de mare, iar la acest cod nu are dozator de apa. Heinner e brandul care domina segmentul accesibil de side by side, cu multe modele si service la noi. Il iei cand vrei cel mai mult frigider pe banii dati, pentru o familie, fara sa treci de un buget rezonabil.' },
+  { g: 'buget', id: 'D920FVYBM', badge: 'Capacitate mare, ieftin', short: 'Heinner HSBS-HM532', capacitate: '532 l', clasa: 'E, 313 kWh/an', latime: '90 cm',
+    specs: ['532 litri, Full No Frost', 'clasa E, consum 313 kWh/an', 'latime 90 cm', 'super congelare'],
+    pros: ['532 litri, spatiu generos, la un pret inca mic', 'Full No Frost, fara gheata si fara dezghetare', 'Functie de super congelare pentru cumparaturi mari', 'Raport foarte bun capacitate-pret'],
+    cons: ['Consuma ceva mai mult decat modelul de 442 l, normal la volum mai mare', 'Clasa E'],
+    verdict: 'Alegerea daca vrei mult spatiu fara sa dai bani de premium. Heinner HSBS-HM532 are 532 de litri, cu aproape 100 mai mult decat modelul de baza, deci incape tot pentru o familie mare sau pentru cine face cumparaturi rare si multe, la un pret care ramane accesibil. Are Full No Frost si o functie de super congelare, utila cand bagi deodata multa mancare si vrei sa inghete repede. Consuma 313 kWh pe an, ceva mai mult decat modelul de 442 l, normal la un volum mai mare, si e tot clasa E. Il iei cand capacitatea conteaza cel mai mult si vrei cei mai multi litri pe leu.' },
+  { g: 'buget', id: 'DMCQ17MBM', badge: 'Cu dozator de apa', short: 'Heinner HSBS-H439 WD', capacitate: '433 l', clasa: 'E, 286 kWh/an', latime: '90.5 cm',
+    specs: ['433 litri, cu dozator de apa', 'Full No Frost, clasa E', 'consum 286 kWh/an, 39 dB', 'dozator cu rezervor, fara racord obligatoriu'],
+    pros: ['Are dozator de apa la un pret mic, rar in aceasta clasa', 'Full No Frost, fara dezghetare manuala', 'Consum mic pentru un side by side, 286 kWh/an', 'Apa rece la usa, fara sa deschizi frigiderul'],
+    cons: ['433 litri, ceva mai putin decat modelele de 532 l', 'Dozatorul cu rezervor cere reumplere'],
+    verdict: 'Un side by side cu dozator de apa la cel mai mic pret, un lux rar la acest pret. Heinner HSBS-H439 iti da apa rece direct la usa, fara sa deschizi frigiderul, ceea ce inseamna si mai putina energie pierduta si mai mult confort in zilele calde. Modelul foloseste un dozator cu rezervor, deci nu trebuie neaparat sa il legi la reteaua de apa, il reumpli tu, potrivit acolo unde nu ai racord aproape. Are 433 de litri, Full No Frost si un consum mic de 286 kWh pe an. Il iei cand vrei confortul unui dozator de apa fara sa platesti pentru un model premium sau sa tragi teava de apa.' },
+  // --- Branduri mari ---
+  { g: 'brand', id: 'D29V09MBM', badge: 'Candy, spatios', short: 'Candy CHSBSO 6174B', capacitate: '532 l', clasa: 'E, 313 kWh/an', latime: '90 cm',
+    specs: ['532 litri, No Frost', 'clasa E, 313 kWh/an', 'latime 90 cm', 'brand Candy'],
+    pros: ['532 litri spatiosi, pentru o familie mare', 'No Frost, fara dezghetare', 'Candy, brand cunoscut, cu service la noi', 'Alternativa de brand la modelele Heinner'],
+    cons: ['Nota ceva mai mica decat altele din selectie', 'Clasa E, consum mediu'],
+    verdict: 'O alternativa de la un brand cunoscut pentru cine vrea spatiu mult, dar prefera un nume mai familiar decat Heinner. Candy CHSBSO 6174B are 532 de litri, cu No Frost, deci fara dezghetare manuala, si un consum de 313 kWh pe an, la un pret apropiat de modelele Heinner de aceeasi marime. Candy e un brand cu traditie in electrocasnice si cu service la noi, un plus de siguranta. Nota de la cumparatori e ceva mai mica decat la altele din selectie, iar clasa E inseamna un consum mediu. Il iei cand vrei un side by side spatios de la un brand cunoscut, la un pret competitiv.' },
+  { g: 'brand', id: 'DJ3FR7YBM', badge: 'Beko, racire duala', short: 'Beko GNO5322XPN', capacitate: '532 l', clasa: 'E', latime: '90 cm',
+    specs: ['532 litri, NeoFrost Dual Cooling', 'racire separata pentru frigider si congelator', 'clasa E, latime 90 cm', 'nota mare de la cumparatori'],
+    pros: ['NeoFrost Dual Cooling, racire separata pe cele doua compartimente', 'Mirosurile nu trec intre frigider si congelator', 'Nota mare de la cumparatori, aproape de maxim', 'Beko, brand mare cu retea de service extinsa'],
+    cons: ['Clasa E, ca majoritatea', 'Fara dozator la acest cod'],
+    verdict: 'Alegerea daca vrei tehnologie mai buna de racire de la un brand mare. Beko GNO5322XPN are 532 de litri si sistemul NeoFrost Dual Cooling, adica doua circuite separate de racire, unul pentru frigider si unul pentru congelator: asta pastreaza umiditatea corecta in fiecare compartiment si impiedica mirosurile sa treaca dintr-o parte in alta, un avantaj real fata de un sistem simplu. Are nota mare de la cumparatori si vine de la Beko, cu una dintre cele mai extinse retele de service. E clasa E si nu are dozator la acest cod. Il iei cand vrei racire de calitate si un brand mare, pentru o familie.' },
+  { g: 'brand', id: 'D79R81YBM', badge: 'Samsung, cel mai spatios', short: 'Samsung RS57DG400', capacitate: '583 l', clasa: 'E, 331 kWh/an', latime: '91 cm',
+    specs: ['583 litri, Samsung', 'foarte silentios, 37 dB', 'No Frost, clasa E', 'congelare rapida'],
+    pros: ['583 litri, printre cele mai spatioase din selectie', 'Foarte silentios, 37 dB, bun intr-un living deschis', 'Samsung, brand mare, fiabilitate si service', 'Congelare rapida pentru cumparaturi mari'],
+    cons: ['Consum mai mare, 331 kWh/an, la volumul acesta', 'Mai scump decat modelele accesibile'],
+    verdict: 'Alegerea daca vrei mult spatiu si un brand mare, la un pret inca rezonabil. Samsung RS57DG400 are 583 de litri, printre cele mai mari din selectie, si e foarte silentios, doar 37 dB, un plus real daca bucataria e deschisa spre living. Are No Frost si congelare rapida, plus fiabilitatea si reteaua de service Samsung in spate. Consuma 331 kWh pe an, mai mult decat modelele mici, normal la un volum atat de mare, si e mai scump decat Heinner-ele accesibile. Il iei cand vrei un side by side mare si silentios de la Samsung, pentru o familie numeroasa care gateste mult.' },
+  { g: 'brand', id: 'DJB82PYBM', badge: 'Cel mai ingust', short: 'Arctic AMD421E4', capacitate: '421 l', clasa: 'E, 280 kWh/an', latime: '79 cm',
+    specs: ['421 litri, latime doar 79 cm', 'cel mai ingust din selectie', 'consum mic, 280 kWh/an', 'mod vacanta'],
+    pros: ['Latime de doar 79 cm, incape unde un side by side normal nu', 'Cel mai mic consum din selectie, 280 kWh/an', 'Full No Frost si mod vacanta', 'Arctic, brand din grupul Beko, cu service la noi'],
+    cons: ['421 litri, mai putin decat modelele late', 'Nota buna, dar nu maxima'],
+    verdict: 'Solutia pentru o bucatarie mai stramta, unde un side by side obisnuit de 90 cm nu incape. Arctic AMD421E4 are o latime de doar 79 cm, cu peste zece centimetri mai putin decat majoritatea, deci intra pe usi si in nise unde altele nu au loc, pastrand formatul cu doua usi. Are 421 de litri, mai putin decat modelele late, dar suficient pentru multe familii, si cel mai mic consum din selectie, 280 kWh pe an, plus un mod vacanta pentru cand pleci. Arctic face parte din grupul Beko, cu service la noi. Il iei cand vrei un side by side, dar spatiul de montaj e limitat si latimea conteaza.' },
+  // --- Premium ---
+  { g: 'premium', id: 'DWL77MYBM', badge: 'Samsung, mai ingust', short: 'Samsung RF48A401', capacitate: '488 l', clasa: 'E, 298 kWh/an', latime: '83.3 cm',
+    specs: ['488 litri, latime 83.3 cm', 'mai ingust decat un side by side clasic', 'Samsung, No Frost', 'consum bun, 298 kWh/an'],
+    pros: ['Latime de 83.3 cm, mai ingust decat modelele de 90 cm', '488 litri, un echilibru bun intre spatiu si dimensiune', 'Samsung, brand mare, cu design placut', 'Consum bun pentru volum, 298 kWh/an'],
+    cons: ['41 dB, ceva mai zgomotos decat alte Samsung', 'Pret de gama premium'],
+    verdict: 'Alegerea daca vrei un Samsung spatios, dar nu ai loc de un side by side lat de 90 cm. Samsung RF48A401 are 488 de litri intr-un corp de doar 83.3 cm latime, un compromis inteligent intre capacitate si dimensiune, potrivit pentru bucatarii care nu inghit un frigider urias. Are No Frost, designul si fiabilitatea Samsung, si un consum bun pentru volumul lui, 298 kWh pe an. E ceva mai zgomotos, 41 dB, si intra deja in zona de pret premium. Il iei cand vrei brandul si spatiul Samsung intr-un format mai ingust, care sa incapa mai usor in bucatarie.' },
+  { g: 'premium', id: 'D22S533BM', badge: 'Cel mai mare, nota maxima', short: 'Samsung RS70F65QET', capacitate: '659 l', clasa: 'E, 364 kWh/an', latime: '91 cm',
+    specs: ['659 litri, cel mai mare din selectie', 'nota maxima de la cumparatori', 'foarte silentios, 36 dB', 'Samsung, No Frost'],
+    pros: ['659 litri, cel mai spatios din selectie', 'Nota maxima de la cumparatori', 'Foarte silentios, doar 36 dB', 'Samsung, brand mare, cu iluminare interioara si dotari'],
+    cons: ['Consuma cel mai mult, 364 kWh/an, pe masura volumului', 'Cere spatiu si buget pe masura'],
+    verdict: 'Varful pentru cine vrea cel mai mult spatiu si un aparat premium de la Samsung. RS70F65QET are 659 de litri, cel mai mare din selectie, cu loc pentru orice familie numeroasa care gateste si depoziteaza mult, si a primit nota maxima de la cumparatori. E foarte silentios, doar 36 dB, aproape imperceptibil, si vine cu iluminare interioara si dotarile Samsung. Consuma cel mai mult din selectie, 364 kWh pe an, pe masura volumului urias, si cere si spatiu, si buget pe masura. Il iei cand vrei cel mai incapator si mai silentios side by side, pentru o familie mare, si ai loc pentru el.' },
+  { g: 'premium', id: 'DQ2NYFMBM', badge: 'LG, premium cu dozator', short: 'LG GSLV71PZTE', capacitate: '635 l', clasa: 'E, 350 kWh/an', latime: '91.3 cm',
+    specs: ['635 litri, cu dozator de apa', 'LG, Total No Frost', 'foarte silentios, 36 dB', 'consum 350 kWh/an'],
+    pros: ['635 litri plus dozator de apa la usa', 'LG, brand premium, cu tehnologie de racire buna', 'Foarte silentios, 36 dB', 'Total No Frost, fara gheata si dezghetare'],
+    cons: ['Dozatorul cu apa poate cere racord la reteaua de apa', 'Consum si pret de gama premium'],
+    verdict: 'Alegerea premium daca vrei spatiu mare, dozator de apa si un brand de top. LG GSLV71PZTE are 635 de litri si dozator de apa la usa, deci confort maxim, cu tehnologie Total No Frost si o racire buna, marca LG. E foarte silentios, 36 dB, ca modelele de top. Trebuie stiut ca multe dozatoare de apa si gheata cer racord la reteaua de apa, deci verifica din timp daca poti trage o teava pana la frigider, sau daca modelul are rezervor. Consuma 350 kWh pe an si e in zona premium ca pret. Il iei cand vrei un side by side mare, cu dozator, de la un brand de top, si ai unde-l racorda.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const BUGET = PICKS.filter(x => x.g === 'buget');
+const BRAND = PICKS.filter(x => x.g === 'brand');
+const PREMIUM = PICKS.filter(x => x.g === 'premium');
+
+const site = 'https://centrocasa.ro';
+const hero = '/images/articles/frigider-side-by-side-pentru-familie.webp';
+const figBuget = '/imagini/articole/frigider-accesibile.webp';
+const figBrand = '/imagini/articole/frigider-branduri.webp';
+const figPremium = '/imagini/articole/frigider-premium.webp';
+const published = '2026-07-18T15:46:40+03:00';
+
+const faq = [
+  { question: 'Ce e un frigider side by side si pentru cine e potrivit?', answer: 'Un side by side are doua usi verticale, una langa alta: de obicei congelatorul pe stanga si frigiderul pe dreapta, cu volum mare, in general 400-660 de litri. E potrivit pentru familii numeroase sau pentru cine face cumparaturi rare si multe si are nevoie de spatiu, atat la frigider, cat si la congelator. Fata de o combina clasica, iti da mai mult loc si acces usor la ambele compartimente la nivelul ochilor, dar cere o bucatarie mai lata, pentru ca e mult mai lat.' },
+  { question: 'De cat spatiu am nevoie pentru un side by side?', answer: 'Mai mult decat pentru un frigider obisnuit. Un side by side are in general 90-100 cm latime, 175-190 cm inaltime si 70-80 cm adancime, plus loc suplimentar in fata ca sa poti deschide complet cele doua usi. Masoara locul, dar si usa de la bucatarie si de la intrare, pe unde trebuie sa incapa la livrare. Daca spatiul e limitat, cauta modelele mai inguste, de 79-83 cm, ca Arctic sau anumite Samsung din selectie, care intra unde unul de 90 cm nu are loc.' },
+  { question: 'Clasa energetica E e proasta la un side by side?', answer: 'Nu, e normala pentru aceasta categorie. Aparatele mari, cu volum de sute de litri si doua compartimente, consuma inevitabil mai mult, iar clasa E e comuna. Important e ca litera clasei nu spune singura cat platesti: uita-te la consumul anual in kWh de pe eticheta si compara-l intre modele, pentru ca doua aparate clasa E pot avea volume si consumuri diferite. In selectia noastra, consumul merge de la circa 280 la 364 kWh pe an, in functie mai ales de volum.' },
+  { question: 'Ce inseamna No Frost si de ce conteaza?', answer: 'No Frost inseamna ca aparatul nu formeaza gheata in congelator si nu mai trebuie sa il dezghetezi manual, o corvoada pe care o stiu toti cei cu frigidere vechi. Sistemul circula aer rece si scoate umezeala, asa ca peretii raman fara promoroaca si mancarea nu se lipeste in bloc de gheata. Practic toate side by side-urile moderne, inclusiv cele din selectie, au No Frost sau Total No Frost, deci e o functie pe care o poti considera standard, dar merita confirmata.' },
+  { question: 'Dozatorul de apa are nevoie de racord la apa?', answer: 'Depinde de model. Multe frigidere side by side cu dozator de apa si gheata trebuie conectate la reteaua de apa, printr-o teava, deci trebuie sa ai un racord in apropiere sau sa poti trage unul. Exista insa si modele cu rezervor reincarcabil, pe care il umpli tu, fara nicio racordare, potrivite acolo unde nu ai acces usor la apa. Inainte sa comanzi un model cu dozator, verifica exact ce tip e si daca poti asigura racordul, ca sa nu ai surprize la montaj.' },
+  { question: 'Cat de zgomotos e un side by side?', answer: 'Modelele bune sunt surprinzator de silentioase. Nivelul de zgomot al aparatelor din selectie merge de la circa 36 la 41 dB, iar valorile de 36-37 dB, ca la modelele Samsung si LG mari, sunt aproape imperceptibile intr-o casa. Zgomotul conteaza mai ales daca bucataria e deschisa spre living sau daca frigiderul e aproape de zona de zi. Cauta nivelul de zgomot in specificatii si, daca stai mult langa el, alege un model de 36-38 dB.' },
+  { question: 'Side by side sau combina frigorifica clasica?', answer: 'Alege dupa spatiu si nevoi. Un side by side iti da volum mare, congelator generos si acces usor la ambele compartimente, dar cere o bucatarie lata si consuma mai mult. O combina clasica, cu frigiderul sus si congelatorul jos, e mai ingusta, mai ieftina si mai economica, dar cu mai putin loc, mai ales la congelator. Daca ai familie numeroasa, gatesti si congelezi mult si ai spatiu, side by side-ul merita; daca esti la apartament si spatiul e limitat, o combina e mai practica.' },
+  { question: 'Ce buget imi trebuie pentru un side by side bun?', answer: 'Un side by side accesibil, dar bun, de la un brand ca Heinner, incepe in jur de 2400-2900 de lei si acopera nevoile unei familii. Modelele de la branduri mari, ca Samsung, Beko sau Candy, sunt in general 3300-3700 de lei. Cele premium, cu volum foarte mare, dozator de apa sau de la LG si Samsung de top, trec de 4500 si urca spre 5500 de lei si peste. Pe langa pret, tine cont de consumul anual, care se simte pe factura in anii de folosire.' },
+];
+
+const images = [hero, figBuget, figBrand, figPremium, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
 ---
 
 <Layout
-  title="Frigider side by side pentru familie - CentroCasa"
-  description="Stai sa vezi, am tot auzit vorbindu-se despre frigiderele alea mari, side by side, si m-am gandit sa va povestesc si voua, ca intre prieteni. Mai ales daca aveti o familie mai numeroasa, stiti cat de greu e sa tii totul in frau in bucatarie cand vine vorba de alimente proaspete si congelate. Eu am trecut prin asta si am gasit solutia perfecta. "
-  image="/images/articles/frigider-side-by-side-pentru-familie.webp"
+  title="Cele mai bune frigidere side by side in 2026: pentru familie, pe capacitate si buget"
+  description="Care sunt cele mai bune frigidere side by side in 2026 pentru familie: modele accesibile Heinner, branduri mari Samsung, Beko si Candy, si premium LG, comparate pe capacitate, clasa energetica, dozator si latime. Plus ce conteaza si de cat spatiu ai nevoie."
+  image={hero}
   type="article"
-  publishedTime="2026-01-13T19:33:39.631Z"
-  modifiedTime="2026-01-29T19:33:39.210Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Cristian Popa"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune frigidere side by side' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/electrocasnice-casa/">Electrocasnice Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Frigider side by side pentru familie</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune frigidere side by side</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/electrocasnice-casa/" class="article-category">Electrocasnice Casa</a>
-        <span class="article-date">24 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Frigider side by side pentru familie</h1>
-    </header>
+    <h1>Cele mai bune frigidere side by side</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/frigider-side-by-side-pentru-familie.webp" alt="Frigider side by side pentru familie" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune frigidere side by side pentru familie" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-frigider-side-by-side-pentru-familie">
-        <h2>De ce ai nevoie de un frigider side by side pentru familie</h2>
-        <p>Uite, sincer sa fiu, cand am inceput sa ma gandesc la un frigider nou, nu stiam exact ce caut. Aveam un frigider clasic, dar parca nu mai facea fata. Sotia cumpara mereu legume si fructe din piata, copiii mananca iaurturi si branzeturi, iar eu sunt fanul carnii la gratar, deci si congelatorul era mereu plin. Era un haos.</p><p>Problema principala era spatiul. Era mereu o lupta sa gasesti loc pentru tot. Uile frigiderului devenisera un depozit de borcane si sticle. Sertarele pentru legume erau mereu supraaglomerate, iar cand voiam sa iau ceva din congelator, trebuia sa scot jumatate din continut. Nu era deloc practic, mai ales cand te grabesti dimineata sau seara.</p><p>Asa ca am inceput sa ma interesez. Am vazut prin reviste, pe net, la prieteni, si am ramas fascinat de frigiderele astea side by side. Mi se pareau o solutie eleganta si, mai ales, spatioasa. Gândește-te, un frigider mare, cu doua usi care se deschid una langa alta, una pentru partea de refrigerare si cealalta pentru congelator. Pare o logica simpla, dar face toata diferenta.</p><p>Pentru cine se potriveste? Pai, clar, pentru familiile numeroase. Daca ai 3-4 copii, sau chiar doi, si esti genul care pune accent pe alimentatie sanatoasa, pe legume proaspete, pe varietate, atunci ai nevoie de spatiu. Si nu doar spatiu, ci si organizare. Frigiderele side by side vin cu rafturi generoase, cu sertare dedicate, cu compartimente speciale pentru lactate sau carne. Totul e la indemana.</p><p>Chiar si pentru cuplurile care gatesc mult sau fac aprovizionare pentru o saptamana intreaga, e o investitie buna. Eu am realizat ca, de fapt, nu e doar despre cat de mare e frigiderul, ci despre cum iti usureaza viata in <a href="/plita-cu-inductie-pentru-bucatarie/">bucatarie</a>. Nu mai trebuie sa ma gandesc de doua ori inainte sa cumpar un pachet de peste congelat sau un bax de iaurturi. Totul gaseste un loc.</p><p>Deci, daca te regasesti in descrierea asta, daca simti ca frigiderul tau actual te trage in jos si ca bucataria ta merita o piesa de mobilier cu adevarat functionala, atunci un frigider side by side pentru familie ar putea fi exact ce cauti. Eu m-am convins si nu regret nicio secunda. E o investitie in confort si in mancare mai bine pastrata.</p>
-      </section>
-
-      <section id="top-recomandari-de-frigidere-side-by-side-pe-care-le-am-testat">
-        <h2>Top recomandari de frigidere side by side pe care le-am testat</h2>
-        <p>Dupa ce m-am hotarat ca asta e, am inceput cautarea propriu-zisa. Am citit pareri, am comparat specificatii, si am ajuns la cateva modele care mi-au atras atentia. Am incercat sa le aleg pe cele care mi s-au parut cele mai echilibrate ca pret, calitate si functii. Si, bineinteles, am tinut cont si de parerile altor utilizatori.</p><ul><li><strong>Samsung RS6GN8821S9/EF</strong> - Acesta a fost unul dintre preferatele mele. L-am gasit pe emag la pretul de <strong>7.499,99 RON</strong>. Ce mi-a placut la el? In primul rand, designul. E foarte modern, din inox, si arata excelent in bucatarie. Are o capacitate impresionanta, peste 600 de litri. Partea de frigider e imensa, cu multe rafturi reglabile si sertare. Congelatorul e si el generos. Un mare plus e functia de <strong>Twin Cooling Plus</strong>, care mentine umiditatea ideala in ambele compartimente, separand aerul. Asta inseamna ca mancarea ramane proaspata mai mult timp si nu se amesteca mirosurile. Dezavantajul? E printre cele mai scumpe modele, dar consider ca merita investitia pentru ce ofera.</li><li><strong>LG GBB72NSXEN</strong> - Acesta e putin diferit, e un frigider clasic cu congelator jos, dar am vrut sa il mentionez pentru ca am ramas surprins de cat de bine organizeaza spatiul, ca o alternativa mai accesibila. L-am vazut in jur de <strong>3.799,00 RON</strong>. E un model mai compact, dar cu o tehnologie foarte interesanta, <strong>Linear Cooling</strong>, care reduce fluctuatiile de temperatura. Si <strong>Door Cooling+</strong>, care raceste mai rapid mancarea depozitata in usa. E o optiune buna daca nu ai nevoie de un volum urias, dar vrei eficienta maxima.</li><li><strong>Bosch KGN86AI30</strong> - L-am gasit la <strong>6.599,00 RON</strong>. Acesta e un model side by side mai clasic, dar foarte robust si fiabil. Bosch e un brand pe care ma bazez intotdeauna. Are un sistem de racire <strong>No Frost</strong> pe ambele parti, deci scapi de grija dezghetarii. Capacitatea e si ea generoasa, undeva la 600 de litri. Ce mi-a placut la el e calitatea materialelor. Sertarele sunt solide, rafturile se simt bine. Dezavantajul ar fi ca nu are neaparat functii "wow", e mai mult pe partea de performanta pura si durabilitate.</li><li><strong>Electrolux EN6874AAX</strong> - Acesta l-a gasit sotia la un pret bun, undeva la <strong>5.999,99 RON</strong>. Electrolux face electrocasnice bune, iar modelul asta nu face exceptie. Are o capacitate similar cu celelalte, peste 500 de litri. Ce mi-a atras atentia e sistemul de iluminare LED, care face ca totul sa fie vizibil imediat. Si functia de <strong>Fast Freeze</strong>, utila cand vrei sa congelezi rapid cantitati mari de mancare. E un model echilibrat, nici prea scump, nici prea ieftin, cu performante bune.</li><li><strong>Whirlpool WQ70I BL</strong> - Acesta e mai mult un frigider cu congelator dedesubt, dar am vrut sa il aduc in discutie pentru ca e o optiune mai accesibila, in jur de <strong>3.200,00 RON</strong>. Totusi, are o organizare a spatiului foarte buna. Sertarele sunt generoase, iar rafturile sunt din sticla securizata. Nu e side by side, dar daca bugetul e o problema, merita sa te uiti si la variantele astea.</li></ul><p>Am incercat sa va dau o varietate de modele si preturi. Fiecare are plusurile si minusurile lui. Samsung-ul e cel mai scump, dar si cel mai tehnologizat. Bosch-ul e pentru cei care vor fiabilitate. Electrolux-ul si Whirlpool-ul sunt optiuni mai echilibrate ca pret.</p><p>Important e sa va faceti o idee despre ce cautati. Eu am ales in final un Samsung, pentru ca mi-am dorit functiile avansate si spatiul maxim. Dar pentru alte familii, poate un model mai simplu, dar la fel de <a href="/cum-sa-cureti-eficient-casa/">eficient</a>, ar fi perfect.</p>
-      </section>
-
-      <section id="cum-alegi-corect-un-frigider-side-by-side-pentru-familia-ta">
-        <h2>Cum alegi corect un frigider side by side pentru familia ta</h2>
-        <p>Alegerea unui frigider side by side nu e chiar ca si cum ai alege un bec. E o investitie pe termen lung si vrei sa fie una potrivita. Primul lucru la care m-am gandit a fost <strong>capacitatea</strong>. Avem o familie numeroasa, deci am nevoie de mult spatiu. Ma uit la litri, dar mai ales la cum sunt distribuiti. Un frigider cu 600 de litri poate fi mai mic ca utilitate decat unul de 550 daca organizarea interioara nu e buna.</p><p>Apoi, vine <strong>clasa energetica</strong>. E important sa nu te trezesti cu o factura la curent uriasa la sfarsitul lunii. Cautati modele cu clasa A++ sau chiar A+++, daca bugetul permite. Diferenta se vede in timp. Eu am stat cu ochii pe consumul anual in kWh.</p><p><strong>Sistemul de racire</strong> e un alt aspect esential. <strong>No Frost</strong> e practic un must-have. Inseamna ca nu trebuie sa dezgheti niciodata frigiderul sau congelatorul. Asta imi economiseste enorm de mult timp si e mai igienic. Multe modele vin cu No Frost pe ambele compartimente, ceea ce e ideal.</p><p><strong>Functiile suplimentare</strong>. Aici poti sa te pierzi. Unele frigidere au dozator de apa si gheata, altele au functii de racire rapida sau de congelare rapida. Eu am vrut un dozator de apa, pentru ca ne place apa rece si e mai comod decat sa tin sticle in usa. Functia de congelare rapida e utila cand cumperi cantitati mai mari de carne sau legume.</p><p><strong>Zgomotul</strong>. Un frigider zgomotos poate fi foarte deranjant, mai ales daca bucataria e integrata in living. Verificati nivelul de zgomot exprimat in decibeli (dB). Sub 40 de dB e considerat destul de silentios.</p><p><strong>Dimensiunile</strong>. Asta e evident, dar trebuie sa masori cu atentie spatiul unde va sta frigiderul. Nu uita sa lasi si spatiu pentru ventilatie in spate si in parti, si sa te gandesti cum il vei aduce in casa. Unele usi de <a href="/hota-pentru-bucatarie-puternica/">bucatarie</a> sunt inguste.</p><p><strong>Designul</strong>. Asta e mai mult o chestiune de gust. Inoxul e popular, dar se patateaza usor. Exista si modele cu finisaje negre sau albe. Eu am mers pe inox, dar am ales un model cu un strat anti-amprenta, ceea ce a ajutat mult.</p><p><strong>Garantia</strong>. E bine sa te uiti si la garantia oferita. O garantie mai lunga, mai ales la compresor, iti ofera liniste sufleteasca. Eu am cautat modele cu cel putin 2 ani garantie pentru intreg aparatul si 10 ani pentru compresor.</p><p>Nu uita sa citesti si <strong>recenziile altor cumparatori</strong>. Parerile lor sincere pot fi foarte utile in luarea deciziei. Eu am cautat experiente legate de fiabilitate si de cat de bine isi fac treaba functiile.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ale-frigiderelor-side-by-side">
-        <h2>Avantaje si dezavantaje ale frigiderelor side by side</h2>
-        <p>Ca orice produs electrocasnic, si frigiderele side by side vin cu un pachet de avantaje si dezavantaje. E bine sa le cunosti pe amandoua inainte sa te hotarasti.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Spatiu generos si organizat:</strong> Asta e punctul forte principal. Daca ai o familie mare sau gatesti des, vei aprecia imens spatiul. Partea de frigider e de obicei mai mare, dar si congelatorul e suficient de incapator pentru provizii.</li><li><strong>Acces facil la ambele compartimente:</strong> Nu mai trebuie sa te apleci pana jos pentru a accesa congelatorul, cum se intampla la frigiderele clasice. Totul e la nivelul ochilor, ceea ce e mult mai comod.</li><li><strong>Design modern:</strong> Frigiderele side by side arata foarte bine in bucatariile moderne. Sunt piese de mobilier impunatoare si dau un aer premium incaperii.</li><li><strong>Dozatoare de apa si gheata:</strong> Multe modele vin cu aceste functii, ceea ce e foarte practic. Ai mereu apa rece la indemana si gheata pentru bauturi, fara sa trebuiasca sa cumperi pungi de gheata.</li><li><strong>Tehnologii avansate:</strong> Multe modele au functii precum Twin Cooling Plus, No Frost, control electronic al temperaturii, ceea ce asigura o conservare mai buna a alimentelor.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Pretul:</strong> Acestea sunt, in general, mai scumpe decat frigiderele clasice, atat la achizitie, cat si uneori la intretinere.</li><li><strong>Dimensiuni mari:</strong> Nu se potrivesc in orice <a href="/plita-cu-inductie-pentru-bucatarie/" class="interlink">bucatarie</a>. Trebuie sa ai spatiul necesar pentru a-l amplasa si pentru a deschide usile complet.</li><li><strong>Consum energetic:</strong> Desi clasa energetica a evoluat, frigiderele mari pot consuma mai multa energie decat cele mici, mai ales daca sunt incarcate la maximum si deschise frecvent.</li><li><strong>Reparatii mai costisitoare:</strong> Daca se defecteaza, piesele si manopera pentru un frigider side by side pot fi mai scumpe.</li><li><strong>Dozatorul de apa necesita conectare la retea:</strong> Daca vrei dozator de apa, trebuie sa te asiguri ca ai o sursa de apa in apropiere si ca instalarea e corecta.</li><li><strong>Dificultate la mutare:</strong> Sunt grele si voluminoase, deci mutarea lor dintr-o casa in alta poate fi o provocare.</li></ul><p>Parerea mea e ca, daca spatiul si bugetul iti permit, avantajele depasesc cu mult dezavantajele, mai ales pentru o familie. E o investitie in confort si eficienta pe termen lung.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea-cu-frigiderul-side-by-side">
-        <h2>Sfaturi practice din experienta mea cu frigiderul side by side</h2>
-        <p>Dupa ce am achizitionat si am folosit un frigider side by side timp de cateva luni, am invatat cateva lucruri care sper sa va fie de folos. Sunt sfaturi simple, din viata de zi cu zi.</p><p><strong>Nu il supraaglomera la inceput.</strong> Cand il primiti, e tentant sa il umpli imediat. Dar lasa-l sa se raceasca bine, sa ajunga la temperatura setata. Apoi, incepe sa organizezi. Nu pune toate produsele calde sau la temperatura camerei direct in el.</p><p><strong>Organizeaza <a href="/cos-de-gunoi-inteligent-cu-senzor/" class="interlink">inteligent</a>.</strong> Foloseste sertarele pentru legume si fructe, compartimentele speciale pentru lactate si carne. Nu amesteca totul la intamplare. Eu am pus o eticheta pe fiecare raft din congelator: "Fructe", "Legume", "Carne pui", "Carne vita/porc". Te ajuta sa gasesti repede ce cauti.</p><p><strong>Curata-l regulat.</strong> Chiar daca e No Frost, tot trebuie curatat. Cel putin o data la 3-4 luni, scoate tot, sterge rafturile cu o solutie de apa si otet sau un detergent bland. Acorda atentie si garniturilor de la usi, se poate acumula murdarie.</p><p><strong>Verifica temperatura.</strong> Eu am setat frigiderul la 3 grade Celsius si congelatorul la -18 grade Celsius. Asta e o temperatura standard, dar o poti ajusta in functie de nevoi. Nu le seta prea jos, ca vei consuma inutil curent.</p><p><strong>Nu lasa usile deschise mult timp.</strong> Stiu ca e tentant sa stai si sa te uiti ce ai in frigider, dar fiecare secunda conteaza. Aerul rece iese rapid si frigiderul trebuie sa depuna efort sa il raceasca din nou.</p><p><strong>Foloseste functiile.</strong> Daca ai dozator de apa, foloseste-l. Daca ai functia de congelare rapida, foloseste-o cand cumperi carne in cantitati mari. Nu le lasa degeaba.</p><p><strong>Atentie la alimentele care pot fi "rebele".</strong> Anumite fructe, cum ar fi bananele sau rosiile, nu se tin bine la frigider. De asemenea, anumite legume pot sa se usuce prea repede daca nu sunt bine depozitate.</p><p><strong>In caz de defectiune, apeleaza la service autorizat.</strong> Nu incerca sa il repari singur daca nu te pricepi. Poti face mai mult rau decat bine.</p><p><strong>Nu uita de spatiul din jurul frigiderului.</strong> Asigura-te ca exista suficient aerisire in spate. Nu il baga lipit de perete sau de alte electrocasnice. Asta ii afecteaza performanta si ii poate scurta durata de viata.</p><p><strong>Familiarizeaza-te cu manualul de utilizare.</strong> Poate parea plictisitor, dar acolo gasesti informatii pretioase despre cum sa folosesti corect frigiderul si cum sa rezolvi probleme simple.</p>
-      </section>
-
-      <section id="parerea-mea-finala-despre-frigiderul-side-by-side">
-        <h2>Parerea mea finala despre frigiderul side by side</h2>
-        <p>Dupa ce am trecut prin toata experienta asta, de la cautare, la achizitie si apoi la utilizare, pot spune cu mana pe inima ca frigiderul side by side e o investitie excelenta pentru o familie. Nu e doar un electrocasnic, e un ajutor in <a href="/hota-pentru-bucatarie-puternica/" class="interlink">bucatarie</a>.</p><p>Pentru mine, cel mai mare avantaj a fost organizarea si spatiul. Nu mai am batai de cap cu locul pentru legume, pentru lactate sau pentru congelator. Totul are un loc si totul e la indemana. Asta ma face sa cumpar mai multe produse proaspete si sa gatesc mai diversificat.</p><p>Daca te gandesti la un frigider nou si ai o familie numeroasa, sau pur si simplu gatesti mult si iti place sa ai mereu provizii, atunci un frigider side by side merita cu siguranta sa fie luat in considerare. Da, e o investitie, dar una care se amortizeaza prin confortul si eficienta pe care le aduce.</p><p>Recomandarea mea este sa nu te grabesti. Informeaza-te, compara modele, citeste pareri. Gandeste-te la nevoile tale specifice: ai nevoie de dozator de apa? Cat de importanta e clasa energetica? Ce functii suplimentare iti sunt cu adevarat utile?</p><p>Pentru familiile active, care pun pret pe mancare proaspata si pe o bucatarie bine organizata, un frigider side by side este, in opinia mea, cea mai buna solutie. Eu sunt foarte multumit de alegerea facuta si nu as da inapoi.</p><p>Daca ma intrebi pe mine, pentru cine e cel mai potrivit? Pentru familiile cu copii, pentru cei care gatesc des si au nevoie de mult spatiu pentru ingrediente, pentru cei care iubesc sa aiba mereu la indemana fructe, legume, lactate si carne. E un frigider pentru cei care vor sa isi simplifice viata in bucatarie si sa se bucure de mancare proaspata.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de mult curent consuma un frigider side by side?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Consumul variaza in functie de model, clasa energetica si dimensiuni. Modelele noi, cu clasa A++ sau A+++, sunt destul de eficiente. Un model mediu poate consuma intre 300 si 500 kWh pe an. E important sa verifici specificatiile tehnice ale modelului vizat.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Este greu de instalat un frigider side by side?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Instalarea standard, adica asezarea in locul destinat si conectarea la priza, nu e complicata. Daca modelul are dozator de apa, atunci e nevoie de conectare la o sursa de apa, ceea ce poate necesita un instalator. Asigura-te ca ai spatiu si ca poti transporta frigiderul in bucatarie.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa iau un model cu dozator de apa si gheata?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Daca bei multa apa rece si folosesti gheata frecvent, da, merita. E mult mai comod decat sa cumperi pungi de gheata sau sa tii sticle in frigider. Totusi, verifica daca ai o sursa de apa in apropiere si tine cont ca poate creste putin pretul modelului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie curatat un frigider side by side?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Chiar daca majoritatea au sistem No Frost, o curatare generala o data la 3-4 luni este recomandata. Sterge rafturile, sertarele si garniturile usilor. Asta asigura igiena si o functionare optima a aparatului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot sa pun un frigider side by side intr-o bucatarie mica?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde cat de mica e bucataria. Frigiderele side by side sunt voluminoase. Trebuie sa masori cu atentie spatiul si sa te asiguri ca usile se pot deschide complet fara a lovi alte piese de mobilier. De asemenea, lasa spatiu pentru ventilatie.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Care e diferenta intre No Frost si alte sisteme de racire?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Sistemul No Frost previne formarea ghetii in frigider si congelator, eliminand nevoia de dezghetare manuala. Alte sisteme pot necesita dezghetare periodica. No Frost e mult mai convenabil si igienic.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru o familie, cel mai bun raport il da <strong>Heinner HSBS-H442</strong>: 442 de litri, No Frost si cel mai bun pret, motiv pentru care e si cel mai vandut. Daca vrei un brand mare, <strong>Samsung RS57</strong> are 583 de litri si e foarte silentios, iar <strong>Beko GNO5322</strong> vine cu racire duala. Pentru bucatarii stramte, <strong>Arctic AMD421</strong> are doar 79 cm latime, iar la varf, <strong>Samsung RS70</strong> ajunge la 659 de litri.</p>
+      <p>La un side by side, patru lucruri decid alegerea: <strong>capacitatea</strong> in litri, <strong>consumul</strong> real in kWh pe an, nu doar litera clasei, daca vrei <strong>dozator de apa</strong> si, foarte important, <strong>latimea</strong> si locul din bucatarie. Le luam pe rand mai jos.</p>
+      <p>Am pornit de la frigiderele side by side, in stoc, vandute pe eMAG, le-am verificat capacitatea, clasa energetica, consumul, zgomotul si latimea, si le-am grupat pe accesibile, branduri mari si premium. Pentru restul bucatariei, vezi <a href="/plita-cu-inductie-pentru-bucatarie/">plitele cu inductie</a> si <a href="/masina-de-spalat-vase-incorporabila/">masinile de spalat vase incorporabile</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#ce-e">Ce e un side by side si pentru cine</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#spatiu">De cat spatiu ai nevoie</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#buget">Side by side accesibile</a></li>
+        <li><a href="#brand">Branduri mari</a></li>
+        <li><a href="#premium">Premium</a></li>
+        <li><a href="#cat-costa">Cat costa un side by side</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="ce-e">Ce e un side by side si pentru cine</h2>
+    <p>Un frigider side by side are doua usi verticale, una langa alta: de obicei congelatorul pe stanga si frigiderul pe dreapta, cu un volum mare, in general intre 400 si 660 de litri. Fata de o combina clasica, cu frigiderul sus si congelatorul jos, iti da mult mai mult loc si acces usor la ambele compartimente, la nivelul ochilor.</p>
+    <p>E alegerea potrivita pentru <strong>familii numeroase</strong>, pentru cine <strong>gateste si congeleaza mult</strong> sau face cumparaturi rare si mari. In schimb, cere o bucatarie mai lata si consuma mai mult decat o combina. Daca stai la apartament, cu spatiu limitat si nevoi modeste, o combina clasica ramane mai practica; daca ai loc si o familie mare, side by side-ul iti schimba complet felul in care depozitezi mancarea.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Dincolo de brand, cateva lucruri fac diferenta reala intre doua modele:</p>
+    <ul>
+      <li><strong>Capacitatea:</strong> intre 400 si 660 de litri. Pentru o familie de 3-4 persoane, 420-530 de litri ajung; pentru una numeroasa sau pentru cine cumpara mult, mergi spre 580-660.</li>
+      <li><strong>Consumul, nu doar clasa:</strong> aproape toate sunt clasa E, normal la volumul asta. Nu te opri la litera: compara consumul anual in kWh de pe eticheta, pentru ca doua modele clasa E pot consuma diferit. In selectie e intre 280 si 364 kWh pe an.</li>
+      <li><strong>No Frost:</strong> fara gheata si fara dezghetare manuala. E standard la modelele moderne, dar merita confirmat.</li>
+      <li><strong>Dozatorul de apa:</strong> apa rece la usa, fara sa deschizi frigiderul. Atentie: multe cer racord la apa, unele au rezervor reincarcabil, iar multe nu au deloc.</li>
+      <li><strong>Zgomotul:</strong> intre 36 si 41 dB. Conteaza daca bucataria e deschisa spre living; 36-37 dB sunt aproape imperceptibili.</li>
+    </ul>
+
+    <h2 id="spatiu">De cat spatiu ai nevoie</h2>
+    <p>E greseala cea mai frecventa: oamenii cumpara side by side-ul si abia apoi descopera ca nu incape. Un model tipic are <strong>90-100 cm latime, 175-190 cm inaltime si 70-80 cm adancime</strong>, plus loc in fata ca sa deschizi complet cele doua usi.</p>
+    <p>Inainte sa comanzi, masoara nu doar nisa unde il pui, ci si <strong>usa de la bucatarie si de la intrare</strong>, pe unde trebuie sa treaca la livrare. Daca spatiul e strans, cauta modelele mai inguste, de 79-83 cm, ca Arctic AMD421 sau Samsung RF48 din selectie, care intra unde unul de 90 cm nu are loc. La cele cu dozator de apa cu racord, verifica si daca poti trage o teava de apa pana la frigider.</p>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Clasa / consum</th><th>Latime</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.capacitate}</td>
+              <td>{x.clasa}</td>
+              <td>{x.latime}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="buget">Side by side accesibile</h2>
+    <p>Cel mai mult frigider pe banii dati, pentru o familie. Heinner domina segmentul, cu No Frost, capacitati de la 433 la 532 de litri si chiar o varianta cu dozator de apa, la preturi mici.</p>
+    <div class="rd-grid">
+      {BUGET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Frigidere side by side accesibile Heinner" width="1200" height="675" loading="lazy" />
+
+    <h2 id="brand">Branduri mari</h2>
+    <p>Mai multe dotari si tehnologii de racire, de la nume mari: Samsung spatios si silentios, Beko cu racire duala, Candy spatios si Arctic pentru bucatarii stramte.</p>
+    <div class="rd-grid">
+      {BRAND.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBrand} alt="Frigidere side by side de la branduri mari: Samsung, Beko, Candy, Arctic" width="1200" height="675" loading="lazy" />
+
+    <h2 id="premium">Premium</h2>
+    <p>Volum foarte mare, dozator de apa si silentiozitate de top, de la Samsung si LG, pentru cine vrea cel mai incapator si mai bine dotat side by side.</p>
+    <div class="rd-grid">
+      {PREMIUM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPremium} alt="Frigidere side by side premium Samsung si LG" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={b64('oferte-frigidere-sbs')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate frigiderele side by side la oferta</strong>
+        <span>Reducerile din acest moment la frigidere side by side, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa un side by side</h2>
+    <p>Preturile depind de capacitate, brand si dotari:</p>
+    <p><strong>Accesibile:</strong> in general 2400-2900 de lei pentru un model bun de la Heinner, cu 433-532 de litri si No Frost, unele chiar cu dozator de apa.</p>
+    <p><strong>Branduri mari:</strong> circa 3300-3700 de lei pentru Samsung, Beko, Candy sau Arctic, cu tehnologii de racire mai bune si dotari in plus.</p>
+    <p><strong>Premium:</strong> de la 4500 de lei in sus, spre 5500 si peste, pentru volum foarte mare, dozator de apa si modele de top LG sau Samsung.</p>
+    <p>Pe langa pret, tine cont de <strong>consumul anual</strong>: un aparat mare merge non-stop ani intregi, iar diferenta de kWh dintre doua modele se aduna pe factura. Un side by side cu un consum mai mic isi poate justifica in timp un pret ceva mai mare la cumparare. Daca amenajezi bucataria, vezi si <a href="/cele-mai-bune-seturi-de-mobila-de-bucatarie/">seturile de mobila de bucatarie</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">CP</div>
       <div class="author-info">
-        <h4><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></h4>
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
         <p class="author-role">Specialist Electrocasnice</p>
-        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="frigider-side-by-side-pentru-familie"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="frigider-side-by-side-pentru-familie"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="frigider-side-by-side-pentru-familie" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="frigider-side-by-side-pentru-familie" currentCategory="electrocasnice-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

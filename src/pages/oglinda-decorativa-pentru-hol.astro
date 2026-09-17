@@ -1,259 +1,320 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Oglinda decorativa pentru hol",
-  excerpt: "Pentru un hol primitor si spatios, cea mai buna alegere este o oglinda decorativa pentru hol de mari dimensiuni, cu rama minimalista din metal negru sau lemn natural. Modelele rotunde sau ovale adauga un plus de stil, iar cele cu lumina integrata sunt practice pe timp de seara. Prioritizeaza o sticla de calitate, fara distorsiuni, pentru a reflecta lumina si a crea iluzia de spatiu.",
-  image: "/images/articles/oglinda-decorativa-pentru-hol.webp",
-  category: "Decoratiuni Casa",
-  categorySlug: "decoratiuni-casa",
-  date: "2026-02-07T13:17:48.472Z",
-  modifiedDate: "2026-02-07T13:17:48.472Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat costa o oglinda decorativa pentru hol?", answer: "Preturile pentru o oglinda decorativa pentru hol variaza mult, de la aproximativ 150 lei pentru modele mici, simple, pana la peste 1000 lei pentru oglinzi mari, cu design special sau iluminare LED. Un model mediu, de calitate decenta, costa intre 300 si 600 lei." },
-  { question: "Ce dimensiune de oglinda e potrivita pentru un hol mic?", answer: "Pentru un hol mic, alege o oglinda cat mai mare pe care ti-o permiti, dar proportionala cu peretele. O oglinda de 60x80 cm sau o oglinda rotunda cu diametrul de 50-60 cm poate face minuni. Evita ramele groase, mergi pe modele minimaliste." },
-  { question: "Merita sa cumpar o oglinda cu rama din lemn pentru hol?", answer: "Da, o oglinda cu rama din lemn natural adauga caldura si un aspect primitor holului, mai ales daca stilul casei e rustic, scandinav sau modern-calduros. Lemnul poate fi insa mai greu si necesita o prindere solida pe perete." },
-  { question: "Ce fel de oglinda e mai buna pentru a mari vizual holul?", answer: "Pentru a mari vizual un hol, cea mai buna optiune este o oglinda rectangulara de mari dimensiuni, montata pe peretele lung. Aceasta creeaza o iluzie de profunzime si face spatiul sa para mai lat. O oglinda rotunda mare poate fi un accent, dar nu are acelasi efect de 'deschidere'." },
-  { question: "Cum intretin corect o oglinda decorativa pentru hol?", answer: "Curata oglinda regulat cu o solutie speciala pentru geamuri si o laveta moale, fara scame. Sterge apoi cu o carpa uscata pentru a evita urmele. Pentru ramele din lemn, foloseste o carpa usor umeda, iar pentru cele metalice, o carpa uscata sau o solutie de curatat specifica metalului." },
-  { question: "De ce se abureste oglinda din hol?", answer: "Oglinda din hol se poate aburi din cauza diferentei de temperatura si umiditate, mai ales daca holul e langa o baie cu aburi sau o sursa de caldura. O buna ventilatie a holului poate ajuta. Modelele cu strat anti-aburire sunt mai rare si mai scumpe." },
-  { question: "Unde gasesc modele de oglinda decorativa pentru hol unice?", answer: "Modele unice de oglinda decorativa pentru hol pot fi gasite la designeri de interior, pe platforme de artizani online (gen Etsy, dar cu livrare in Romania), in showroom-uri de mobilier premium sau la ateliere locale de prelucrare a sticlei si oglinzilor. Uneori, si magazinele mari de bricolaj au colectii limitate." },
-  { question: "Ce greutate poate avea o oglinda decorativa pentru hol mare?", answer: "Oglinzile decorative mari, de 80x100 cm sau mai mult, pot cantari intre 10 si 25 kg, in functie de grosimea sticlei si materialul ramei. Este esential sa folosesti sisteme de prindere adecvate greutatii si tipului de perete pentru a preveni accidentele." }
-];
-
-const toc = [
-  { title: "Ce oglinda decorativa pentru hol face holul sa para mai mare si mai primitor", id: "ce-oglinda-decorativa-pentru-hol-face-holul-sa-para-mai-mare-si-mai-primitor" },
-  { title: "Top 4 modele de oglinda decorativa pentru hol si ce sa stii despre ele", id: "top-4-modele-de-oglinda-decorativa-pentru-hol-si-ce-sa-stii-despre-ele" },
-  { title: "Cum sa alegi oglinda decorativa pentru hol potrivita stilului tau", id: "cum-sa-alegi-oglinda-decorativa-pentru-hol-potrivita-stilului-tau" },
-  { title: "Oglinda rotunda vs. rectangulara pentru hol: Care e mai buna?", id: "oglinda-rotunda-vs-rectangulara-pentru-hol-care-e-mai-buna" },
-  { title: "Greseli frecvente la alegerea si montajul unei oglinda decorativa pentru hol", id: "greseli-frecvente-la-alegerea-si-montajul-unei-oglinda-decorativa-pentru-hol" },
-  { title: "Recomandari oglinda decorativa pentru hol pe categorii de buget", id: "recomandari-oglinda-decorativa-pentru-hol-pe-categorii-de-buget" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['oglinda-deco'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Oglinzi de podea ---
+  { g: 'podea', id: 'D5XGQ6YBM', badge: 'Cea mai vanduta', short: 'Elindor arcada', forma: 'Arcada', dim: '150 x 40 cm', montare: 'De podea',
+    specs: ['forma arcada, la moda pentru holuri', 'rama din aluminiu negru, 150 x 40 cm', 'verticala, se reazema de perete', 'nota mare, 4.85 din 59 de pareri'],
+    pros: ['De departe cea mai vanduta din selectie, 59 de pareri', 'Forma arcada, foarte la moda in amenajari', 'Rama subtire din aluminiu negru, eleganta', 'Inalta, 150 cm, reflecta silueta intreaga'],
+    cons: ['Se reazema de perete, cere fixare de siguranta', 'Rama neagra, mai putin luminoasa decat auriul'],
+    verdict: 'Cea mai vanduta oglinda din selectie si cea mai sigura alegere pentru un hol modern. Elindor cu forma arcada are o rama subtire din aluminiu negru si 150 cm inaltime, deci reflecta silueta intreaga si mareste vizual spatiul, iar arcul de sus ii da un aer actual, foarte cautat in amenajarile de acum. Se aseaza pe podea, rezemata de perete, si devine imediat un punct de atractie la intrare. Cu 59 de pareri si nota 4.85 e de departe cea mai testata si mai apreciata de aici. Fiind rezemata, e bine sa o prinzi cu sistemul de siguranta, mai ales daca ai copii, iar rama neagra e mai discreta decat una aurie. O iei cand vrei cea mai populara oglinda de podea, cu o forma la moda si o rama eleganta, pentru un hol care sa faca impresie.' },
+  { g: 'podea', id: 'DB7PK03BM', badge: 'Cea mai mare, aurie', short: 'Elindor semicerc', forma: 'Semicerc', dim: '165 x 60 cm', montare: 'De podea',
+    specs: ['165 x 60 cm, cea mai mare din selectie', 'rama aurie din aluminiu, forma semicerc', 'nota aproape perfecta, 4.95', 'reflecta silueta intreaga, lejer'],
+    pros: ['Cea mai mare din selectie, 165 x 60 cm', 'Rama aurie, calda si luminoasa', 'Nota aproape perfecta, 4.95', 'Forma semicerc, eleganta si moderna'],
+    cons: ['Cea mai scumpa dintre oglinzile de podea', 'Latimea de 60 cm cere mai mult loc'],
+    verdict: 'Oglinda de podea de ales daca vrei un accent generos si cald intr-un hol mai spatios. Elindor semicerc are 165 x 60 cm, cea mai mare din selectie, si o rama aurie din aluminiu care aduce lumina si un aer sofisticat, potrivit cu amenajarile in tonuri calde sau cu accente metalice. Forma cu partea de sus rotunjita o face eleganta si mai putin severa decat un dreptunghi clasic, iar inaltimea generoasa reflecta silueta intreaga fara probleme. A luat o nota aproape perfecta, 4.95, chiar daca din 22 de pareri. E cea mai scumpa dintre oglinzile de podea si, cu 60 cm latime, cere ceva mai mult loc. O iei cand ai un hol mai larg si vrei cea mai mare si mai luminoasa oglinda, cu o rama aurie care sa devina piesa centrala a intrarii.' },
+  { g: 'podea', id: 'D2CM7XYBM', badge: 'Cu picior propriu', short: 'Callena cu picior', forma: 'Arcada', dim: '150 x 40 cm', montare: 'Podea sau perete',
+    specs: ['vine cu picior propriu, sta singura', 'rama bronz, 150 x 40 cm, forma arcada', 'se poate si atarna pe perete', 'nota mare, 4.78 din 23 de pareri'],
+    pros: ['Are picior propriu, sta singura fara sa o rezemi', 'Rama bronz, ton cald si elegant', 'Se poate folosi si de podea, si pe perete', 'Forma arcada, la moda'],
+    cons: ['Piciorul ocupa ceva loc in fata', 'Inca 23 de pareri'],
+    verdict: 'Oglinda de ales daca vrei una care sta singura, fara sa o rezemi de perete. Callena vine cu un picior propriu, pliabil, deci o asezi oriunde in hol si o inclini cum iti place, iar la nevoie o poti si atarna pe perete, o flexibilitate reala. Are o rama bronz calda, 150 x 40 cm si forma arcada la moda, potrivita pentru un hol elegant. Cu 23 de pareri si nota 4.78 e bine cotata. Piciorul ii da stabilitate, dar ocupa ceva loc in fata, deci o iei cand ai spatiu si preferi sa nu gauresti peretele. O alegi cand vrei o oglinda de podea care sta singura, cu picior reglabil, un ton bronz cald si posibilitatea de a o muta usor sau de a o monta pe perete cand vrei.' },
+  { g: 'podea', id: 'D1SJ003BM', badge: 'Cea mai accesibila de podea', short: 'Elindor dreptunghi', forma: 'Dreptunghi', dim: '150 x 40 cm', montare: 'De podea',
+    specs: ['cea mai ieftina oglinda de podea din selectie', 'forma dreptunghiulara clasica, rama neagra', '150 x 40 cm, aluminiu', 'nota maxima, 5 din 5'],
+    pros: ['Cea mai ieftina oglinda de podea din selectie', 'Forma dreptunghiulara clasica, se potriveste oriunde', 'Nota maxima, 5 din 5', 'Rama subtire din aluminiu negru'],
+    cons: ['Design mai simplu decat arcada sau semicercul', 'Inca 25 de pareri'],
+    verdict: 'Cea mai accesibila oglinda de podea din selectie, pentru cine vrea efectul unei oglinzi mari fara sa dea multi bani. Elindor dreptunghiulara are o rama subtire din aluminiu negru si 150 cm inaltime, exact ca variantele mai scumpe, dar cu o forma clasica, dreptunghiulara, care se potriveste in orice amenajare, de la modern la clasic. Reflecta silueta intreaga si lumineaza holul, iar simplitatea ei o face usor de asortat. A luat nota maxima, 5 din 5, chiar daca din 25 de pareri. Designul e mai sobru decat al modelelor arcada sau semicerc, dar tocmai asta o face versatila si mai ieftina. O iei cand vrei cea mai buna oglinda de podea la cel mai mic pret, cu o forma clasica pe care o asezi in orice hol.' },
+  // --- Oglinzi de perete ---
+  { g: 'perete', id: 'DD68M8MBM', badge: 'Cea mai accesibila', short: 'Callena rotunda', forma: 'Rotund', dim: '40 cm', montare: 'De perete',
+    specs: ['rotunda, 40 cm, rama aurie', 'cea mai ieftina din selectie', 'pentru hol, dormitor sau baie', 'aluminiu, nota 4.58'],
+    pros: ['Cea mai accesibila oglinda din selectie', 'Forma rotunda, moderna si placuta', 'Rama aurie, calda si luminoasa', 'Compacta, 40 cm, incape oriunde'],
+    cons: ['Mica, 40 cm, doar accent, nu de silueta', 'Nota 4.58, buna dar nu maxima'],
+    verdict: 'Cea mai accesibila oglinda din selectie si un accent perfect pentru un hol mic. Callena rotunda are 40 cm si o rama aurie care aduce un plus de lumina si eleganta pe un perete gol de la intrare, deasupra unei console sau langa cuier. Forma rotunda e moderna si prietenoasa, iar dimensiunea compacta o face potrivita si pentru dormitor sau baie. Cu 19 pareri si nota 4.58 e o alegere buna la banii ei. Fiind mica, e un accent decorativ, nu o oglinda in care sa te vezi din cap pana in picioare, asa ca o combini bine cu o consola sau cu alte piese pe perete. O iei cand vrei cea mai ieftina cale de a infrumuseta un hol cu o oglinda rotunda aurie, ca accent, nu ca oglinda de silueta.' },
+  { g: 'perete', id: 'D17L7W3BM', badge: 'Ovala, eleganta', short: 'Callena ovala', forma: 'Oval', dim: '70 x 50 cm', montare: 'De perete',
+    specs: ['ovala, 70 x 50 cm, rama bronz', 'forma clasica, eleganta', 'pentru hol si living', 'nota 4.67 din 18 pareri'],
+    pros: ['Forma ovala, eleganta si atemporala', 'Rama bronz, ton cald si rafinat', 'Dimensiune buna, 70 x 50 cm', 'Se potriveste in hol si in living'],
+    cons: ['Inca 18 pareri', 'Necesita montare pe perete'],
+    verdict: 'Oglinda de perete de ales daca vrei o forma eleganta si atemporala. Callena ovala are 70 x 50 cm si o rama bronz care ii da un aer rafinat, cald, potrivit atat intr-un hol, cat si intr-un living sau dormitor. Forma ovala e clasica si mereu la moda, mai bland pe ochi decat un colt drept, si suficient de mare cat sa fie functionala, nu doar decorativa. Cu 18 pareri si nota 4.67 e bine cotata. Necesita montare pe perete, deci alege bine locul si sistemul de prindere. O iei cand vrei o oglinda de perete cu o forma ovala eleganta si o rama bronz calda, care sa arate bine ani la rand, indiferent cum iti schimbi restul amenajarii.' },
+  { g: 'perete', id: 'DJ6Z26MBM', badge: 'Rama din lemn', short: 'Rama lemn alb', forma: 'Dreptunghi', dim: '120 x 30 cm', montare: 'De perete',
+    specs: ['rama din lemn alb, aspect natural', 'cleme de fixare pe vertical si orizontal', '120 x 30 cm, ingusta si inalta', 'nota 4.39 din 18 pareri'],
+    pros: ['Singura cu rama din lemn, aspect cald si natural', 'Se monteaza si vertical, si orizontal', 'Forma ingusta, buna pentru holuri stramte', 'Se potriveste in amenajari naturale'],
+    cons: ['Nota 4.39, cea mai modesta din grup', 'Lemnul cere ceva grija in timp'],
+    verdict: 'Oglinda de ales daca vrei un aspect cald, natural, care sa se potriveasca intr-o amenajare cu lemn. E singura din selectie cu rama din lemn, in nuanta alb, si are 120 x 30 cm, o forma ingusta si inalta, potrivita pentru un hol stramt sau pentru un perete lung si subtire. Vine cu cleme de fixare care iti permit sa o montezi si pe verticala, si pe orizontala, dupa cum ai loc. Cu 18 pareri si nota 4.39 e cotata mai modest decat celelalte, asa ca te uiti la recenzii inainte. Ca orice lemn, rama cere ceva grija in timp, ferita de umezeala. O iei cand pui pret pe aspectul natural al lemnului si ai un perete ingust si inalt de decorat, intr-o amenajare calda.' },
+  { g: 'perete', id: 'D3FKXHMBM', badge: 'Design deosebit', short: 'ONDA serpuita', forma: 'Serpuita', dim: '150 x 29 cm', montare: 'De perete',
+    specs: ['design serpuit, val ONDA, fara rama', 'cristal, 150 x 29 cm, aspect sculptural', 'cea mai ieftina piesa de design', 'nota maxima, 5 din 5'],
+    pros: ['Design serpuit deosebit, ca o piesa de arta', 'Fara rama, aspect curat si modern', 'Inalta, 150 cm, prezenta puternica', 'Nota maxima, 5 din 5, la un pret mic'],
+    cons: ['Forma ingusta, 29 cm, mai mult decorativa', 'Inca 22 de pareri'],
+    verdict: 'Oglinda de ales daca vrei ceva cu adevarat diferit, o piesa de design pe perete. ONDA are o forma serpuita, ondulata, ca o unda, fara rama, din cristal, si arata mai degraba ca o sculptura decat ca o oglinda obisnuita, un punct de atractie garantat intr-un hol modern. Are 150 cm inaltime, deci o prezenta puternica, si o latime mica, de 29 cm, care o face mai mult un accent artistic decat o oglinda functionala de silueta. A luat nota maxima, 5 din 5, la un pret surprinzator de mic, cel mai accesibil design deosebit din selectie. O iei cand vrei sa iesi din tipare, cu o oglinda-obiect de design care sa dea personalitate holului, si nu cauti neaparat o suprafata mare in care sa te vezi intreg.' },
+  // --- Seturi oglinzi acrilice autoadezive ---
+  { g: 'set', id: 'D1JZD6MBM', badge: 'Cel mai vandut set', short: 'DAVIDAMI 18', forma: 'Valuri', dim: 'Set 18 buc', montare: 'Autoadeziv',
+    specs: ['set de 18 oglinzi acrilice autoadezive', 'model valuri, se lipesc direct pe perete', 'compun un aranjament decorativ', 'usor de montat, fara scule'],
+    pros: ['Cel mai vandut set din selectie, 29 de pareri', '18 bucati, acoperi o suprafata buna', 'Autoadezive, se lipesc fara scule si gauri', 'Acrilic, usor si fara risc de spargere'],
+    cons: ['Nota 4.17, mai modesta', 'Efect decorativ, nu oglinda functionala'],
+    verdict: 'Cea mai populara solutie daca vrei sa decorezi un perete de hol cu un aranjament de oglinzi, nu cu o singura piesa. Setul DAVIDAMI are 18 oglinzi acrilice autoadezive cu model valuri, pe care le lipesti direct pe perete, fara scule si fara gauri, si le aranjezi cum vrei, intr-un val, un cerc sau imprastiate. Fiind din acril, sunt usoare si nu se sparg, un plus daca ai copii. Cu 29 de pareri e cel mai vandut set din selectie, iar nota 4.17 e decenta pentru categorie. E un efect pur decorativ, care da textura si lumina peretelui, nu o oglinda in care te privesti. O iei cand vrei sa transformi un perete gol de hol intr-un accent modern, ieftin si usor de montat, cu un aranjament de oglinzi mici.' },
+  { g: 'set', id: 'D6Y59QMBM', badge: 'Model hexagon', short: 'Luxer hexagon', forma: 'Hexagon', dim: 'Set 24 buc', montare: 'Autoadeziv',
+    specs: ['set de 24 oglinzi acrilice hexagonale', 'model hexagon, foarte la moda', 'autoadezive, argintii', 'nota 4.63, cea mai buna dintre seturi'],
+    pros: ['Model hexagon, foarte la moda in decor', '24 de bucati, acoperi o suprafata generoasa', 'Cea mai buna nota dintre seturi, 4.63', 'Autoadezive, montaj simplu fara scule'],
+    cons: ['Efect decorativ, nu oglinda functionala', 'Aspectul depinde mult de cum le aranjezi'],
+    verdict: 'Setul de ales daca vrei modelul hexagon, foarte cautat in decorul modern. Luxer are 24 de oglinzi acrilice hexagonale autoadezive, in nuanta argintiu, pe care le lipesti pe perete intr-un fagure sau imprastiate, pentru un efect geometric la moda. Cu 24 de bucati acoperi o suprafata generoasa, iar montajul e simplu, fara scule si fara gauri. Cu nota 4.63 e cel mai bine cotat set din selectie, semn ca rezultatul multumeste. Ca la orice set de acest fel, e un efect decorativ, nu o oglinda in care sa te vezi, iar rezultatul final depinde mult de cum le aranjezi, deci merita sa planifici modelul dinainte. O iei cand vrei un accent geometric hexagonal modern pe un perete de hol, usor de montat si la un pret accesibil.' },
+  { g: 'set', id: 'DHZ4LQMBM', badge: 'Model valuri', short: 'Luxer valuri', forma: 'Valuri', dim: 'Set 12 buc', montare: 'Autoadeziv',
+    specs: ['set de 12 oglinzi acrilice, model valuri', '19 x 17 cm fiecare, argintii', 'autoadezive, se lipesc pe perete', 'pentru un aranjament ondulat'],
+    pros: ['Model valuri, forme organice, moi pe ochi', 'Bucati mari, 19 x 17 cm, efect rapid', 'Autoadezive, montaj fara scule', 'Argintii, se asorteaza usor'],
+    cons: ['Doar 12 bucati, pentru o suprafata mai mica', 'Nota 4.41, buna dar nu in top'],
+    verdict: 'Setul de ales daca preferi forme organice, ondulate, in locul hexagoanelor geometrice. Luxer valuri are 12 oglinzi acrilice autoadezive cu forme de val, fiecare de 19 x 17 cm, deci bucati mari cu care obtii un efect vizibil rapid, fara sa lipesti zeci de piese mici. Nuanta argintie se asorteaza usor cu orice perete, iar formele moi dau un aer mai bland, mai putin sever decat liniile drepte. Cu 17 pareri si nota 4.41 e o alegere buna, chiar daca nu in varful clasamentului. Fiind doar 12 bucati, acopera o suprafata mai mica, potrivita pentru un accent, nu pentru un perete intreg. O iei cand vrei un aranjament decorativ cu forme ondulate, cu bucati mari si montaj rapid, pentru un colt de perete la intrare.' },
+  { g: 'set', id: 'D4M0G5MBM', badge: 'Accent mic, ieftin', short: 'DAVIDAMI 6', forma: 'Valuri', dim: 'Set 6 buc', montare: 'Autoadeziv',
+    specs: ['set mic de 6 oglinzi acrilice', 'model valuri, autoadezive', 'cel mai ieftin set din selectie', 'pentru un accent mic pe perete'],
+    pros: ['Cel mai ieftin set din selectie', 'Bun pentru un accent mic sau de proba', '6 bucati, montaj rapid', 'Acrilic usor, fara risc de spargere'],
+    cons: ['Doar 6 bucati, acoperi o suprafata mica', 'Nota 4.17, mai modesta'],
+    verdict: 'Cel mai ieftin set din selectie, ideal pentru un accent mic sau ca sa incerci efectul inainte de a acoperi un perete intreg. DAVIDAMI cu 6 oglinzi acrilice autoadezive, model valuri, iti da exact atat cat trebuie pentru a decora un colt de perete, o nisa sau spatiul de deasupra unei console, la un pret minim. Se lipesc fara scule si fara gauri, iar acrilul le face usoare si fara risc de spargere. Cu 29 de pareri, aceleasi ca setul mare DAVIDAMI, si nota 4.17, e o varianta verificata la banii ei. Fiind doar 6 bucati, acopera o suprafata mica, deci o iei ca accent, nu ca decor de perete intreg. O alegi cand vrei sa adaugi un mic detaliu decorativ la intrare, cu cel mai mic buget, sau sa testezi ideea inainte de un set mai mare.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const PODEA = PICKS.filter(x => x.g === 'podea');
+const PERETE = PICKS.filter(x => x.g === 'perete');
+const SET = PICKS.filter(x => x.g === 'set');
+
+const hero = '/images/articles/oglinda-decorativa-pentru-hol.webp';
+const figPodea = '/imagini/articole/oglinda-podea.webp';
+const figPerete = '/imagini/articole/oglinda-perete.webp';
+const figSet = '/imagini/articole/oglinda-seturi.webp';
+const published = '2026-07-19T12:02:40+03:00';
+
+const faq = [
+  { question: 'Ce fel de oglinda se potriveste intr-un hol?', answer: 'Depinde de spatiu si de ce vrei sa obtii. Intr-un hol ingust sau mic, o oglinda de perete rotunda sau ovala, ca modelele Callena, e un accent elegant care nu ocupa loc pe podea. Daca ai putin mai mult spatiu si vrei sa te vezi din cap pana in picioare inainte sa iesi din casa, o oglinda de podea inalta, de 150 cm, ca Elindor, e alegerea ideala si mareste vizual holul. Pentru un perete gol pe care vrei sa il animi, un set de oglinzi acrilice autoadezive creeaza un aranjament decorativ modern. Cheia e sa masori spatiul si sa alegi o oglinda pe masura lui.' },
+  { question: 'Oglinda de podea sau de perete?', answer: 'Oglinda de podea, inalta de 150-165 cm, iti reflecta silueta intreaga si e perfecta la intrare, ca sa te verifici inainte de a iesi; se reazema de perete sau sta pe un picior propriu, deci nu ai nevoie de gauri, dar ocupa loc pe jos. Oglinda de perete se monteaza sus, nu ocupa spatiu la podea si e ideala pentru holuri mici sau deasupra unei console, dar reflecta doar partial. Daca vrei o oglinda functionala de silueta si ai loc, alege una de podea; daca ai spatiu putin sau vrei doar un accent decorativ, una de perete e mai practica.' },
+  { question: 'Cum fixez in siguranta o oglinda de podea?', answer: 'O oglinda de podea inalta, rezemata de perete, trebuie prinsa obligatoriu cu un sistem de siguranta, mai ales daca ai copii sau animale. Majoritatea modelelor vin cu un set de prindere: un carlig sau o brida care se fixeaza in perete si tine oglinda sa nu cada in fata daca e atinsa. Nu te baza doar pe faptul ca se reazema, pentru ca o oglinda mare care cade se poate sparge si poate rani. Modelele cu picior propriu, ca Callena, stau singure si sunt mai stabile, dar si acolo merita atentie la un loc drept si ferm. In toate cazurile, alege un perete solid pentru ancorare.' },
+  { question: 'Ce forma de oglinda sa aleg?', answer: 'Forma da tonul amenajarii. Arcada, cu partea de sus rotunjita, e foarte la moda si aduce un aer moale si actual, potrivit pentru holuri moderne. Dreptunghiul e clasic si versatil, se aseaza in orice stil. Ovalul e elegant si atemporal, mai bland pe ochi decat colturile drepte. Rotundul e prietenos si modern, bun ca accent pe un perete. Iar formele deosebite, ca modelul serpuit ONDA, transforma oglinda intr-o piesa de design. Alege forma dupa stilul casei: linii moi si curbe pentru un aer cald si actual, forme clasice pentru un stil atemporal.' },
+  { question: 'Ce culoare de rama se asorteaza mai bine?', answer: 'Negrul e discret si modern, se potriveste in amenajari contemporane si scoate in evidenta oglinda prin contrast, fara sa atraga atentia asupra ramei. Auriul si bronzul aduc caldura si un aer sofisticat, merg foarte bine cu tonuri neutre, lemn si accente metalice, si lumineaza un hol. Lemnul da un aspect natural si cald, potrivit in amenajari rustice sau scandinave. Alege rama in functie de restul pieselor din hol: daca ai deja accente aurii sau bronz, o rama in acelasi ton leaga totul; daca vrei ceva discret si modern, negrul e cea mai sigura alegere.' },
+  { question: 'Oglinzile acrilice autoadezive sunt o oglinda adevarata?', answer: 'Sunt oglinzi decorative, nu oglinzi functionale ca cele din sticla. Reflecta lumina si dau un efect de oglinda, dar imaginea nu e la fel de clara si de precisa ca la o oglinda de sticla, tocmai pentru ca sunt din acril subtire. Rolul lor e pur decorativ: creezi un aranjament pe perete, ca un tablou din bucati oglindite, care aduce lumina si textura intr-un hol. Marele avantaj e ca sunt usoare, nu se sparg si se lipesc fara scule si fara gauri. Le iei pentru efectul decorativ pe un perete, nu ca sa te privesti in ele ca intr-o oglinda obisnuita.' },
+  { question: 'Cat costa o oglinda decorativa buna pentru hol?', answer: 'In selectie, o oglinda de perete decorativa porneste de la circa 75 de lei, cazul modelului de design ONDA, si urca spre 280 de lei pentru una ovala cu rama bronz. Oglinzile de podea, inalte de 150-165 cm, sunt in general intre 250 si 390 de lei, in functie de forma, culoare si dimensiune. Seturile de oglinzi acrilice autoadezive costa intre circa 70 si 155 de lei, dupa numarul de bucati. Cel mai bun raport il gasesti alegand tipul potrivit nevoii: o oglinda de podea daca vrei sa te vezi intreg, una de perete ca accent, sau un set acrilic pentru un perete decorativ.' },
+];
+
+const images = [hero, figPodea, figPerete, figSet, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Oglinda decorativa pentru hol - CentroCasa"
-  description="Pentru un hol primitor si spatios, cea mai buna alegere este o oglinda decorativa pentru hol de mari dimensiuni, cu rama minimalista din metal negru sau lemn natural. Modelele rotunde sau ovale adauga un plus de stil, iar cele cu lumina integrata sunt practice pe timp de seara. Prioritizeaza o sticla de calitate, fara distorsiuni, pentru a reflecta lumina si a crea iluzia de spatiu."
-  image="/images/articles/oglinda-decorativa-pentru-hol.webp"
+  title="Cele mai bune oglinzi decorative pentru hol in 2026: de podea, de perete si seturi"
+  description="Care sunt cele mai bune oglinzi decorative pentru hol in 2026: oglinzi de podea inalte de la Elindor si Callena, oglinzi de perete rotunde, ovale si de design, si seturi de oglinzi acrilice autoadezive, comparate pe forma, dimensiune si montare. Plus cum alegi, podea vs perete si fixare in siguranta."
+  image={hero}
   type="article"
-  publishedTime="2026-02-07T13:17:48.472Z"
-  modifiedTime="2026-02-07T13:17:48.472Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Decoratiuni Casa', url: '/decoratiuni-casa/' }, { name: 'Cele mai bune oglinzi decorative pentru hol' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Oglinda decorativa pentru hol</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune oglinzi decorative pentru hol</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
-        <span class="article-date">7 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Oglinda decorativa pentru hol</h1>
-    </header>
+    <h1>Cele mai bune oglinzi decorative pentru hol</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/oglinda-decorativa-pentru-hol.webp" alt="Oglinda decorativa pentru hol" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune oglinzi decorative pentru hol: de podea, de perete si seturi acrilice" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="ce-oglinda-decorativa-pentru-hol-face-holul-sa-para-mai-mare-si-mai-primitor">
-        <h2>Ce oglinda decorativa pentru hol face holul sa para mai mare si mai primitor</h2>
-        <p>Uite care-i treaba cu holul. E prima impresie pe care o lasi, nu? Si daca e mic si inghesuit, o <strong>oglinda <a href="/vaza-decorativa-pentru-flori/" class="interlink">decorativa pentru</a> hol</strong> e salvatoare. Nu te complica cu forme ciudate sau rame incarcate.</p>
-        <p>Mergi pe ceva simplu, dar <a href="/cum-sa-cureti-eficient-casa/" class="interlink">eficient</a>. Eu zic ca o oglinda dreptunghiulara, cat mai mare, montata pe peretele lung, e aur curat. Creeaza o linie vizuala care prelungeste spatiul.</p>
-        <p>Stai putin, ma gandeam la varianta ovala. Aia aduce un pic de fluiditate, stii? Mai ales daca holul tau are unghiuri mai ascutite. Si, pe bune, nu uita de rama.</p>
-        <p>Lemnul deschis la culoare sau metalul negru mat sunt alegeri sigure. Evita ramele prea groase, aurii sau cu ornamente, alea fac holul sa para si mai mic.</p><p>Daca holul tau e mai mult un culoar, o oglinda mare, patrata sau rectangulara, pusa pe peretele opus intrarii, e un truc clasic. Reflexia dubleaza vizual spatiul. Am vazut o chestie faina la un prieten: o oglinda cu lumina LED integrata pe margine. Pe langa ca arata modern, lumineaza si holul ala intunecos, facandu-l mult mai primitor. E o investitie mica, dar face diferenta, sincer.</p><p>Ce sa zic, am testat personal vreo 3 modele diferite in holul meu, care nu-i chiar imens. Oglinda rotunda cu rama subtire de metal negru a fost cea mai ok. Nu aglomereaza, se potriveste cu restul decorului si chiar pare ca a marit putin spatiul. Dar daca vrei efect maxim, cea mai mare pe care ti-o permiti, montata strategic, aia e.</p><p>Deci, raspunsul scurt: o <strong>oglinda <a href="/statueta-decorativa-pentru-casa/" class="interlink">decorativa pentru</a> hol</strong> mare, cu rama simpla, alba, neagra sau din lemn natural. Asta e cheia pentru a transforma un hol anost intr-un spatiu aerisit.</p>
-      </section>
-
-      <section id="top-4-modele-de-oglinda-decorativa-pentru-hol-si-ce-sa-stii-despre-ele">
-        <h2>Top 4 modele de oglinda decorativa pentru hol si ce sa stii despre ele</h2>
-        <p>Ok, hai sa trecem la partea practica. Ce gasesti pe piata si merita sa iei in calcul? Nu te lua dupa prima chestie frumoasa pe care o vezi. Fiecare are plusurile si minusurile ei.</p><h3>Oglinda Rotunda cu Rama Metalica Neagra</h3><p>Asta e un soi de clasic modern. Arata bine in aproape orice hol. Rama neagra e subtire, da un aer minimalist. E perfecta daca ai deja elemente negre in decor, cum ar fi clanțe, aplice sau o consola.</p><ul><li><strong>Pret estimativ:</strong> 250 - 600 lei, in functie de diametru.</li><li><strong>Avantaje:</strong> Versatila, arata bine, usor de montat. Creeaza un punct focal interesant.</li><li><strong>Dezavantaje:</strong> Unele modele au rama prea groasa, ceea ce o face sa para mai mica. Calitatea sticlei poate varia, uita-te sa fie fara distorsiuni.</li></ul><h3>Oglinda Rectangulara cu Rama din Lemn Natural</h3><p>Daca holul tau e mai rustic sau scandinav, asta e alegerea. Lemnul aduce caldura. Alege o nuanta de lemn deschis, gen stejar sau fag. Evita stejarul prea inchis, daca holul e mic.</p><ul><li><strong>Pret estimativ:</strong> 300 - 800 lei, in functie de dimensiune si tipul de lemn.</li><li><strong>Avantaje:</strong> Adauga caldura si naturalete. Se potriveste cu multe stiluri.</li><li><strong>Dezavantaje:</strong> Poate fi grea, deci ai nevoie de o prindere solida. Lemnul se poate zgaraia daca nu e tratat corespunzator. Unele rame sunt prea masive.</li></ul><h3>Oglinda Ovala cu Margine Slefuita (Fara Rama)</h3><p>Asta e pentru cei care vor eleganta pura. Fara rama, doar sticla. E o alegere sigura daca nu vrei sa te complici cu asortatul ramei. Lumina se reflecta pe toata suprafata ei.</p><ul><li><strong>Pret estimativ:</strong> 200 - 500 lei, in functie de dimensiune.</li><li><strong>Avantaje:</strong> Design curat, modern. Pare ca „dispare” pe perete, maximizand efectul de spatiu.</li><li><strong>Dezavantaje:</strong> Montajul poate fi mai delicat, ai nevoie de cleme speciale. Marginea slefuita se poate ciobi daca nu e manipulata cu grija.</li></ul><h3>Oglinda cu Iluminare LED Integrata</h3><p>Asta e varianta smart. Perfecta pentru holurile fara fereastra sau cele cu putina lumina naturala. Lumina LED poate fi calda sau rece, in functie de preferinte.</p><ul><li><strong>Pret estimativ:</strong> 400 - 1000+ lei, depinde mult de tehnologie si design.</li><li><strong>Avantaje:</strong> Functionala, ofera lumina suplimentara, arata high-tech.</li><li><strong>Dezavantaje:</strong> Mai scumpa. Daca se arde un LED, poate fi greu de reparat. Ai nevoie de o sursa de curent in apropiere sau de baterii. Am avut una la care bateria s-a terminat repede, frustrant.</li></ul><p>Stai putin, am uitat sa mentionez ceva important: grosimea oglinzii. Cele mai ieftine au sticla mai subtire, se pot ondula. Alege una cu minimum 4mm grosime. Si verifica sa fie securizata pe spate, mai ales daca ai copii sau animale. Siguranta pe primul loc.</p>
-      </section>
-
-      <section id="cum-sa-alegi-oglinda-decorativa-pentru-hol-potrivita-stilului-tau">
-        <h2>Cum sa alegi oglinda decorativa pentru hol potrivita stilului tau</h2>
-        <p>Alegerea unei <strong>oglinda decorativa pentru hol</strong> nu e chiar un mister, dar trebuie sa te gandesti la cateva chestii. Nu e doar sa pui o oglinda pe perete si gata. E un element de design.</p><h3>Dimensiunea conteaza, pe bune</h3><p>Asta e prima regula. Masoara holul tau. Nu lua o oglinda enorma pentru un hol mic, ca o sa para sufocat. Si nici una minuscula pentru un hol generos, ca se pierde. Pentru un hol ingust, una lunga si ingusta, pusa pe peretele lung, e ideala. Pentru un hol mai patrat, una mai mare, poate chiar cu rama, poate fi un punct focal. Gandeste-te la proportii. Oglinda ar trebui sa fie cam 2/3 din latimea mobilei de sub ea (daca ai consola) sau sa ocupe o buna parte din peretele liber.</p><h3>Stilul holului tau, stilul oglinzii</h3><p>Ai un hol modern, minimalist? Atunci o oglinda rotunda, fara rama sau cu rama metalica neagra subtire, e perfecta. E curata, simpla, eleganta. Daca holul e mai clasic, cu mobilier din lemn masiv, o oglinda dreptunghiulara cu rama din lemn sculptat sau cu un finisaj auriu patinat ar arata de minune. Nu amesteca stilurile prea mult, ca iese un haos.</p><p>Am avut un client care si-a luat o oglinda super baroca pentru un hol pe care il amenajasem minimalist. Arata... ciudat. Pana la urma a schimbat-o cu una cu rama din lemn natur, mult mai potrivita.</p><h3>Materialul ramei – mai mult decat un detaliu</h3><p>Rama e ca o tinuta pentru oglinda. Lemnul, cum am zis, aduce caldura. Metalul (negru, auriu, argintiu) da un aer mai industrial sau modern. Sticla colorata? Poate fi interesanta, dar greu de integrat, mai ales intr-un hol. Plasticul? De evitat, de obicei arata ieftin. Daca bugetul e mic, mai bine o oglinda simpla, fara rama, decat una cu rama de plastic proasta.</p><h3>Pozitionarea, cheia succesului</h3><p>Unde pui oglinda? Asta influenteaza cum percepi spatiul. Ideal e sa pui oglinda in asa fel incat sa reflecte ceva frumos: o usa de <a href="/plante-artificiale-decorative-pentru-interior/">interior</a> cu un design misto, un tablou, o lampa, sau chiar intrarea principala (daca e bine amenajata). Evita sa pui oglinda fix vizavi de usa de la baie, nu e tocmai cea mai buna priveliste cand intri in casa.</p>
-        <p>Daca holul tau e lung si ingust, o oglinda pe peretele lung va alungi si mai mult. Daca e mai scurt, o oglinda mare pe peretele scurt poate da impresia de profunzime.</p><p>Si un ultim sfat de la mine: ia in considerare si lumina. Daca holul tau e intunecos, alege o oglinda care sa capteze si sa reflecte cat mai multa lumina. O oglinda mare, cu rama alba sau argintie, sau chiar una cu lumina integrata, te va ajuta enorm.</p>
-      </section>
-
-      <section id="oglinda-rotunda-vs-rectangulara-pentru-hol-care-e-mai-buna">
-        <h2>Oglinda rotunda vs. rectangulara pentru hol: Care e mai buna?</h2>
-        <p>Bun, acum hai sa comparam doua dintre cele mai populare forme: rotunda si rectangulara. Fiecare are farmecul ei si se potriveste in contexte diferite.</p><h3>Oglinda Rotunda: Fluiditate si Stil</h3><p>Oglinda rotunda e ca o gura de aer proaspat, mai ales in holurile cu linii drepte. Forma ei rotunjita aduce un strop de moliciune si echilibru. E genul de piesa care atrage atentia fara sa fie ostentativa.</p><ul><li><strong>Avantaje:</strong></li><li>Creeaza un contrast vizual placut intr-un spatiu dominat de linii drepte.</li><li>Adauga un element de surpriza si stil.</li><li>Functioneaza bine in holuri de diverse dimensiuni, dar e mai potrivita pentru cele mai mici sau medii, unde nu vrei sa domine.</li><li>Poate fi un punct focal grozav, mai ales daca e de dimensiuni mai mari sau are o rama interesanta.</li><li><strong>Dezavantaje:</strong></li><li>Poate fi mai putin eficienta in a crea iluzia de spatiu continuu pe un hol lung si ingust, comparativ cu una rectangulara.</li><li>Daca e prea mica, se poate pierde in spatiu.</li><li>Unele modele, mai ales cele cu rame groase, pot limita suprafata reflectanta.</li></ul><h3>Oglinda Rectangulara: Functionalitate si Spatiu</h3><p>Oglinda rectangulara e vedeta holurilor lungi si inguste. E campioana la crearea iluziei de spatiu si la adaugarea de profunzime. Este si cea mai versatila forma, potrivindu-se cu aproape orice stil.</p><ul><li><strong>Avantaje:</strong></li><li>Excelenta pentru a face un hol lung sa para mai lat sau mai scurt.</li><li>Ofera o suprafata reflectanta mare, ideala pentru a te vedea complet inainte de a pleca.</li><li>Se integreaza usor in design, fie ca e pusa deasupra unei console, fie ca e montata singura pe perete.</li><li>Disponibila intr-o varietate uriasa de dimensiuni, de la mici la foarte mari.</li><li><strong>Dezavantaje:</strong></li><li>Poate fi prea „cuminte” daca nu alegi un model cu o rama deosebita.</li><li>Intr-un hol foarte scurt si lat, s-ar putea sa nu fie cea mai buna alegere, ca poate accentua latimea.</li></ul><p><strong>Verdictul meu?</strong> Daca ai un hol lung si ingust, mergi pe o <strong>oglinda decorativa pentru hol</strong> rectangulara, cat mai mare. Daca holul tau e mai patrat, sau daca vrei sa adaugi un element de design mai jucaus, o oglinda rotunda e o alegere excelenta. Am avut o situatie unde un client a pus o oglinda rotunda mare intr-un hol foarte lung.</p>
-        <p>Arata fain ca obiect <a href="/ceas-de-perete-decorativ-mare/">decorativ</a>, dar vizual nu a ajutat prea mult la „scurtarea” lui. Pe cand o oglinda rectangulara lunga, pusa pe peretele lateral, a facut minuni.</p>
-      </section>
-
-      <section id="greseli-frecvente-la-alegerea-si-montajul-unei-oglinda-decorativa-pentru-hol">
-        <h2>Greseli frecvente la alegerea si montajul unei oglinda decorativa pentru hol</h2>
-        <p>Stai, ca nu tot ce zboara se mananca. Si la oglinzi, ca la orice altceva, se pot face greseli. Si nu, nu ma refer la a sparge oglinda si a avea 7 ani ghinion, ma refer la chestii de design si functionalitate.</p><h3>1. Alegerea unei oglinzi prea mici</h3><p>Asta e clasica. Te gandesti ca nu vrei sa aglomerezi holul si iei o oglinjoara mica. Rezultatul? Oglinda aia se pierde pe perete, nu face niciun impact vizual si, cel mai rau, nu-ti ofera o vedere completa asupra ta. E ca si cum ai pune o stampila pe un perete gol. Oglinda trebuie sa aiba o prezenta. Ca regula generala, ar trebui sa ocupe cel putin 2/3 din latimea consolei sau a peretelui pe care o montezi.</p><h3>2. Ignorarea luminii din hol</h3><p>Holul e adesea un spatiu intunecos. Daca pui o oglinda mica, fara rama, intr-un colt intunecat, nu va reflecta nimic util. Nu va aduce lumina, nu va crea iluzia de spatiu. Daca holul e intunecat, ai nevoie de o oglinda mare, care sa capteze lumina existenta, sau chiar una cu lumina integrata. Gandeste-te unde bate lumina naturala sau unde ai surse de <a href="/corpuri-de-iluminat-pentru-living-modern/">iluminat</a> artificial. Oglinda pusa strategic poate dubla lumina aia.</p><h3>3. Rama nepotrivita stilului</h3><p>Cum am mai zis, rama e importanta. O rama prea masiva, cu ornamente baroce, intr-un hol minimalist, va arata ca un... catus. Sau invers, o rama super simpla, din metal negru, intr-un hol rustic cu mobilier din lemn masiv, se va simti stingher. Incearca sa mentii o corespondenta intre stilul ramei si stilul general al casei tale.</p><h3>4. Montajul prost executat</h3><p>Asta e o problema tehnica, dar face toata diferenta. O oglinda dreapta, bine prinsa in perete, arata finisat. Una stramba, care pare ca o sa cada, strica tot. Daca oglinda e grea, nu te juca. Foloseste dibluri si suruburi potrivite pentru tipul de perete (beton, rigips). Si, daca nu esti sigur, mai bine cheama pe cineva care se pricepe. Am vazut oglinzi cazute, sparte, si a fost un dezastru.</p><h3>5. Plasarea gresita</h3><p>Unde pui oglinda? Daca o pui fix vizavi de usa de la baie sau de debara, nu e cea mai inspirata idee. Oglinda ar trebui sa reflecte ceva placut: o usa de interior frumoasa, un tablou, o planta, sau chiar o fereastra (daca ai noroc de una in hol). Daca holul e lung, o oglinda pe peretele lung va accentua lungimea. O oglinda pe peretele scurt, la capatul holului, poate da impresia de profunzime. E vorba de iluzii optice.</p><p>Si inca un tip: nu uita sa cureti oglinda regulat. O oglinda plina de amprente si praf nu face niciun serviciu decorului tau.</p>
-      </section>
-
-      <section id="recomandari-oglinda-decorativa-pentru-hol-pe-categorii-de-buget">
-        <h2>Recomandari oglinda decorativa pentru hol pe categorii de buget</h2>
-        <p>Ok, hai sa fim sinceri, bugetul conteaza. Dar asta nu inseamna ca trebuie sa renunti la o <strong>oglinda decorativa pentru hol</strong> misto. Iti dau eu niste idei pe categorii.</p><h3>Buget Mic (sub 300 lei)</h3><p>In zona asta, te poti astepta la oglinzi mai mici, cu rame din materiale mai simple, gen plastic imbracat sau MDF. Totusi, gasesti si optiuni bune.</p><ul><li><strong>Recomandare:</strong> Oglinda rotunda sau rectangulara, fara rama sau cu rama metalica neagra subtire, de dimensiuni medii (40-60 cm diametru/latura).</li><li><strong>Unde cauti:</strong> Magazine de bricolaj (Dedeman, Leroy Merlin), magazine online cu decoratiuni (JYSK, Kika, eMag marketplace).</li><li><strong>Ce sa verifici:</strong> Grosimea sticlei (minim 4mm), calitatea prinderilor. Evita ramele din plastic lucios.</li><li><strong>Minus real:</strong> Dimensiunea e limitata, nu va transforma radical un hol mare.</li></ul><h3>Buget Mediu (300 - 700 lei)</h3><p>Aici deja ai optiuni mult mai serioase. Poti gasi oglinzi mai mari, cu rame din lemn natural, metal de calitate sau chiar modele cu lumina LED integrata, mai simple.</p><ul><li><strong>Recomandare:</strong> Oglinda rectangulara mare (aprox. 60x80 cm sau mai mult) cu rama din lemn masiv (stejar, fag) sau o oglinda rotunda de diametru mare (70-90 cm) cu rama metalica neagra sau aurie mata. Modelele cu LED sunt si ele accesibile.</li><li><strong>Unde cauti:</strong> Magazine de mobilier (Mobexpert, XXXLutz), showroom-uri de design interior, magazine online specializate.</li><li><strong>Ce sa verifici:</strong> Calitatea finisajului ramei, tipul de sticla (cea cu argintare de calitate superioara e mai buna), daca lumina LED are temperatura de culoare reglabila.</li><li><strong>Minus real:</strong> Unele modele cu rame din lemn masiv pot fi destul de grele, atentie la montaj.</li></ul><h3>Buget Generos (peste 700 lei)</h3><p>In segmentul asta, vorbim de piese statement. Oglinzi mari, cu design special, rame din materiale premium, sau modele personalizate.</p><ul><li><strong>Recomandare:</strong> Oglinda supradimensionata, poate chiar partial incadrata in perete, un model cu forme organice sau un set de oglinzi <a href="/plante-artificiale-decorative-pentru-interior/" class="interlink">decorative</a> aranjate artistic. Oglinzi cu rama din otel inoxidabil, bronz sau sticla colorata de designer.</li><li><strong>Unde cauti:</strong> Showroom-uri de design de lux, producatori de mobilier la comanda, galerii de arta cu obiecte de decor.</li><li><strong>Ce sa verifici:</strong> Autenticitatea produsului, calitatea sticlei (fara nicio distorsiune), designul unic. Pot fi si oglinzi cu sablare sau gravura.</li><li><strong>Minus real:</strong> Pretul e pe masura, iar un design prea indraznet s-ar putea sa nu se potriveasca peste ani. Investitia e mare, deci trebuie sa fii sigur pe alegere.</li></ul><p>Indiferent de buget, tine minte ca o <strong>oglinda decorativa pentru hol</strong> e o investitie in aspectul si functionalitatea casei tale. Nu te grabi, analizeaza, si alege ce se potriveste cel mai bine spatiului si personalitatii tale.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat costa o <strong>oglinda decorativa pentru hol</strong>?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Preturile pentru o <strong>oglinda decorativa pentru hol</strong> variaza mult, de la aproximativ 150 lei pentru modele mici, simple, pana la peste 1000 lei pentru oglinzi mari, cu design special sau iluminare LED. Un model mediu, de calitate decenta, costa intre 300 si 600 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce dimensiune de oglinda e potrivita pentru un hol mic?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru un hol mic, alege o oglinda cat mai mare pe care ti-o permiti, dar proportionala cu peretele. O oglinda de 60x80 cm sau o oglinda rotunda cu diametrul de 50-60 cm poate face minuni. Evita ramele groase, mergi pe modele minimaliste.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar o oglinda cu rama din lemn pentru hol?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, o oglinda cu rama din lemn natural adauga caldura si un aspect primitor holului, mai ales daca stilul casei e rustic, scandinav sau modern-calduros. Lemnul poate fi insa mai greu si necesita o prindere solida pe perete.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fel de oglinda e mai buna pentru a mari vizual holul?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru a mari vizual un hol, cea mai buna optiune este o oglinda rectangulara de mari dimensiuni, montata pe peretele lung. Aceasta creeaza o iluzie de profunzime si face spatiul sa para mai lat. O oglinda rotunda mare poate fi un accent, dar nu are acelasi efect de 'deschidere'.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum intretin corect o oglinda decorativa pentru hol?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Curata oglinda regulat cu o solutie speciala pentru geamuri si o laveta moale, fara scame. Sterge apoi cu o carpa uscata pentru a evita urmele. Pentru ramele din lemn, foloseste o carpa usor umeda, iar pentru cele metalice, o carpa uscata sau o solutie de curatat specifica metalului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                De ce se abureste oglinda din hol?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Oglinda din hol se poate aburi din cauza diferentei de temperatura si umiditate, mai ales daca holul e langa o baie cu aburi sau o sursa de caldura. O buna ventilatie a holului poate ajuta. Modelele cu strat anti-aburire sunt mai rare si mai scumpe.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Unde gasesc modele de <strong>oglinda decorativa pentru hol</strong> unice?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Modele unice de <strong>oglinda decorativa pentru hol</strong> pot fi gasite la designeri de interior, pe platforme de artizani online (gen Etsy, dar cu livrare in Romania), in showroom-uri de mobilier premium sau la ateliere locale de prelucrare a sticlei si oglinzilor. Uneori, si magazinele mari de bricolaj au colectii limitate.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce greutate poate avea o <strong>oglinda decorativa pentru hol</strong> mare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Oglinzile decorative mari, de 80x100 cm sau mai mult, pot cantari intre 10 si 25 kg, in functie de grosimea sticlei si materialul ramei. Este esential sa folosesti sisteme de prindere adecvate greutatii si tipului de perete pentru a preveni accidentele.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru un hol modern, cea mai vanduta e oglinda de podea <strong>Elindor arcada</strong>, inalta si eleganta, iar cea mai mare, <strong>Elindor semicerc</strong>, aduce lumina cu rama ei aurie. Daca vrei doar un accent pe perete, <strong>Callena rotunda</strong> e cea mai accesibila, iar pentru un efect deosebit, oglinda de design <strong>ONDA</strong> serpuita arata ca o piesa de arta.</p>
+      <p>La o oglinda decorativa de hol conteaza <strong>tipul</strong> (de podea, de perete sau set decorativ), <strong>forma si dimensiunea</strong> potrivite cu spatiul, si <strong>rama</strong>, ca ton si material. Mai jos gasesti direct recomandarile, impartite pe cele trei tipuri, iar sub ele un ghid despre cum alegi.</p>
+      <p>Am pornit de la oglinzile decorative in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe forma, dimensiuni si montare, si le-am grupat in oglinzi de podea, oglinzi de perete si seturi de oglinzi acrilice autoadezive, ca sa gasesti repede tipul potrivit pentru holul tau. Fiind o categorie mai mica, am fost onesti si am notat unde parerile sunt inca putine. Pentru un hol primitor, vezi si <a href="/ceas-de-perete-decorativ-mare/">ceasurile de perete decorative</a> si <a href="/plante-artificiale-decorative-pentru-interior/">plantele artificiale</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#podea">Oglinzi de podea</a></li>
+        <li><a href="#perete">Oglinzi de perete</a></li>
+        <li><a href="#set">Seturi de oglinzi acrilice</a></li>
+        <li><a href="#de-ce">De ce o oglinda in hol</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#forma-rama">Forma si culoarea ramei</a></li>
+        <li><a href="#montare">Montare si siguranta</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Forma</th><th>Dimensiune</th><th>Montare</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.forma}</td>
+              <td>{x.dim}</td>
+              <td>{x.montare}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="podea">Oglinzi de podea</h2>
+    <p>Inalte de 150-165 cm, iti reflecta silueta intreaga si maresc vizual holul. Se reazema de perete sau stau pe un picior propriu, si devin imediat piesa centrala la intrare. Aici e si cea mai vanduta oglinda din selectie.</p>
+    <div class="rd-grid">
+      {PODEA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPodea} alt="Oglinzi de podea decorative: Elindor si Callena" width="1200" height="675" loading="lazy" />
+
+    <h2 id="perete">Oglinzi de perete</h2>
+    <p>Se monteaza sus si nu ocupa loc pe podea, ideale pentru holuri mici sau deasupra unei console. De la rotund si oval clasic la rame de lemn si forme de design, alegi dupa stilul casei.</p>
+    <div class="rd-grid">
+      {PERETE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPerete} alt="Oglinzi de perete decorative: rotunda, ovala, rama lemn si design" width="1200" height="675" loading="lazy" />
+
+    <h2 id="set">Seturi de oglinzi acrilice</h2>
+    <p>Bucati mici autoadezive pe care le lipesti pe perete intr-un aranjament decorativ, fara scule si fara gauri. Sunt un efect vizual modern si ieftin pentru un perete gol, nu oglinzi functionale de silueta.</p>
+    <div class="rd-grid">
+      {SET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSet} alt="Seturi de oglinzi acrilice autoadezive: DAVIDAMI si Luxer" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-oglinda-hol').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate oglinzile decorative la oferta</strong>
+        <span>Reducerile din acest moment la oglinzi decorative, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o oglinda in hol</h2>
+    <p>Holul e primul lucru pe care il vezi cand intri in casa si ultimul inainte sa iesi, dar e adesea spatiul cel mai neglijat. O oglinda il transforma din doua directii: <strong>practic</strong> si <strong>estetic</strong>. Practic, iti dai o ultima privire inainte de a iesi din casa, verifici tinuta si parul, fara sa alergi pana in dormitor sau in baie.</p>
+    <p>Estetic, o oglinda <strong>mareste vizual spatiul si aduce lumina</strong>, exact ce ii trebuie unui hol, care de obicei e ingust si fara ferestre. Reflectand lumina de la un bec sau dintr-o camera alaturata, face intrarea sa para mai mare, mai deschisa si mai primitoare. In plus, o oglinda cu o rama frumoasa sau o forma deosebita devine o piesa de decor in sine, care da personalitate holului si impresioneaza de la prima privire. E una dintre cele mai simple si mai eficiente moduri de a infrumuseta o intrare.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua oglinzi decorative:</p>
+    <ul>
+      <li><strong>Tipul:</strong> de podea pentru silueta intreaga si efect de spatiu, de perete pentru un accent care nu ocupa loc pe jos, set acrilic pentru un aranjament decorativ ieftin.</li>
+      <li><strong>Dimensiunea:</strong> masoara peretele sau locul. O oglinda de podea cere circa 150-165 cm inaltime liberi; una de perete se potriveste dupa spatiul disponibil.</li>
+      <li><strong>Forma:</strong> arcada si curbele sunt la moda si moi, dreptunghiul si ovalul sunt clasice si versatile, formele de design dau personalitate.</li>
+      <li><strong>Rama:</strong> negru discret si modern, auriu si bronz calde si elegante, lemn natural. Alege in ton cu restul amenajarii.</li>
+      <li><strong>Montarea:</strong> de podea rezemata cere fixare de siguranta; cu picior sta singura; de perete cere un perete solid; setul acrilic se lipeste fara scule.</li>
+      <li><strong>Materialul:</strong> sticla adevarata pentru o reflexie clara, acril pentru seturile decorative usoare si fara risc de spargere.</li>
+    </ul>
+
+    <h2 id="forma-rama">Forma si culoarea ramei</h2>
+    <p>Forma si rama dau tonul intregului hol, mai mult decat crezi. Formele cu <strong>linii curbe</strong>, ca arcada sau semicercul, sunt foarte cautate acum pentru ca aduc un aer moale, cald si actual, si se potrivesc perfect intr-o amenajare moderna. <strong>Dreptunghiul</strong> ramane clasic si versatil, se aseaza in orice stil, iar <strong>ovalul</strong> e elegant si atemporal, mai bland pe ochi. Pentru cine vrea sa iasa din tipare, o forma de design, ca modelul serpuit ONDA, transforma oglinda intr-o piesa de arta.</p>
+    <p>La culoarea ramei, alegerea leaga oglinda de restul casei. <strong>Negrul</strong> e discret si modern, scoate in evidenta oglinda prin contrast si merge in amenajari contemporane. <strong>Auriul si bronzul</strong> aduc caldura si un aer sofisticat, se asorteaza cu tonuri neutre, lemn si accente metalice, si lumineaza holul. <strong>Lemnul</strong> da un aspect natural si cald, potrivit in amenajari rustice sau scandinave. Regula simpla: daca ai deja accente aurii sau din lemn in hol, alege o rama in acelasi ton, ca sa legi totul; daca vrei ceva sigur si modern, negrul se potriveste aproape oriunde.</p>
+
+    <h2 id="montare">Montare si siguranta</h2>
+    <p>La o oglinda de podea rezemata de perete, <strong>fixarea de siguranta nu e optionala</strong>. Toate modelele inalte vin cu un sistem de prindere, un carlig sau o brida care se ancoreaza in perete si tine oglinda sa nu cada in fata daca e atinsa. Foloseste-l intotdeauna, mai ales daca ai copii sau animale, pentru ca o oglinda mare care cade se sparge si poate rani. Modelele cu picior propriu, ca cel de la Callena, stau singure si sunt mai stabile, dar merita si acolo un loc drept si ferm.</p>
+    <p>La oglinzile de perete, alege un <strong>perete solid</strong> si sistemul de prindere potrivit greutatii, mai ales la modelele mari, ovale sau cu rama grea. Unele, ca cea cu rama de lemn, vin cu cleme care permit montarea si pe verticala, si pe orizontala, deci decizi orientarea dupa spatiu. Seturile de oglinzi acrilice autoadezive sunt cele mai simple: se lipesc direct pe un perete curat si uscat, fara scule si fara gauri, dar planifica aranjamentul dinainte, pentru ca adezivul tine bine si e greu de repozitionat dupa lipire.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tip, dimensiune si forma:</p>
+    <p><strong>Oglinzi de podea:</strong> in general intre 250 si 390 de lei pentru modele inalte de 150-165 cm, in functie de forma, culoarea ramei si dimensiune. Cea mai ieftina e varianta dreptunghiulara, cea mai scumpa, semicercul auriu mare.</p>
+    <p><strong>Oglinzi de perete:</strong> de la circa 75 de lei pentru un model de design ca ONDA, si pana spre 280 de lei pentru una ovala cu rama bronz. O oglinda rotunda accesibila e in jur de 135 de lei.</p>
+    <p><strong>Seturi de oglinzi acrilice:</strong> intre circa 70 si 155 de lei, dupa numarul de bucati, de la seturi mici de 6 piese pana la seturi de 18-24 pentru o suprafata mai mare.</p>
+    <p>Pe langa pret, alege <strong>tipul potrivit nevoii</strong>: o oglinda de podea daca vrei sa te vezi intreg si sa maresti spatiul, una de perete ca accent elegant, sau un set acrilic pentru un perete decorativ modern. Fiind o categorie cu produse inca putin recenzate, citeste si parerile de pe pagina inainte de a comanda. Pentru living, vezi si <a href="/corpuri-de-iluminat-pentru-living-modern/">corpurile de iluminat moderne</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor interioare si exterioare in oaze de relaxare.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="oglinda-decorativa-pentru-hol"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="oglinda-decorativa-pentru-hol"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="oglinda-decorativa-pentru-hol" currentCategory="decoratiuni-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="oglinda-decorativa-pentru-hol" currentCategory="decoratiuni-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

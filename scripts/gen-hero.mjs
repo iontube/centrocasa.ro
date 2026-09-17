@@ -219,52 +219,174 @@ export async function buildHero({ title, tag = 'OFERTA eMAG', products = [], out
   return buf;
 }
 
-// Figură inline pt corpul articolului: rând de produse pe carduri albe, etichetă sub fiecare
-// + bară-titlu (sus SAU jos). 16:9, 1600x900. items = [{img, label, sub?}]
-// theme + captionPos variază per articol/figură ca să nu semene între ele.
-export async function buildFigure({ items = [], caption = '', out, theme = 'blue', captionPos = 'bottom' }) {
+// Figură inline pt corpul articolului. 16:9, 1600x900. items = [{img, label, sub?}]
+// template: 'cards' | 'numbered' | 'stripe' | 'split' | 'chips' — layout-uri diferite ca sa nu semene.
+// theme + captionPos + template variază per articol/figură.
+export const FIGURE_TEMPLATES = ['cards', 'numbered', 'stripe', 'split', 'chips', 'gallery', 'spotlight'];
+export async function buildFigure({ items = [], caption = '', out, theme = 'blue', captionPos = 'bottom', template = 'cards' }) {
   const W = 1600, H = 900;
   const t = THEMES[theme] || THEMES.blue;
-  const bg = Buffer.from(
-    `<svg width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${t.bg1}"/><stop offset="1" stop-color="${t.bg2}"/></linearGradient></defs>
-      <rect width="${W}" height="${H}" fill="url(#g)"/></svg>`);
-  let img = sharp(bg).png();
   const n = Math.min(4, Math.max(1, items.length));
   const picks = items.slice(0, n);
-  const capH = caption ? 96 : 0;
-  const top = captionPos === 'top';
-  const areaTop = top ? capH : 0, areaH = H - capH;
-  const cardH = 560, cardW = Math.round(cardH * 0.66), gap = 48;
-  const totalW = n * cardW + (n - 1) * gap;
-  let x = Math.round((W - totalW) / 2);
-  const y = areaTop + Math.round((areaH - cardH) / 2) - 20;
   const composites = [];
-  for (const it of picks) {
-    try {
-      const buf = await loadBuf(it.img);
-      const prod = await sharp(buf).resize(cardW - 70, cardH - 150, { fit: 'contain', background: '#fff' }).png().toBuffer();
-      const lf = Math.max(22, Math.min(36, Math.floor((cardW - 30) / ((it.label || ' ').length * 0.60))));
-      const sf = Math.max(18, Math.min(28, Math.floor((cardW - 30) / ((it.sub || ' ').length * 0.56))));
-      const card = Buffer.from(
-        `<svg width="${cardW}" height="${cardH}"><rect width="${cardW}" height="${cardH}" rx="34" fill="#fff" filter="url(#s)"/>
-         <defs><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#1b3a6b" flood-opacity="0.18"/></filter></defs>
-         <text x="${cardW / 2}" y="${cardH - 58}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${lf}" font-weight="800" fill="#101828">${esc(it.label || '')}</text>
-         ${it.sub ? `<text x="${cardW / 2}" y="${cardH - 20}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${sf}" font-weight="600" fill="${t.d2}">${esc(it.sub)}</text>` : ''}</svg>`);
-      const cardImg = await sharp(card).png().composite([{ input: prod, top: 35, left: 35 }]).toBuffer();
-      composites.push({ input: cardImg, top: y, left: x });
+  const fitLabel = (s, boxW, max = 34, min = 18, k = 0.6) => Math.max(min, Math.min(max, Math.floor(boxW / (((s || ' ').length) * k))));
+  // taie marginile albe/transparente ale imaginii eMAG (500px cu padding intern) -> produsul umple cardul
+  async function prod(src, w, h) {
+    const buf = await loadBuf(src);
+    let base;
+    try { base = sharp(await sharp(buf).trim({ threshold: 12 }).toBuffer()); } catch { base = sharp(buf); }
+    return base.resize(w, h, { fit: 'contain', background: '#fff' }).png().toBuffer();
+  }
+  // produsele eMAG au fundal ALB si sunt deseori albe (saltele/aer conditionat) -> mereu pe CARD ALB ca sa se vada
+  async function card(src, cw, ch, rx = 28) {
+    const pad = Math.round(cw * 0.05);
+    const p = await prod(src, cw - pad * 2, ch - pad * 2);
+    const svg = `<svg width="${cw}" height="${ch}"><rect width="${cw}" height="${ch}" rx="${rx}" fill="#fff" filter="url(#sc)"/><defs><filter id="sc" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#0f2747" flood-opacity="0.18"/></filter></defs></svg>`;
+    return sharp(Buffer.from(svg)).png().composite([{ input: p, top: pad, left: pad }]).toBuffer();
+  }
+
+  // ---- fundal per template ----
+  let bgSvg;
+  if (template === 'stripe' || template === 'split') {
+    bgSvg = `<svg width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#ffffff"/></svg>`;
+  } else {
+    bgSvg = `<svg width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.bg1}"/><stop offset="1" stop-color="${t.bg2}"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`;
+  }
+  const img = sharp(Buffer.from(bgSvg)).png();
+
+  if (template === 'stripe') {
+    // coloane de culoare pe toata inaltimea, in fiecare un card alb cu produsul + eticheta jos pe culoare
+    const cw = Math.floor(W / n);
+    const cardW = cw - 120, cardH = Math.round(cardW * 0.72);
+    const cardY = Math.round((H - 130 - cardH) / 2) + 20;
+    for (let i = 0; i < n; i++) {
+      const it = picks[i], x0 = i * cw;
+      const tint = i % 2 === 0 ? t.d1 : t.d2;
+      const panel = `<svg width="${cw}" height="${H}"><rect width="${cw}" height="${H}" fill="${tint}"/>${i > 0 ? `<rect x="0" y="0" width="4" height="${H}" fill="${t.accent}"/>` : ''}
+        <text x="${cw / 2}" y="${H - 88}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.label, cw - 60, 40)}" font-weight="800" fill="#fff">${esc(it.label || '')}</text>
+        ${it.sub ? `<text x="${cw / 2}" y="${H - 44}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.sub, cw - 60, 30, 16, 0.55)}" font-weight="700" fill="${t.accent}">${esc(it.sub)}</text>` : ''}</svg>`;
+      composites.push({ input: Buffer.from(panel), top: 0, left: x0 });
+      try { composites.push({ input: await card(it.img, cardW, cardH), top: cardY, left: x0 + 60 }); } catch { }
+    }
+  } else if (template === 'split') {
+    // stanga: panou inchis cu titlul mare; dreapta: pana la 2 produse pe carduri
+    const PW = 620;
+    const lines = wrap(caption || '', 13, 5);
+    const lh = 74, startY = Math.round((H - lines.length * lh) / 2) + 20;
+    const panel = `<svg width="${W}" height="${H}"><defs><linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.d1}"/><stop offset="1" stop-color="${t.d2}"/></linearGradient></defs>
+      <rect x="0" y="0" width="${PW}" height="${H}" fill="url(#sp)"/><rect x="${PW - 10}" y="0" width="10" height="${H}" fill="${t.accent}"/>
+      <rect x="72" y="${startY - 88}" width="120" height="12" rx="6" fill="${t.accent}"/>
+      ${lines.map((ln, i) => `<text x="72" y="${startY + i * lh}" font-family="Arial, sans-serif" font-size="54" font-weight="800" fill="#fff">${esc(ln)}</text>`).join('')}
+      <text x="72" y="${H - 56}" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#fff" fill-opacity="0.7">centrocasa.ro</text></svg>`;
+    composites.push({ input: Buffer.from(panel), top: 0, left: 0 });
+    const rW = W - PW, m = Math.min(n, 2), gap2 = 44;
+    const cardW2 = Math.min(430, Math.floor((rW - 120 - (m - 1) * gap2) / m)), cardH2 = Math.round(cardW2 * 1.15);
+    const totalW = m * cardW2 + (m - 1) * gap2;
+    let x = PW + Math.round((rW - totalW) / 2), yv = Math.round((H - cardH2) / 2) - 24;
+    for (let i = 0; i < m; i++) {
+      const it = picks[i];
+      try {
+        composites.push({ input: await card(it.img, cardW2, cardH2), top: yv, left: x });
+        const lab = `<svg width="${cardW2}" height="120"><text x="${cardW2 / 2}" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.label, cardW2, 32)}" font-weight="800" fill="${t.d1}">${esc(it.label || '')}</text>${it.sub ? `<text x="${cardW2 / 2}" y="88" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.sub, cardW2, 26, 15, 0.55)}" font-weight="600" fill="${t.d2}">${esc(it.sub)}</text>` : ''}</svg>`;
+        composites.push({ input: Buffer.from(lab), top: yv + cardH2 + 16, left: x });
+      } catch { }
+      x += cardW2 + gap2;
+    }
+  } else if (template === 'chips') {
+    // carduri albe pe rand (fara bara mare de titlu) + eticheta bold + "chip" rotunjit sub fiecare
+    const capH = caption ? 96 : 0;
+    const slotW = Math.round((W - 160) / n);
+    const cardW = slotW - 30, cardH = Math.round(cardW * 0.9);
+    const cardY = capH + 40;
+    let x = 80;
+    for (let i = 0; i < n; i++) {
+      const it = picks[i];
+      try { composites.push({ input: await card(it.img, cardW, cardH), top: cardY, left: x + 15 }); } catch { }
+      const cy = cardY + cardH + 30, chipW = Math.min(slotW - 30, ((it.sub || '').length) * 15 + 60);
+      const lab = `<svg width="${slotW}" height="170">
+        <text x="${slotW / 2}" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.label, slotW - 20, 34)}" font-weight="800" fill="${t.d1}">${esc(it.label || '')}</text>
+        ${it.sub ? `<rect x="${(slotW - chipW) / 2}" y="70" width="${chipW}" height="54" rx="27" fill="${t.accent}"/><text x="${slotW / 2}" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.sub, chipW - 28, 26, 15, 0.5)}" font-weight="700" fill="#fff">${esc(it.sub)}</text>` : ''}</svg>`;
+      composites.push({ input: Buffer.from(lab), top: cy, left: x });
+      x += slotW;
+    }
+    if (caption) composites.push({ input: Buffer.from(`<svg width="${W}" height="${capH}"><text x="80" y="62" font-family="Arial, sans-serif" font-size="44" font-weight="800" fill="${t.d1}">${esc(caption)}</text><rect x="82" y="80" width="160" height="8" rx="4" fill="${t.accent}"/></svg>`), top: 20, left: 0 });
+  } else if (template === 'gallery') {
+    // plci mari tip catalog: produs dominant pe alb + footer colorat cu eticheta (colturi jos rotunjite)
+    const capH = caption ? 92 : 0;
+    const gap = 32;
+    const cardW = Math.floor((W - 120 - (n - 1) * gap) / n);
+    const cardH = H - capH - 64;
+    const cardY = capH + 30;
+    let x = Math.round((W - (n * cardW + (n - 1) * gap)) / 2);
+    const footerH = Math.min(172, Math.round(cardH * 0.27)), r = 30;
+    for (let i = 0; i < n; i++) {
+      const it = picks[i];
+      const base = `<svg width="${cardW}" height="${cardH}"><rect width="${cardW}" height="${cardH}" rx="${r}" fill="#fff" filter="url(#gf)"/><defs><filter id="gf" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#0f2747" flood-opacity="0.18"/></filter></defs></svg>`;
+      composites.push({ input: Buffer.from(base), top: cardY, left: x });
+      try {
+        const pw = cardW - 52, ph = (cardH - footerH) - 40, p = await prod(it.img, pw, ph);
+        composites.push({ input: p, top: cardY + 24, left: x + Math.round((cardW - pw) / 2) });
+      } catch { }
+      const foot = `<svg width="${cardW}" height="${footerH}"><path d="M0 0 H${cardW} V${footerH - r} Q${cardW} ${footerH} ${cardW - r} ${footerH} H${r} Q0 ${footerH} 0 ${footerH - r} Z" fill="${t.d1}"/>
+        <rect x="${(cardW - 74) / 2}" y="24" width="74" height="6" rx="3" fill="${t.accent}"/>
+        <text x="${cardW / 2}" y="${footerH - 62}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.label, cardW - 48, 32, 17, 0.62)}" font-weight="800" fill="#fff">${esc(it.label || '')}</text>
+        ${it.sub ? `<text x="${cardW / 2}" y="${footerH - 24}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.sub, cardW - 48, 25, 14, 0.56)}" font-weight="700" fill="${t.accent}">${esc(it.sub)}</text>` : ''}</svg>`;
+      composites.push({ input: Buffer.from(foot), top: cardY + cardH - footerH, left: x });
       x += cardW + gap;
-    } catch (e) { /* sar */ }
+    }
+    if (caption) composites.push({ input: Buffer.from(`<svg width="${W}" height="${capH}"><text x="66" y="62" font-family="Arial, sans-serif" font-size="46" font-weight="800" fill="${t.d1}">${esc(caption)}</text><rect x="68" y="80" width="170" height="8" rx="4" fill="${t.accent}"/></svg>`), top: 18, left: 0 });
+  } else if (template === 'spotlight') {
+    // produs(e) mari centrate, cu glow accent in spate; titlu sus, eticheta sub card
+    const capH = caption ? 108 : 0;
+    const glow = `<svg width="${W}" height="${H}"><defs><filter id="gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="62"/></filter></defs><ellipse cx="${W / 2}" cy="${capH + (H - capH) / 2 - 6}" rx="540" ry="360" fill="${t.accent}" fill-opacity="0.2" filter="url(#gl)"/></svg>`;
+    composites.push({ input: Buffer.from(glow), top: 0, left: 0 });
+    const cardH = 560, cardW = n === 1 ? 720 : Math.round(cardH * 0.88), gap = 58;
+    const totalW = n * cardW + (n - 1) * gap;
+    let x = Math.round((W - totalW) / 2);
+    const cy = capH + Math.round((H - capH - cardH) / 2) - 26;
+    for (let i = 0; i < n; i++) {
+      const it = picks[i];
+      try {
+        composites.push({ input: await card(it.img, cardW, cardH, 42), top: cy, left: x });
+        const lab = `<svg width="${cardW}" height="122"><text x="${cardW / 2}" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.label, cardW, 40)}" font-weight="800" fill="${t.d1}">${esc(it.label || '')}</text>${it.sub ? `<text x="${cardW / 2}" y="98" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fitLabel(it.sub, cardW, 30, 16, 0.55)}" font-weight="600" fill="${t.d2}">${esc(it.sub)}</text>` : ''}</svg>`;
+        composites.push({ input: Buffer.from(lab), top: cy + cardH + 14, left: x });
+      } catch { }
+      x += cardW + gap;
+    }
+    if (caption) composites.push({ input: Buffer.from(`<svg width="${W}" height="${capH}"><text x="${W / 2}" y="66" text-anchor="middle" font-family="Arial, sans-serif" font-size="50" font-weight="800" fill="${t.d1}">${esc(caption)}</text><rect x="${W / 2 - 95}" y="86" width="190" height="8" rx="4" fill="${t.accent}"/></svg>`), top: 22, left: 0 });
+  } else {
+    // 'cards' (default) sau 'numbered' — carduri albe in rand + bara-titlu
+    const numbered = template === 'numbered';
+    const capH = caption ? 96 : 0;
+    const top = captionPos === 'top';
+    const areaTop = top ? capH : 0, areaH = H - capH;
+    const cardH = 620, cardW = Math.round(cardH * 0.72), gap = 46;
+    const totalW = n * cardW + (n - 1) * gap;
+    let x = Math.round((W - totalW) / 2);
+    const y = areaTop + Math.round((areaH - cardH) / 2) - 18;
+    const prodW = cardW - 44, prodH = cardH - 118, prodLeft = Math.round((cardW - prodW) / 2);
+    for (let i = 0; i < n; i++) {
+      const it = picks[i];
+      try {
+        const p = await prod(it.img, prodW, prodH);
+        const lf = fitLabel(it.label, cardW - 28, 36), sf = fitLabel(it.sub, cardW - 28, 28, 18, 0.56);
+        const card = `<svg width="${cardW}" height="${cardH}"><rect width="${cardW}" height="${cardH}" rx="36" fill="#fff" filter="url(#s)"/>
+          <defs><filter id="s" x="-25%" y="-25%" width="150%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#0f2747" flood-opacity="0.2"/></filter></defs>
+          ${numbered ? `<circle cx="56" cy="56" r="42" fill="${t.accent}"/><text x="56" y="73" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="800" fill="#fff">${i + 1}</text>` : ''}
+          <rect x="${(cardW - 90) / 2}" y="${cardH - 96}" width="90" height="7" rx="3.5" fill="${t.accent}"/>
+          <text x="${cardW / 2}" y="${cardH - 54}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${lf}" font-weight="800" fill="#101828">${esc(it.label || '')}</text>
+          ${it.sub ? `<text x="${cardW / 2}" y="${cardH - 20}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${sf}" font-weight="600" fill="${t.d2}">${esc(it.sub)}</text>` : ''}</svg>`;
+        const ci = await sharp(Buffer.from(card)).png().composite([{ input: p, top: 30, left: prodLeft }]).toBuffer();
+        composites.push({ input: ci, top: y, left: x });
+      } catch { }
+      x += cardW + gap;
+    }
+    if (caption) {
+      const capY = top ? 0 : H - capH, lineY = top ? capH - 6 : H - capH;
+      composites.push({ input: Buffer.from(`<svg width="${W}" height="${H}"><rect x="0" y="${capY}" width="${W}" height="${capH}" fill="${t.d1}"/><rect x="0" y="${lineY}" width="${W}" height="6" fill="${t.accent}"/><text x="${W / 2}" y="${capY + capH / 2 + 16}" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="700" fill="#fff">${esc(caption)}</text></svg>`), top: 0, left: 0 });
+    }
   }
-  if (caption) {
-    const capY = top ? 0 : H - capH;
-    const lineY = top ? capH - 6 : H - capH;
-    const cap = Buffer.from(
-      `<svg width="${W}" height="${H}"><rect x="0" y="${capY}" width="${W}" height="${capH}" fill="${t.d1}"/>
-       <rect x="0" y="${lineY}" width="${W}" height="6" fill="${t.accent}"/>
-       <text x="${W / 2}" y="${capY + capH / 2 + 16}" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="700" fill="#fff">${esc(caption)}</text></svg>`);
-    composites.push({ input: cap, top: 0, left: 0 });
-  }
+
   const buf = await img.composite(composites).webp({ quality: 90 }).toBuffer();
   if (out) { const { writeFileSync } = await import('node:fs'); writeFileSync(out, buf); }
   return buf;

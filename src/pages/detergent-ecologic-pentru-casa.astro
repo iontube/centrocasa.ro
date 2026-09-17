@@ -1,611 +1,305 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
 import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Detergent ecologic pentru casa",
-  excerpt: "Cautati un detergent ecologic pentru casa care sa curete eficient fara a afecta mediul sau sanatatea familiei? Alegerea unui produs de curatenie ecologic inseamna optarea pentru ingrediente derivate din surse naturale, biodegradabile si fara substante chimice agresive precum fosfatii, clorul sau amoniacul.",
-  image: "/images/articles/detergent-ecologic-pentru-casa.webp",
-  category: "Curatenie si Intretinere",
-  categorySlug: "curatenie-intretinere",
-  date: "2026-03-10T07:57:20.138Z",
-  modifiedDate: "2026-03-10T07:57:20.138Z",
-  author: "Elena Dragomir",
-  authorRole: "Consultant Amenajari",
-  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
-};
-
-const faq = [
-  { question: "Cat costa in medie un detergent ecologic pentru casa?", answer: "Pretul mediu pentru un detergent ecologic de uz general (500ml - 1L) variaza intre 15 si 35 lei. Produsele concentrate sau cele specializate pentru bucatarie/baie pot ajunge la 40-50 lei, insa sunt mai economice pe termen lung datorita concentratiei." },
-  { question: "Sunt detergentii ecologici la fel de eficienti ca cei chimici?", answer: "Majoritatea detergentilor ecologici moderni sunt la fel de eficienti ca cei conventionali pentru curatenia zilnica si murdaria obisnuita. Pentru pete foarte vechi, grasime incrustata sau dezinfectare puternica, unii detergenti chimici pot avea un avantaj, insa produsele ecologice specializate (ex: Almawin pentru bucatarie) pot concura cu succes." },
-  { question: "Merita sa cumpar detergent ecologic concentrat?", answer: "Da, merita daca doresti sa economisesti pe termen lung, sa reduci deseurile (mai putine ambalaje) si sa ai un impact minim asupra mediului. Un produs concentrat (ex: Sonett) dureaza mult mai mult decat unul gata de utilizat, chiar daca pretul initial este mai mare." },
-  { question: "Ce inseamna 'biodegradabil' la un detergent ecologic?", answer: "Biodegradabil inseamna ca ingredientele din detergent se descompun natural in mediu (apa, dioxid de carbon, biomasa) in cel mai scurt timp posibil, fara a lasa reziduuri toxice pe termen lung. Este un indicator cheie al prieteniei fata de mediu." },
-  { question: "Pot folosi detergent ecologic universal pentru toate suprafetele?", answer: "Majoritatea detergentilor universali ecologici sunt siguri pentru majoritatea suprafetelor lavabile (gresie, faianta, lemn lăcuit, plastic). Totusi, este intotdeauna recomandat sa verifici eticheta produsului si, daca ai dubii, sa testezi pe o zona ascunsa, mai ales pe suprafete delicate sau nefinisate." }
-];
-
-const toc = [
-  { title: "Ecover Universal Cleaner - Citrice si Busuioc", id: "ecover-universal-cleaner---citrice-si-busuioc" },
-  { title: "Frosch Detergent Ecologic Universal", id: "frosch-detergent-ecologic-universal" },
-  { title: "Sonett Detergent Universal Concentrat", id: "sonett-detergent-universal-concentrat" },
-  { title: "Green Goddess Detergent Multi-Suprafata cu Lavanda", id: "green-goddess-detergent-multi-suprafata-cu-lavanda" },
-  { title: "Almawin Detergent Bucatarie Ecologic", id: "almawin-detergent-bucatarie-ecologic" },
-  { title: "Method All-Purpose Cleaner - Zmeura", id: "method-all-purpose-cleaner---zmeura" },
-  { title: "Comparatie", id: "comparatie" },
-  { title: "Cum alegi cel mai bun detergent ecologic pentru casa ta?", id: "ghid" },
-  { title: "Intrebari Frecvente", id: "faq" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['detergent-eco'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Universale si multisuprafete ---
+  { g: 'univ', id: 'DLJPBMBBM', badge: 'Cel mai bine notat', short: 'Frosch anticalcar', tip: 'Universal', pentru: 'Suprafete, anticalcar', form: '1 L',
+    specs: ['detergent ecologic anticalcar, cu otet', 'Frosch, brand german eco cunoscut', 'dizolva calcarul si da luciu', '41 pareri, nota 4.88, cea mai mare din selectie'],
+    pros: ['Cea mai mare nota din selectie, 4.88, cu multe pareri', 'Pe baza de otet, dizolva calcarul natural', 'De la Frosch, brand german eco de incredere', 'Cel mai accesibil pret din selectie'],
+    cons: ['Pentru suprafete, nu pentru rufe', 'Mirosul de otet nu place tuturor'],
+    verdict: 'Cu 41 de pareri si nota 4.88, cea mai mare din selectie, detergentul anticalcar Frosch cu otet e cel mai apreciat produs de aici, si o alegere de start excelenta pentru curatenie ecologica. Foloseste puterea otetului ca sa dizolve calcarul de pe robinete, gresie, faianta si obiecte sanitare, si sa lase luciu, fara clor sau substante agresive, iar Frosch e un brand german cu reputatie solida in produsele eco. E si cel mai ieftin din selectie. E gandit pentru suprafete, nu pentru rufe, iar mirosul de otet, chiar daca dispare la uscare, nu place tuturor. Il iei cand vrei cel mai bine notat detergent ecologic din selectie, ieftin si eficient pe calcar, de la un brand eco de incredere, pentru curatenia din baie si bucatarie.' },
+  { g: 'univ', id: 'DCDJFPMBM', badge: 'Canistra economica 5 L', short: 'Frosch PH neutru 5 L', tip: 'Universal', pentru: 'Curatenie generala', form: '5 L',
+    specs: ['detergent ecologic universal, PH neutru', 'canistra mare, de 5 L, economica', 'bland cu suprafetele si cu mainile', '23 pareri, nota 4.87'],
+    pros: ['Canistra mare de 5 L, cel mai bun pret pe litru', 'PH neutru, bland cu suprafetele si mainile', 'De la Frosch, tot un produs eco de incredere', 'Nota mare, 4.87'],
+    cons: ['Canistra mare ocupa loc', 'Ai nevoie si de un flacon pentru dozat'],
+    verdict: 'Pentru cine face curatenie des si vrea sa nu ramana fara, canistra Frosch de 5 litri cu PH neutru e varianta economica: acelasi brand eco de incredere, dar la un pret pe litru mult mai bun decat flacoanele mici. E un detergent universal cu PH neutru, deci bland cu suprafetele si cu mainile, bun de folosit pe podele, mobila si suprafete generale, diluat in apa. Cu 23 de pareri si nota 4.87, e la fel de apreciat ca fratele sau anticalcar. Canistra mare ocupa loc si ai nevoie de un flacon separat pentru dozat comod. O iei cand faci curatenie regulat si vrei un detergent ecologic universal, bland, la cel mai bun pret pe litru, cu care aprovizionezi casa pentru mult timp.' },
+  { g: 'univ', id: 'DGSCKM2BM', badge: 'Bio-enzimatic', short: 'Bio-Enzimatic multisuprafete', tip: 'Universal', pentru: 'Multisuprafete', form: '1 L',
+    specs: ['detergent bio-enzimatic multisuprafete', 'enzimele descompun murdaria si petele', 'parfum Herbal Fresh, natural', '15 pareri, nota 4.73'],
+    pros: ['Bio-enzimatic: enzimele descompun murdaria natural', 'Multisuprafete, il folosesti aproape peste tot', 'Parfum herbal placut, din surse naturale', 'Nota buna, 4.73'],
+    cons: ['Enzimele lucreaza mai bine cu putin timp de actiune', 'Mai putine pareri decat produsele Frosch'],
+    verdict: 'O abordare mai moderna a curateniei o gasesti la detergentul bio-enzimatic multisuprafete, care mizeaza pe enzime in loc de substante chimice dure. Enzimele sunt molecule naturale care descompun murdaria, grasimile si petele la nivel biologic, curatand eficient dar bland, si il folosesti aproape peste tot in casa, cu un parfum herbal placut, din surse naturale. Cu 15 pareri si nota 4.73, e bine primit de cei care l-au incercat. Enzimele dau ce e mai bun daca le lasi cateva momente sa actioneze, nu freci imediat, iar produsul are mai putine recenzii decat clasicele Frosch. Il iei cand vrei un detergent ecologic modern, bio-enzimatic, pentru toate suprafetele, care curata natural si miroase placut.' },
+  // --- Pentru rufe ---
+  { g: 'rufe', id: 'DMG4M0BBM', badge: 'Pentru rufe colorate', short: 'Rufe colorate menta-lamaie', tip: 'Rufe', pentru: 'Rufe colorate', form: '1.5 L',
+    specs: ['detergent ecologic lichid pentru rufe colorate', 'parfum de menta si lamaie', 'bland cu fibrele si cu pielea', '9 pareri, nota 4.11'],
+    pros: ['Formulat pentru rufe colorate, pastreaza culorile', 'Parfum natural de menta si lamaie', 'Ecologic, biodegradabil, bland cu pielea', 'Format lichid, se dozeaza usor'],
+    cons: ['Nota mai modesta, 4.11', 'Doar pentru colorate, nu si albe puternic patate'],
+    verdict: 'Cand vrei sa speli rufele colorate fara substantele dure ale detergentilor obisnuiti, varianta ecologica cu menta si lamaie e o alegere blanda. E un detergent lichid formulat special pentru colorate, care spala eficient dar menajeaza fibrele si pastreaza culorile mai mult, cu un parfum natural, proaspat, si o formula biodegradabila, blanda si cu pielea sensibila. Nota, 4.11 din 9 pareri, e ceva mai modesta decat a altor produse, semn ca pentru pete grele poate cere o mana de ajutor. E pentru colorate, nu pentru albe foarte patate. Il iei cand vrei un detergent ecologic pentru rufele colorate, bland cu fibrele si cu pielea, cu un parfum natural placut.' },
+  { g: 'rufe', id: 'DYNSK5BBM', badge: 'Canistra 5 L, albe si colorate', short: 'Biolu BIO rufe', tip: 'Rufe', pentru: 'Albe si colorate', form: '5 L',
+    specs: ['Biolu, detergent BIO lichid pentru rufe', 'pentru albe si colorate, parfum lamaie', 'canistra mare de 5 L, economica', 'nota 5 din 5'],
+    pros: ['Pentru albe si colorate deopotriva', 'Canistra mare de 5 L, economica pentru o familie', 'Biolu, brand romanesc eco cunoscut', 'Nota maxima, 5 din 5'],
+    cons: ['Doar 3 pareri deocamdata', 'Canistra mare ocupa loc'],
+    verdict: 'Pentru o familie care spala des si vrea un singur detergent eco pentru tot cosul de rufe, Biolu in canistra de 5 litri rezolva economic problema. E un detergent BIO lichid bun pentru albe si colorate deopotriva, cu parfum de lamaie, de la Biolu, un brand romanesc cunoscut in zona produselor ecologice de curatenie, iar formatul mare il face avantajos pentru consum regulat. A luat nota maxima, 5 din 5, chiar daca din doar 3 pareri deocamdata, prea putine pentru o concluzie ferma. Canistra mare ocupa loc si o dozezi cu paharul. Il iei cand vrei un detergent de rufe ecologic romanesc, pentru albe si colorate, in format economic de 5 litri, potrivit unei familii care spala mult.' },
+  { g: 'rufe', id: 'D3FMHK3BM', badge: 'Foi, fara plastic', short: 'Natulim Foi', tip: 'Rufe', pentru: 'Rufe, zero plastic', form: '40 spalari',
+    specs: ['detergent ecologic sub forma de foi', '40 de spalari, o foaie per spalare', 'zero plastic, ambalaj mic de carton', 'parfum floral, nota 5 din 5'],
+    pros: ['Foi care se dizolva, fara plastic si fara turnat', 'Ultra compact: 40 de spalari intr-un plic mic', 'Fara risc de scurgeri sau supradozare', 'Nota maxima, 5 din 5'],
+    cons: ['Doar 4 pareri deocamdata', 'Pretul pe spalare, ceva mai ridicat'],
+    verdict: 'Cea mai inovatoare idee din selectie vine de la Natulim: detergent nu lichid, nu praf, ci sub forma de foi care se dizolva in apa. Pui o foaie in masina pentru fiecare spalare, fara sa torni, fara sa dozezi si fara riscul de a varsa, iar cele 40 de spalari incap intr-un plic mic de carton, zero plastic, care ocupa cat o carte. E solutia cea mai curata si mai ecologica ca ambalaj, fara bidoane de aruncat, cu un parfum floral placut. A luat nota maxima, 5 din 5, din doar 4 pareri deocamdata, iar pretul pe spalare e ceva mai ridicat. Il iei cand vrei sa elimini complet plasticul din spalatul rufelor si preferi comoditatea unei foi gata dozate, curata si compacta.' },
+  // --- Speciale ---
+  { g: 'spec', id: 'D4HNT3MBM', badge: 'Pentru lana si matase', short: 'Lana si matase', tip: 'Delicate', pentru: 'Lana, matase', form: '1 L',
+    specs: ['detergent ecologic pentru lana si matase', 'formula neutra, foarte blanda', 'protejeaza fibrele delicate', '16 pareri, nota 4.75'],
+    pros: ['Formulat special pentru lana si matase delicate', 'Neutru, foarte bland, nu deterioreaza fibrele', 'Ecologic, biodegradabil', '16 pareri, nota buna 4.75'],
+    cons: ['Nisa, doar pentru textile delicate', 'Nu inlocuieste un detergent obisnuit'],
+    verdict: 'Lana si matasea nu suporta detergentii obisnuiti, care le infoiaza, le scamoseaza si le strica, iar aici intervine detergentul ecologic neutru special pentru ele. Are o formula foarte blanda, cu PH neutru, care curata delicat fara sa agreseze fibrele fine, pastrand puloverele de lana si bluzele de matase moi si intacte spalare dupa spalare, si e biodegradabil. Cu 16 pareri si nota 4.75, e cel mai testat produs de nisa din selectie. Fiind specializat, nu inlocuieste un detergent obisnuit, ci il completezi cu el pentru textilele delicate. Il iei cand ai haine de lana sau matase la care tii si vrei un detergent ecologic bland, facut anume sa le protejeze, nu sa le strice.' },
+  { g: 'spec', id: 'D7JWDL3BM', badge: 'Pentru parchet', short: 'Bona parchet', tip: 'Pardoseli', pentru: 'Parchet lacuit', form: '4 L',
+    specs: ['Bona, detergent pentru parchet lacuit', 'rezerva economica de 4 L, pe baza bio', 'curata fara sa lase urme sau pelicula', '9 pareri, nota 4.89'],
+    pros: ['De la Bona, referinta in intretinerea parchetului', 'Formula pe baza bio, mai prietenoasa cu mediul', 'Curata parchetul lacuit fara urme si fara pelicula', 'Rezerva mare de 4 L, nota mare 4.89'],
+    cons: ['Doar pentru parchet lacuit, nu uleiat', 'Produs de nisa'],
+    verdict: 'Parchetul cere un detergent anume, iar Bona e numele de referinta in intretinerea pardoselilor de lemn, aici intr-o varianta pe baza bio, mai prietenoasa cu mediul. E gandit pentru parchetul lacuit: curata praful si murdaria fara sa lase urme, dare sau pelicula lipicioasa, si fara sa deterioreze lacul, pastrand lemnul curat si cu aspectul lui natural. Rezerva economica de 4 litri ajunge mult, iar nota, 4.89 din 9 pareri, il aseaza sus. E strict pentru parchet lacuit, nu pentru cel uleiat sau pentru alte pardoseli. Il iei cand ai parchet lacuit si vrei sa il intretii corect, cu un detergent Bona de incredere, intr-o formula pe baza bio.' },
+  { g: 'spec', id: 'DW9XFKYBM', badge: 'Pentru scos pete', short: 'Biolu scos pete', tip: 'Detapator', pentru: 'Pete', form: 'spray 1 L',
+    specs: ['spray BIO pentru scos pete, Biolu', 'se aplica direct pe pata inainte de spalare', 'formula ecologica, biodegradabila', 'nota 5 din 5'],
+    pros: ['Ataca petele grele inainte de spalare', 'Spray comod, se aplica direct pe pata', 'Formula BIO, biodegradabila, de la Biolu', 'Nota maxima, 5 din 5'],
+    cons: ['Doar o parere deocamdata', 'Detapator, il folosesti alaturi de detergent'],
+    verdict: 'Petele grele, de iarba, grasime sau vin, cer un tratament punctual inainte de spalare, iar sprayul BIO Biolu pentru scos pete face exact asta, ecologic. Il pulverizezi direct pe pata, o lasi sa actioneze cateva momente, apoi speli normal, iar formula ataca petele fara clor sau substante dure, ramanand biodegradabila. E complementul care rezolva ce un detergent bland pentru colorate nu scoate din prima. A luat nota maxima, 5 din 5, dar deocamdata dintr-o singura parere, prea putin ca sa spui sigur. E un detapator, il folosesti alaturi de detergentul obisnuit, nu in locul lui. Il iei cand vrei o solutie ecologica pentru petele grele, un spray de pretratare care sa completeze detergentul de rufe.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const UNIV = PICKS.filter(x => x.g === 'univ');
+const RUFE = PICKS.filter(x => x.g === 'rufe');
+const SPEC = PICKS.filter(x => x.g === 'spec');
+
+const hero = '/images/articles/detergent-ecologic-pentru-casa.webp';
+const figUniv = '/imagini/articole/detergent-universale.webp';
+const figRufe = '/imagini/articole/detergent-rufe.webp';
+const figSpec = '/imagini/articole/detergent-speciale.webp';
+const published = '2026-07-19T19:26:33+03:00';
+
+const faq = [
+  { question: 'Ce inseamna un detergent cu adevarat ecologic?', answer: 'Un detergent ecologic real e formulat sa curete eficient dar cu un impact cat mai mic asupra sanatatii si a mediului. In practica, asta inseamna cateva lucruri: ingrediente biodegradabile, care se descompun in natura fara sa polueze apele, absenta fosfatilor si a clorului, care fac rau ecosistemelor acvatice, si parfumuri si coloranti din surse naturale sau lipsa lor, mai blande cu pielea sensibila si cu caile respiratorii. Multe produse eco folosesc ingrediente simple si cunoscute, ca otetul, sau enzime naturale in loc de substante chimice dure. Atentie insa la termenii de marketing: cauta certificari eco reale si o lista de ingrediente transparenta, nu doar cuvinte ca bio sau verde pe eticheta. Un detergent bun eco iti curata casa la fel de bine, dar fara reziduurile chimice agresive ale celor conventionali.' },
+  { question: 'Curata la fel de bine ca detergentii obisnuiti?', answer: 'Pentru curatenia de zi cu zi, da: detergentii ecologici moderni, mai ales cei bine notati, curata suprafetele, vasele si rufele obisnuite la fel de eficient ca cei conventionali, mai ales cand sunt bine formulati, cu enzime sau cu ingrediente active naturale ca otetul. Diferenta apare uneori la petele foarte grele sau la murdaria intarita, unde un detergent chimic dur poate parea mai rapid; acolo, solutia ecologica cere putin mai mult timp de actiune, sa o lasi cateva momente sa lucreze, sau un produs punctual, ca un spray de scos pete inainte de spalare. Pentru marea majoritate a nevoilor casnice, un detergent eco de calitate isi face treaba fara compromisuri, cu avantajul ca nu lasa reziduuri chimice agresive pe suprafete, pe vase si pe haine.' },
+  { question: 'Ce e un detergent bio-enzimatic?', answer: 'Un detergent bio-enzimatic foloseste enzime, molecule naturale, ca sa descompuna murdaria. Enzimele sunt aceleasi tipuri de substante pe care organismele vii le folosesc ca sa desfaca grasimile, proteinele si amidonul; intr-un detergent, ele ataca petele si murdaria la nivel biologic, taind-o in bucati mici pe care apa le indeparteaza usor. Avantajul e ca acest proces e eficient dar bland, fara substantele chimice dure ale detergentilor clasici, si prietenos cu mediul, pentru ca enzimele sunt biodegradabile. Ele lucreaza cel mai bine cand le lasi putin timp sa actioneze, deci pentru pete pulverizezi si astepti un moment inainte sa freci sau sa speli. Detergentii bio-enzimatici, ca cel multisuprafete din selectie, sunt printre cele mai moderne solutii ecologice de curatenie.' },
+  { question: 'Sunt detergentii ecologici mai blanzi pentru piele si pentru copii?', answer: 'In general, da, si e unul dintre marile lor avantaje. Pentru ca evita substantele chimice agresive, parfumurile sintetice puternice si colorantii artificiali, detergentii ecologici sunt de obicei mai blanzi cu pielea si mai putin susceptibili sa provoace iritatii sau alergii, un plus important pentru pielea sensibila, pentru copii mici si pentru cei cu alergii sau probleme respiratorii. Multi sunt formulati special hipoalergenic. Asta ii face potriviti pentru rufele bebelusilor, pentru lenjerie si pentru orice intra in contact apropiat cu pielea. Totusi, sensibilitatile sunt individuale, deci daca ai piele foarte reactiva sau un copil cu alergii cunoscute, verifica lista de ingrediente si, la nevoie, alege produse cu mentiunea hipoalergenic si fara parfum. In ansamblu, trecerea la eco reduce expunerea familiei la substante chimice de care te poti lipsi.' },
+  { question: 'De ce sunt bune formatele concentrate si canistrele mari?', answer: 'Din doua motive: bani si mediu. Un detergent concentrat sau o canistra mare, ca cele de 5 litri Frosch si Biolu din selectie, costa mult mai putin pe litru sau pe spalare decat flacoanele mici, deci economisesti daca faci curatenie sau speli des. In plus, formatele mari si concentratele inseamna mai putin ambalaj de plastic pe unitatea de produs si mai putine transporturi, deci un impact mai mic asupra mediului, in spiritul unei alegeri ecologice. Ideea de a reduce plasticul merge si mai departe la produsele sub forma de foi, ca Natulim, care elimina complet bidonul. Sfatul practic: cumpara concentrat sau canistra mare pentru produsele pe care le folosesti cel mai des, si pastreaza un flacon mic reutilizabil pentru dozat comod.' },
+  { question: 'Am nevoie de un detergent diferit pentru fiecare lucru?', answer: 'Nu neaparat, dar cateva produse specializate merita. Baza o poti face cu un detergent universal multisuprafete, ca cel bio-enzimatic sau cel Frosch cu PH neutru, cu care cureti majoritatea suprafetelor din casa, si un detergent de rufe pentru albe si colorate. Peste aceasta baza, merita cateva produse dedicate acolo unde chiar conteaza: unul anticalcar pentru baie si robinete, unul special pentru lana si matase, ca sa nu strici textilele delicate, unul pentru parchet daca ai pardoseli de lemn, care cer o formula anume, si un spray de scos pete pentru murdaria grea. Nu ai nevoie de zeci de flacoane; un mic set bine ales, doua-trei universale plus cateva specializate pentru nevoile tale reale, acopera toata casa fara sa incarci dulapul.' },
+  { question: 'Cat costa sa treci la detergenti ecologici?', answer: 'Mai putin decat te-ai astepta, mai ales daca alegi inteligent. In selectie, un detergent universal anticalcar bun porneste de la circa 16 lei flaconul, iar produsele multisuprafete si cele pentru rufe stau in general intre 30 si 70 de lei. Formatele economice, ca detergentii de rufe si universali in canistra de 5 litri, sunt in jur de 80-160 de lei dar tin foarte mult, deci pe spalare sau pe litru ies ieftin. Produsele specializate, pentru lana si matase, parchet sau scos pete, costa intre circa 50 si 125 de lei, dar le cumperi mai rar. Pe ansamblu, un set eco de baza pentru toata casa costa comparabil cu detergentii obisnuiti, mai ales cand mizezi pe formate mari si concentrate, iar diferenta o simti in aer mai curat, piele mai putin iritata si un impact mai mic asupra mediului.' },
+];
+
+const images = [hero, figUniv, figRufe, figSpec, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Detergent ecologic pentru casa - CentroCasa"
-  description="Cautati un detergent ecologic pentru casa care sa curete eficient fara a afecta mediul sau sanatatea familiei? Alegerea unui produs de curatenie ecologic inseamna optarea pentru ingrediente derivate din surse naturale, biodegradabile si fara substante chimice agresive precum fosfatii, clorul sau amoniacul."
-  image="/images/articles/detergent-ecologic-pentru-casa.webp"
+  title="Cel mai bun detergent ecologic pentru casa in 2026: universale, pentru rufe si speciale"
+  description="Care e cel mai bun detergent ecologic pentru casa in 2026: solutii universale si multisuprafete de la Frosch si bio-enzimatice, detergenti eco pentru rufe de la Biolu si Natulim, si produse speciale pentru lana, parchet si scos pete. Comparate pe folosire, format si nota, plus ce inseamna cu adevarat ecologic si cum alegi."
+  image={hero}
   type="article"
-  publishedTime="2026-03-10T07:57:20.138Z"
-  modifiedTime="2026-03-10T07:57:20.138Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Elena Dragomir"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cel mai bun detergent ecologic pentru casa' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      Curatenie si Intretinere
-      <span class="breadcrumb-separator">/</span>
-      <span>Detergent ecologic pentru casa</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
+      <span>Cel mai bun detergent ecologic pentru casa</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        Curatenie si Intretinere
-        <span class="article-date">10 martie 2026</span>
-      </div>
-      <h1 class="article-title">Detergent ecologic pentru casa</h1>
-    </header>
+    <h1>Cel mai bun detergent ecologic pentru casa</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/detergent-ecologic-pentru-casa.webp" alt="Detergent ecologic pentru casa" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cel mai bun detergent ecologic pentru casa: universale, pentru rufe si speciale" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list" id="toc-desktop-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
-        ))}
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      <section id="intro">
-        <p>Cautati un <strong>detergent ecologic pentru casa</strong> care sa curete eficient fara a afecta mediul sau sanatatea familiei? Alegerea unui produs de curatenie ecologic inseamna optarea pentru ingrediente derivate din surse naturale, biodegradabile si fara substante chimice agresive precum fosfatii, clorul sau amoniacul. Aceste produse sunt ideale pentru persoanele cu alergii, familiile cu copii mici sau oricine doreste sa reduca amprenta ecologica a gospodariiei. Un <strong>detergent ecologic pentru casa</strong> nu face compromisuri la capitolul performanta, multe formule moderne fiind la fel de eficiente ca cele conventionale, dar cu un impact mult mai mic asupra planetei.</p><p>Ce inseamna, practic, un detergent ecologic pentru casa? Inseamna ingrediente precum uleiuri esentiale, otet, bicarbonat de sodiu, acid citric si agenti de curatare derivati din plante. Aceste componente actioneaza delicat asupra suprafetelor, dar indeparteaza eficient murdaria, grasimea si bacteriile. Mai mult, ambalajele produselor ecologice sunt adesea confectionate din materiale reciclate sau sunt complet reciclabile, completand astfel filosofia sustenabila.</p><p>In acest articol, vom analiza cele mai bune optiuni de <strong>detergent ecologic pentru casa</strong> disponibile pe piata in 2026, comparand performanta, pretul si beneficiile specifice. Vom acoperi o gama variata de produse, de la solutii universale la cele dedicate anumitor suprafete, pentru a va ajuta sa faceti cea mai informata alegere pentru curatenia locuintei dumneavoastra.</p>
-      </section>
-
-
-          <article class="product-review" id="ecover-universal-cleaner---citrice-si-busuioc">
-            <div class="product-review__header">
-              <span class="section-tag">Alegerea Noastra</span>
-              <h3>Ecover Universal Cleaner - Citrice si Busuioc</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Solutie universala de curatenie
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>Actiune de curatare puternica, bazata pe ingrediente vegetale
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Toate suprafetele lavabile din casa (gresie, faianta, lemn lăcuit, plastic, etc.)
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Degresare, indepartare praf si murdarie, parfum natural
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic 100% reciclat, recipient reciclabil
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Ecover Universal Cleaner in varianta Citrice si Busuioc este un produs care isi merita pe deplin statutul de alegere principala pentru un <strong>detergent ecologic pentru casa</strong>. Formula sa pe baza de plante si minerale actioneaza eficient asupra murdariei zilnice, fara a lasa reziduuri toxice. Am testat acest produs pe o varietate de suprafete, de la blatul de bucatarie la gresia din baie si chiar pe parchetul laminat, si rezultatele au fost constant satisfacatoare. Curata bine grasimea de pe aragaz si lasa suprafetele stralucitoare, iar parfumul proaspat si natural de citrice si busuioc este mult mai placut decat mirosul chimic al detergentilor obisnuiti.</p><p>Unul dintre avantajele majore ale Ecover Universal Cleaner este versatilitatea sa. Poate fi diluat in apa pentru curatarea generala a podelelor sau folosit nediluat pentru petele mai dificile. Acest lucru il face o solutie economica pe termen lung, deoarece un singur produs poate inlocui mai multe solutii specifice. De asemenea, fiind un produs ecologic, este o optiune sigura pentru familiile cu copii sau animale de companie, eliminand grija expunerii la substante nocive.</p><p>Comparativ cu alte solutii ecologice universale, Ecover se distinge prin puterea sa de curatare, care nu este intotdeauna un punct forte al produselor bio. In timp ce unele alternative pot necesita frecare suplimentara, Ecover actioneaza rapid. Pretul sau, in jur de 25-30 lei pentru 1 litru, este competitiv, avand in vedere concentratia si calitatea ingredientelor. Ambalajul, fabricat din plastic 100% reciclat, subliniaza angajamentul brandului fata de sustenabilitate.</p><p>Pentru cine este potrivit acest produs? Este ideal pentru persoanele care cauta un detergent eficient, sigur si versatil, care sa poata fi folosit in toata casa. Daca prioritizati un parfum natural si o formula prietenoasa cu mediul, Ecover Universal Cleaner este o alegere excelenta. De asemenea, daca ati vizualizat articole despre <a href="/cum-sa-cureti-eficient-casa/">cum sa cureti eficient casa</a>, acest produs se aliniază perfect cu principiile unei curatenii responsabile.</p><p>Recomandarea noastra este sa utilizati Ecover Universal Cleaner pentru curatenia zilnica si saptamanala. Diluati 1-2 capace in 5 litri de apa pentru podele si suprafete mari, sau pulverizati direct pe o carpa umeda pentru pete locale. Daca doriti un produs care combina eficienta cu respectul fata de mediu, Ecover Citrice si Busuioc este solutia potrivita.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Formula pe baza de plante si minerale</li>
-              <li>Actiune de curatare eficienta, inclusiv pe grasime</li>
-              <li>Parfum natural si placut</li>
-              <li>Versatil, potrivit pentru toate suprafetele lavabile</li>
-              <li>Ambalaj din plastic 100% reciclat</li>
-              <li>Sigur pentru copii si animale de companie</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Poate fi mai scump decat detergentii conventionali</li>
-              <li>Disponibilitatea poate varia in functie de magazin</li>
-              <li>Pentru petele foarte vechi, poate necesita aplicare repetata</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="frosch-detergent-ecologic-universal">
-            <div class="product-review__header">
-              <span class="section-tag">Raport Calitate-Pret</span>
-              <h3>Frosch Detergent Ecologic Universal</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Solutie universala de curatenie
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>Putere de curatare echilibrata
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Toate suprafetele netede si rezistente la apa
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Degresare usoara, indepartare praf, parfum discret
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Flacon din PET reciclat
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Frosch este un nume recunoscut pe piata produselor de curatenie ecologice, iar detergentul sau universal se ridica la nivelul asteptarilor, oferind un raport calitate-pret excelent. Acest produs este o optiune buna pentru cei care doresc un <strong>detergent ecologic pentru casa</strong> accesibil, fara a sacrifica prea mult din performanta de curatare. Formula sa, bazata pe ingrediente de origine vegetala, este blanda cu suprafetele si sigura pentru utilizare in prezenta copiilor si animalelor. Curata eficient murdaria obisnuita si lasa suprafetele curate si stralucitoare.</p><p>Ce avantaje aduce Frosch in curatenia casei? In primul rand, pretul. La aproximativ 15-20 lei pentru 1 litru, este una dintre cele mai accesibile optiuni ecologice. In al doilea rand, este foarte usor de gasit in majoritatea supermarketurilor si magazinelor cu produse naturiste. Parfumul este discret, ceea ce este un plus pentru persoanele sensibile la mirosuri puternice.</p><p>Cum se compara cu alte produse? Fata de Ecover, Frosch poate fi usor mai putin eficient pe petele de grasime foarte persistente, necesitand uneori o actiune mai energica. Totusi, pentru curatenia de zi cu zi, este mai mult decat suficient. Utilizarea sa este simpla: fie diluat in apa pentru podele, fie pulverizat direct pe o carpa pentru suprafete. Nu lasa urme vizibile daca este clatit corespunzator sau daca suprafata este stearsa uscat.</p><p>Pentru cine este recomandat Frosch Universal? Este perfect pentru familiile cu un buget limitat care nu vor sa renunte la produsele ecologice. Daca aveti nevoie de un detergent de zi cu zi, sigur si la un pret bun, acesta este o optiune solida. Este o alegere buna si pentru cei care cauta un produs cu un miros neutru sau foarte subtil.</p><p>Recomandarea finala pentru Frosch Universal este sa il folositi pentru curatenia generala a casei. Este excelent pentru stersul zilnic al meselor, blaturilor de bucatarie, meselor sau chiar pentru a improspata aerul prin diluarea in apa. Pentru un <strong>detergent ecologic pentru casa</strong> accesibil, Frosch este o alegere inteligenta.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Pret foarte accesibil</li>
-              <li>Disponibilitate largă</li>
-              <li>Formula blanda, pe baza de plante</li>
-              <li>Sigur pentru utilizare zilnica</li>
-              <li>Parfum discret</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Mai putin eficient pe petele foarte incrustate</li>
-              <li>Necesita stergere pentru a evita urmele fine</li>
-              <li>Ambalajul, desi reciclat, nu este intotdeauna cel mai robust</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="sonett-detergent-universal-concentrat">
-            <div class="product-review__header">
-              <span class="section-tag">Premium</span>
-              <h3>Sonett Detergent Universal Concentrat</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Detergent universal concentrat
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>Putere de curatare ridicata, datorita concentratiei si ingredientelor naturale active
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Toate tipurile de suprafete rezistente la apa (inclusiv cele delicate, diluat)
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Degresare, curatare in profunzime, antistatic, parfum din uleiuri esentiale organice
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Sticla din sticla, dop din plastic reciclat
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Sonett Universal Detergent Concentrat se adreseaza celor care cauta performanta maxima intr-un produs ecologic. Fiind un produs concentrat, o cantitate mica este suficienta pentru a obtine rezultate excelente, ceea ce il face foarte economic pe termen lung, in ciuda pretului initial mai ridicat. Formula sa, certificata ecologic de catre ECOCERT, contine agenti de curatare derivati din zaharuri si surse vegetale, impreuna cu uleiuri esentiale organice care confera un parfum subtil si revigorant. Curata eficient si fara efort grasimea, murdaria si calcarul de pe diverse suprafete.</p><p>Ce face Sonett sa iasa in evidenta? Concentratia sa. Un flacon de 500ml poate dura cateva luni bune, in functie de frecventa utilizarii. Acest lucru reduce volumul de deseuri generate si costul per utilizare. De asemenea, ingredientii sunt 100% biodegradabili, iar ambalajul din sticla este o alternativa ecologica la plastic. Este o optiune excelenta daca doriti un <strong>detergent ecologic pentru casa</strong> care sa imbine sustenabilitatea cu puterea de curatare.</p><p>Comparativ cu alte produse, Sonett ofera o performanta de curatare superioara, fiind comparabil cu detergentii non-ecologici in ceea ce priveste indepartarea petelor dificile. De exemplu, am observat ca indeparteaza urmele de pasta de dinti de pe oglinda din baie mult mai usor decat alte solutii testate. Pretul sau, in jur de 35-45 lei pentru 500ml, se justifica prin concentratie si calitatea ingredientelor.</p><p>Pentru cine este Sonett Universal Concentrat? Este ideal pentru gospodariile care cauta solutii premium, durabile si extrem de eficiente. Daca sunteti dispusi sa investiti mai mult intr-un produs care dureaza mai mult si ofera rezultate impecabile, Sonett este alegerea potrivita. De asemenea, este o optiune grozava daca doriti sa minimizati numarul de produse chimice din casa si sa optati pentru un singur detergent concentrat pentru majoritatea sarcinilor de curatenie.</p><p>Recomandarea noastra este sa experimentati cu dilutia. Pentru curatenie generala, 1-2 lingurite la 5 litri de apa sunt suficiente. Pentru pete mai dificile, aplicati nediluat pe o carpa sau direct pe pata, lasati sa actioneze cateva minute, apoi stergeti. Sonett Universal Concentrat este un <strong>detergent ecologic pentru casa</strong> care nu dezamageste.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Produs foarte concentrat, economic pe termen lung</li>
-              <li>Performanta de curatare ridicata, inclusiv pe pete dificile</li>
-              <li>Ingrediente 100% biodegradabile si certificate ecologic</li>
-              <li>Ambalaj din sticla, prietenos cu mediul</li>
-              <li>Parfum natural din uleiuri esentiale organice</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Pret initial mai ridicat</li>
-              <li>Disponibilitate mai limitata in magazinele fizice</li>
-              <li>Necesita atentie la dozare pentru a nu folosi excesiv</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="green-goddess-detergent-multi-suprafata-cu-lavanda">
-            <div class="product-review__header">
-              <span class="section-tag">Pentru Buget Mic</span>
-              <h3>Green Goddess Detergent Multi-Suprafata cu Lavanda</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Solutie de curatenie multi-suprafata
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>Actiune de curatare blanda, dar eficienta
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Toate suprafetele lavabile (bucatarie, baie, mobilier, podele)
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Curata, degreseaza usor, improspateaza, lasa un parfum relaxant de lavanda
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic reciclat
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Green Goddess Multi-Surface Cleaner cu Lavanda este o optiune excelenta pentru cei care cauta un <strong>detergent ecologic pentru casa</strong> la un pret accesibil, fara a compromite calitatea. Acest produs se concentreaza pe ingrediente blande, de origine vegetala, care curata eficient murdaria zilnica si lasa in urma un parfum linistitor de lavanda. Este ideal pentru utilizarea zilnica in bucatarie si baie, precum si pentru stergerea mobilierului si a podelelor.</p><p>Ce face acest detergent special pentru un buget redus? Pretul sau, care se situeaza in jur de 12-18 lei pentru 750ml, il face extrem de atractiv. In plus, formula sa este suficient de blanda pentru a fi folosita pe o varietate mare de suprafete, eliminand necesitatea achizitionarii mai multor produse specifice. Acest lucru contribuie la economii suplimentare.</p><p>Comparativ cu alte alternative, Green Goddess ofera o performanta decenta pentru pretul sau. Nu va asteptati la aceeasi putere de curatare ca a unui produs concentrat premium pe petele de grasime intarita sau calcar vechi, dar pentru intretinerea curenta, este mai mult decat capabil. Parfumul de lavanda este un bonus, aducand o nota de prospetime naturala in casa. Ambalajul este realizat din plastic reciclat, o alta nota pozitiva pentru mediu.</p><p>Pentru cine este potrivit Green Goddess? Este perfect pentru studenti, familii tinere sau oricine cauta o solutie de curatenie ecologica, eficienta pentru uz general si cu un cost redus. Daca aveti nevoie de un produs simplu, care sa isi faca treaba bine, sa miroasa placut si sa nu va goleasca buzunarele, acesta este o alegere buna.</p><p>Recomandarea noastra este sa folositi Green Goddess pentru curatenia zilnica a suprafetelor din bucatarie, baie, mese si podele. Pulverizati pe suprafata dorita si stergeti cu o carpa curata. Daca doriti un produs de curatenie <strong>detergent ecologic pentru casa</strong> accesibil si eficient, Green Goddess este o optiune pe care o puteti considera.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Pret foarte mic</li>
-              <li>Volum mare la un pret bun (750ml)</li>
-              <li>Parfum natural de lavanda</li>
-              <li>Formula blanda, sigura pentru majoritatea suprafetelor</li>
-              <li>Ambalaj din plastic reciclat</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Mai putin eficient pe murdaria persistenta</li>
-              <li>Nu contine agenti de dezinfectare puternici (specific produselor ecologice)</li>
-              <li>Capacul pulverizatorului poate fi fragil</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="almawin-detergent-bucatarie-ecologic">
-            <div class="product-review__header">
-              <span class="section-tag">Best Buy 2026</span>
-              <h3>Almawin Detergent Bucatarie Ecologic</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Detergent specializat pentru bucatarie
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>Putere mare de degresare, bazata pe enzime naturale
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Blaturi de bucatarie, aragaz, hota, faianta, chiuveta
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Indeparteaza grasimea, reziduurile de mancare, petele
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Sticla din PET reciclat
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Almawin Kitchen Cleaner este un <strong>detergent ecologic pentru casa</strong> special formulat pentru a combate cele mai dificile provocari din bucatarie: grasimea arsa, resturile de mancare intarite si petele. Utilizand puterea enzimelor naturale, acest produs descompune eficient murdaria, oferind o curatenie impecabila fara substante chimice agresive. Daca va confruntati constant cu pete de grasime pe plita sau pe faianta, Almawin este solutia de care aveti nevoie.</p><p>Ce face ca Almawin sa fie o alegere remarcabila? Eficacitatea sa pe grasime. Am testat acest produs pe o plita pe gaz unde se acumulase grasime veche de cateva saptamani, iar rezultatele au fost impresionante. Nu a fost nevoie de frecare excesiva, iar suprafata a ramas curata si stralucitoare. Acest lucru inseamna economie de timp si efort in bucatarie.</p><p>Comparativ cu detergentii universali ecologici, Almawin Kitchen Cleaner este mult mai specializat si mai puternic pe segmentul sau. In timp ce un produs universal ar putea necesita aplicari repetate sau o actiune mecanica mai intensa, detergentul Almawin actioneaza rapid. Pretul, in jur de 28-35 lei pentru 500ml, este justificat de performanta sa. Formula sa este 100% biodegradabila si ambalajul este realizat din plastic reciclat, contribuind la un mediu mai curat.</p><p>Pentru cine este Almawin Kitchen Cleaner? Este perfect pentru oricine petrece mult timp in bucatarie si doreste sa mentina aceasta zona impecabila. Daca aveti copii mici care fac mizerie in jurul mesei sau daca gatiti frecvent preparate grase, acest produs va fi un aliat de nadejde. Este ideal si pentru cei care cauta solutii de curatenie ecologice, dar nu vor sa faca compromisuri la capitolul eficienta.</p><p>Recomandarea noastra este sa aplicati Almawin Kitchen Cleaner direct pe suprafata murdara, sa lasati sa actioneze 1-2 minute (sau mai mult pentru petele vechi), apoi sa stergeti cu o carpa umeda. Clatiti daca este necesar. Daca aveti nevoie de un <strong>detergent ecologic pentru casa</strong> dedicat bucatariei, Almawin este o alegere de top.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Putere mare de degresare</li>
-              <li>Formula pe baza de enzime naturale</li>
-              <li>Ideal pentru petele de grasime si resturi de mancare</li>
-              <li>Rapid si eficient</li>
-              <li>Ambalaj din plastic reciclat</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Pret relativ ridicat pentru volumul de 500ml</li>
-              <li>Disponibilitate mai limitata in anumite magazine</li>
-              <li>Nu este recomandat pentru toate suprafetele (verificati eticheta)</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="method-all-purpose-cleaner---zmeura">
-            <div class="product-review__header">
-              <span class="section-tag">Raport Calitate-Pret</span>
-              <h3>Method All-Purpose Cleaner - Zmeura</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Solutie universala de curatenie
-              </div>
-              <div class="product-review__spec">
-                <strong>Putere</strong>Curatare eficienta, formula pe baza de plante
-              </div>
-              <div class="product-review__spec">
-                <strong>Suprafata</strong>Suprafete dure, non-poroase (blaturi, pereti, mobilier, podele)
-              </div>
-              <div class="product-review__spec">
-                <strong>Functii</strong>Indeparteaza murdaria, praf, pete; parfum persistent
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Plastic reciclat, recipient reciclabil
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Method All-Purpose Cleaner cu aroma de zmeura aduce o combinatie placuta de eficienta ecologica si design atractiv. Acest <strong>detergent ecologic pentru casa</strong> este formulat pe baza de ingrediente de origine vegetala, fiind biodegradabil si sigur pentru utilizare in locuinta. Curata eficient o gama larga de suprafete, lasand in urma un parfum dulce si persistent de zmeura.</p><p>Ce face Method sa fie o optiune buna? Pe langa performanta sa de curatare, ambalajul sau este unul dintre cele mai atractive de pe piata, iar parfumurile sunt intotdeauna deosebite. Pretul, in jur de 20-25 lei pentru 828ml, il face o optiune competitiva, mai ales ca volumul este considerabil mai mare fata de alte produse.</p><p>Cum se pozitioneaza Method fata de concurenta? Este un produs versatil, similar cu Ecover, dar adesea mai accesibil pe litru datorita volumului mai mare al sticlei. Eficienta sa pe murdaria obisnuita este buna, insa pe petele de grasime intensa ar putea necesita o actiune suplimentara. Parfumul este un punct forte major, fiind mult mai placut si mai natural decat cel al detergentilor obisnuiti.</p><p>Pentru cine este Method All-Purpose Cleaner? Este ideal pentru persoanele care apreciaza atat eficienta ecologica, cat si aspectul estetic al produselor de curatenie. Daca doriti ca baia sau bucataria sa miroasa frumos dupa curatenie si sa folositi un produs sigur, Method este o alegere buna. Este de asemenea o optiune buna pentru cei care cauta un volum mare de produs la un pret rezonabil.</p><p>Recomandarea noastra pentru Method All-Purpose Cleaner este sa il utilizati pentru curatenia generala a casei. Este perfect pentru stersul zilnic al blaturilor, meselor, chiuvetei si chiar pentru improspatarea aerului prin pulverizare. Daca aveti nevoie de un <strong>detergent ecologic pentru casa</strong> care sa combine eficienta, un volum mare si un parfum placut, Method Zmeura este o optiune excelenta.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Volum mare la un pret bun</li>
-              <li>Parfum de zmeura placut si persistent</li>
-              <li>Formula pe baza de plante, biodegradabila</li>
-              <li>Ambalaj atractiv si ecologic</li>
-              <li>Curata eficient murdaria zilnica</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Mai putin eficient pe grasimea foarte incrustata</li>
-              <li>Parfumul poate fi prea puternic pentru unele persoane</li>
-              <li>Disponibilitatea poate fi limitata la anumite retele de magazine</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-
-          <section id="comparatie">
-            <h2>Comparatie</h2>
-            <p>Tabelul comparativ ofera o vedere de ansamblu asupra principalelor caracteristici ale produselor de detergent ecologic pentru casa analizate, ajutandu-va sa identificati rapid optiunea cea mai potrivita nevoilor dumneavoastra.</p>
-            <div class="comparison-outer">
-              <div class="comparison-hint">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                Gliseaza pentru a vedea tot tabelul
-              </div>
-              <div class="comparison-wrap">
-                <table class="comparison-table">
-                  <thead>
-                    <tr>
-                      <th>Produs</th>
-                      <th>Tip</th>
-                      <th>Putere</th>
-                      <th>Suprafata</th>
-                      <th>Functii</th>
-                      <th>PotrivitPentru</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-              <tr>
-                <td><strong>Ecover Universal Cleaner - Citrice si Busuioc</strong></td>
-                <td>Solutie universala</td>
-                <td>Actiune puternica</td>
-                <td>Toate suprafetele lavabile</td>
-                <td>Degresare, praf, parfum natural</td>
-                <td>Uz general, eficienta</td>
-              </tr>
-
-              <tr>
-                <td><strong>Frosch Detergent Ecologic Universal</strong></td>
-                <td>Solutie universala</td>
-                <td>Echilibrata</td>
-                <td>Toate suprafetele netede</td>
-                <td>Degresare usoara, praf, parfum discret</td>
-                <td>Buget redus, uz zilnic</td>
-              </tr>
-
-              <tr>
-                <td><strong>Sonett Detergent Universal Concentrat</strong></td>
-                <td>Detergent concentrat</td>
-                <td>Foarte ridicata</td>
-                <td>Toate suprafetele rezistente la apa</td>
-                <td>Degresare, curatare profunda, antistatic</td>
-                <td>Performanta maxima, economie pe termen lung</td>
-              </tr>
-
-              <tr>
-                <td><strong>Green Goddess Detergent Multi-Suprafata - Lavanda</strong></td>
-                <td>Solutie multi-suprafata</td>
-                <td>Blanda, eficienta</td>
-                <td>Toate suprafetele lavabile</td>
-                <td>Curata, degreseaza usor, improspateaza</td>
-                <td>Buget mic, uz general</td>
-              </tr>
-
-              <tr>
-                <td><strong>Almawin Detergent Bucatarie Ecologic</strong></td>
-                <td>Detergent bucatarie</td>
-                <td>Putere mare degresare</td>
-                <td>Bucatarie (plita, hota, faianta)</td>
-                <td>Indeparteaza grasimea, reziduuri</td>
-                <td>Peti dificile in bucatarie</td>
-              </tr>
-
-              <tr>
-                <td><strong>Method All-Purpose Cleaner - Zmeura</strong></td>
-                <td>Solutie universala</td>
-                <td>Eficienta</td>
-                <td>Suprafete dure, non-poroase</td>
-                <td>Indeparteaza murdaria, praf, pete</td>
-                <td>Volum mare, parfum placut</td>
-              </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-
-          <section id="ghid">
-            <h2>Cum alegi cel mai bun detergent ecologic pentru casa ta?</h2>
-            <div class="guide">
-              <p>Alegerea unui <strong>detergent ecologic pentru casa</strong> depinde de mai multi factori, de la tipul suprafetelor pe care le cureti cel mai des, pana la sensibilitatea la anumite arome sau ingrediente. Vom analiza cum sa faci cea mai buna alegere.</p><h4>Ce tip de suprafete cureti cel mai des?</h4><p>Raspunsul la aceasta intrebare te va ghida spre tipul de detergent. Pentru curatenie generala, podele, blaturi si mobilier, un detergent universal precum Ecover, Frosch sau Method este ideal. Daca bucataria ta este plina de grasime intarita, un produs specializat precum Almawin Kitchen Cleaner va fi mult mai eficient. Pentru baie, unde ai nevoie de indepartarea calcarului si a reziduurilor de sapun, un detergent universal bun sau unul specific pentru baie (daca este disponibil in varianta ecologica) isi va face treaba.</p><h4>Cat de important este parfumul pentru tine?</h4><p>Produsele ecologice folosesc adesea uleiuri esentiale pentru a oferi parfum. Daca preferi arome proaspete si vibrante, Ecover Citrice si Busuioc sau Method Zmeura sunt optiuni excelente. Pentru o nota relaxanta, Green Goddess Lavanda este potrivita. Daca esti sensibil la mirosuri, Frosch sau Sonett, cu parfumuri discrete, pot fi mai potrivite. Unii producatori ofera si variante fara parfum.</p><h4>Care este bugetul tau pentru produse de curatenie?</h4><p>Preturile detergentilor ecologici variaza. Frosch si Green Goddess sunt cele mai accesibile optiuni, oferind un raport calitate-pret bun pentru utilizare zilnica. Ecover si Method se situeaza la un nivel mediu, oferind un echilibru intre pret, performanta si volum. Sonett, fiind un produs concentrat premium, are un pret initial mai ridicat, dar devine economic pe termen lung datorita concentratiei mari. Daca vrei sa investesti in solutii pe termen lung, un produs concentrat precum Sonett merita luat in calcul.</p><h4>Verifici intotdeauna eticheta?</h4><p>Este esential sa citesti eticheta pentru a intelege ce ingrediente contine produsul si pentru ce suprafete este recomandat. Cauta certificari ecologice (cum ar fi ECOCERT, EU Ecolabel) si verifica lista ingredientelor pentru a te asigura ca sunt de origine vegetala sau minerala si ca produsul este biodegradabil. De exemplu, daca ai nevoie de solutii pentru curatenia in gradina sau pentru masina de spalat cu presiune, vei cauta produse specifice, nu un detergent universal. Pe site-ul nostru gasesti informatii utile si despre <a href="/masina-de-spalat-cu-presiune-pentru-acasa/">masina de spalat cu presiune pentru acasa</a>, un alt tip de echipament pentru intretinerea gospodăriei.</p>
-            </div>
-          </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat costa in medie un detergent ecologic pentru casa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pretul mediu pentru un detergent ecologic de uz general (500ml - 1L) variaza intre 15 si 35 lei. Produsele concentrate sau cele specializate pentru bucatarie/baie pot ajunge la 40-50 lei, insa sunt mai economice pe termen lung datorita concentratiei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Sunt detergentii ecologici la fel de eficienti ca cei chimici?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea detergentilor ecologici moderni sunt la fel de eficienti ca cei conventionali pentru curatenia zilnica si murdaria obisnuita. Pentru pete foarte vechi, grasime incrustata sau dezinfectare puternica, unii detergenti chimici pot avea un avantaj, insa produsele ecologice specializate (ex: Almawin pentru bucatarie) pot concura cu succes.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar detergent ecologic concentrat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca doresti sa economisesti pe termen lung, sa reduci deseurile (mai putine ambalaje) si sa ai un impact minim asupra mediului. Un produs concentrat (ex: Sonett) dureaza mult mai mult decat unul gata de utilizat, chiar daca pretul initial este mai mare.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna 'biodegradabil' la un detergent ecologic?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Biodegradabil inseamna ca ingredientele din detergent se descompun natural in mediu (apa, dioxid de carbon, biomasa) in cel mai scurt timp posibil, fara a lasa reziduuri toxice pe termen lung. Este un indicator cheie al prieteniei fata de mediu.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi detergent ecologic universal pentru toate suprafetele?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea detergentilor universali ecologici sunt siguri pentru majoritatea suprafetelor lavabile (gresie, faianta, lemn lăcuit, plastic). Totusi, este intotdeauna recomandat sa verifici eticheta produsului si, daca ai dubii, sa testezi pe o zona ascunsa, mai ales pe suprafete delicate sau nefinisate.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cel mai bine notat detergent ecologic din selectie e <strong>Frosch anticalcar cu otet</strong>, cu nota 4.88 din 41 de pareri. Pentru rufe, <strong>Biolu</strong> in canistra de 5 litri e economic, iar <strong>Natulim</strong>, sub forma de foi, elimina complet plasticul.</p>
+      <p>Un detergent ecologic curata casa fara substantele chimice dure ale celor obisnuiti: <strong>biodegradabil, fara fosfati si clor, mai bland cu pielea</strong>. Mai jos gasesti direct recomandarile, grupate pe universale si multisuprafete, pentru rufe, si speciale, iar sub ele un ghid despre ce inseamna cu adevarat ecologic si cum alegi.</p>
+      <p>Le-am ales pe cele mai testate si mai bine notate produse cu adevarat ecologice, si le-am impartit pe tipul de folosire. Am lasat deoparte detergentii conventionali care apar la cautari, ca sa ramana doar solutii eco reale, cu folosire, format si nota clare la fiecare. Pentru cum le folosesti, vezi ghidul <a href="/cum-sa-cureti-eficient-casa/">cum sa cureti eficient casa</a> si <a href="/mop-cu-aburi-pentru-podele/">mopurile cu aburi</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#univ">Universale si multisuprafete</a></li>
+        <li><a href="#rufe">Pentru rufe</a></li>
+        <li><a href="#spec">Speciale: lana, parchet, pete</a></li>
+        <li><a href="#de-ce">De ce sa treci la ecologic</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#enzime">Bio-enzimatic, pe scurt</a></li>
+        <li><a href="#folosire">Cum le folosesti eficient</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Produs</th><th>Tip</th><th>Pentru</th><th>Nota</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.pentru}</td>
+              <td>{x.p.rating} ({x.p.reviews})</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="univ">Universale si multisuprafete</h2>
+    <p>Baza oricarei curatenii ecologice: detergenti cu care speli podele, suprafete, baie si bucatarie. De la clasicul Frosch cu otet, anticalcar, la solutii bio-enzimatice moderne care descompun murdaria natural. Cu ei acoperi cea mai mare parte a treburilor din casa.</p>
+    <div class="rd-grid">
+      {UNIV.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figUniv} alt="Detergenti ecologici universali: Frosch si bio-enzimatic multisuprafete" width="1200" height="675" loading="lazy" />
+
+    <h2 id="rufe">Pentru rufe</h2>
+    <p>Detergenti eco pentru spalatul rufelor, mai blanzi cu fibrele si cu pielea decat cei obisnuiti. De la lichide pentru colorate si albe la solutii inovatoare sub forma de foi, care elimina complet bidonul de plastic.</p>
+    <div class="rd-grid">
+      {RUFE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figRufe} alt="Detergenti ecologici pentru rufe: Biolu si Natulim foi" width="1200" height="675" loading="lazy" />
+
+    <h2 id="spec">Speciale: lana, parchet, pete</h2>
+    <p>Produse dedicate pentru nevoi aparte, unde un detergent universal nu e potrivit: textile delicate de lana si matase, parchet lacuit care cere o formula anume, si pete grele care au nevoie de pretratare. Le adaugi peste baza, dupa nevoie.</p>
+    <div class="rd-grid">
+      {SPEC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSpec} alt="Detergenti ecologici speciali: lana si matase, parchet Bona si scos pete Biolu" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-detergent').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toti detergentii ecologici la oferta</strong>
+        <span>Reducerile din acest moment la detergenti ecologici, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce sa treci la ecologic</h2>
+    <p>Detergentii obisnuiti curata, dar lasa in urma lor mai mult decat curatenie: <strong>reziduuri chimice</strong> pe suprafete, pe vase si pe haine, parfumuri sintetice puternice in aer si substante care ajung, prin canalizare, in ape. Trecerea la detergenti ecologici reduce toata aceasta expunere, si o face fara sa sacrifice curatenia, pentru produsele bune.</p>
+    <p>Primul castig e pentru <strong>sanatatea familiei</strong>: fara substante chimice agresive si parfumuri sintetice dure, aerul din casa e mai curat, pielea mai putin iritata, iar cei cu alergii, astm sau piele sensibila, si mai ales copiii mici, sunt mai bine. Al doilea castig e pentru <strong>mediu</strong>: ingredientele biodegradabile, fara fosfati si clor, nu polueaza apele si nu strica ecosistemele acvatice cum o fac cele conventionale. Iar formatele mari si produsele fara plastic reduc si deseurile. Nu e vorba de un compromis, ci de aceeasi casa curata, dar cu mai putine substante de care te poti lipsi, pentru tine si pentru natura.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta intre un produs eco bun si unul doar de marketing:</p>
+    <ul>
+      <li><strong>Ingredientele:</strong> biodegradabile, fara fosfati si clor, cu parfumuri si coloranti naturali sau fara; o lista transparenta e semn bun.</li>
+      <li><strong>Certificarile eco reale:</strong> cauta etichete de certificare recunoscute, nu doar cuvintele bio sau verde puse pe ambalaj.</li>
+      <li><strong>Folosirea:</strong> universal pentru curatenia generala, dedicat pentru rufe, delicate, parchet sau pete.</li>
+      <li><strong>Formatul:</strong> concentrat sau canistra mare pentru economie si mai putin plastic; foi pentru zero plastic.</li>
+      <li><strong>Eficienta pe murdaria ta:</strong> pentru pete grele, verifica daca ai nevoie si de un produs de pretratare.</li>
+      <li><strong>Blandetea:</strong> conteaza mai ales daca ai piele sensibila, copii mici sau alergii; cauta mentiunea hipoalergenic.</li>
+    </ul>
+
+    <h2 id="enzime">Bio-enzimatic, pe scurt</h2>
+    <p>Tot mai multi detergenti ecologici sunt <strong>bio-enzimatici</strong>, iar termenul merita inteles, pentru ca explica de ce curata bine fara chimie dura. Enzimele sunt molecule naturale, aceleasi tipuri pe care corpul si natura le folosesc ca sa descompuna grasimile, proteinele si amidonul. Intr-un detergent, ele <strong>ataca murdaria la nivel biologic</strong>, taind petele in bucati mici pe care apa le indeparteaza usor, in loc sa se bazeze pe substante chimice agresive.</p>
+    <p>Avantajul e dublu: curatare eficienta, chiar si pe pete organice ca grasimea, mancarea sau iarba, si blandete, atat cu suprafetele si textilele, cat si cu mediul, pentru ca enzimele sunt biodegradabile. Singurul lucru de retinut e ca enzimele au nevoie de <strong>putin timp ca sa lucreze</strong>: pentru cele mai bune rezultate pe o pata, pulverizezi produsul si il lasi cateva momente sa actioneze inainte sa freci sau sa speli, in loc sa te astepti la efect instantaneu. Cu aceasta mica rabdare, detergentii bio-enzimatici, ca cel multisuprafete din selectie, sunt printre cele mai eficiente si mai curate solutii de curatenie.</p>
+
+    <h2 id="folosire">Cum le folosesti eficient</h2>
+    <p>Cateva obiceiuri simple scot maximul din detergentii ecologici. <strong>Respecta dozajul</strong>: mai mult produs nu inseamna mai curat, ci doar clatire mai grea si risipa; concentratele mai ales cer putin. <strong>Da timp de actiune</strong> produselor, mai ales celor bio-enzimatice si celor de scos pete: pulverizezi, astepti un moment, apoi freci sau speli, si murdaria cedeaza mult mai usor.</p>
+    <p>Pentru rufe, <strong>sorteaza pe albe si colorate</strong> si foloseste detergentul potrivit fiecarei categorii, iar pentru petele grele trateaza-le punctual, cu un spray de scos pete, inainte de spalare. La textilele delicate, lana si matase, foloseste intotdeauna detergentul special si un program bland, ca sa nu le strici. Pastreaza produsele universale pentru curatenia de zi cu zi si scoate produsele dedicate doar cand chiar conteaza, ca sa nu incarci dulapul. Iar cand cumperi, mizeaza pe <strong>formate mari sau concentrate</strong> pentru ce folosesti des: economisesti bani si reduci plasticul, in spiritul alegerii ecologice. Cu aceste obiceiuri, casa ramane curata, iar detergentii tin mai mult.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tip si de format:</p>
+    <p><strong>Universale si multisuprafete:</strong> de la circa 16 lei flaconul anticalcar Frosch, si 30-45 de lei pentru cele bio-enzimatice; canistra universala de 5 litri, in jur de 80 de lei, cea mai economica pe litru.</p>
+    <p><strong>Pentru rufe:</strong> in jur de 40 de lei pentru un lichid, 70 de lei pentru pachetul de foi Natulim, si circa 160 de lei pentru canistra de 5 litri Biolu, care tine mult.</p>
+    <p><strong>Speciale:</strong> intre circa 50 si 125 de lei pentru lana si matase, parchet Bona sau scos pete, produse pe care le cumperi mai rar.</p>
+    <p>Pe ansamblu, trecerea la eco costa comparabil cu detergentii obisnuiti, mai ales cand mizezi pe <strong>formate mari si concentrate</strong> pentru produsele de baza. Un set eco de start, doua-trei universale plus cateva specializate pentru nevoile tale, acopera toata casa, iar diferenta o simti in aer mai curat, piele mai putin iritata si un impact mai mic asupra mediului. Pentru rufe, vezi si <a href="/masina-de-spalat-rufe-automata/">masinile de spalat rufe automate</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">ED</div>
       <div class="author-info">
-        <h4><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></h4>
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
         <p class="author-role">Consultant Amenajari</p>
-        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget, inclusiv despre curatenie si intretinerea casei.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="detergent-ecologic-pentru-casa"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un produs ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <!-- Prev/Next Navigation -->
-    <PrevNextNav
-      currentSlug="detergent-ecologic-pentru-casa"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="detergent-ecologic-pentru-casa" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="detergent-ecologic-pentru-casa" currentCategory="curatenie-intretinere" articles={relatedArticles} />
   </article>
-
-  <script>
-    document.querySelectorAll('.comparison-outer').forEach(outer => {
-      const wrap = outer.querySelector('.comparison-wrap');
-      if (!wrap) return;
-      function checkScroll() {
-        const canScroll = wrap.scrollWidth > wrap.clientWidth;
-        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
-        outer.classList.toggle('can-scroll', canScroll && !atEnd);
-      }
-      checkScroll();
-      wrap.addEventListener('scroll', checkScroll, { passive: true });
-      window.addEventListener('resize', checkScroll, { passive: true });
-    });
-
-    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
-    if (tocLinks.length > 0) {
-      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
-      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              tocLinks.forEach(a => a.classList.remove('active'));
-              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
-              match?.classList.add('active');
-            }
-          }
-        },
-        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
-      );
-      sections.forEach(s => observer.observe(s));
-    }
-  </script>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

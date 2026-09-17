@@ -1,0 +1,297 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['prajitoare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Cu 2 felii, accesibile ---
+  { g: 'acc', id: 'D6WTYDBBM', rol: 'Cel mai vandut, echilibrat', short: 'Philips HD2581', felii: '2', putere: '750 W', trepte: '8', pret: '128 lei',
+    specs: ['2 felii, 750 W, 8 trepte de rumenire', 'oprire automata si ridicare inalta a painii', 'decongelare si reincalzire', 'de la Philips, cu service in tara'],
+    pros: ['366 de pareri, de departe cel mai testat', '8 trepte, control fin al rumenirii', 'Ridicare inalta, scoti usor si feliile mici', 'Brand cunoscut, la doar 128 de lei'],
+    cons: ['Doar 2 felii, mic pentru o familie', 'Carcasa de plastic, nu inox'],
+    verdict: 'Cu 366 de pareri, e cel mai cumparat prajitor din articol, si e usor de vazut de ce: face tot ce trebuie sa faca un prajitor bun, fara sa ceara mult. Cele 8 trepte de rumenire iti dau control fin, de la o felie abia aurie la una bine facuta, iar functia de ridicare inalta impinge painea mai sus la final, deci nu-ti frigi degetele scotand feliile mici. Are si decongelare, pentru painea din congelator, si reincalzire, ca sa reincalzesti fara sa rumenesti in plus. La 128 de lei, de la Philips, e alegerea sigura pentru una-doua persoane. Limita e evidenta: doua fante, deci pentru o familie care ia micul dejun impreuna, un model de 4 felii scuteste a doua tura. Il iei ca prajitor de zi cu zi, bine facut si ieftin.' },
+  { g: 'acc', id: 'DZC9VVMBM', rol: 'Cel mai ieftin din articol', short: 'Heinner Tasty 700', felii: '2', putere: '750 W', trepte: '7', pret: '70 lei',
+    specs: ['2 felii, 750 W, 7 niveluri de rumenire', 'decongelare si reincalzire', 'pretul cel mai mic din selectie', 'design compact, colorat'],
+    pros: ['Sub 70 de lei, cel mai accesibil prajitor', '330 de pareri, bine cotat pentru pret', '7 niveluri de rumenire, suficient', 'Compact, incape oriunde'],
+    cons: ['Functii de baza, fara ridicare inalta', 'Carcasa de plastic'],
+    verdict: 'Daca vrei doar sa prajesti doua felii dimineata si nu te intereseaza nimic in plus, aici te opresti: sub 70 de lei, cu 330 de pareri in spate. Heinner Tasty face exact ce promite, are 7 niveluri de rumenire, deci reglezi cat de aurie iese painea, plus decongelare si reincalzire, cele doua functii pe care chiar le folosesti. Nu are ridicare inalta a painii sau alte rafinamente, dar la pretul asta nici nu te astepti. E prajitorul pentru o bucatarie de student, o casa de vacanta sau pentru cine nu vrea sa dea mai mult pe un aparat simplu. Il iei cand cauti minimul functional, ieftin si bine notat, fara sa platesti pentru un nume.' },
+  { g: 'acc', id: 'DCX60NBBM', rol: 'Design retro, carcasa care nu se incinge', short: 'Daewoo 700 W', felii: '2', putere: '700 W', trepte: 'reglabil', pret: '93 lei',
+    specs: ['2 felii, 700 W, rumenire reglabila', 'carcasa Cool Touch, nu se incinge la atingere', 'decongelare, reincalzire, anulare', 'loc de depozitare a cablului'],
+    pros: ['Design retro, arata bine pe blat', 'Cool Touch, carcasa ramane rece la atingere', 'Are si functie de anulare a prajirii', 'Sub 100 de lei'],
+    cons: ['700 W, cel mai putin putere din articol', '125 de pareri, mai putine ca liderii'],
+    verdict: 'Nu toti cumpara un prajitor doar dupa functii; unii vor sa arate bine pe blat, iar Daewoo mizeaza exact pe asta cu un design retro care iese in evidenta. Dincolo de aspect, are un avantaj practic real: carcasa Cool Touch ramane rece la atingere in timpul folosirii, ceva ce conteaza intr-o casa cu copii sau daca prajitorul sta la indemana. Are decongelare, reincalzire, functie de anulare si un loc de infasurat cablul, deci e complet pentru uz zilnic. Cei 700 W sunt cel mai putin din articol, ceea ce inseamna ca rumenirea dureaza putin mai mult, dar la un prajitor diferenta e de secunde. Il iei cand vrei un aparat aratos si sigur la atingere, la un pret bun.' },
+  // --- B. Cu 2 felii, cu functii si inox ---
+  { g: 'func', id: 'D5WTYDBBM', rol: 'Mai multa putere, pret mic', short: 'Philips Viva 900 W', felii: '2', putere: '900 W', trepte: '8', pret: '100 lei',
+    specs: ['2 felii, 900 W, 8 setari de rumenire', 'oprire automata la final', 'decongelare si anulare', 'loc de depozitare a cablului'],
+    pros: ['900 W, printre cele mai puternice de 2 felii', '8 setari de rumenire pentru control fin', 'Philips, la doar 100 de lei', 'Oprire automata si anulare'],
+    cons: ['Fara ridicare inalta ca la HD2581', 'Carcasa de plastic'],
+    verdict: 'Pentru cine vrea un pic mai multa forta la acelasi pret mic, Viva urca puterea la 900 W, printre cele mai mari dintre modelele de doua felii. In practica, puterea in plus inseamna ca prajitorul ajunge mai repede la temperatura si rumeneste ceva mai uniform, mai ales daca faci mai multe randuri la rand. Are 8 setari de rumenire, oprire automata si functie de anulare, tot ce iti trebuie zilnic, si vine de la Philips la doar 100 de lei. Fata de HD2581, cel mai vandut, renunta la ridicarea inalta a painii, dar castiga la putere. Il iei cand vrei un prajitor Philips ieftin, cu ceva mai multa forta, si nu ai nevoie de rafinamente.' },
+  { g: 'func', id: 'DDTSJBMBM', rol: 'Cu verificarea prajirii, fara sa intrerupi', short: 'Tefal Vita', felii: '2', putere: '800 W', trepte: '7', pret: '129 lei',
+    specs: ['2 felii, 800 W, 7 niveluri de rumenire', 'functie de verificare a prajirii fara anulare', 'de la Tefal, cu service in tara', 'design curat'],
+    pros: ['Verifici cat e prajita painea fara sa opresti ciclul', '7 niveluri de rumenire', 'Brand Tefal, cu piese si service', 'Pret rezonabil, 129 de lei'],
+    cons: ['Functii de baza in rest', '143 de pareri, bine cotat fara sa fie lider'],
+    verdict: 'Tefal Vita aduce o functie mica dar surprinzator de utila: verificarea prajirii. Ridici painea sa vezi cat de aurie e, la mijlocul ciclului, iar aparatul continua de unde a ramas in loc sa o ia de la capat, asa cum se intampla la prajitoarele care anuleaza complet cand ridici parghia. Pare un detaliu, dar oricine a ars o felie pentru ca nu a putut verifica stie cat conteaza. In rest e un prajitor Tefal simplu si solid, cu 7 niveluri de rumenire, la 129 de lei, cu service in tara. Nota de 4.59 e buna, iar cele 143 de pareri il confirma ca o alegere de incredere. Il iei cand vrei sa poti verifica painea fara sa strici ciclul, de la un brand serios.' },
+  { g: 'func', id: 'DS7G2MMBM', rol: 'Cu ecran digital si spatiu larg', short: 'Tefal Smart\'n Light', felii: '2', putere: '850 W', trepte: '7', pret: '232 lei',
+    specs: ['2 felii, 850 W, ecran digital cu numaratoare', 'spatiu de prajire larg, pentru felii groase', 'decongelare, reincalzire, indicator luminos', 'cel mai bine echipat de 2 felii'],
+    pros: ['Ecran digital care arata timpul ramas', 'Fante largi, incap felii groase si chifle', 'Nota 4.74, printre cele mai mari', 'Aspect modern, negru cu display'],
+    cons: ['Cel mai scump prajitor de 2 felii', '232 de lei pentru doua fante'],
+    verdict: 'Cel mai bine echipat prajitor de doua felii din articol, si arata partea asta. Ecranul digital afiseaza numaratoarea inversa, deci vezi exact cat mai are pana e gata, nu ghicesti dupa o parghie. Fantele sunt largi, asa ca incap si felii mai groase, si chifle taiate, nu doar paine feliata subtire. Are decongelare, reincalzire si indicator luminos, iar nota de 4.74, pe 139 de pareri, e printre cele mai bune din articol. Reversul e pretul: 232 de lei pentru doua fante, adica mai mult decat unele modele de 4 felii. Il iei cand vrei un prajitor de doua felii premium, cu ecran si fante largi, si aspectul conteaza la fel de mult ca functia.' },
+  { g: 'func', id: 'D49LHH3BM', rol: 'Carcasa de inox, cu afisaj digital', short: 'Biovita ELITE inox', felii: '2', putere: '1500 W', trepte: '6', pret: '215 lei',
+    specs: ['2 felii, 1500 W, 6 trepte cu afisaj digital', 'carcasa din inox, robusta', 'spatiu de prajire larg, anti-alunecare', 'decongelare, reincalzire, anulare'],
+    pros: ['Carcasa de inox, arata si rezista mai bine', '1500 W, rumenire rapida', 'Afisaj digital al treptelor', 'Fante largi si picioruse anti-alunecare'],
+    cons: ['Inoxul se incinge mai tare decat plasticul', '141 de pareri, brand mai putin cunoscut'],
+    verdict: 'Daca vrei ca prajitorul sa arate a aparat serios, nu a jucarie de plastic, varianta de inox rezolva asta. Biovita ELITE are carcasa metalica, care da un aspect de bucatarie ingrijita si rezista mai bine in timp la zgarieturi. Cei 1500 W rumenesc rapid, are afisaj digital al treptelor si fante largi, plus picioruse anti-alunecare ca sa stea fix pe blat. Un avertisment onest legat de inox: metalul se incinge mai tare decat plasticul in timpul folosirii, deci nu il atinge pe lateral cat lucreaza, spre deosebire de un model Cool Touch. Cu 141 de pareri, e mai putin testat decat liderii, dar bine notat. Il iei cand vrei aspectul si robustetea inoxului, constient ca se incalzeste la atingere.' },
+  // --- C. Cu 4 felii, pentru familie ---
+  { g: 'patru', id: 'D92KLLMBM', rol: 'Cel mai bine notat, pentru familie', short: 'Biovita CLASSIC-4 inox', felii: '4', putere: '1500 W', trepte: '6', pret: '210 lei',
+    specs: ['4 felii, 1500 W, carcasa din inox', '6 trepte de rumenire cu temporizator', 'functie de preparare covrigi', 'anti-alunecare, decongelare, reincalzire'],
+    pros: ['Nota 4.91, cea mai mare din tot articolul', '4 felii, tot micul dejun al familiei odata', 'Carcasa de inox si temporizator', 'Are si functie dedicata pentru covrigi'],
+    cons: ['Inoxul se incinge la atingere', 'Ocupa mai mult loc decat unul de 2 felii'],
+    verdict: 'Cu nota de 4.91, e cel mai bine notat aparat din tot articolul, iar pentru o familie e alegerea logica. Patru felii inseamna ca tot micul dejun se face dintr-o tura, nu astepti a doua runda cat se raceste prima portie. Carcasa e din inox, are temporizator si 6 trepte de rumenire, plus o functie dedicata pentru covrigi, care rumeneste doar interiorul si lasa exteriorul mai moale. La 210 lei, e un aparat complet pentru o bucatarie de familie. Ca la orice model de inox, metalul se incinge la atingere, deci atentie cu copiii in preajma, si ocupa mai mult loc pe blat decat unul de doua fante. Il iei cand esti o familie si vrei tot micul dejun gata odata, de la aparatul cu cea mai buna nota.' },
+  { g: 'patru', id: 'D2PDXXMBM', rol: '4 felii accesibil, cu centrare automata', short: 'FRAM 1600 W', felii: '4', putere: '1600 W', trepte: '6', pret: '167 lei',
+    specs: ['4 felii, 1600 W, cea mai mare putere din articol', '6 nivele de rumenire', 'centrare automata a feliilor pentru rumenire uniforma', 'decongelare si reincalzire'],
+    pros: ['4 felii la doar 167 de lei, cel mai ieftin din grupa', '1600 W, rumenire rapida pe patru fante', 'Centrare automata, painea se rumeneste uniform', 'Decongelare si reincalzire'],
+    cons: ['74 de pareri, cel mai putin testat', 'Brand mai putin cunoscut'],
+    verdict: 'Pentru o familie cu buget strans, FRAM ofera patru felii la doar 167 de lei, cel mai ieftin din grupa. Cei 1600 W, cea mai mare putere din articol, au sens aici: patru fante cer mai multa energie ca sa rumeneasca uniform si repede toate feliile odata. Detaliul care conteaza e centrarea automata: painea e tinuta la mijlocul fantei, deci se rumeneste egal pe ambele fete, nu mai tare pe o parte. Are si decongelare, si reincalzire. Compromisul e ca, la 74 de pareri, e cel mai putin testat din articol, iar brandul e mai putin cunoscut decat Philips sau Tefal. Il iei cand vrei capacitate de familie la cel mai mic pret si nu te deranjeaza un brand mai discret.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const FUNC = PICKS.filter(x => x.g === 'func');
+const PATRU = PICKS.filter(x => x.g === 'patru');
+
+const hero = '/imagini/articole/cele-mai-bune-prajitoare-de-paine.webp';
+const figAcc = '/imagini/articole/prajitoare-accesibile.webp';
+const figFunc = '/imagini/articole/prajitoare-functii.webp';
+const figPatru = '/imagini/articole/prajitoare-patru-felii.webp';
+const published = '2026-07-21T16:37:23+03:00';
+
+const faq = [
+  { question: 'Doua felii sau patru?', answer: 'Depinde de cati sunteti dimineata. Un prajitor de doua felii ajunge pentru una-doua persoane si ocupa mai putin loc pe blat. Unul de patru felii e pentru o familie care ia micul dejun impreuna: prajesti tot odata, in loc sa astepti a doua tura cat se raceste prima. Regula e simpla: daca dimineata mananca doi oameni, ia de doua felii; daca sunteti trei sau mai multi, cele patru fante iti scutesc timp si nervi. Modelele de patru felii sunt ceva mai mari si mai puternice, dar diferenta de pret nu e mare.' },
+  { question: 'Conteaza puterea la un prajitor de paine?', answer: 'Mai putin decat la alte electrocasnice, dar nu e de ignorat. La un prajitor de doua felii, 700-900 W sunt normali si diferenta dintre ei se masoara in secunde la rumenire. Puterea conteaza mai mult la modelele de patru felii, care au nevoie de 1500-1600 W ca sa rumeneasca uniform toate cele patru felii odata; cu prea putina putere pe patru fante, unele felii ies mai palide decat altele. Pe scurt: la doua felii, nu te lua dupa wati, ci dupa functii; la patru felii, cauta de la 1500 W in sus.' },
+  { question: 'Ce inseamna treptele de rumenire?', answer: 'Sunt nivelele dintre care alegi cat de aurie sa iasa painea, de la abia incalzita la bine facuta. Majoritatea prajitoarelor au intre 6 si 8 trepte. Mai multe trepte inseamna control mai fin: poti nimeri exact nuanta care iti place, in loc sa alegi doar intre putin si mult. In practica, oricine mananca paine prajita des isi gaseste treapta preferata si o lasa acolo. Un detaliu util: prima felie iese de obicei ceva mai deschisa decat urmatoarele, pentru ca prajitorul e inca rece, asa ca s-ar putea sa cresti o treapta pentru prima runda.' },
+  { question: 'Ce functii chiar folosesti?', answer: 'Cateva conteaza cu adevarat, restul sunt marketing. Decongelarea prajeste corect painea scoasa direct din congelator, cu un ciclu care intai o dezgheata, apoi o rumeneste, deci nu iese arsa pe afara si rece la mijloc. Reincalzirea readuce la temperatura o felie deja prajita, dar racita, fara sa o mai rumeneasca. Anularea opreste ciclul cand vrei tu. Ridicarea inalta a painii impinge feliile mai sus la final, ca sa scoti usor si bucatile mici fara sa te arzi. Pe astea le folosesti; functiile exotice de pe cutie, mai rar.' },
+  { question: 'Inox sau plastic?', answer: 'Tine de aspect si de un compromis practic. Carcasa de inox arata mai bine si mai scumpa, rezista mai bine la zgarieturi si da un aer de bucatarie ingrijita. Are insa un dezavantaj real: metalul se incinge mai tare in timpul folosirii, deci nu atinge lateralele cat prajitorul lucreaza. Plasticul e mai ieftin si ramane mai rece, iar unele modele au carcasa Cool Touch anume proiectata sa nu frigi. Daca ai copii mici sau prajitorul sta la indemana, plasticul Cool Touch e mai sigur; daca pui pret pe aspect si esti atent, inoxul arata mai bine.' },
+  { question: 'Pot praji si altceva decat paine feliata?', answer: 'In fantele normale intra painea feliata subtire, toast, si chiflele taiate in doua, daca fantele sunt largi. Baghetele groase sau feliile foarte inalte nu incap intr-un prajitor obisnuit, pentru asta ar trebui un model cu fanta lunga. Multe prajitoare vin insa cu un gratar care se aseaza deasupra, pentru incalzit cornuri, chifle sau croissante fara sa le bagi in fanta. Nu baga niciodata paine cu unt sau branza deasupra direct in fanta, pica pe rezistenta si arde; foloseste gratarul de deasupra pentru asa ceva.' },
+  { question: 'E sigur, se incinge carcasa?', answer: 'Depinde de material. La modelele de plastic, mai ales cele cu carcasa Cool Touch, exteriorul ramane rece sau caldut, deci le poti atinge fara probleme. La cele de inox, carcasa metalica se incalzeste vizibil in timpul folosirii, asa ca nu le atinge pe lateral cat lucreaza si ai grija cu copiii in preajma. In rest, prajitoarele au oprire automata cand painea e gata si functie de anulare, deci nu raman pornite la nesfarsit. Regulile de bun simt raman valabile: nu le acoperi in timp ce merg si le tii departe de perdele sau alte materiale.' },
+  { question: 'Cum curat prajitorul?', answer: 'Cel mai important e sertarul de firimituri de la baza: aproape toate prajitoarele au unul care se trage afara, il golesti si il stergi. Fa-o regulat, pentru ca firimiturile acumulate se ard, fac fum si, in timp, sunt un risc. Corpul il stergi pe dinafara cu o carpa umeda, dupa ce s-a racit, si niciodata nu bagi prajitorul in apa. Pentru firimiturile prinse inauntru, intoarce aparatul cu gura in jos deasupra chiuvetei si scutura-l usor. Nu introduce niciodata furculite sau obiecte metalice in fante ca sa scoti painea blocata fara sa scoti aparatul din priza mai intai.' },
+];
+
+const images = [hero, figAcc, figFunc, figPatru, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune prajitoare de paine in ${SEO_YEAR}: cu 2 sau 4 felii, de la buget la inox`}
+  description="9 prajitoare de paine comparate pe numar de felii, trepte de rumenire si functii, de la 70 la 232 de lei. Cand alegi 2 felii si cand ai nevoie de 4."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune prajitoare de paine' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune prajitoare de paine</span>
+    </nav>
+
+    <h1>Cele mai bune prajitoare de paine</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune prajitoare de paine: de la modele cu 2 felii accesibile la variante de inox cu 4 felii" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>La un prajitor de paine, cea mai importanta intrebare e si cea mai simpla: <strong>doua felii sau patru</strong>? Pentru una-doua persoane, doua fante ajung. Pentru o familie care ia micul dejun impreuna, patru fante scutesc a doua tura, cat prima se raceste. De aici pornesc toate celelalte alegeri.</p>
+      <p>Odata lamurit numarul de felii, restul se decide repede, pentru ca un prajitor e un aparat simplu. Cel mai vandut din articol, <strong>Philips HD2581</strong>, le face pe toate bine la 128 de lei. Cel mai ieftin, <strong>Heinner Tasty</strong>, prajeste doua felii cinstit la 70 de lei. Iar pentru familie, cel mai bine notat aparat din tot articolul e un model de patru felii, <strong>Biovita CLASSIC-4</strong>, cu nota 4.91.</p>
+      <p>Ce conteaza cu adevarat dincolo de felii sunt <strong>treptele de rumenire</strong> si cateva functii pe care chiar le folosesti: decongelare, reincalzire, ridicare inalta a painii. Restul, de la putere la carcasa de inox, tine mai mult de aspect si de preferinte. De aceea le-am grupat dupa numarul de felii si dotari, nu dupa pret.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Cu 2 felii, accesibile</a></li>
+        <li><a href="#func">Cu 2 felii, cu functii si inox</a></li>
+        <li><a href="#patru">Cu 4 felii, pentru familie</a></li>
+        <li><a href="#felii">Doua felii sau patru: cum decizi</a></li>
+        <li><a href="#trepte">Trepte de rumenire si functii utile</a></li>
+        <li><a href="#inox">Inox sau plastic, si ce cu puterea</a></li>
+        <li><a href="#sfaturi">Sfaturi pentru cea mai buna paine prajita</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Felii</th><th>Putere</th><th>Trepte</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.felii}</td>
+              <td>{x.putere}</td>
+              <td>{x.trepte}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Cu 2 felii, accesibile</h2>
+    <p>Prajitoarele de doua felii sunt alegerea potrivita pentru una-doua persoane, iar cele de aici acopera nevoile de baza fara sa treaca de 130 de lei. Au functiile pe care le folosesti zilnic, decongelare si reincalzire, si difera intre ele prin cate trepte de rumenire au si cat de bine sunt facute.</p>
+    {ACC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figAcc} alt="Prajitoare de paine cu 2 felii accesibile, Philips, Heinner si Daewoo" width="1600" height="900" loading="lazy" />
+
+    <h2 id="func">Cu 2 felii, cu functii si inox</h2>
+    <p>Tot doua felii, dar cu ceva in plus: mai multa putere, ecran digital, fante largi pentru felii groase sau carcasa de inox. Sunt pentru cine foloseste prajitorul des si vrea un aparat mai bine echipat sau care arata mai bine pe blat, fara sa treaca la patru felii.</p>
+    {FUNC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figFunc} alt="Prajitoare de paine cu functii si carcasa de inox, Tefal, Philips si Biovita" width="1600" height="900" loading="lazy" />
+
+    <h2 id="patru">Cu 4 felii, pentru familie</h2>
+    <p>Cand la micul dejun sunt trei sau mai multi, patru fante schimba complet dimineata: tot prajitul se face odata, fara a doua tura. Modelele astea sunt ceva mai mari si mai puternice, ca sa rumeneasca uniform toate feliile in acelasi timp, si costa surprinzator de putin fata de ce ofera.</p>
+    {PATRU.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPatru} alt="Prajitoare de paine cu 4 felii pentru familie, Biovita CLASSIC-4 si FRAM" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-prajitoare').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate prajitoarele de paine la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="felii">Doua felii sau patru: cum decizi</h2>
+    <p>E prima si cea mai importanta alegere, si se face dupa un singur criteriu: cati oameni prajesc paine in acelasi timp.</p>
+    <p>Un prajitor de <strong>doua felii</strong> e potrivit pentru una-doua persoane. Ocupa putin loc, costa mai putin si e mai mult decat suficient daca dimineata mananci singur sau in doi. Aproape toate modelele bune de la Philips, Tefal si Heinner sunt de doua felii.</p>
+    <p>Un prajitor de <strong>patru felii</strong> are sens de la trei persoane in sus. Diferenta nu e doar de cantitate: cand toata familia ia micul dejun in acelasi timp, cele doua ture la un prajitor de doua fante inseamna ca prima portie se raceste pana e gata a doua. Cu patru fante, toata lumea mananca odata.</p>
+    <p>Pe scurt:</p>
+    <ul>
+      <li>Locuiesti singur sau in doi: <strong>doua felii</strong>, alege dupa functii, nu dupa marime.</li>
+      <li>Sunteti trei sau mai multi: <strong>patru felii</strong>, iar diferenta de pret nu e mare.</li>
+      <li>Prajesti rar, doar tu: cel mai simplu si mai ieftin model de doua felii e suficient.</li>
+    </ul>
+
+    <h2 id="trepte">Trepte de rumenire si functii utile</h2>
+    <p>Dupa numarul de felii, astea sunt lucrurile care fac diferenta intre un prajitor bun si unul frustrant.</p>
+    <p><strong>Treptele de rumenire</strong> sunt nivelele dintre care alegi cat de aurie iese painea. Majoritatea au 6-8 trepte, iar mai multe inseamna control mai fin. In practica, iti gasesti treapta preferata si o lasi acolo; conteaza doar sa ai destule ca sa nimeresti nuanta care iti place.</p>
+    <p>Dintre <strong>functii</strong>, cateva chiar conteaza:</p>
+    <ul>
+      <li><strong>Decongelare.</strong> Prajeste corect painea scoasa din congelator, dezghetand-o intai, apoi rumenind-o, ca sa nu iasa arsa pe afara si rece la mijloc.</li>
+      <li><strong>Reincalzire.</strong> Readuce la temperatura o felie deja prajita, dar racita, fara sa o rumeneasca in plus.</li>
+      <li><strong>Ridicare inalta.</strong> Impinge painea mai sus la final, ca sa scoti usor si feliile mici fara sa te arzi.</li>
+      <li><strong>Anulare.</strong> Opreste ciclul cand vrei tu, util cand vezi ca painea e deja gata.</li>
+      <li><strong>Verificarea prajirii,</strong> la unele Tefal: ridici painea sa vezi cat e rumenita, iar ciclul continua, nu se reseteaza.</li>
+    </ul>
+    <p>Restul functiilor exotice de pe cutie le folosesti rar sau deloc. Cauta-le pe astea si ignora umplutura.</p>
+
+    <h2 id="inox">Inox sau plastic, si ce cu puterea</h2>
+    <p>Doua intrebari care par importante, dar conteaza mai putin decat par.</p>
+    <p><strong>Materialul carcasei</strong> tine de aspect si de un compromis. Inoxul arata mai bine si rezista mai bine la zgarieturi, dar se incinge mai tare in timpul folosirii, deci nu il atingi pe lateral cat lucreaza. Plasticul e mai ieftin si ramane mai rece; unele modele au carcasa Cool Touch, proiectata sa nu frigi. Cu copii in casa, plasticul Cool Touch e mai sigur; daca pui pret pe aspect, inoxul arata mai bine.</p>
+    <p><strong>Puterea</strong> conteaza mai putin decat la alte electrocasnice. La doua felii, 700-900 W sunt normali si diferenta se masoara in secunde. Devine importanta la modelele de patru felii, care au nevoie de 1500-1600 W ca sa rumeneasca uniform toate feliile odata. Deci la doua felii nu te lua dupa wati, ci dupa functii; la patru, cauta de la 1500 W in sus.</p>
+
+    <h2 id="sfaturi">Sfaturi pentru cea mai buna paine prajita</h2>
+    <p>Aparatul face jumatate din treaba; cealalta jumatate tine de cateva obiceiuri simple, pe care putina lume le stie.</p>
+    <ul>
+      <li><strong>Prima felie iese mai deschisa.</strong> Cat timp prajitorul e inca rece, primul ciclu rumeneste mai putin decat urmatoarele. Daca vrei aceeasi nuanta, creste o treapta pentru prima runda si revino la normal dupa.</li>
+      <li><strong>Painea veche se prajeste mai repede.</strong> Cu cat painea e mai uscata, cu atat rumeneste mai iute, pentru ca are mai putina umezeala de evaporat. Pentru o felie de paine de acum doua zile, coboara o treapta ca sa nu se arda.</li>
+      <li><strong>Painea din congelator cere setarea de decongelare,</strong> nu o treapta mai mare. Ciclul de decongelare o dezgheata intai, apoi o rumeneste, deci iese facuta uniform, nu arsa afara si rece la mijloc.</li>
+      <li><strong>Nu forta felii care nu incap.</strong> O felie prea groasa sau o chifla intreaga blocheaza mecanismul si se prajeste inegal. Daca modelul are fante largi, ai voie cu felii groase; altfel, taie-le mai subtiri.</li>
+      <li><strong>Pentru cornuri si chifle, foloseste gratarul de deasupra,</strong> daca aparatul are unul. Nu baga niciodata paine cu unt sau branza direct in fanta, pica pe rezistenta, arde si face fum.</li>
+    </ul>
+    <p>Cu obiceiurile astea, chiar si un prajitor ieftin scoate paine constant buna, iar unul scump nu te salveaza daca ignori setarea potrivita pentru ce pui in el.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Iei doua felii pentru o familie.</strong> Prima portie se raceste cat se face a doua. De la trei persoane, mergi pe patru fante.</li>
+      <li><strong>Te iei dupa putere la doua felii.</strong> Diferenta dintre 700 si 900 W e de secunde. Uita-te la trepte si functii, nu la wati.</li>
+      <li><strong>Ignori sertarul de firimituri.</strong> Un prajitor fara sertar detasabil se curata greu, iar firimiturile arse fac fum si miros.</li>
+      <li><strong>Alegi inox fara sa te gandesti la copii.</strong> Carcasa metalica se incinge. Cu cei mici in casa, un model Cool Touch de plastic e mai sigur.</li>
+      <li><strong>Bagi in fanta ce nu trebuie.</strong> Paine cu unt sau branza pica pe rezistenta si arde. Pentru chifle si cornuri, foloseste gratarul de deasupra, daca exista.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la prajitoarele in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca aceleasi aparate apar listate de mai multe ori, in culori diferite, cu coduri diferite, la acelasi pret.</p>
+    <p><strong>Le-am grupat dupa numarul de felii si dotari, nu dupa pret</strong>, pentru ca numarul de felii e prima decizie reala, iar restul, functii si material, urmeaza dupa ea. Un prajitor e un aparat simplu, deci am pus accent pe ce chiar conteaza, treptele de rumenire si functiile utile, si am semnalat unde pretul urca pentru aspect, cum e la carcasa de inox sau la ecranul digital.</p>
+    <p>Nu testam aparatele in laborator si nu pretindem asta. Ne bazam pe date reale, mii de pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare. Un prajitor de paine se completeaza firesc cu <a href="/espressor-automat-pentru-acasa/">un espressor bun</a> pentru cafeaua de dimineata si cu <a href="/cele-mai-bune-blendere/">un blender</a> pentru un smoothie langa paine.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 70 la 232 de lei, un interval mic, pentru ca prajitoarele sunt printre cele mai accesibile electrocasnice.</p>
+    <p><strong>Sub 130 de lei</strong> stau modelele bune de doua felii: Heinner Tasty, Daewoo, Philips HD2581 si Viva, Tefal Vita. Aici gasesti tot ce iti trebuie pentru una-doua persoane, cu functiile de baza.</p>
+    <p><strong>Intre 165 si 215 lei</strong> intri la modelele de patru felii, FRAM si Biovita CLASSIC-4, si la variantele de inox de doua felii. Zona buna pentru familie sau pentru cine vrea un aparat mai aratos.</p>
+    <p><strong>La 232 de lei</strong>, Tefal Smart'n Light e cel mai scump, un prajitor de doua felii premium, cu ecran digital si fante largi. Il alegi cand vrei un aparat de doua felii cat mai bine echipat, nu neaparat cel mai practic pe leu.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-prajitoare-de-paine" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-prajitoare-de-paine" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

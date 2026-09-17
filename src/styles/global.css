@@ -141,6 +141,23 @@ a:hover {
   color: var(--color-primary-700);
 }
 
+/* Linkuri contextuale din textul articolelor: subliniate (interlink).
+   TOC foloseste <ol> (.rd-toc ol), listele din articol <ul>, deci TOC nu e afectat. */
+.rd p:not(.rd-byline):not(.rd-disc):not(.author-name) a,
+.rd ul li a,
+.rd-note a {
+  color: var(--color-primary-700);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.rd p:not(.rd-byline):not(.rd-disc):not(.author-name) a:hover,
+.rd ul li a:hover,
+.rd-note a:hover {
+  text-decoration-thickness: 2px;
+}
+
 p {
   margin-bottom: 1.25rem;
 }
@@ -220,8 +237,13 @@ p {
   .nav-desktop {
     display: flex;
     align-items: center;
-    gap: var(--space-lg);
+    gap: .15rem;
   }
+  .nav-desktop .nav-link { font-size: .9rem; white-space: nowrap; padding: .45rem .5rem; }
+}
+@media (min-width: 1280px) {
+  .nav-desktop { gap: .3rem; }
+  .nav-desktop .nav-link { font-size: .93rem; padding: .5rem .65rem; }
 }
 
 .nav-link {
@@ -1475,3 +1497,95 @@ p {
 
 /* Intro pagina de categorie (descriere mutata din homepage) */
 .category-intro { color: var(--color-gray-600); font-size: 1.02rem; line-height: 1.65; max-width: 760px; margin-top: var(--space-sm); }
+
+
+/* ------------------------------------------------------------------
+   Stiluri de articol (.rd*)
+   Erau copiate ca bloc <style> scoped in fiecare dintre cele 68 de articole.
+   Astro incapsuleaza stilurile per componenta, deci un articol NOU scris fara
+   blocul ala ramanea complet nestilizat — exact ce s-a intamplat la primul
+   articol din Faza 3 si la pagina 404.
+   Mutate aici ca sursa unica: orice pagina care foloseste .rd le primeste automat.
+   Articolele vechi isi pastreaza copia scoped (reguli identice, fara efect vizual).
+   ------------------------------------------------------------------ */
+.rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+.rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+.rd-byline a { font-weight: 600; }
+.rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+.rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+.rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+.rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+.rd h2, .rd h3 { scroll-margin-top: 84px; }
+.rd p { line-height: 1.7; }
+.rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+.rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+.rd-toc summary::-webkit-details-marker { display: none; }
+.rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+.rd-toc[open] summary::before { transform: rotate(90deg); }
+.rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+.rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+.rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+.rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+.rd-toc a:hover { color: var(--color-primary-700); }
+/* Bulina verde e pentru listele din TEXTUL articolului. Cand regulile astea erau scoped in
+   fiecare articol, Astro le tinea in afara componentelor-copil. Devenite globale, intrau si in
+   interiorul ProductCard si puneau buline la specs si la avantaje/dezavantaje, care au deja
+   propriul marcaj. De aceea excludem explicit continutul cardurilor. */
+.rd ul:not(.pcard-specs):not(.pcard-pc ul) { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+.rd ul:not(.pcard-specs):not(.pcard-pc ul) > li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+.rd ul:not(.pcard-specs):not(.pcard-pc ul) > li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+/* plasa de siguranta: nimic din interiorul unui card nu primeste bulina noastra */
+.rd .pcard li::before { content: none; }
+.rd .pcard ul { padding-left: 0; }
+/* min-width: fara el, pe mobil tabelul se STRIVESTE in latimea ecranului in loc sa
+   deruleze, iar numele lungi de produs se inghesuie peste randul urmator.
+   .table-wrap are overflow-x:auto, dar n-are ce derula daca tabelul se lasa micsorat. */
+.rd-table { width: 100%; min-width: 540px; border-collapse: collapse; font-size: .92rem; }
+.rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+.rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+.cmp-prod { display: flex; align-items: center; gap: .65rem; }
+.cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+.cmp-prod span { font-weight: 600; line-height: 1.35; }
+.table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+.rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+.rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+.rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+.rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+.rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+.rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+.rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+.rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+.rd-offers-txt span { font-size: .9rem; opacity: .92; }
+.rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+.author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+.author-name a { color: inherit; }
+.rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+@media (max-width: 640px) {
+  .rd { padding-left: .55rem; padding-right: .55rem; }
+  .rd h1 { font-size: 1.6rem; }
+  .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+  .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+}
+
+
+/* ------------------------------------------------------------------
+   Grafice (.rd-chart) vs figuri de produs (.rd-fig)
+   Graficele sunt generate ingust si cu fonturi mari, ca sa fie lizibile pe telefon
+   (vezi scripts/lib/chart-base.mjs). Consecinta: pe desktop, la latimea coloanei de
+   860 px, ies prea inalte si domina pagina. Le limitam latimea pe ecrane mari — textul
+   ramane lizibil (38 px la 1100 px imagine, afisata la 620 px = ~21 px efectivi),
+   iar pe mobil ocupa toata latimea disponibila.
+   ------------------------------------------------------------------ */
+.rd-chart {
+  display: block;
+  width: 100%;
+  max-width: 620px;
+  height: auto;
+  margin: 1.6rem auto 1.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-gray-200, #e7e5e4);
+}
+@media (max-width: 700px) {
+  .rd-chart { max-width: 100%; margin: 1.2rem 0 1.4rem; border-radius: 8px; }
+}

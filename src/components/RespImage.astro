@@ -1,0 +1,46 @@
+---
+// Imagine responsiva pentru hero si figuri.
+//
+// De ce exista: hero-ul master e 1920x1080 (peste pragul Discover de 1200px latime), dar fara
+// srcset telefoanele descarcau exact acelasi fisier. Hero-ul e de obicei elementul LCP, deci
+// costul se vedea direct in Core Web Vitals pe mobil, unde vine majoritatea traficului.
+//
+// Variantele (-1280, -960) se genereaza cu buildResponsive() din scripts/hero3.mjs.
+// Daca lipsesc de pe disc, `sizes`/`srcset` tot indica master-ul, deci nu se strica nimic.
+interface Props {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  widths?: number[];
+  sizes?: string;
+  priority?: boolean;   // true = hero (fetchpriority high, fara lazy)
+  class?: string;
+}
+
+const {
+  src, alt, width, height,
+  widths = [960, 1280, 1920],
+  sizes = '(max-width: 860px) 100vw, 860px',
+  priority = false,
+  class: className = '',
+} = Astro.props;
+
+const base = src.replace(/\.webp$/, '');
+const srcset = widths
+  .map(w => (w === Math.max(...widths) ? `${src} ${w}w` : `${base}-${w}.webp ${w}w`))
+  .join(', ');
+---
+
+<img
+  class={className}
+  src={src}
+  srcset={srcset}
+  sizes={sizes}
+  alt={alt}
+  width={width}
+  height={height}
+  loading={priority ? 'eager' : 'lazy'}
+  decoding={priority ? 'sync' : 'async'}
+  fetchpriority={priority ? 'high' : 'auto'}
+/>

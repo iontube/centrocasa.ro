@@ -1,243 +1,319 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Aspirator cu spalare pentru covoare",
-  excerpt: "Stau si ma gandesc la covoarele mele. Parca le-am cam neglijat in ultima vreme. Incep sa arate obosite si nu prea mai au viata aia de alta data. M-am gandit ca e momentul sa investesc intr-un aspirator cu spalare pentru covoare. Am tot cautat si am citit, si acum vreau sa va povestesc ce am aflat si ce am incercat.",
-  image: "/images/articles/aspirator-cu-spalare-pentru-covoare.webp",
-  category: "Curatenie si Intretinere",
-  categorySlug: "curatenie-intretinere",
-  date: "2026-01-05T12:34:02.473Z",
-  modifiedDate: "2026-01-26T12:34:02.157Z",
-  author: "Elena Dragomir",
-  authorRole: "Consultant Amenajari",
-  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
-};
-
-const faq = [
-  { question: "Cat de des ar trebui sa folosesc aspiratorul cu spalare pentru covoare?", answer: "Depinde de cat de murdare sunt covoarele tale. Pentru o intretinere generala, o data la 2-3 luni ar fi suficient. Daca ai copii sau animale, sau daca apar pete frecvent, poti folosi aspiratorul si mai des, poate chiar saptamanal pe zonele cu trafic intens sau unde apar accidente." },
-  { question: "Pot folosi orice solutie de curatare?", answer: "Este recomandat sa folosesti solutiile specifice recomandate de producatorul aspiratorului. Solutiile de casa sau detergentii obisnuiti pot crea prea multa spuma, pot lasa reziduuri sau pot chiar deteriora aparatul sau covorul." },
-  { question: "Cat timp dureaza pana se usuca covorul dupa spalare?", answer: "Timpul de uscare variaza in functie de umiditatea din aer, temperatura camerei si cat de bine a fost aspirata apa. In general, poate dura intre 2 si 6 ore. O buna ventilatie accelereaza procesul." },
-  { question: "Pot curata si tapiteria cu acest aparat?", answer: "Da, multe aspiratoare cu spalare vin cu accesorii speciale pentru curatarea tapiteriei canapelelor, scaunelor sau a saltelelor. Verifica specificatiile modelului pe care il alegi." },
-  { question: "Ce fac daca un covor se decoloreaza la testul pe o zona ascunsa?", answer: "Daca observi ca solutia de curatare decoloreaza covorul, nu mai folosi aparatul pe acea suprafata. Poate fi necesara curatarea profesionala sau sa folosesti un produs special pentru covoare delicate, testat in prealabil." },
-  { question: "Cum intretin aspiratorul cu spalare ca sa tina cat mai mult?", answer: "Cel mai important este sa cureti si sa clatesti bine toate componentele (rezervoare, furtunuri, duze) dupa fiecare utilizare. Asigura-te ca aparatul este complet uscat inainte de a-l depozita. Evita sa il depozitezi in locuri umede." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un aspirator cu spalare pentru covoare?", id: "de-ce-ai-nevoie-de-un-aspirator-cu-spalare-pentru-covoare" },
-  { title: "Top recomandari de aspiratoare cu spalare pentru covoare", id: "top-recomandari-de-aspiratoare-cu-spalare-pentru-covoare" },
-  { title: "Cum alegi corect aspiratorul cu spalare pentru covoare", id: "cum-alegi-corect-aspiratorul-cu-spalare-pentru-covoare" },
-  { title: "Avantaje si dezavantaje: o parere sincera", id: "avantaje-si-dezavantaje-o-parere-sincera" },
-  { title: "Sfaturi practice din experienta mea si a altora", id: "sfaturi-practice-din-experienta-mea-si-a-altora" },
-  { title: "Parerea mea finala: merita investitia?", id: "parerea-mea-finala-merita-investitia" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['aspirator-spalare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Cu spalare si extractie ---
+  { g: 'extr', id: 'DQ5L903BM', badge: 'Cel mai vandut', short: 'SeveShop C5', tip: '3 in 1, spray-extractie', putere: '450 W', greutate: '4 kg',
+    specs: ['3 in 1: aspira, spala si extrage', 'putere 450 W, doar 4 kg', 'cablu de 3 m, functionare silentioasa', 'de departe cel mai vandut, 422 de pareri'],
+    pros: ['De departe cel mai vandut din selectie, 422 de pareri', 'Nota aproape maxima, 4.93', 'Usor, 4 kg, si silentios', 'Spalare intensiva prin spray si extractie, pentru covoare si tapiterii'],
+    cons: ['Cablu scurt, 3 m, te leaga de priza', 'Rezervoare mici fata de aparatele profesionale'],
+    verdict: 'Cel mai popular aspirator cu spalare de aici si cea mai sigura alegere pentru un cumparator obisnuit. SeveShop C5 face trei lucruri intr-unul: aspira, pulverizeaza solutia de curatare si extrage imediat apa murdara, adica spalare prin injectie-extractie, exact ce scoate petele adanci din covoare, canapele si saltele. Are 450 W, cantareste doar 4 kg si e silentios, deci il manevrezi usor pe scari sau prin masina. E de departe cel mai vandut din selectie, cu 422 de pareri si nota 4.93, cea mai buna dovada ca isi face treaba pentru mii de oameni. Cablul de 3 m e cam scurt si rezervoarele sunt mici fata de un aparat profesional, normal la un model de casa. Il iei cand vrei cel mai verificat aspirator cu spalare, usor si eficient, pentru curatenia textilelor din casa.' },
+  { g: 'extr', id: 'D8VDZL3BM', badge: 'Cel mai bun raport', short: 'SeveShop C3', tip: '3 in 1, spray-extractie', putere: '450 W', greutate: '3.5 kg',
+    specs: ['3 in 1, cu extractie', 'putere 450 W, cel mai usor, 3.5 kg', 'cablu generos, 5 m', 'nota 4.89 din 140 de pareri'],
+    pros: ['Cel mai usor din selectie, 3.5 kg', 'Cablu de 5 m, mai multa libertate de miscare', 'Pret mai mic decat C5, aceeasi functie de baza', 'Nota mare, 4.89, din multe pareri'],
+    cons: ['Rezervoare mici, pauze de reumplere la suprafete mari', 'Fara abur sau incalzire a apei'],
+    verdict: 'Fratele mai mic si mai ieftin al lui C5, cu un avantaj practic: cablul. SeveShop C3 face acelasi lucru, aspira, pulverizeaza si extrage, la aceeasi putere de 450 W, dar e si mai usor, doar 3.5 kg, si vine cu un cablu de 5 m, cu doi metri mai mult decat C5, deci te misti mai lejer in jurul canapelei sau al covorului fara sa schimbi priza. Are nota 4.89 din 140 de pareri, la un pret mai mic. Ca la orice model de casa, rezervoarele sunt mici, deci la suprafete mari faci pauze de reumplere, si nu are abur. Il iei cand vrei cel mai bun raport pret-performanta, un aparat usor cu cablu lung, si nu ai nevoie de functii in plus.' },
+  { g: 'extr', id: 'D0FY7L3BM', badge: 'Cel mai complet', short: 'SeveShop C6 Max', tip: '4 in 1, spray-extractie', putere: '1650 W', greutate: '4.5 kg',
+    specs: ['4 in 1, cea mai puternica din gama SeveShop', 'putere 1650 W', 'spalare intensiva prin spray si extractie', 'cablu de 4 m, 4.5 kg'],
+    pros: ['4 in 1, cea mai completa din gama SeveShop', 'Putere mult mai mare, 1650 W', 'Extractie mai eficienta, suprafete mai uscate', 'Nota buna, 4.69'],
+    cons: ['Mai grea si mai scumpa decat C3 si C5', 'Rezervoare tot de uz casnic'],
+    verdict: 'Modelul cel mai puternic de la SeveShop, pentru cine vrea o curatare mai in profunzime. C6 Max e un 4 in 1, cu o putere de 1650 W, mult peste cei 450 W ai modelelor C3 si C5: asta inseamna aspirare si extractie mai puternice, deci scoate mai multa apa din covor sau canapea, iar suprafata ramane mai uscata si o poti folosi mai repede. Are spalare intensiva prin spray si extractie si cablu de 4 m. E, evident, mai grea, 4.5 kg, si mai scumpa decat C3 si C5, iar rezervoarele raman de uz casnic. O iei cand vrei cea mai puternica optiune SeveShop, pentru covoare groase, pete incapatanate sau curatare mai deasa, si nu te deranjeaza pretul mai mare.' },
+  { g: 'extr', id: 'DXZPJYBBM', badge: 'Aspira si lichide', short: 'Studio filtrare apa', tip: 'Filtrare prin apa, wet & dry', putere: '2400 W', greutate: '7 kg',
+    specs: ['filtrare prin apa si absorbtie de lichide', 'putere mare, 2400 W', 'derulator automat de cablu, 6 m', 'nota 4.42 din 133 de pareri'],
+    pros: ['Aspira si lichide, nu doar praf, bun la inundatii mici si pete', 'Filtrarea prin apa retine praful si alergenii', 'Putere mare, 2400 W, si cablu lung cu derulator automat', 'Multe pareri, 133, nota buna'],
+    cons: ['Cel mai greu din selectie, 7 kg', 'Alt principiu decat spray-extractia clasica'],
+    verdict: 'O abordare diferita, pentru cine vrea un aparat care aspira si lichidele, nu doar spala textile. Studio foloseste filtrarea prin apa: praful si murdaria sunt prinse intr-un rezervor cu apa, in loc de sac, ceea ce retine bine particulele fine si alergenii, iar aparatul poate aspira si lichide, deci e util la o inundatie mica, o bautura varsata sau dupa ce ai udat un covor la spalat. Are o putere mare, 2400 W, cablu de 6 m cu derulator automat si 133 de pareri, cu nota buna. E cel mai greu din selectie, 7 kg, si functioneaza dupa alt principiu decat spray-extractia clasica, deci il iei mai mult pentru versatilitatea aspirat uscat plus lichide. Il alegi cand vrei un aparat puternic, care ridica si apa, si prinde praful in apa, nu doar un aspirator de spalat covoare.' },
+  { g: 'extr', id: 'DKFKXK2BM', badge: 'Pentru canapele', short: 'CleanKoala Carpet Cleaner', tip: '3 in 1, spray-extractie', putere: '450 W', greutate: '4 kg',
+    specs: ['spalare prin spray si extractie', 'pentru canapele, covoare, tapiterii', 'putere 450 W, 4 kg', 'uz rezidential'],
+    pros: ['Gandit pentru canapele si tapiterii', 'Usor, 4 kg, manevrabil', 'Spalare prin injectie-extractie, ca modelele SeveShop', 'Alternativa de brand la un pret apropiat'],
+    cons: ['Mai putine pareri, 24', 'Fara abur sau incalzire'],
+    verdict: 'O alternativa de brand la modelele SeveShop, cu acelasi principiu de curatare. CleanKoala Carpet Cleaner spala prin spray si extractie, pulverizeaza solutia si o trage inapoi cu murdaria, si e gandit anume pentru canapele, covoare si tapiterii, unde petele si mizeria intra adanc in fibre. Cantareste 4 kg, deci il duci usor de la o camera la alta sau in masina, si costa similar cu modelele SeveShop de baza. Are mai putine pareri, 24, cu o nota buna, 4.21, si nu are functii de abur sau incalzire a apei. Il iei cand vrei un aspirator cu spalare simplu si usor, dedicat tapiteriilor, si preferi sa incerci un alt brand la un pret asemanator.' },
+  { g: 'extr', id: 'DC14XQ3BM', badge: 'Fara fir', short: 'Bedee 3 in 1 fara fir', tip: '3 in 1, cu baterie', putere: '600 W', greutate: '4.8 kg',
+    specs: ['3 in 1, cu baterie reincarcabila, fara fir', '600 W, 15000 Pa aspirare', 'filtru lavabil', 'uz rezidential si comercial'],
+    pros: ['Fara fir, cu baterie, te misti fara priza', 'Aspirare puternica, 15000 Pa', 'Filtru lavabil, il speli si il refolosesti', 'Bun si acasa, si pentru firme mici'],
+    cons: ['Foarte putine pareri, 5', 'Autonomia bateriei limiteaza sesiunile lungi'],
+    verdict: 'Singura optiune fara fir din selectie, pentru cine vrea libertate totala de miscare. Bedee e un 3 in 1 cu baterie reincarcabila, deci nu depinzi de priza si de lungimea cablului, un plus real cand cureti scari, masina sau colturi departate. Are 600 W si o aspirare declarata de 15000 Pa, plus un filtru lavabil pe care il speli si il pui la loc, fara consumabile. Marele avantaj, lipsa firului, vine cu limita clasica a bateriilor: la sesiuni lungi trebuie sa reincarci, deci nu e pentru curatat toata casa dintr-o data. Are inca foarte putine pareri, doar 5, asa ca il iei mai mult pe specificatii. Il alegi cand vrei mobilitate maxima, fara cablu, pentru curatari scurte si punctuale.' },
+  // --- Cu abur ---
+  { g: 'abur', id: 'DLM9YWYBM', badge: 'Cu abur, brand', short: 'Fakir PR 7020', tip: 'Spalare + abur', putere: '2000 W', greutate: '',
+    specs: ['spalare si abur, igienizare la cald', 'putere mare, 2000 W', 'pentru canapele si tapiterii', 'de la Fakir, brand cunoscut'],
+    pros: ['Combina spalarea cu aburul, igienizare in profunzime', 'Putere mare, 2000 W', 'Fakir, brand cu traditie in aspiratoare', 'Aburul desface petele si distruge o parte din bacterii si acarieni'],
+    cons: ['Cel mai scump din selectie', 'Mai putine pareri, 24'],
+    verdict: 'Alegerea daca vrei nu doar spalare, ci si igienizare cu abur, de la un brand cunoscut. Fakir PR 7020 are 2000 W si combina spalarea prin apa cu aburul: caldura desface mai usor petele si grasimea si distruge o parte din bacterii si acarieni, un avantaj real pe canapele, saltele si acolo unde stau copiii sau animalele. Fakir e un brand cu traditie in aspiratoare, un plus de incredere fata de marcile generice. E cel mai scump din selectie si are inca putine pareri, 24, cu nota buna. Il iei cand pui pret pe igienizarea cu abur si pe un brand consacrat, si esti dispus sa platesti mai mult pentru curatare la cald, nu doar cu apa.' },
+  { g: 'abur', id: 'DTT4XK2BM', badge: 'Cu abur si caldura', short: 'CleanKoala Multi Heat', tip: 'Spalare + abur', putere: '1650 W', greutate: '3.5 kg',
+    specs: ['spalare si abur, 1650 W', 'rezervor de apa detasabil', 'usor, 3.5 kg', 'pentru canapele si tapiterii'],
+    pros: ['Spalare cu abur la un pret mai mic decat Fakir', 'Rezervor de apa detasabil, il umpli si golesti usor', 'Usor, 3.5 kg', 'Igienizare la cald pentru textile'],
+    cons: ['Putine pareri, 24', 'Brand mai putin cunoscut'],
+    verdict: 'Varianta accesibila de aspirator cu spalare si abur, pentru cine vrea igienizare la cald fara pretul unui brand mare. CleanKoala Multi Heat are 1650 W si combina spalarea cu aburul, deci curata in profunzime canapelele si tapiteriile si ajuta la desprinderea petelor si la reducerea acarienilor. Are un rezervor de apa detasabil, pe care il umpli si il golesti comod, si cantareste doar 3.5 kg, deci e usor de manevrat. Are aceleasi 24 de pareri ca modelele apropiate, cu nota buna, si vine de la un brand mai putin cunoscut. Il iei cand vrei functia de abur la un pret mai mic decat Fakir si un aparat usor, si nu conteaza ca brandul e mai nou.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const EXTR = PICKS.filter(x => x.g === 'extr');
+const ABUR = PICKS.filter(x => x.g === 'abur');
+
+const hero = '/images/articles/aspirator-cu-spalare-pentru-covoare.webp';
+const figExtr = '/imagini/articole/aspirator-spalare-extractie.webp';
+const figAbur = '/imagini/articole/aspirator-spalare-abur.webp';
+const published = '2026-07-18T18:56:52+03:00';
+
+const faq = [
+  { question: 'Ce e un aspirator cu spalare si cu ce difera de unul obisnuit?', answer: 'Un aspirator cu spalare, numit si cu injectie-extractie, pulverizeaza o solutie de apa cu detergent direct in covor sau tapiterie si, in aceeasi miscare, extrage lichidul impreuna cu murdaria desprinsa. Fata de un aspirator obisnuit, care doar ridica praful uscat de la suprafata, cel cu spalare patrunde in fibre si scoate mizeria si petele adanci, apa murdara, parul de animale, alergenii. Practic, spala textilele, nu doar le aspira. De aceea e folosit pentru curatarea in profunzime a covoarelor, canapelelor, saltelelor si scaunelor auto, acolo unde un aspirator normal nu ajunge.' },
+  { question: 'Pe ce suprafete pot folosi un aspirator cu spalare?', answer: 'Pe aproape orice suprafata textila din casa si din masina: covoare si mochete, canapele si fotolii, saltele, perne mari, scaune si tapiterie auto, covorase, uneori chiar draperii groase. E ideal pentru familiile cu copii mici sau cu animale, unde petele, parul si mirosurile se aduna in textile. Nu se foloseste pe suprafete care nu suporta apa, ca lemnul nefinisat, pielea naturala sensibila sau materialele care se pateaza la umezeala; pentru ele verifica intai eticheta de intretinere. Pe textilele obisnuite, insa, e cel mai bun mod de a le readuce aproape ca noi.' },
+  { question: 'Cat de repede se usuca covorul sau canapeaua dupa spalare?', answer: 'Mult mai repede decat dupa o spalare clasica, tocmai pentru ca aparatul extrage cea mai mare parte a apei imediat. Cu cat extractia e mai puternica, cu atat suprafata ramane mai uscata: un model cu putere mai mare, ca SeveShop C6 Max sau aparatele cu abur, scoate mai multa apa, deci covorul se usuca mai repede. In general, o canapea sau un covor tratat corect e uscat in cateva ore, iar daca aerisesti camera sau folosesti un ventilator, si mai repede. Nu uda excesiv: treci de mai multe ori cu extractia, fara spray suplimentar, ca sa scoti apa ramasa.' },
+  { question: 'Ce solutie sau detergent folosesc?', answer: 'Cel mai sigur, un detergent special pentru aspiratoare cu spalare sau pentru curatat covoare si tapiterii, care face putina spuma si se dizolva bine, ca sa nu infunde aparatul. Multe modele vin cu o recomandare de solutie sau chiar cu o proba. Doza corect, nu pune mai mult detergent decat scrie, pentru ca surplusul ramane in fibre, atrage mizeria si face textilul sa se murdareasca mai repede. Evita detergentii care fac multa spuma sau produsele neadecvate, care pot deteriora pompa. Pentru pete grele, poti pulveriza intai un pretratant, il lasi cateva minute, apoi treci cu aparatul.' },
+  { question: 'Merita un model cu abur?', answer: 'Daca vrei igienizare, nu doar curatare, da. Modelele cu abur, ca Fakir PR 7020 sau CleanKoala Multi Heat din selectie, adauga caldura la spalare: aburul desface mai usor petele si grasimea si distruge o parte din bacterii si acarieni, un plus real pe saltele, canapele si acolo unde stau copiii sau animalele. Dezavantajul e pretul mai mare si, uneori, greutatea. Daca ai nevoie mai ales sa scoti pete si mizerie din textile, un model clasic cu spray-extractie e suficient si mai ieftin; daca vrei si dezinfectie la cald, un model cu abur merita banii in plus.' },
+  { question: 'Cu fir sau fara fir, ce sa aleg?', answer: 'Depinde de cum il folosesti. Modelele cu fir, majoritatea din selectie, au putere constanta si nu se descarca, dar te leaga de priza si de lungimea cablului, de aceea conteaza sa aiba un cablu lung, de 4-6 m, ca la SeveShop C3 sau Studio. Un model fara fir, ca Bedee din selectie, iti da libertate totala de miscare, ideal pentru scari, masina si colturi departate, dar autonomia bateriei limiteaza sesiunile lungi si trebuie reincarcat. Pe scurt: cu fir pentru curatari mari, sustinute; fara fir pentru interventii scurte si mobilitate maxima. Alege dupa unde si cat de mult cureti.' },
+  { question: 'Cum intretin aparatul dupa folosire?', answer: 'Curatarea de dupa e la fel de importanta ca spalarea. Goleste imediat rezervorul de apa murdara, nu lasa apa statuta inauntru, pentru ca prinde miros si bacterii. Clateste rezervoarele, atat cel de apa curata, cat si cel de apa murdara, si lasa-le sa se usuce. Multe modele au un filtru intre rezervorul murdar si motor, care prinde particulele mari si protejeaza motorul; verifica-l periodic, curata-l sau spala-l daca e lavabil, ca la Bedee din selectie. Sterge duzele si periile de par si scame. O intretinere simpla dupa fiecare folosire prelungeste mult viata aparatului si tine mirosurile la distanta.' },
+  { question: 'Cat costa un aspirator cu spalare bun?', answer: 'Mai putin decat ai crede pentru cat de mult ajuta. In selectie, un model bun cu spray-extractie, usor si eficient, porneste de la circa 470-570 de lei, cazul modelelor SeveShop C3 si C5, cele mai vandute. Variantele mai puternice, 4 in 1 sau cu filtrare prin apa, sunt in general 600-800 de lei. Modelele cu abur, care adauga igienizarea la cald, merg de la circa 800 la 1100 de lei, cazul CleanKoala Multi Heat si Fakir. Pe langa pret, tine cont ca un astfel de aparat inlocuieste multe interventii la firme de curatat covoare, deci se amortizeaza dupa cateva folosiri.' },
+  { question: 'Inlocuieste un aspirator cu spalare aspiratorul obisnuit?', answer: 'Nu, cele doua se completeaza, nu se inlocuiesc. Un aspirator cu spalare e gandit pentru curatarea in profunzime, ocazionala, a textilelor: il scoti cand vrei sa speli covorul, canapeaua sau salteaua, nu in fiecare zi. Pentru aspirarea zilnica a prafului, a firimiturilor si a parului de pe podele si covoare ai in continuare nevoie de un aspirator normal, vertical sau cu sac, mai usor si mai rapid de folosit pentru rutina. Practic, aspiratorul obisnuit intretine curatenia de zi cu zi, iar cel cu spalare face curatenia mare, la interval de cateva saptamani sau luni.' },
+  { question: 'Cat de des ar trebui sa spal covoarele si canapelele?', answer: 'Depinde de cat de intens sunt folosite si de cine e in casa. Pentru o gospodarie obisnuita, o spalare in profunzime a covoarelor si canapelelor la fiecare doua-trei luni tine textilele proaspete. In casele cu copii mici, cu animale sau cu trafic intens, merita mai des, chiar lunar, pentru ca petele, parul si mirosurile se aduna repede. In plus, trateaza petele imediat ce apar, nu astepta spalarea generala: cu cat o pata sta mai mult, cu atat intra mai adanc in fibre si mai greu iese. Intre spalari, aspira regulat cu un aspirator normal, ca sa nu se adune mizeria.' },
+];
+
+const images = [hero, figExtr, figAbur, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Aspirator cu spalare pentru covoare - CentroCasa"
-  description="Stau si ma gandesc la covoarele mele. Parca le-am cam neglijat in ultima vreme. Incep sa arate obosite si nu prea mai au viata aia de alta data. M-am gandit ca e momentul sa investesc intr-un aspirator cu spalare pentru covoare. Am tot cautat si am citit, si acum vreau sa va povestesc ce am aflat si ce am incercat."
-  image="/images/articles/aspirator-cu-spalare-pentru-covoare.webp"
+  title="Cele mai bune aspiratoare cu spalare pentru covoare si tapiterii in 2026"
+  description="Care sunt cele mai bune aspiratoare cu spalare pentru covoare si tapiterii in 2026: modele 3 in 1 si 4 in 1 cu injectie-extractie de la SeveShop si CleanKoala, variante cu filtrare prin apa si aparate cu abur de la Fakir, comparate pe putere, greutate si dotari. Plus cum functioneaza si cum alegi."
+  image={hero}
   type="article"
-  publishedTime="2026-01-05T12:34:02.473Z"
-  modifiedTime="2026-01-26T12:34:02.157Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Elena Dragomir"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cele mai bune aspiratoare cu spalare pentru covoare si tapiterii' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Aspirator cu spalare pentru covoare</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune aspiratoare cu spalare pentru covoare si tapiterii</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/curatenie-intretinere/" class="article-category">Curatenie si Intretinere</a>
-        <span class="article-date">30 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Aspirator cu spalare pentru covoare</h1>
-    </header>
+    <h1>Cele mai bune aspiratoare cu spalare pentru covoare si tapiterii</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/aspirator-cu-spalare-pentru-covoare.webp" alt="Aspirator cu spalare pentru covoare" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune aspiratoare cu spalare pentru covoare si tapiterii" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-aspirator-cu-spalare-pentru-covoare">
-        <h2>De ce ai nevoie de un aspirator cu spalare pentru covoare?</h2>
-        <p>Salutare, dragilor! Azi vorbim despre ceva ce ne sta pe suflet multora dintre noi, mai ales daca suntem parinti, avem animale de companie sau pur si simplu iubim sa ne bucuram de un camin curat si primitor. Vorbesc despre covoare. Ah, covoarele! Ele aduc caldura, culoare si confort in casele noastre.</p>
-        <p>Dar, recunoastem, ele sunt si un magnet pentru praf, murdarie, pete si tot felul de microbi. Curatarea lor poate fi o adevarata corvoada, nu-i asa? De cate ori nu v-ati impiedicat de ideea de a le curata in profunzime? Eu am patit-o de multe ori.</p><p>Si aici intervine marele erou al zilei: <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspirator</a>ul cu spalare pentru covoare. Pentru cine e potrivit? Pai, sincer sa fiu, pentru oricine are covoare in casa si isi doreste o curatenie de exceptie, mult mai <a href="/cum-sa-cureti-eficient-casa/">eficient</a>a decat ce poate oferi un aspirator clasic. Daca aveti copii mici, care mai scapa cate ceva pe jos, sau animale de companie, stiti despre ce vorbesc.</p>
-        <p>Petele de mancare, zgarieturile de la gheare, blana… toate se depun in fibrele covorului si devin greu de indepartat. Un aspirator cu spalare nu doar ca aspira, ci si curata in profunzime, indepartand murdaria si improspatand tesatura.</p><p>Pentru mine, a fost o adevarata revelations. Am un covor in living pe care il iubesc, dar care a inceput sa arate putin cam trist. Am incercat sa-l curat cu solutii din comert si cu mopul, dar rezultatele au fost… modeste.</p>
-        <p>Parca doar mutam murdaria dintr-un loc in altul. Si apoi am inceput sa ma interesez despre aspiratoarele astea cu spalare. Am citit pareri, am vazut filmulete, si am zis ca trebuie sa incerc.</p>
-        <p>Partea buna e ca nu e nevoie sa fiti experti in curatenie pentru a le folosi. Sunt gandite sa fie cat mai practice si usor de utilizat.</p><p>M-am gandit ca ar fi util sa impartasesc cu voi motivele pentru care am decis sa fac aceasta achizitie si ce probleme concrete rezolva. In primul rand, igienizarea. Covoarele pot deveni adevarate focare de bacterii si acarieni, mai ales daca nu sunt <a href="/robot-de-curatat-geamuri/">curatat</a>e regulat.</p>
-        <p>Un aspirator cu spalare, prin procesul de curatare cu apa si solutie speciala, poate elimina pana la 99% din acesti microbi, asigurand un mediu mult mai sanatos in casa. Pentru familiile cu alergii, astm sau probleme respiratorii, acest aspect este crucial.</p><p>Apoi, vine vorba de pete. Fie ca e vorba de vin, cafea, suc sau zgarieturi de la animale, petele pe covoare pot fi extrem de frustrante. Aspiratoarele cu spalare au jeturi de apa si solutie care patrund in fibre, dizolva pata si apoi o aspira.</p>
-        <p>Rezultatele sunt, de cele mai multe ori, spectaculoase. Am vazut covoare care aratau ca noi dupa o curatare temeinica. Si, ultimul, dar nu cel din urma, aspectul estetic.</p>
-        <p>Un covor curat si proaspat inseamna un ambient placut, o atmosfera mai primitoare in casa. Nu subestimati puterea unui covor care arata bine!</p>
-      </section>
-
-      <section id="top-recomandari-de-aspiratoare-cu-spalare-pentru-covoare">
-        <h2>Top recomandari de aspiratoare cu spalare pentru covoare</h2>
-        <p>Bun, si acum ca v-am convins ca e o idee buna, hai sa vedem ce optiuni avem pe piata. Am facut un mic research si am ales cateva modele care mi s-au parut interesante, luand in considerare pretul, performanta si parerile altor utilizatori. Sincer sa fiu, am stat mult pe ganduri, pentru ca sunt multe modele si diferentele nu sunt mereu evidente la prima vedere. Dar am incercat sa ma concentrez pe ce conteaza cu adevarat.</p><p>Pe primul loc in lista mea a intrat <strong>Bissell SpotClean Pro</strong>. E un model destul de popular si, pe buna dreptate. E compact, usor de manevrat, si foarte eficient pe pete.</p>
-        <p>Pretul lui se invarte in jur de 700-800 RON. Partea buna e ca vine cu diverse accesorii, inclusiv un furtun lung si duze pentru zone greu accesibile. Dezavantajul ar fi ca rezervorul de apa nu e foarte mare, deci pentru suprafete extinse s-ar putea sa fie nevoie de reumpleri frecvente.</p>
-        <p>Dar pentru pete punctuale si curatarea zonelor mici, e excelent.</p><p>Apoi, am dat peste <strong>Karcher Puzzi 100</strong>. Acesta e un pic mai scump, ajungand spre 1200-1500 RON, dar este un aparat profesional, gandit pentru suprafete mai mari si o curatare in profunzime. Este mai robust, are o putere de aspiratie mai mare si un rezervor mai generos. E ideal daca aveti multe covoare sau tapiterii de curatat. Un mic minus ar fi ca este mai greu si mai voluminos decat Bissell, deci nu e tocmai cel mai la indemana pentru o curatare rapida.</p><p>O alta optiune interesanta, mai ales pentru cei cu un buget mai restrans, este <strong>Heinner HVC-X1200X</strong>. Acesta se gaseste pe la 500-600 RON si ofera o solutie decenta <a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">pentru curatarea</a> covoarelor. Nu are aceeasi putere ca modelele de top, dar pentru o utilizare ocazionala si pentru a improspata covoarele, este o alegere buna.</p>
-        <p>E usor si simplu de folosit. Partea mai putin buna ar fi ca durabilitatea si eficienta pe petele dificile s-ar putea sa nu fie la acelasi nivel cu aparatele mai scumpe.</p><p>Nu pot sa nu mentionez nici <strong>Hoover CleanTexx</strong>, un alt aspirator cu spalare care a primit pareri bune. Pretul lui este undeva intre 900 si 1100 RON. Are un design ergonomic, o putere de curatare buna si vine cu functii utile, cum ar fi peria rotativa pentru o curatare mai eficienta. Un mic dezavantaj ar putea fi consumul de solutie de curatare, dar asta depinde si de cat de murdar este covorul.</p><p>Am cautat si modele mai accesibile de la branduri mai putin cunoscute, insa am preferat sa ma axez pe cele cu recenzii pozitive si o reputatie mai buna. Sincer, nu as vrea sa investesc bani intr-un aparat care sa ma dezamageasca. E important sa cautati si oferte, reduceri, pentru ca preturile pot varia destul de mult. Si nu uitati sa verificati ce solutii de curatare sunt recomandate de producator, pentru a nu deteriora covorul.</p>
-      </section>
-
-      <section id="cum-alegi-corect-aspiratorul-cu-spalare-pentru-covoare">
-        <h2>Cum alegi corect aspiratorul cu spalare pentru covoare</h2>
-        <p>Acum ca am vazut cateva exemple concrete, hai sa vorbim despre cum sa alegi cel mai <a href="/cel-mai-bun-aspirator-robot-pentru-casa/" class="interlink">bun aspirator</a> cu spalare pentru nevoile tale. Nu e chiar asa complicat daca stii la ce sa te uiti. Eu am facut o lista cu criteriile pe care le-am considerat importante inainte sa ma decid.</p><p>In primul rand, <strong>tipul de utilizare</strong>. Te gandesti sa cureti doar pete punctuale, sau vrei sa faci o curatenie generala a intregului covor? Daca e vorba de pete ocazionale, un aparat mai mic si mai usor, cum ar fi Bissell SpotClean Pro, ar fi ideal. Daca insa vrei sa cureti suprafete mari, un model mai performant, cu rezervoare mai mari si o putere de aspiratie mai mare, precum Karcher Puzzi 100, ar fi o investitie mai buna.</p>
-        <p>Gandeste-te cat de des vei folosi aparatul si ce tip de murdarie vei intalni cel mai des.</p><p>Apoi, <strong>puterea de aspiratie</strong>. Acest parametru este esential pentru a indeparta eficient apa si solutia de curatare din covor. Cu cat puterea de aspiratie e mai mare, cu atat covorul se va usca mai repede. Cauta specificatii legate de puterea in Pascali (Pa) sau volumul de aer aspirat (m³/h). Un aparat bun ar trebui sa aiba o putere de aspiratie suficienta pentru a nu lasa covorul prea ud.</p><p><strong>Capacitatea rezervoarelor</strong> (de apa curata si de apa murdara) este si ea importanta. Daca ai multe covoare de curatat, vei dori rezervoare cat mai mari pentru a nu fi nevoit sa le reumpli si sa le golesti constant. Totusi, rezervoarele mai mari pot insemna si un aparat mai greu.</p><p><strong>Greutatea si manevrabilitatea</strong> sunt cruciale, mai ales daca nu esti o persoana foarte puternica sau daca trebuie sa duci aparatul pe scari. Aparatele mai compacte sunt, in general, mai usor de manevrat, dar pot avea rezervoare mai mici. Daca ai multe obstacole in casa, cum ar fi mobila, vei aprecia un aparat usor de impins si de intors.</p><p><strong>Accesoriile incluse</strong> pot face o mare diferenta. Duzele pentru pete, perii rotative, furtunurile prelungitoare – toate astea iti pot usura munca si te pot ajuta sa ajungi in locuri greu accesibile. Verifica ce accesorii vin la pachet si daca se potrivesc nevoilor tale specifice.</p><p><strong>Pretul</strong>, bineinteles, este un factor important. Stabileste-ti un buget si cauta cel mai bun raport calitate-pret in acel interval. Nu te lasa tentat doar de cel mai ieftin model, dar nici nu cheltui o avere daca nu ai neaparat nevoie de un aparat <a href="/blender-profesional-pentru-smoothie/" class="interlink">profesional</a>. Parerile altor utilizatori te pot ajuta sa iti faci o idee despre performanta reala a aparatului in raport cu pretul.</p><p>Nu in ultimul rand, <strong>tipul de covoare</strong> pe care le ai. Majoritatea aspiratoarelor cu spalare sunt potrivite pentru covoare cu fir scurt sau mediu. Daca ai covoare cu fir lung sau din materiale delicate, verifica specificatiile producatorului si recomandarile pentru a te asigura ca aparatul nu le va deteriora.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-o-parere-sincera">
-        <h2>Avantaje si dezavantaje: o parere sincera</h2>
-        <p>Dupa ce am cercetat si am stat de vorba cu prieteni care au deja astfel de aparate, am ajuns la o concluzie destul de clara despre plusurile si minusurile aspiratoarelor cu spalare pentru covoare. E bine sa fii pregatit si sa stii la ce sa te astepti, nu?</p><p><strong>Avantaje:</strong></p><ul><li><strong>Curatare in profunzime</strong>: Acesta este, fara indoiala, cel mai mare avantaj. Aceste aparate nu doar aspira, ci patrund in fibrele covorului, indepartand murdaria si bacteriile pe care un aspirator clasic nu le poate atinge. Rezultatul este un covor mult mai igienic si mai curat.</li><li><strong>Indepartarea petelor</strong>: Fie ca sunt vechi sau noi, petele sunt o mare bataie de cap. Aspiratorul cu spalare, cu jetul de apa si solutie, este mult mai eficient in indepartarea petelor decat metodele traditionale. Am vazut cum pete de vin sau cafea disparusera aproape complet.</li><li><strong>Improspatarea culorilor</strong>: Dupa o curatare temeinica, covoarele parca prind viata din nou. Culorile devin mai vii, iar textura covorului se reface. E ca si cum ai da un suflu nou intregului ambient.</li><li><strong>Eliminarea mirosurilor neplacute</strong>: Multe aparate vin cu solutii de curatare care neutralizeaza mirosurile neplacute, fie ca sunt de la animale, fum sau alte surse.</li><li><strong>Economie pe termen lung</strong>: Desi investitia initiala poate parea mare, gandeste-te la cat ai cheltui pe servicii <a href="/set-unelte-de-gradinarit-profesionale/" class="interlink">profesionale</a> de curatare a covoarelor. Pe termen lung, un aspirator cu spalare te poate scuti de multi bani.</li><li><strong>Confort si economie de timp</strong>: Nu mai trebuie sa astepti curatatorii sau sa cari covoarele afara. Poti face curatenie oricand ai nevoie, in confortul casei tale.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Pretul initial</strong>: Un aparat bun, de calitate, poate fi destul de scump. Am vazut modele care depasesc 1000 RON, ceea ce poate fi o investitie considerabila pentru unii.</li><li><strong>Uscarea covorului</strong>: Dupa spalare, covorul ramane umed si are nevoie de timp pentru a se usca complet. Acest lucru poate dura cateva ore, in functie de umiditatea din aer si de cat de bine a fost aspirata apa.</li><li><strong>Greutatea si manevrabilitatea</strong>: Unele modele, mai ales cele destinate suprafetelor mari, pot fi destul de grele si incomode de manevrat, mai ales pe scari sau in spatii inguste.</li><li><strong>Consumul de solutii</strong>: Pentru o curatare eficienta, vei avea nevoie de solutii speciale de curatare, care pot adauga un cost suplimentar pe termen lung.</li><li><strong>Intretinerea aparatului</strong>: Dupa fiecare utilizare, aparatul trebuie curatat si clatit pentru a preveni acumularea de murdarie si mirosuri neplacute. Nu e un proces complicat, dar necesita timp.</li><li><strong>Nu inlocuieste complet curatarea profesionala pentru covoare foarte vechi sau deteriorate</strong>: Pentru covoare extrem de murdare, cu pete vechi si incrustate, sau pentru materiale foarte delicate, s-ar putea sa fie nevoie totusi de interventia unui specialist.</li></ul><p>Parerea mea e ca, pentru majoritatea utilizatorilor casnici, avantajele depasesc cu mult dezavantajele. E o investitie care merita facuta daca iti doresti cu adevarat un covor curat si un camin igienic.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea-si-a-altora">
-        <h2>Sfaturi practice din experienta mea si a altora</h2>
-        <p>Am invatat destule din cautarile si discutiile mele, si cred ca am cateva sfaturi utile pe care vi le pot oferi, ca sa va faca tranzitia spre acest tip de aparat mai usoara. Si sa evitati cateva greceli pe care le-as fi facut si eu, probabil.</p><p><strong>Pregatirea covorului</strong>: Inainte de a folosi aspiratorul cu spalare, aspira bine covorul cu un aspirator clasic. Acest lucru va indeparta praful si murdaria de suprafata, permitand aparatului de spalare sa se concentreze pe curatarea in profunzime. Nu sari peste acest pas, e important!</p><p><strong>Testarea pe o zona ascunsa</strong>: Inainte de a curata intreg covorul, testeaza aparatul si solutia de curatare pe o zona mica, mai putin vizibila. Asa te asiguri ca solutia nu decoloreaza sau nu deterioreaza materialul covorului.</p><p><strong>Foloseste solutii recomandate</strong>: Producatorii de aspiratoare cu spalare recomanda anumite solutii de curatare pentru a asigura o performanta optima si pentru a nu deteriora aparatul. Foloseste-le pe acestea. Evita sa folosesti detergenti de vase sau alte solutii de casa, deoarece pot crea prea multa spuma si pot lasa reziduuri.</p><p><strong>Nu satura covorul cu apa</strong>: Foloseste cantitatea recomandata de apa si solutie. Prea multa apa poate lasa covorul prea ud si ii poate prelungi timpul de uscare, putand duce si la aparitia mucegaiului sau a mirosurilor neplacute.</p><p><strong>Aspira bine dupa spalare</strong>: Dupa ce ai aplicat solutia si ai curatat zona, insista cu functia de aspirare pentru a indeparta cat mai multa apa. Acest lucru va grabi procesul de uscare.</p><p><strong>Ventilatie buna</strong>: Dupa curatare, asigura o buna ventilatie in camera. Deschide ferestrele sau foloseste un ventilator pentru a ajuta covorul sa se usuce mai repede. Acest lucru previne si aparitia mirosurilor de umezeala.</p><p><strong>Curata aparatul dupa fiecare utilizare</strong>: Nu uita sa cureti si sa clatesti rezervoarele, furtunurile si duzele dupa fiecare utilizare. Acest lucru previne acumularea de murdarie, bacterii si mirosuri neplacute, asigurand o durata de viata mai lunga aparatului.</p><p><strong>Nu lasa apa in rezervoare</strong>: Goleste intotdeauna rezervoarele de apa curata si murdara dupa utilizare si lasa-le sa se usuce. Acest lucru previne dezvoltarea mucegaiului si a bacteriilor.</p><p><strong>Fii rabdator</strong>: Unele pete mai vechi sau mai dificile pot necesita mai multe treceri sau o combinatie de solutii. Nu te descuraja daca rezultatele nu sunt spectaculoase din prima.</p>
-      </section>
-
-      <section id="parerea-mea-finala-merita-investitia">
-        <h2>Parerea mea finala: merita investitia?</h2>
-        <p>Dupa toata aceasta poveste, ma intorc la intrebarea initiala: merita sa investesti intr-un aspirator cu spalare pentru covoare? Raspunsul meu, bazat pe experienta si pe ce am invatat, este un mare DA, dar cu cateva precizari.</p><p>Pentru mine, a fost o decizie excelenta. Am un covor in living care arata mult mai bine acum, iar in bucatarie, unde am un covoras mai mic, a fost o minune sa scap de petele de mancare si de grasime. Nu ma asteptam la rezultate de curatatorie profesionala, dar am fost placut surprins de cat de bine a curatat si cat de usor a fost procesul.</p><p>Recomandarea mea se indreapta catre oricine isi doreste un plus de igiena in casa, mai ales daca aveti copii mici sau animale de companie. De asemenea, daca aveti alergii sau probleme respiratorii, un astfel de aparat poate face o diferenta semnificativa in calitatea aerului din locuinta.</p><p>Daca locuiesti la curte, cu un spatiu generos, si nu te deranjeaza sa petreci cateva ore pentru o curatenie generala, atunci un model mai performant, precum Karcher Puzzi 100, ar fi o alegere potrivita. Daca insa spatiul tau este mai mic, sau daca vrei un aparat mai usor de manevrat pentru pete punctuale, atunci Bissell SpotClean Pro sau un model similar ar fi perfect.</p><p>Pentru cei cu un buget mai restrans, aparatele de la Heinner sau alte branduri mai accesibile pot fi o solutie buna pentru utilizare ocazionala. Important este sa nu va asteptati de la ele la aceeasi performanta ca de la un aparat profesional, dar isi fac treaba destul de bine pentru improspatarea covoarelor.</p><p>In concluzie, un aspirator cu spalare pentru covoare este o unealta valoroasa in gospodarie. Nu este un moft, ci o investitie in sanatatea si confortul familiei tale. Cu putina atentie la alegerea modelului potrivit si respectand sfaturile de utilizare, vei fi cu siguranta multumit de rezultate. Eu sunt, si abia astept sa vad cum arata covoarele mele dupa ce le voi folosi mai des!</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des ar trebui sa folosesc aspiratorul cu spalare pentru covoare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde de cat de murdare sunt covoarele tale. Pentru o intretinere generala, o data la 2-3 luni ar fi suficient. Daca ai copii sau animale, sau daca apar pete frecvent, poti folosi aspiratorul si mai des, poate chiar saptamanal pe zonele cu trafic intens sau unde apar accidente.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi orice solutie de curatare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Este recomandat sa folosesti solutiile specifice recomandate de producatorul aspiratorului. Solutiile de casa sau detergentii obisnuiti pot crea prea multa spuma, pot lasa reziduuri sau pot chiar deteriora aparatul sau covorul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat timp dureaza pana se usuca covorul dupa spalare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Timpul de uscare variaza in functie de umiditatea din aer, temperatura camerei si cat de bine a fost aspirata apa. In general, poate dura intre 2 si 6 ore. O buna ventilatie accelereaza procesul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot curata si tapiteria cu acest aparat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, multe aspiratoare cu spalare vin cu accesorii speciale pentru curatarea tapiteriei canapelelor, scaunelor sau a saltelelor. Verifica specificatiile modelului pe care il alegi.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fac daca un covor se decoloreaza la testul pe o zona ascunsa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Daca observi ca solutia de curatare decoloreaza covorul, nu mai folosi aparatul pe acea suprafata. Poate fi necesara curatarea profesionala sau sa folosesti un produs special pentru covoare delicate, testat in prealabil.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum intretin aspiratorul cu spalare ca sa tina cat mai mult?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Cel mai important este sa cureti si sa clatesti bine toate componentele (rezervoare, furtunuri, duze) dupa fiecare utilizare. Asigura-te ca aparatul este complet uscat inainte de a-l depozita. Evita sa il depozitezi in locuri umede.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru cei mai multi, cel mai bun aspirator cu spalare e <strong>SeveShop C5</strong>, de departe cel mai vandut, usor si eficient prin spray-extractie. Daca vrei sa economisesti, <strong>SeveShop C3</strong> e mai ieftin si cu cablu mai lung, iar pentru mai multa putere, <strong>C6 Max</strong> e un 4 in 1. Daca vrei si igienizare la cald, alegi un model <strong>cu abur</strong>, ca Fakir PR 7020, iar pentru libertate fara priza, <strong>Bedee fara fir</strong>.</p>
+      <p>Mai jos gasesti direct recomandarile, impartite in aspiratoare <strong>cu spalare si extractie</strong>, cele mai populare, si modele <strong>cu abur</strong>, pentru igienizare in profunzime. Dupa produse, un ghid despre cum functioneaza, pe ce suprafete le folosesti si ce conteaza cand alegi.</p>
+      <p>Am pornit de la aspiratoarele cu spalare pentru covoare si tapiterii, in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe tip, putere, greutate si dotari, si le-am grupat pe cele cu spray-extractie si cele cu abur. Pentru covorul din living, vezi <a href="/covor-modern-pentru-living/">covoarele moderne</a>, iar pentru curatenie zilnica, <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspiratoarele robot cu mop</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#extr">Cu spalare si extractie</a></li>
+        <li><a href="#abur">Cu abur, igienizare la cald</a></li>
+        <li><a href="#cum-functioneaza">Cum functioneaza</a></li>
+        <li><a href="#pentru-ce">Pentru ce il folosesti</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#accesorii">Accesoriile si duzele</a></li>
+        <li><a href="#seveshop">C3, C5 sau C6 Max</a></li>
+        <li><a href="#intretinere">Cum il intretii</a></li>
+        <li><a href="#greseli">Greseli de evitat</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Putere</th><th>Greutate</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.putere}</td>
+              <td>{x.greutate || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="extr">Cu spalare si extractie</h2>
+    <p>Cele mai populare: pulverizeaza solutia de curatare in covor sau tapiterie si extrag imediat apa murdara. Gama SeveShop domina, cu modele usoare si foarte bine cotate, plus o varianta cu filtrare prin apa si una fara fir.</p>
+    <div class="rd-grid">
+      {EXTR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figExtr} alt="Aspiratoare cu spalare si extractie pentru covoare si tapiterii" width="1200" height="675" loading="lazy" />
+
+    <h2 id="abur">Cu abur, igienizare la cald</h2>
+    <p>Daca vrei nu doar sa cureti, ci si sa igienizezi, modelele cu abur adauga caldura la spalare: desprind mai usor petele si distrug o parte din bacterii si acarieni, un plus pe saltele, canapele si acolo unde stau copiii sau animalele.</p>
+    <div class="rd-grid">
+      {ABUR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAbur} alt="Aspiratoare cu spalare si abur pentru canapele si tapiterii" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-aspirator-spalare').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate aspiratoarele cu spalare la oferta</strong>
+        <span>Reducerile din acest moment la aspiratoare cu spalare, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cum-functioneaza">Cum functioneaza</h2>
+    <p>Un aspirator cu spalare, numit si <strong>cu injectie-extractie</strong>, face doua lucruri deodata: pulverizeaza o solutie de apa cu detergent direct in covor sau tapiterie si, in aceeasi trecere, extrage lichidul impreuna cu murdaria desprinsa. Practic, combina aspirarea cu injectia de solutie si extractia simultana.</p>
+    <p>Diferenta fata de un aspirator obisnuit e mare: unul normal ridica doar praful uscat de la suprafata, in timp ce cel cu spalare <strong>patrunde in fibre</strong> si scoate mizeria si petele adanci, apa murdara, parul de animale si o buna parte din alergeni. Pentru ca extractia trage inapoi cea mai mare parte a apei, suprafata ramane <strong>semnificativ mai uscata</strong> decat la o spalare clasica, deci poti folosi din nou covorul sau canapeaua mult mai repede. Un filtru asezat de obicei intre rezervorul de apa murdara si motor prinde particulele mari si protejeaza aparatul.</p>
+
+    <h2 id="pentru-ce">Pentru ce il folosesti</h2>
+    <p>Un aspirator cu spalare e util pe aproape orice suprafata textila din casa si din masina:</p>
+    <ul>
+      <li><strong>Covoare si mochete:</strong> scoate mizeria intrata adanc si petele vechi, pe care un aspirator normal nu le atinge.</li>
+      <li><strong>Canapele, fotolii si scaune:</strong> improspateaza tapiteria si scoate petele, parul si mirosurile.</li>
+      <li><strong>Saltele si perne mari:</strong> curata in profunzime si, la modelele cu abur, igienizeaza acolo unde dormim.</li>
+      <li><strong>Tapiterie si scaune auto:</strong> readuce interiorul masinii aproape ca nou.</li>
+    </ul>
+    <p>E o alegere aproape obligatorie pentru <strong>familiile cu copii mici sau cu animale</strong>, unde petele si parul se aduna in textile. Nu se foloseste, insa, pe suprafete care nu suporta apa, ca lemnul nefinisat, pielea naturala sensibila sau materialele delicate; pentru ele, verifica intai eticheta de intretinere.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Dincolo de brand, cateva lucruri fac diferenta reala intre doua aparate:</p>
+    <ul>
+      <li><strong>Puterea si extractia:</strong> o extractie mai puternica scoate mai multa apa, deci suprafata se usuca mai repede. Modelele de baza au 450 W, iar cele mai puternice, ca C6 Max sau aparatele cu abur, trec de 1600 W.</li>
+      <li><strong>Cele doua rezervoare:</strong> unul de apa curata, cu detergent, si unul de apa murdara. La aparatele de casa sunt mici, deci la suprafete mari faci pauze de reumplere si golire; verifica sa se scoata si sa se umple usor.</li>
+      <li><strong>Cu abur sau fara:</strong> aburul adauga igienizare la cald, util pe saltele si canapele, dar creste pretul.</li>
+      <li><strong>Cu fir sau fara fir:</strong> cel cu fir are putere constanta, dar te leaga de priza; cel fara fir, ca Bedee, iti da mobilitate, dar are autonomie limitata.</li>
+      <li><strong>Greutatea si cablul:</strong> un aparat usor, de 3.5-4.5 kg, si un cablu lung, de 4-6 m, fac diferenta la scari, in masina si in colturi.</li>
+    </ul>
+
+    <h2 id="accesorii">Accesoriile si duzele care conteaza</h2>
+    <p>Un aspirator cu spalare e la fel de bun ca duzele cu care vine, pentru ca fiecare suprafata cere alt cap. Cand alegi, uita-te ce accesorii sunt incluse, nu doar la aparatul in sine.</p>
+    <p>Duza <strong>lata</strong>, pentru covoare si mochete, acopera repede suprafete mari. Duza <strong>mica</strong>, ingusta, e pentru tapiterie, canapele, scaune si colturi, unde ai nevoie de precizie si de acces in spatii stramte. Multe modele includ si o <strong>perie</strong>, care ajuta la desprinderea murdariei intrate adanc in fibre inainte de extractie, si un <strong>furtun flexibil</strong>, foarte util la scaunele auto si la trepte. Pentru masina, verifica sa existe accesorii mici si un furtun destul de lung.</p>
+    <p>Practic, cu cat un aparat vine cu mai multe duze potrivite pe nevoile tale, cu atat il folosesti in mai multe locuri: acelasi aparat iti spala si covorul din living, si canapeaua, si bancheta din spate a masinii. Verifica in descriere lista de accesorii incluse inainte sa cumperi.</p>
+
+    <h2 id="seveshop">C3, C5 sau C6 Max: care SeveShop alegi</h2>
+    <p>Cele trei modele SeveShop domina selectia si sunt cele mai cumparate, asa ca merita comparate direct. Toate spala prin injectie-extractie, diferentele tin de putere, cablu si buget.</p>
+    <p><strong>SeveShop C3</strong> e cel mai ieftin si cel mai usor, 3.5 kg, cu cel mai lung cablu, 5 m. E alegerea daca vrei un aparat lejer, cu libertate de miscare, pentru curatari obisnuite de covoare si canapele, si tii la pret. Are aceeasi putere de 450 W ca C5.</p>
+    <p><strong>SeveShop C5</strong> e cel mai vandut si cel mai bine cotat, cu 422 de pareri si nota 4.93. Are tot 450 W, dar un cablu mai scurt, de 3 m. Il iei cand vrei cel mai verificat model, dovada ca merge, si nu te deranjeaza sa fii mai aproape de priza.</p>
+    <p><strong>SeveShop C6 Max</strong> e varful, un 4 in 1 cu 1650 W, de aproape patru ori mai puternic. Extractia mai puternica scoate mai multa apa, deci curata mai in profunzime si suprafata se usuca mai repede. Il alegi pentru covoare groase, pete incapatanate sau daca folosesti aparatul des, si accepti ca e mai greu si mai scump.</p>
+    <p>Pe scurt: <strong>C3</strong> pentru buget si usurinta, <strong>C5</strong> pentru siguranta celui mai testat, <strong>C6 Max</strong> pentru putere si curatare intensa.</p>
+
+    <h2 id="intretinere">Cum il intretii</h2>
+    <p>Curatarea de dupa folosire e la fel de importanta ca spalarea si tine aparatul in forma ani buni. <strong>Goleste imediat rezervorul de apa murdara</strong>, nu lasa apa statuta inauntru, pentru ca prinde miros si bacterii. Clateste ambele rezervoare, cel de apa curata si cel de apa murdara, si lasa-le sa se usuce cu capacul deschis.</p>
+    <p>Verifica periodic <strong>filtrul</strong> dintre rezervorul murdar si motor: curata-l de particule sau spala-l, daca e lavabil, ca la modelul Bedee din selectie. Sterge duzele si periile de par si scame dupa fiecare folosire. Si nu uita de <strong>detergent</strong>: foloseste unul special, care face putina spuma, si doza corect, pentru ca surplusul ramane in fibre, atrage mizeria si poate afecta pompa. O rutina simpla de intretinere previne mirosurile si prelungeste mult viata aparatului.</p>
+
+    <h2 id="greseli">Greseli de evitat</h2>
+    <p>Cateva greseli frecvente strica rezultatul sau chiar aparatul. Le eviti usor daca le stii dinainte:</p>
+    <ul>
+      <li><strong>Uzi prea mult suprafata:</strong> mai mult spray nu inseamna mai curat, ci un covor imbibat care se usuca greu si poate mucegai. Pulverizeaza cu masura, apoi treci de mai multe ori doar cu extractia, ca sa scoti apa.</li>
+      <li><strong>Pui prea mult detergent sau unul nepotrivit:</strong> surplusul ramane in fibre, atrage mizeria si face textilul sa se murdareasca mai repede; detergentii care fac multa spuma pot afecta pompa. Foloseste o solutie dedicata, dozata corect.</li>
+      <li><strong>Nu golesti rezervorul de apa murdara:</strong> apa statuta prinde miros si bacterii. Goleste-l imediat dupa folosire si clateste-l.</li>
+      <li><strong>Il folosesti pe suprafete nepotrivite:</strong> pielea naturala, lemnul nefinisat sau materialele delicate nu suporta apa. Verifica eticheta inainte.</li>
+      <li><strong>Nu testezi culoarea:</strong> pe un textil colorat sau vechi, incearca intai intr-un colt ascuns, ca sa te asiguri ca nu lasa urme sau nu decoloreaza.</li>
+      <li><strong>Cureti pe pete uscate de mult, fara pretratare:</strong> pentru pete vechi, pulverizeaza intai un pretratant, lasa-l cateva minute, apoi treci cu aparatul.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>E o investitie mai mica decat pare, pentru cat de mult ajuta:</p>
+    <p><strong>Cu spray-extractie:</strong> de la circa 470-570 de lei pentru modelele cele mai vandute, usoare si eficiente, ca SeveShop C3 si C5. Variantele mai puternice, 4 in 1 sau cu filtrare prin apa, sunt in general 600-800 de lei.</p>
+    <p><strong>Cu abur:</strong> de la circa 800 la 1100 de lei, pentru modele care adauga igienizarea la cald, ca CleanKoala Multi Heat si Fakir PR 7020.</p>
+    <p>Pe langa pret, gandeste-te ca un astfel de aparat <strong>inlocuieste multe interventii</strong> la firme de curatat covoare si canapele, care nu sunt deloc ieftine, deci se amortizeaza dupa cateva folosiri. Iar textilele curate periodic arata mai bine si tin mai mult. Pentru pardoseli, vezi si <a href="/mop-cu-aburi-pentru-podele/">mopurile cu aburi</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">ED</div>
       <div class="author-info">
-        <h4><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></h4>
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
         <p class="author-role">Consultant Amenajari</p>
-        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+        <p class="author-bio">Elena scrie despre curatenie si intretinerea casei. Cauta aparatele care chiar usureaza treaba, nu pe cele cu cele mai multe functii pe cutie.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="aspirator-cu-spalare-pentru-covoare"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="aspirator-cu-spalare-pentru-covoare"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="aspirator-cu-spalare-pentru-covoare" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="aspirator-cu-spalare-pentru-covoare" currentCategory="curatenie-intretinere" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

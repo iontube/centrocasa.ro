@@ -1,233 +1,293 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Cel mai bun robot de tuns iarba",
-  excerpt: "Am tot auzit discuții prin vecini despre robotii de tuns iarba. Unii zic ca sunt o minune, alții ca sunt o bătaie de cap. Eu am zis să văd cu ochii mei ce și cum. Și uite că am ajuns să testez câteva modele. Azi vorbim despre cel mai bun robot de tuns iarba și dacă merită investiția.",
-  image: "/images/articles/cel-mai-bun-robot-de-tuns-iarba.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-01-08T07:25:35.684Z",
-  modifiedDate: "2026-01-27T07:25:35.894Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "Pot lăsa robotul de tuns iarba să funcționeze peste noapte?", answer: "Da, majoritatea modelelor moderne sunt foarte silențioase și pot fi programate să funcționeze și pe timpul nopții, fără a deranja vecinii. Totuși, verifică specificațiile modelului tău și legislația locală privind zgomotul." },
-  { question: "Ce se întâmplă dacă robotul de tuns iarba întâlnește un obiect neașteptat?", answer: "Roboții sunt dotați cu senzori de coliziune care detectează obstacolele. Când întâlnesc un obiect, de obicei se opresc, își schimbă direcția și continuă să tundă pe o altă rută. Modelele mai avansate pot chiar să evite anumite zone marcate." },
-  { question: "Cât de des trebuie să schimb lamele robotului?", answer: "Frecvența depinde de cât de des funcționează robotul și de tipul de iarbă. În general, lamele trebuie verificate lunar și ascuțite sau înlocuite la fiecare 2-3 luni, sau când se observă că iarba nu mai este tunsă fin." },
-  { question: "Este dificil de instalat cablul perimetral?", answer: "Instalarea cablului perimetral necesită puțin timp și atenție, dar nu este extrem de dificilă. Mulți utilizatori reușesc să o facă singuri urmând instrucțiunile sau tutorialele video. Poți opta și pentru instalare profesională." },
-  { question: "Pot folosi același robot pentru două grădini separate?", answer: "Teoretic, da, dacă suprafața totală nu depășește capacitatea robotului și dacă poți delimita corect cele două zone cu cablu perimetral. Totuși, instalarea și mutarea cablului poate fi incomodă." },
-  { question: "Ce se întâmplă cu iarba tăiată?", answer: "Iarba este tunsă în fărâmițe foarte mici, care sunt lăsate pe gazon. Aceste resturi se descompun rapid și acționează ca un fertilizator natural, îmbunătățind sănătatea solului și a gazonului." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un robot de tuns iarba? Pentru cine e el?", id: "de-ce-ai-nevoie-de-un-robot-de-tuns-iarba-pentru-cine-e-el" },
-  { title: "Top recomandari: Ce am testat și ce mi-a plăcut", id: "top-recomandari-ce-am-testat-si-ce-mi-a-placut" },
-  { title: "Cum alegi corect? Criterii și specificații tehnice", id: "cum-alegi-corect-criterii-si-specificatii-tehnice" },
-  { title: "Avantaje și dezavantaje: Sincer să fiu, ce e bun și ce nu", id: "avantaje-si-dezavantaje-sincer-sa-fiu-ce-e-bun-si-ce-nu" },
-  { title: "Sfaturi practice din experiența mea: Trucuri și greșeli de evitat", id: "sfaturi-practice-din-experienta-mea-trucuri-si-greseli-de-evitat" },
-  { title: "Parerea mea finala: Merita investitia?", id: "parerea-mea-finala-merita-investitia" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['robot-tuns-iarba'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Cu fir perimetral ---
+  { g: 'fir', id: 'DY12C5MBM', badge: 'Cel mai bun raport', short: 'iHunt RoboMower 2500', supraf: '2500 m²', ghidare: 'Fir perimetral', panta: 'medie',
+    specs: ['2500 m², cea mai mare acoperire din grupul cu fir', 'inaltime de taiere reglabila, 25-60 mm', 'senzor de ploaie si control prin Bluetooth', 'de departe cel mai vandut, 74 de pareri'],
+    pros: ['De departe cel mai ieftin robot din articol', 'Cel mai vandut, cu 74 de pareri si nota 4.18', 'Acopera pana la 2500 m², enorm pentru pretul lui', 'Senzor de ploaie si control din aplicatie'],
+    cons: ['Foloseste fir perimetral, de instalat la inceput', 'Brand mai putin cunoscut decat Husqvarna sau Navimow'],
+    verdict: 'Punctul de plecare pentru cine vrea un robot de tuns iarba fara sa dea o avere. iHunt RoboMower acopera pana la 2500 m², cea mai mare suprafata din grupul cu fir, la un pret care e de cateva ori mai mic decat al robotilor premium: e si motivul pentru care e de departe cel mai vandut din selectie, cu 74 de pareri si nota 4.18. Are inaltime de taiere reglabila intre 25 si 60 mm, senzor de ploaie care il trimite la baza cand ploua, si control din aplicatie prin Bluetooth. Foloseste fir perimetral, deci la inceput trebuie sa fixezi cablul pe marginea gazonului, o munca de o zi, o singura data. Il iei cand vrei cel mai mult gazon acoperit pe banii dati si nu te sperie instalarea firului.' },
+  { g: 'fir', id: 'DVKB8ZBBM', badge: 'Brand de referinta', short: 'Husqvarna Automower 105', supraf: '600 m²', ghidare: 'Fir perimetral', panta: '25% (14°)',
+    specs: ['600 m², pentru gradini mici si medii', 'latime de lucru 17 cm, 3 lame pivotante', 'panta maxima 25% (14°)', 'ecran LCD, alarma si temporizator'],
+    pros: ['Husqvarna, brandul de referinta la roboti de tuns', 'Nota 4.53, cea mai buna din grupul cu fir', 'Lame mici pivotante, tund fin si maruntesc iarba', 'Fiabilitate si service Husqvarna la noi'],
+    cons: ['Panta maxima modesta, 25%', 'Suprafata de 600 m², mai mica decat iHunt'],
+    verdict: 'Alegerea daca vrei un robot de la brandul care a inventat categoria. Husqvarna Automower 105 e gandit pentru gradini mici si medii, pana la 600 m², cu o latime de lucru de 17 cm si trei lame mici pivotante care tund fin si lasa firele maruntite ca ingrasamant natural pe gazon. Are ecran LCD, alarma si temporizator, si e cel mai bine cotat din grupul cu fir, cu nota 4.53. Urca pante de pana la 25%, deci e pentru terenuri mai degraba plane, iar suprafata acoperita e mai mica decat la iHunt. Foloseste fir perimetral. Il iei cand pui pret pe fiabilitatea si service-ul Husqvarna, pentru o gradina mica sau medie, relativ plana.' },
+  { g: 'fir', id: 'D2TX8MMBM', badge: 'Husqvarna, pentru pante', short: 'Husqvarna Automower 305', supraf: '600 m²', ghidare: 'Fir perimetral', panta: '40%',
+    specs: ['600 m², latime de lucru mai mare, 22 cm', 'urca pante de pana la 40%', 'taiere sistematica in pasaje inguste', 'senzor de inghet si temporizator meteo'],
+    pros: ['Urca pante de pana la 40%, mult mai mult decat 105', 'Latime de lucru 22 cm, tunde mai repede', 'Functie de taiere in pasaje inguste, pentru gradini cu coridoare', 'Senzor de inghet, nu tunde pe frig'],
+    cons: ['Fir perimetral de instalat', 'Pret apropiat de robotii fara fir de baza'],
+    verdict: 'Fratele mai capabil al lui 105, pentru gradini cu denivelari. Husqvarna Automower 305 acopera tot 600 m², dar aduce doua avantaje reale: urca pante de pana la 40%, fata de doar 25% la 105, si are o latime de lucru mai mare, de 22 cm, deci termina gazonul mai repede. In plus, are o functie de taiere sistematica in pasaje inguste, utila daca gradina are coridoare intre zone, si un senzor de inghet care il opreste cand e prea frig. Ramane un robot cu fir perimetral, de instalat la inceput, iar pretul se apropie de al robotilor fara fir de baza. Il iei cand ai un teren in panta sau cu forme complicate si vrei tot un Husqvarna.' },
+  // --- Fara fir perimetral, gradini mici-medii ---
+  { g: 'entry', id: 'D41M0M2BM', badge: 'Cel mai ieftin fara fir', short: 'Bosch Visimo', supraf: 'compact', ghidare: 'Fara fir (senzori)', panta: 'medie',
+    specs: ['Fara fir perimetral, se orienteaza cu senzori ultrasonici', 'latime de taiere 16 cm, inaltime 20-60 mm', 'motor brushless, durabil si silentios', 'acumulator 18V 4.0 Ah si incarcator incluse'],
+    pros: ['Cel mai ieftin robot fara fir perimetral din selectie', 'Fara cablu de ingropat, mai putina bataie de cap la instalare', 'Motor brushless si senzori ultrasonici pentru ocolirea obstacolelor', 'De la Bosch, cu acumulator si incarcator in pachet'],
+    cons: ['Nota mai mica, 3.75', 'Se bazeaza pe senzori, nu pe RTK sau LiDAR, deci mai putin precis'],
+    verdict: 'La cel mai mic pret pentru a scapa de firul perimetral. Bosch Visimo nu foloseste cablu de ingropat, ci senzori ultrasonici cu care isi da seama de obstacole si de marginile gazonului, deci instalarea e mai simpla decat la un robot clasic cu fir. Are o latime de taiere de 16 cm, inaltime reglabila intre 20 si 60 mm si un motor brushless, mai durabil si mai silentios, iar in pachet vin acumulatorul de 18V 4.0 Ah si incarcatorul. Fata de sistemele RTK sau LiDAR, orientarea pe senzori e mai putin precisa, iar nota de la cumparatori e mai modesta, 3.75. Il iei cand vrei sa renunti la fir cu bugetul cel mai mic si ai o gradina simpla, fara forme complicate.' },
+  { g: 'entry', id: 'DN0Q0CYBM', badge: 'Navigatie cu camera', short: 'Ecovacs Goat G1-800', supraf: '800 m²', ghidare: 'Fara fir (camera)', panta: 'medie',
+    specs: ['800 m², fara fir perimetral', 'navigatie VSLAM cu camera si UWB, fara antena', 'harta digitala, fara cablu de ingropat', 'acumulator Li-ion 4000 mAh'],
+    pros: ['Fara fir si fara antena RTK de montat, se ghideaza cu camera', 'Acopera 800 m², bun pentru o gradina medie', 'Harta digitala, delimitezi zonele din aplicatie', 'Nota maxima, 5 din 5'],
+    cons: ['Putine pareri deocamdata, model nou pe piata', 'Navigatia pe camera cere lumina buna'],
+    verdict: 'Alegerea daca vrei fara fir, dar fara sa montezi nici antena. Ecovacs Goat G1-800 acopera 800 m² si se orienteaza cu un sistem VSLAM cu camera si UWB, adica se ghideaza vizual si prin balize radio, fara cablu de ingropat si fara antena RTK pe stalp, cum cer alte modele. Delimitezi zonele de lucru direct pe harta din aplicatie, iar acumulatorul Li-ion de 4000 mAh ii da autonomie pentru o sesiune buna. E un model nou, cu putine pareri inca, dar cu nota maxima, iar navigatia pe camera merge cel mai bine cand e lumina suficienta. Il iei cand vrei o instalare cat mai simpla, fara fir si fara antena, pentru o gradina medie.' },
+  { g: 'entry', id: 'DLZJ1D2BM', badge: 'Fara fir, pentru inceput', short: 'Navimow i105E', supraf: '500 m²', ghidare: 'Fara fir (RTK + camera)', panta: '30% (17°)',
+    specs: ['500 m², fara fir perimetral', 'localizare EFLS 2.0 cu VisionFence (camera)', 'urca pante de 30% (17°), rezistenta IP66', 'WiFi, 4G, compatibil Alexa si Google Home'],
+    pros: ['Intrarea in gama Navimow fara fir, la 500 m²', 'Localizare EFLS 2.0 plus camera VisionFence, foarte precisa', 'Rezistenta IP66 si urcare panta 30%', 'Conectat: WiFi, 4G, Alexa si Google Home'],
+    cons: ['500 m², cea mai mica suprafata din gama Navimow', 'Pret de robot premium, desi e modelul de intrare'],
+    verdict: 'Cea mai accesibila poarta de intrare in robotii fara fir Navimow. Modelul i105E acopera 500 m² si combina localizarea EFLS 2.0 cu camera VisionFence, adica pozitionare precisa fara sa depinda doar de semnal satelit, un plus in gradini cu copaci sau cladiri in jur. Urca pante de pana la 30% (17°), e rezistent la apa si praf la nivel IP66 si e complet conectat: il comanzi din aplicatie prin WiFi si 4G si merge cu Alexa si Google Home. Suprafata de 500 m² e cea mai mica din gama, iar pretul ramane de robot premium chiar daca e modelul de baza. Il iei cand vrei tehnologia fara fir Navimow pentru o gradina mica, cu obstacole in jur.' },
+  // --- Fara fir perimetral, suprafete mari si pante ---
+  { g: 'mari', id: 'DCZJ1D2BM', badge: 'Cel mai bun pe pante', short: 'Navimow i206 AWD', supraf: '600 m²', ghidare: 'Fara fir (RTK)', panta: '45% (24°)',
+    specs: ['600 m², tractiune integrala AWD', 'urca pante abrupte, pana la 45% (24°)', 'localizare EFLS NRTK cu VisionFence', 'WiFi, 4G, mapare automata'],
+    pros: ['Tractiune integrala AWD, se catara pe pante abrupte', 'Panta maxima 45% (24°), printre cele mai bune', 'Localizare NRTK plus camera, foarte precisa', 'Fara fir perimetral, mapare automata din aplicatie'],
+    cons: ['600 m², suprafata medie pentru pretul lui', 'Antena si configurare, ca la orice robot RTK'],
+    verdict: 'Alegerea clara daca gradina ta are pante serioase. Navimow i206 are tractiune integrala AWD, adica trage pe toate rotile, si urca pante de pana la 45% (24°), acolo unde robotii obisnuiti patineaza sau se blocheaza. Se orienteaza fara fir, cu localizare EFLS NRTK si camera VisionFence, deci mapeaza singur gradina si merge precis chiar pe teren denivelat, iar zonele le stabilesti din aplicatie prin WiFi si 4G. Acopera 600 m², o suprafata medie pentru pretul lui, pentru ca banii se duc pe capacitatea de catarare, nu pe arie. Ca la orice robot RTK, ai de montat o antena si de configurat la inceput. Il iei cand terenul e in panta si vrei un robot care chiar il poate urca.' },
+  { g: 'mari', id: 'DZZJ1D2BM', badge: 'Pentru gradini mari', short: 'Navimow i210E', supraf: '1000 m²', ghidare: 'Fara fir (LiDAR)', panta: '45% (24°)',
+    specs: ['1000 m², fara fir perimetral', 'localizare LiDAR plus camera RGB 140°', 'urca pante de 45% (24°)', 'inaltime lucru 2-7 cm, latime 22 cm'],
+    pros: ['1000 m², pentru gradini cu adevarat mari', 'Navigatie LiDAR plus camera RGB, foarte precisa si sigura', 'Urca pante de 45% (24°)', 'Latime de lucru 22 cm, termina repede'],
+    cons: ['Pret ridicat, de gama premium', 'Are nevoie de configurare atenta la inceput'],
+    verdict: 'Alegerea pentru o gradina mare, unde robotii de 500-600 m² nu fac fata. Navimow i210E acopera 1000 m² si foloseste o navigatie cu LiDAR si camera RGB de 140°, adica scaneaza mediul in detaliu si evita obstacolele cu precizie, fara fir perimetral. Urca pante de pana la 45% (24°), taie la inaltimi intre 2 si 7 cm si are o latime de lucru de 22 cm, deci termina suprafata mare intr-un timp rezonabil. E un robot de gama premium, cu pret pe masura, si cere putina rabdare la configurarea initiala a zonelor. Il iei cand ai o gradina mare si complicata si vrei un robot care sa o gestioneze singur, cu navigatie de top.' },
+  { g: 'mari', id: 'D1ZJ1D2BM', badge: 'Cel mai mare', short: 'Navimow i220E LiDAR Pro', supraf: '2000 m²', ghidare: 'Fara fir (LiDAR+)', panta: '55% (29°)',
+    specs: ['2000 m², cea mai mare acoperire din articol', 'LiDAR+ si camera RGB 140°, cea mai buna navigatie', 'urca cele mai abrupte pante, 55% (29°)', 'pentru gradini mari si complicate'],
+    pros: ['2000 m², cel mai mare din tot articolul', 'LiDAR+ si camera RGB, cea mai avansata navigatie', 'Urca cele mai abrupte pante, 55% (29°)', 'Gestioneaza gradini mari, cu multe zone si obstacole'],
+    cons: ['Cel mai scump din articol, de departe', 'Supradimensionat pentru o gradina obisnuita'],
+    verdict: 'Pentru cele mai mari si mai dificile gradini, cea mai avansata optiune din selectie. Navimow i220E Lidar Pro acopera 2000 m², de departe cel mai mult din articol, si are cea mai avansata navigatie din selectie: LiDAR+ combinat cu camera RGB de 140°, care mapeaza si evita obstacolele mai bine ca orice alt model de aici. Urca si cele mai abrupte pante, pana la 55% (29°), deci nu il opreste aproape niciun teren. E, evident, cel mai scump din articol si e supradimensionat pentru o curte obisnuita, unde un model de 500-1000 m² ajunge. Il iei cand ai o proprietate mare, cu teren accidentat si multe zone, si vrei un singur robot care sa le acopere pe toate, fara compromis.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const FIR = PICKS.filter(x => x.g === 'fir');
+const ENTRY = PICKS.filter(x => x.g === 'entry');
+const MARI = PICKS.filter(x => x.g === 'mari');
+
+const hero = '/images/articles/cel-mai-bun-robot-de-tuns-iarba.webp';
+const figFir = '/imagini/articole/robot-cu-fir.webp';
+const figEntry = '/imagini/articole/robot-fara-fir-mici.webp';
+const figMari = '/imagini/articole/robot-fara-fir-mari.webp';
+const published = '2026-07-18T15:22:23+03:00';
+
+const faq = [
+  { question: 'Robot cu fir perimetral sau fara fir, ce sa aleg?', answer: 'Depinde de buget si de cat de mult vrei sa te chinui la instalare. Robotii cu fir perimetral, ca iHunt sau Husqvarna Automower, sunt mai ieftini, dar la inceput trebuie sa fixezi un cablu pe toata marginea gazonului, o munca de o zi. Robotii fara fir, ca Navimow sau Ecovacs Goat, se orienteaza cu GPS/RTK, LiDAR sau camera si delimitezi zonele digital, direct din aplicatie: instalarea e mult mai rapida si poti schimba usor zonele, dar costa mai mult si au nevoie de semnal si de o configurare atenta. Daca ai buget mai mic si nu te deranjeaza firul, mergi pe cu fir; daca vrei simplitate si flexibilitate, alegi fara fir.' },
+  { question: 'Ce suprafata de robot sa aleg pentru gazonul meu?', answer: 'Alege un robot a carui suprafata recomandata e peste marimea reala a gazonului tau, cu o mica rezerva, ca aparatul sa nu lucreze permanent la limita. Producatorii indica o suprafata maxima, de exemplu 500, 800 sau 2000 m². In selectie ai de la 500 m² (Navimow i105E) pana la 2500 m² (iHunt) si 2000 m² (Navimow i220E). Pe langa cifra, conteaza si forma curtii, numarul de obstacole si pantele: o gradina cu multe zone si copaci pune mai multa presiune pe robot decat una simpla, dreptunghiulara, de aceeasi suprafata.' },
+  { question: 'Pot folosi un robot de tuns iarba pe teren in panta?', answer: 'Da, dar verifica panta maxima inainte sa cumperi, pentru ca nu toti robotii se descurca la fel. Valoarea e data in procente sau grade: in selectie merge de la 25% (14°) la Husqvarna 105, pana la 55% (29°) la Navimow i220E. Daca ai denivelari serioase, cauta un model facut special pentru asta: Navimow i206 AWD are tractiune integrala si urca pante de 45% (24°), acolo unde un robot obisnuit patineaza. Pentru un teren aproape plan, aproape orice model din articol e suficient.' },
+  { question: 'Cum functioneaza un robot fara fir perimetral?', answer: 'In loc de cablul ingropat care delimiteaza gazonul, robotii fara fir isi dau seama singuri unde sunt si unde au voie sa mearga. Unii folosesc GPS/RTK cu o antena montata in curte, altii camere si LiDAR care scaneaza mediul, iar altii senzori. Tu desenezi zonele de lucru pe harta din aplicatie, o singura data, si robotul le respecta. Avantajul e ca instalarea e rapida si poti schimba zonele oricand; dezavantajul e ca sistemele pe satelit au nevoie de semnal bun, iar cele pe camera de lumina suficienta.' },
+  { question: 'Cat de des tunde si e zgomotos un robot?', answer: 'Un robot de tuns iarba lucreaza des si putin, nu o data mult: il programezi sa iasa aproape zilnic si sa tunda cateva milimetri, asa gazonul ramane mereu scurt si des. Fiind electric, cu lame mici, e mult mai silentios decat o masina clasica pe benzina, asa ca il poti lasa sa mearga si seara sau dimineata devreme fara sa deranjeze. Firele scurte pe care le taie sunt maruntite si raman pe gazon ca ingrasamant natural, deci nu mai aduni iarba.' },
+  { question: 'Robotul tunde si iarba foarte inalta sau marginile?', answer: 'Nu. Robotii sunt facuti pentru intretinere regulata, adica pentru un gazon deja tuns, pe care il mentin scurt, nu pentru a reteza o iarba crescuta de sezon: pentru asta iti trebuie o masina de tuns clasica prima data. La fel, robotul lasa o fasie ingusta netunsa langa garduri, ziduri si copaci, unde nu ajunge cu lama, asa ca vei avea nevoie ocazional de o motocoasa sau un trimmer pentru margini si colturi.' },
+];
+
+const images = [hero, figFir, figEntry, figMari, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Cel mai bun robot de tuns iarba - CentroCasa"
-  description="Am tot auzit discuții prin vecini despre robotii de tuns iarba. Unii zic ca sunt o minune, alții ca sunt o bătaie de cap. Eu am zis să văd cu ochii mei ce și cum. Și uite că am ajuns să testez câteva modele. Azi vorbim despre cel mai bun robot de tuns iarba și dacă merită investiția."
-  image="/images/articles/cel-mai-bun-robot-de-tuns-iarba.webp"
+  title="Cel mai bun robot de tuns iarba fara fir perimetral in 2026: pe suprafata, panta si buget"
+  description="Care e cel mai bun robot de tuns iarba in 2026, cu fir sau fara fir perimetral: modele accesibile iHunt si Husqvarna, si roboti fara fir Navimow, Ecovacs Goat si Bosch cu GPS, RTK sau LiDAR, comparati pe suprafata, panta si pret. Plus cum alegi si cum functioneaza cei fara fir."
+  image={hero}
   type="article"
-  publishedTime="2026-01-08T07:25:35.684Z"
-  modifiedTime="2026-01-27T07:25:35.894Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cel mai bun robot de tuns iarba fara fir perimetral' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Cel mai bun robot de tuns iarba</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cel mai bun robot de tuns iarba fara fir perimetral</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">26 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Cel mai bun robot de tuns iarba</h1>
-    </header>
+    <h1>Cel mai bun robot de tuns iarba fara fir perimetral</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/cel-mai-bun-robot-de-tuns-iarba.webp" alt="Cel mai bun robot de tuns iarba" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cel mai bun robot de tuns iarba fara fir perimetral: modele cu fir si fara fir" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-robot-de-tuns-iarba-pentru-cine-e-el">
-        <h2>De ce ai nevoie de un robot de tuns iarba? Pentru cine e el?</h2>
-        <p>Sincer să fiu, ideea de a scăpa de cositul clasic mi se părea SF acum câțiva ani. Dar timpul zboară și responsabilitățile se adună. Cositul, oricât de relaxant ar fi pentru unii, pentru mulți dintre noi e o corvoadă. Mai ales când iarba crește repede, și mai ales vara, când e și cald. Aici intervine robotul de tuns iarba. El preia munca asta grea.</p><p>Gândește-te la el ca la un ajutor de nădejde în grădină. Nu mai trebuie să cari iarba tăiată, nu mai trebuie să te chinui cu cabluri sau benzină. Robotul face totul singur, în ritmul lui. E perfect pentru oamenii ocupați, pentru cei care nu au timp să se ocupe de grădină așa cum și-ar dori. Sau pur și simplu pentru cei care vor o peluză mereu aranjată, fără efort.</p><p>Și nu e doar pentru cei cu suprafețe mari. Există modele și pentru grădini mai mici, compacte. Deci, dacă ai o curte de 200-300 de metri pătrați, tot poți beneficia de tehnologia asta. Chiar și pentru cei cu mobilitate redusă sau cu probleme de spate, un robot de tuns iarba este o <a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">soluție</a> excelentă. Elimină riscurile și efortul fizic.</p><p>Practic, dacă îți dorești o iarbă tunsă constant, la o înălțime perfectă, fără să-ți bați capul, atunci ai nevoie de un astfel de aparat. E o investiție pe termen lung, care îți eliberează timp prețios. Poți să stai la umbră cu o carte, în timp ce robotul muncește pentru tine. Sau să te joci cu copiii, fără grija că trebuie să iei coasa în mână.</p><p>Am văzut și la vecini, unii sunt super mulțumiți. Alții au avut niște rețineri inițiale, dar după ce l-au văzut cum funcționează, și-au dat seama că e o investiție bună. E o schimbare majoră în modul în care îți întreții spațiul verde. Nu mai e o corvoadă, ci devine o plăcere să ai o grădină impecabilă.</p><p>Este important să înțelegi că nu e un obiect magic care rezolvă toate problemele instant. Necesită o instalare inițială și câteva ajustări. Dar odată ce totul e pus la punct, el își face treaba cu brio. Și asta e partea cea mai bună. E ca și cum ai avea un grădinar personal, dar care lucrează 24/7, fără să ceară pauze sau salariu.</p>
-      </section>
-
-      <section id="top-recomandari-ce-am-testat-si-ce-mi-a-placut">
-        <h2>Top recomandari: Ce am testat și ce mi-a plăcut</h2>
-        <p>Am pus mâna pe câteva modele ca să văd care e treaba. Nu am vrut să mă bazez doar pe ce citesc pe net. Așa că am luat câțiva roboței și i-am pus la treabă în grădina mea. Fiecare cu plusurile și minusurile lui, evident. Prețurile variază, dar merită să investești în ceva bun.</p><p><strong>1. Gardena Sileno City 500.</strong> Ăsta e un model destul de popular și nu degeaba. E pentru grădini de până la 500 mp. Eu am o suprafață cam pe acolo și a făcut față cu brio. E silențios, destul de ușor de instalat, mai ales dacă urmezi instrucțiunile. Tunde fin, iarba e mereu aranjată. Prețul lui este undeva la <strong>3500 RON</strong>.</p><ul><li><strong>Pro:</strong> Foarte silențios, consum mic de energie, interfață prietenoasă, conectivitate Bluetooth pentru control de pe telefon.</li><li><strong>Contra:</strong> Poate fi un pic cam lent pe suprafețe mai mari cu denivelări, necesită cablu perimetral care trebuie instalat corect.</li></ul><p><strong>2. Worx Landroid M500 (WR141E).</strong> Acesta este un alt concurent serios. L-am testat și pe el. Este gândit pentru suprafețe de până la 500 mp. Ce mi-a plăcut la el este adaptabilitatea. Poți să-i adaugi diverse module, cum ar fi cel de sistem anti-furt sau de conectivitate Wi-Fi extinsă. Prețul lui este în jur de <strong>3800 RON</strong>.</p><ul><li><strong>Pro:</strong> Design modern, posibilitate de upgrade cu module suplimentare, sistem de tăiere eficient, aplicație mobilă bună.</li><li><strong>Contra:</strong> Instalarea cablului perimetral poate fi puțin mai migăloasă la început, bateria ar putea fi mai performantă pentru suprafețe chiar la limita superioară.</li></ul><p><strong>3. Husqvarna Automower 310 Mark II.</strong> Acesta este un pic mai scump, dar și mai robust. E pentru grădini de până la 1000 mp, deci eu l-am pus la treabă pe o zonă mai extinsă. Este un aparat premium, cu multe funcții avansate. Tunde excelent, chiar și pe vreme umedă. Prețul lui este mai ridicat, în jur de <strong>6500 RON</strong>.</p><ul><li><strong>Pro:</strong> Foarte fiabil, performanță excelentă de tăiere, gestionează pantele ușor, funcții de siguranță avansate, consum redus.</li><li><strong>Contra:</strong> Prețul este mult mai mare, interfața poate fi mai complexă pentru începători, necesită instalare <a href="/blender-profesional-pentru-smoothie/" class="interlink">profesional</a>ă pentru a beneficia de toate funcțiile.</li></ul><p><strong>4. Ambrogio L200 Basic.</strong> Acesta este un model italian, cunoscut pentru robustețe. E bun pentru suprafețe de până la 800 mp. L-am testat și mi-a lăsat o impresie bună. E un pic mai zgomotos decât Gardena, dar taie foarte bine. Prețul lui este undeva la <strong>5000 RON</strong>.</p><ul><li><strong>Pro:</strong> Construcție solidă, motor puternic, gestionează bine terenurile complexe, performanță bună de tăiere.</li><li><strong>Contra:</strong> Este mai greu și mai mare, poate fi mai zgomotos decât alte modele, aplicația mobilă nu e la fel de intuitivă ca la alții.</li></ul><p>Am mai văzut și alte modele, dar astea mi s-au părut cele mai interesante și accesibile pentru un utilizator obișnuit. Alegerea depinde mult de suprafața grădinii tale și de bugetul pe care îl ai. Fiecare are particularitățile lui, dar toate promit să-ți schimbe viața în grădină.</p>
-      </section>
-
-      <section id="cum-alegi-corect-criterii-si-specificatii-tehnice">
-        <h2>Cum alegi corect? Criterii și specificații tehnice</h2>
-        <p>Alegerea unui robot de tuns iarba nu e chiar ca și cum ai cumpăra un toaster. Sunt aparate destul de complexe și trebuie să te uiți la niște detalii. Altfel riști să iei ceva ce nu ți se potrivește și să fii dezamăgit. Eu am stat și m-am uitat pe specificații, am pus întrebări, am citit review-uri.</p><p>Primul și cel mai important criteriu este <strong>suprafața maximă pe care o poate acoperi</strong>. Asta e crucial. Nu lua un <a href="/cel-mai-bun-aspirator-robot-pentru-casa/" class="interlink">robot pentru</a> 300 mp dacă ai 700 mp. Pur și simplu nu va face față. O să fie mereu pe fugă, bateria o să se descarce repede și iarba o să fie tunsă neuniform. Verifică specificațiile producătorului și ia ceva cu o marjă de siguranță.</p><p>Apoi, te uiți la <strong>tipul de teren</strong>. Ai pante? Sunt denivelări? Unele modele sunt mai potrivite pentru terenuri plane, altele pot urca pante de 30-40%. Dacă ai o grădină plină de obstacole, copaci, flori, ai nevoie de un robot cu senzori buni, care să detecteze obstacolele și să le ocolească fără probleme. Cele cu senzori de ridicare și înclinare sunt mai sigure.</p><p><strong>Sistemul de tăiere</strong> e important. Majoritatea folosesc lame mici, ascuțite, care taie iarba fin. Asta e bine pentru iarbă, pentru că seamănă cu mărunțirea. Rezultatul e o iarbă care se descompune rapid și fertilizează solul. Verifică și lățimea de tăiere – cu cât e mai mare, cu atât va termina mai repede. Totuși, asta înseamnă și un robot mai mare.</p><p><strong>Nivelul de zgomot</strong>. Unii roboți sunt incredibil de silențioși, abia îi auzi. Alții sunt mai gălăgioși, cam ca un aspirator mai puternic. Dacă locuiești la bloc cu curte, sau ai vecini apropiați, un model silențios e de preferat. Mulți producători specifică nivelul de zgomot în decibeli (dB). Sub 60 dB e considerat silențios.</p><p><strong>Conectivitatea și controlul</strong>. Majoritatea roboților moderni se conectează la telefon prin Bluetooth sau Wi-Fi. Aplicația îți permite să setezi programul de tuns, să pornești sau să oprești robotul, să vezi stadiul bateriei, să primești notificări. Unele aplicații sunt mai intuitive ca altele. E bine să te uiți la demo-uri sau să citești păreri despre aplicație.</p><p>Nu uita de <strong>baterie</strong>. Capacitatea bateriei influențează cât timp poate funcționa robotul fără să se încarce. Asta e legat și de suprafața pe care o acoperă. Un robot pentru 1000 mp va avea o baterie mult mai mare decât unul pentru 300 mp. Timpul de încărcare e și el un factor. Unii se încarcă rapid, alții durează mai mult.</p><p><strong>Securitatea</strong>. Mulți roboți au cod PIN pentru a preveni furtul. Alții au senzori de ridicare și înclinare care opresc imediat lamele dacă robotul e ridicat sau răsturnat. E un aspect important, mai ales dacă ai copii mici sau animale de companie.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-sincer-sa-fiu-ce-e-bun-si-ce-nu">
-        <h2>Avantaje și dezavantaje: Sincer să fiu, ce e bun și ce nu</h2>
-        <p>Ca orice tehnologie, și roboții de tuns iarba au două fețe. Am stat și m-am gândit la ce am experimentat și ce mi s-a părut mie cel mai important. Sincer, balanța înclină spre avantaje, dar trebuie să fii conștient și de dezavantaje.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Economie de timp și efort:</strong> Asta e cel mai mare plus. Nu mai stai tu să împingi coasa ore în șir. Robotul face treaba singur, în timp ce tu te poți relaxa, te poți ocupa de alte treburi sau poți petrece timp cu familia. E ca și cum ai avea un asistent personal pentru grădină.</li><li><strong>Peluză mereu perfectă:</strong> Robotul tunde iarba des, la o înălțime constantă. Nu ajunge să crească prea mult, deci nu ai acele momente când iarba e prea înaltă și arată neglijat. Rezultatul este o iarbă sănătoasă, deasă și uniformă.</li><li><strong>Iarbă fertilizată natural:</strong> Lamele mici taie iarba în fărâmițe fine, care cad pe sol și se descompun rapid. Aceasta acționează ca un fertilizator natural, oferind nutrienți prețioși pentru creșterea sănătoasă a gazonului. Nu mai ai nevoie de fertilizatori chimici la fel de des.</li><li><strong><a href="/ventilator-de-tavan-silentios/" class="interlink">Silențios</a> și ecologic:</strong> Majoritatea modelelor sunt electrice și foarte silențioase. Poți programa robotul să tundă noaptea, fără să deranjezi pe nimeni. Nu poluează aerul ca un tuns pe benzină.</li><li><strong>Ușurință în utilizare:</strong> Odată instalat, robotul funcționează autonom. Interfețele sunt de obicei intuitive, iar controlul prin aplicația mobilă face totul și mai simplu.</li><li><strong>Siguranță:</strong> Mulți roboți au senzori care opresc lamele instant dacă sunt ridicați sau răsturnați, protejând copiii și animalele de companie.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Costul inițial ridicat:</strong> Acesta este probabil cel mai mare impediment. Roboții de tuns iarba nu sunt ieftini. Chiar și modelele mai accesibile necesită o investiție considerabilă. Trebuie să vezi asta ca pe o investiție pe termen lung.</li><li><strong>Instalarea cablului perimetral:</strong> Majoritatea modelelor necesită un cablu perimetral care delimitează zona de tuns. Instalarea acestuia poate fi un proces migălos și necesită precizie. Dacă nu e instalat corect, robotul poate ieși din zonă sau poate sări peste anumite porțiuni.</li><li><strong>Nu taie colțurile sau zonele greu accesibile:</strong> Roboții sunt excelenți pentru suprafețe deschise, dar pot avea dificultăți în a tunde perfect în colțuri strânse sau în zone foarte apropiate de garduri sau ziduri. S-ar putea să fie nevoie de o retușare manuală ocazională.</li><li><strong>Mentenanța:</strong> Deși nu e la fel de intensă ca la un tuns clasic, tot necesită mentenanță. Lamele trebuie ascuțite sau înlocuite periodic, iar robotul trebuie curățat.</li><li><strong>Dependența de tehnologie:</strong> Dacă ai probleme cu conectivitatea la internet sau cu aplicația, pot apărea dificultăți în controlarea robotului. De asemenea, defecțiunile electronice pot fi costisitoare.</li><li><strong>Performanța pe vreme umedă:</strong> Unele modele mai ieftine pot avea dificultăți în a tunde eficient iarba udă. De obicei, producătorii recomandă evitarea tunditului pe ploaie.</li></ul><p>Per total, cred că avantajele depășesc cu mult dezavantajele, mai ales dacă ai o grădină de dimensiuni medii sau mari și apreciezi timpul liber.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea-trucuri-si-greseli-de-evitat">
-        <h2>Sfaturi practice din experiența mea: Trucuri și greșeli de evitat</h2>
-        <p>După ce am trecut prin procesul de instalare și utilizare, am învățat câteva chestii pe pielea mea. Și cred că vă pot ajuta și pe voi să evitați niște greșeli comune. Sfatul meu e să nu vă grăbiți, mai ales la început.</p><p><strong>Instalarea cablului perimetral:</strong> Asta e cea mai importantă etapă. Eu am încercat să-l îngrop un pic, dar am văzut că unii vecini l-au prins cu cleme direct pe sol. Dacă îl îngropați, asigurați-vă că e suficient de adânc încât să nu fie tăiat de coasa clasică, dacă mai folosiți.</p>
-        <p>Dacă îl prindeți cu cleme, folosiți cleme rezistente la UV. Și cel mai important: <strong>nu vă fie frică să cereți ajutor sau să urmăriți tutoriale pe YouTube</strong>. Există filmulețe pentru fiecare model în parte.</p><p><strong>Poziționarea stației de încărcare:</strong> Am pus-o într-un loc mai ferit, unde nu bate soarele direct și nu plouă. Asta ajută la protejarea componentelor electronice. De asemenea, asigurați-vă că e accesibilă pentru robot. Nu o puneți într-un colț unde abia poate intra.</p><p><strong>Testarea inițială:</strong> După ce ați instalat totul, nu lăsați robotul să plece singur pe toată suprafața. Porniți-l pentru sesiuni scurte de tuns, în prezența voastră. Urmăriți-l cum se comportă, cum ocolește obstacolele, cum se întoarce la stație. Așa puteți identifica rapid eventualele probleme și puteți face ajustări din mers.</p><p><strong>Programarea corectă:</strong> Nu programați robotul să tundă în fiecare zi, mai ales dacă iarba nu crește foarte repede. S-ar putea să tundeți prea mult și să slăbiți <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">gazonul</a>. Verificați cum crește iarba la voi în grădină și ajustați programul. Eu am observat că, odată ce se obișnuiește, iarba rămâne la o înălțime constantă și nu mai crește așa exploziv.</p><p><strong>Curățarea regulată:</strong> Nu uitați să curățați robotul. Praful, iarba tăiată, noroiul se pot acumula. Folosiți o perie, o cârpă umedă. Verificați lamele, să nu fie rupte sau îndoite. O curățare periodică prelungește viața aparatului.</p><p><strong>Greșeli de evitat:</strong></p><ul><li><strong>Să nu instalezi corect cablul perimetral:</strong> Asta e cea mai mare greșeală. Dacă nu e pus cum trebuie, robotul nu va funcționa optim.</li><li><strong>Să nu cureți robotul:</strong> Ignorarea curățeniei poate duce la defectarea componentelor sau la o funcționare defectuoasă.</li><li><strong>Să îl folosești pe ploaie torențială:</strong> Chiar dacă multe modele sunt rezistente la apă, ploile torențiale pot afecta componentele electronice pe termen lung. Mai bine îl pui la încărcat și aștepți să treacă.</li><li><strong>Să nu ascuți sau schimbi lamele:</strong> Lamele tocite nu taie bine iarba, o rup mai mult. Asta afectează aspectul gazonului și poate duce la apariția bolilor.</li><li><strong>Să îl lași nesupravegheat imediat după instalare:</strong> E important să îl supraveghezi la început pentru a te asigura că totul funcționează perfect.</li></ul><p>Sunt mici detalii, dar fac diferența. Nu e complicat, dar necesită atenție.</p>
-      </section>
-
-      <section id="parerea-mea-finala-merita-investitia">
-        <h2>Parerea mea finala: Merita investitia?</h2>
-        <p>După ce am pus totul cap la cap, am analizat avantajele, dezavantajele, am testat produsele, pot să spun cu mâna pe inimă că <strong>un robot de tuns iarba merită investiția</strong>, în anumite condiții. Nu e pentru oricine, dar pentru mulți dintre noi, este o soluție genială.</p><p>Dacă timpul tău liber este prețios și nu vrei să-l petreci cosind iarba, dacă îți dorești o peluză impecabilă fără efort, dacă vrei să scapi de corvoada asta, atunci da, merită. Gândește-te la el ca la o eliberare. E ca și cum ai avea un angajat dedicat grădinii tale, care lucrează non-stop.</p><p>Pentru mine, aspectul cel mai important este <strong>calitatea vieții</strong>. Am mai mult timp pentru mine, pentru familie, pentru hobby-uri. Grădina arată mereu bine, fără să depun un efort considerabil. E o satisfacție să vezi cum iarba e tunsă constant, cum arată totul îngrijit.</p><p>Desigur, costul inițial este o barieră. Dar dacă pui în balanță cât timp și cât efort depui cu un tuns clasic pe parcursul a câțiva ani, plus costurile cu <a href="/motocoasa-electrica-sau-pe-benzina/">benzina</a> sau electricitatea pentru coasa clasică, s-ar putea ca pe termen lung, investiția să se amortizeze. Și nu uita de confortul psihic de a ști că ai o problemă în minus.</p><p>Pentru cine recomand cel mai mult? Pentru oamenii ocupați, pentru familiile cu copii mici, pentru persoanele care au dificultăți fizice, pentru cei care pur și simplu nu vor să mai aibă de-a face cu coasa. Chiar și pentru cei care au suprafețe mari de gazon, unde cositul clasic devine o muncă titanică.</p><p>Dacă ești genul care iubește să muncească în grădină, să simtă pământul în mâini și să aibă control total asupra fiecărui fir de iarbă, atunci probabil că un robot nu e pentru tine. Dar dacă vrei eficiență, confort și mai mult timp liber, atunci nu sta pe gânduri. Cel mai bun robot de tuns iarba este cel care se potrivește cel mai bine nevoilor și bugetului tău. Analizează, documentează-te și alege cu înțelepciune.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot lăsa robotul de tuns iarba să funcționeze peste noapte?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, majoritatea modelelor moderne sunt foarte silențioase și pot fi programate să funcționeze și pe timpul nopții, fără a deranja vecinii. Totuși, verifică specificațiile modelului tău și legislația locală privind zgomotul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce se întâmplă dacă robotul de tuns iarba întâlnește un obiect neașteptat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Roboții sunt dotați cu senzori de coliziune care detectează obstacolele. Când întâlnesc un obiect, de obicei se opresc, își schimbă direcția și continuă să tundă pe o altă rută. Modelele mai avansate pot chiar să evite anumite zone marcate.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cât de des trebuie să schimb lamele robotului?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Frecvența depinde de cât de des funcționează robotul și de tipul de iarbă. În general, lamele trebuie verificate lunar și ascuțite sau înlocuite la fiecare 2-3 luni, sau când se observă că iarba nu mai este tunsă fin.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Este dificil de instalat cablul perimetral?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Instalarea cablului perimetral necesită puțin timp și atenție, dar nu este extrem de dificilă. Mulți utilizatori reușesc să o facă singuri urmând instrucțiunile sau tutorialele video. Poți opta și pentru instalare profesională.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi același robot pentru două grădini separate?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Teoretic, da, dacă suprafața totală nu depășește capacitatea robotului și dacă poți delimita corect cele două zone cu cablu perimetral. Totuși, instalarea și mutarea cablului poate fi incomodă.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce se întâmplă cu iarba tăiată?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Iarba este tunsă în fărâmițe foarte mici, care sunt lăsate pe gazon. Aceste resturi se descompun rapid și acționează ca un fertilizator natural, îmbunătățind sănătatea solului și a gazonului.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Daca vrei un robot de tuns iarba <strong>fara fir perimetral</strong>, cel mai echilibrat e <strong>Navimow i105E</strong> pentru gradini mici, iar pentru pante alegi <strong>Navimow i206 AWD</strong>, cu tractiune integrala. La suprafete mari, <strong>Navimow i210E</strong> duce 1000 m². Iar daca vrei doar sa scapi de fir cu bugetul minim, <strong>Bosch Visimo</strong> se orienteaza pe senzori. Daca insa firul perimetral nu te deranjeaza, <strong>iHunt RoboMower</strong> acopera 2500 m² la cel mai mic pret si e de departe cel mai vandut.</p>
+      <p>Doua lucruri decid alegerea unui robot: <strong>cum se ghideaza</strong> (cu fir perimetral, mai ieftin, sau fara fir, cu GPS, RTK, LiDAR ori camera) si <strong>ce suprafata si ce panta</strong> are gazonul tau. Le luam pe rand mai jos.</p>
+      <p>Am pornit de la robotii de tuns iarba, in stoc pe eMAG, i-am verificat pe suprafata acoperita, sistemul de ghidare, panta maxima si latimea de lucru, si i-am grupat in trei: cu fir perimetral, fara fir pentru gradini mici-medii, si fara fir pentru suprafete mari si pante. Ca alternative clasice, vezi <a href="/masina-de-tuns-gazonul-electrica/">masinile electrice de tuns gazonul</a> si, pentru suprafete mari, <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">tractorasele de tuns gazonul</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#fir">Cu fir sau fara fir perimetral</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#fir-lista">Roboti cu fir perimetral</a></li>
+        <li><a href="#entry">Fara fir, gradini mici-medii</a></li>
+        <li><a href="#mari">Fara fir, suprafete mari si pante</a></li>
+        <li><a href="#cat-costa">Cat costa un robot de tuns iarba</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="fir">Cu fir sau fara fir perimetral</h2>
+    <p>E prima si cea mai importanta decizie. Robotii <strong>cu fir perimetral</strong> folosesc un cablu pe care il fixezi pe marginea gazonului: ii delimiteaza zona in care are voie sa mearga. Sunt mai ieftini si simpli ca principiu, dar instalarea firului e o munca de o zi la inceput, iar daca vrei sa schimbi forma gazonului, muti cablul.</p>
+    <p>Robotii <strong>fara fir perimetral</strong> renunta la cablu: se orienteaza cu GPS si RTK (cu o antena in curte), cu LiDAR si camera, sau cu senzori, iar tu desenezi zonele de lucru <strong>direct in aplicatie</strong>. Instalarea e mult mai rapida, poti muta zonele oricand si e ideal daca ai mai multe suprafete. In schimb, costa mai mult si au nevoie de semnal bun sau de lumina, plus o configurare atenta la inceput. Pe scurt: <strong>cu fir</strong> pentru buget mic si simplitate, <strong>fara fir</strong> pentru comoditate si flexibilitate.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Dincolo de ghidare, cateva lucruri fac diferenta reala intre doi roboti:</p>
+    <ul>
+      <li><strong>Suprafata:</strong> alege un robot cotat peste marimea reala a gazonului, cu o rezerva. In selectie e intre 500 si 2500 m².</li>
+      <li><strong>Panta maxima:</strong> data in procente sau grade. Conteaza mult daca terenul are denivelari; aici merge de la 25% (14°) la 55% (29°).</li>
+      <li><strong>Sistemul de ghidare:</strong> fir perimetral (ieftin), GPS/RTK, LiDAR sau camera (fara fir, mai precise si mai scumpe).</li>
+      <li><strong>Latimea de lucru:</strong> cu cat e mai mare, cu atat termina mai repede o suprafata. In selectie, 16-22 cm.</li>
+      <li><strong>Conectivitatea:</strong> WiFi, 4G si aplicatie iti dau control si programare de la distanta, plus, la unele, comanda vocala prin Alexa sau Google Home.</li>
+    </ul>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Suprafata</th><th>Ghidare</th><th>Panta max</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.supraf}</td>
+              <td>{x.ghidare}</td>
+              <td>{x.panta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="fir-lista">Roboti cu fir perimetral</h2>
+    <p>Mai ieftini si simpli ca principiu: fixezi un cablu pe marginea gazonului si robotul stie unde are voie. iHunt duce cea mai mare suprafata la cel mai mic pret, iar cele doua Husqvarna aduc fiabilitatea brandului de referinta.</p>
+    <div class="rd-grid">
+      {FIR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figFir} alt="Roboti de tuns iarba cu fir perimetral: iHunt si Husqvarna Automower" width="1200" height="675" loading="lazy" />
+
+    <h2 id="entry">Fara fir, gradini mici-medii</h2>
+    <p>Fara cablu de instalat: delimitezi zonele din aplicatie. Bosch Visimo e cea mai ieftina cale de a scapa de fir, Ecovacs Goat se ghideaza cu camera, iar Navimow i105E aduce localizarea precisa RTK plus camera, pentru gradini de pana la 500-800 m².</p>
+    <div class="rd-grid">
+      {ENTRY.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figEntry} alt="Roboti de tuns iarba fara fir perimetral pentru gradini mici si medii" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mari">Fara fir, suprafete mari si pante</h2>
+    <p>Cand gazonul e mare sau in panta, ai nevoie de navigatie de top si de putere de catarare. Navimow i206 AWD are tractiune integrala pentru pante, iar i210E si i220E duc 1000 si 2000 m² cu LiDAR si camera.</p>
+    <div class="rd-grid">
+      {MARI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMari} alt="Roboti de tuns iarba fara fir Navimow pentru suprafete mari si pante" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-robot-tuns-iarba').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toti robotii de tuns iarba la oferta</strong>
+        <span>Reducerile din acest moment la roboti de tuns iarba, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa un robot de tuns iarba</h2>
+    <p>Preturile depind mai ales de tipul de ghidare si de suprafata:</p>
+    <p><strong>Cu fir perimetral:</strong> de la circa 1950 de lei pentru iHunt, care duce 2500 m², pana la 4200 de lei pentru cele doua Husqvarna Automower, mai scumpe pentru brand si fiabilitate, desi acopera 600 m².</p>
+    <p><strong>Fara fir, gradini mici-medii:</strong> in general 2600-5800 de lei, de la Bosch Visimo pe senzori, cel mai ieftin fara fir, pana la Ecovacs Goat si Navimow i105E cu navigatie precisa.</p>
+    <p><strong>Fara fir, suprafete mari si pante:</strong> de la circa 5600 de lei pentru Navimow i206 AWD, pana spre 9500 de lei pentru i220E LiDAR Pro de 2000 m².</p>
+    <p>Regula practica: pentru o gradina mica si plana, un robot cu fir sau un model fara fir de intrare iti ajunge; banii in plus la cele fara fir se duc pe <strong>instalarea simpla, navigatia precisa si urcarea pe pante</strong>. Nu plati pentru 2000 m² daca ai o curte de 400. Daca preferi sa tunzi singur, vezi <a href="/cele-mai-bune-masini-de-tuns-iarba/">masinile de tuns iarba clasice</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
-        <p class="author-role">Expert <a href="/motosapa-electrica-pentru-gradina-mica/">Gradina</a>rit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
+        <p class="author-role">Expert Gradinarit</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="cel-mai-bun-robot-de-tuns-iarba"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="cel-mai-bun-robot-de-tuns-iarba"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="cel-mai-bun-robot-de-tuns-iarba" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cel-mai-bun-robot-de-tuns-iarba" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

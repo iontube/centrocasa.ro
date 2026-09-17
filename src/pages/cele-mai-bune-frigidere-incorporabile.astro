@@ -1,0 +1,294 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['frigidere-incorporabile'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Sub blat, pana in 90 cm (45-136 l) ---
+  { g: 'subblat', id: 'DHKKPF3BM', rol: 'Cel mai mic, sub blat', short: 'Adler 45 l', cap: '45 l', tip: 'Sub blat', clasa: 'E', pret: '750 lei',
+    specs: ['45 litri, inaltime de doar 45 cm, sub blat', 'reglaj de racire in 6 trepte', 'clasa E, doar 80 kWh pe an', 'latime 49.5 cm, usa cu sens schimbabil'],
+    pros: ['Cel mai mic si mai ieftin din articol, 750 de lei', 'Intra sub orice blat, inaltime 45 cm', 'Consum minim, 80 kWh pe an', 'Sensul usii se poate schimba'],
+    cons: ['45 de litri, doar pentru bauturi si cateva alimente', 'Fara congelator, mai zgomotos la 40 dB'],
+    verdict: 'Adler AD 8096 nu e un frigider de bucatarie, ci un aparat de completare: 45 de litri intr-o cutie de 45 pe 49 de centimetri, care intra sub un blat, intr-un birou, la receptie sau intr-o chicineta. La marimea asta tii bauturi, cateva alimente si atat, deci il alegi cand ai nevoie de racire intr-un loc unde un frigider normal nu incape si nu se justifica. Are un reglaj simplu de temperatura in 6 trepte si consuma foarte putin, 80 kWh pe an, tocmai pentru ca e mic. Sensul usii se poate schimba, util intr-un colt. Il iei pentru un spatiu secundar, cu asteptari pe masura, nu ca frigider principal.' },
+  { g: 'subblat', id: 'DCDJ6ZYBM', rol: 'Control electronic, cel mai flexibil', short: 'Electrolux 110 l', cap: '110 l', tip: 'Sub blat', clasa: 'E', pret: '3036 lei',
+    specs: ['110 litri: 94 frigider + 16 congelator mic', 'control electronic al temperaturii', 'clasa climatica SN-N-ST-T, cea mai larga', 'latime 59.6 cm, inaltime 82 cm'],
+    pros: ['Are si un mic congelator de 16 litri', 'Control electronic, reglaj precis al temperaturii', 'Clasa climatica SN-N-ST-T, functioneaza aproape oriunde', 'Brand cunoscut, cu service'],
+    cons: ['Peste 3000 de lei pentru 110 litri, scump pe litru', 'Latime 59.6 cm, cere o nisa de 60, nu de 56', 'O singura parere'],
+    verdict: 'Electrolux LFB3AE82R e un incorporabil sub blat cu doua diferente fata de restul grupei mici. Prima: are un compartiment de congelator de 16 litri, deci pastreaza cateva alimente congelate, nu doar racite. A doua: controlul electronic al temperaturii, mai precis decat termostatul mecanic. Clasa climatica SN-N-ST-T e cea mai larga din articol, adica il pui fara griji si intr-o incapere mai rece, si intr-una mai calda. Doua rezerve oneste: la peste 3000 de lei pentru 110 litri e scump pe litru, iar latimea de 59.6 cm cere o nisa de mobilier de 60 de centimetri, nu una standard de 56, deci verifica dulapul. Are o singura parere, asa ca merge luat pe specificatii. Il iei cand vrei un sub blat cu congelator mic si control electronic.' },
+  { g: 'subblat', id: 'DPTHX4YBM', rol: 'Mini cu congelator, accesibil', short: 'Bomann 118 l', cap: '118 l', tip: 'Sub blat', clasa: 'E', pret: '1442 lei',
+    specs: ['118 litri, cu un congelator de 14 litri', 'inaltime 89 cm, latime 54 cm', 'clasa E, 142 kWh pe an', 'usa reversibila, rafturi ajustabile'],
+    pros: ['Cel mai ieftin sub blat cu congelator, sub 1450 de lei', '118 litri intr-un corp de 89 cm inaltime', 'Usa reversibila si rafturi ajustabile', 'Latime standard de 54 cm'],
+    cons: ['Congelator mic de 14 litri, doar pentru minim', 'O singura parere', '39 dB, se aude usor'],
+    verdict: 'Bomann KSE7810W e varianta accesibila de sub blat care are totusi un mic congelator, 14 litri, cat pentru inghetata si cateva pungi. Cu 118 litri intr-un corp inalt de 89 de centimetri, e potrivit pentru o chicineta, o garsoniera sau ca al doilea frigider intr-un birou, la un pret sub 1450 de lei, mult mai mic decat Electrolux-ul de alaturi. Are latimea standard de 54 cm, deci intra intr-o nisa obisnuita de 56, usa reversibila si rafturi ajustabile. Punctele slabe sunt asteptate la pretul asta: congelatorul e mic, aparatul are o singura parere si se aude usor, 39 dB. Il iei cand vrei un sub blat ieftin, dar cu un minim de congelator, si nu iti trebuie brand premium.' },
+  { g: 'subblat', id: 'D1574ZMBM', rol: 'Cel mai mult volum sub blat', short: 'Bosch 136 l', cap: '136 l', tip: 'Sub blat', clasa: 'E', pret: '2800 lei',
+    specs: ['136 litri, totul frigider, fara congelator', 'clasa E cu doar 92 kWh pe an', 'EcoAirflow pentru aer uniform, MultiBox', 'latime 54 cm, inaltime 87 cm, 35 dB'],
+    pros: ['Cel mai mult volum din grupa sub blat, 136 litri de racire', 'Consum mic, 92 kWh, si foarte silentios, 35 dB', 'EcoAirflow distribuie aerul uniform', 'Sertar MultiBox pentru legume'],
+    cons: ['Peste 2800 de lei, premium pentru un sub blat', 'Fara congelator', 'O singura parere'],
+    verdict: 'Bosch KIR21VFE0 e cel mai incapator din grupa sub blat, cu 136 de litri numai de racire, fara congelator. Il alegi cand vrei maximum de frigider intr-un spatiu sub blat si tii congelarea separat, iar calitatea Bosch se vede la doua lucruri concrete: consumul mic, 92 kWh pe an, si zgomotul redus, 35 de decibeli, printre cele mai silentioase din articol. EcoAirflow distribuie aerul uniform pe rafturi, iar sertarul MultiBox tine legumele mai bine. E mai scump decat restul grupei, peste 2800 de lei, si are o singura parere, dar vine cu numele si service-ul Bosch. Il iei cand vrei cel mai mult frigider sub blat, silentios si econom, si nu te deranjeaza pretul premium.' },
+  // --- B. Medii, in coloana (121-145 cm, 175-220 l) ---
+  { g: 'coloana', id: 'DRSK5KYBM', rol: 'Cel mai accesibil, No Frost', short: 'Beko 175 l', cap: '175 l', tip: 'Coloana medie', clasa: 'E', pret: '1500 lei',
+    specs: ['175 litri: 156 frigider + 19 congelator mic', 'singurul No Frost din articol, fara gheata', 'montare usa culisanta, clasa climatica SN-ST', 'clasa E, 152 kWh, 35 dB, inaltime 121.5 cm'],
+    pros: ['Cel mai accesibil din grupa, sub 1500 de lei', 'Singurul No Frost, nu formeaza gheata', 'Cele mai multe pareri din articol dupa combina, 7', 'Montare cu usa culisanta, mai usor de aliniat'],
+    cons: ['Congelator mic de 19 litri', 'Volum de frigider modest pentru inaltimea lui'],
+    verdict: 'Beko BSSA300M4SN e cel mai bun punct de intrare in grupa medie: 175 de litri la sub 1500 de lei, si singurul din articol cu racire No Frost, adica nu se formeaza gheata si nu il decongelezi manual, un avantaj real fata de restul, care sunt statice. Are un mic congelator de 19 litri, cat pentru strictul necesar, si se monteaza cu sistemul de usa culisanta, unde panoul de mobilier gliseaza pe sine, mai iertator la aliniere decat montajul fix. Cu 7 pareri, e al doilea cel mai verificat din articol, ceea ce intr-o categorie cu putine recenzii conteaza. Volumul de frigider, 156 de litri, e modest pentru inaltimea corpului, dar pretul si No Frost-ul compenseaza. Il iei cand vrei un incorporabil ieftin, fara decongelare.' },
+  { g: 'coloana', id: 'DR574ZMBM', rol: 'Larder Bosch, consum mic', short: 'Bosch 204 l', cap: '204 l', tip: 'Coloana medie', clasa: 'E', pret: '2900 lei',
+    specs: ['204 litri, totul frigider, fara congelator', 'clasa E cu doar 101 kWh pe an', 'FreshSense si EcoAirflow, sertar MultiBox', 'super racire, 35 dB, inaltime 122 cm'],
+    pros: ['204 litri numai de racire, tot spatiul pentru proaspete', 'Consum foarte mic pentru marime, 101 kWh', 'FreshSense regleaza temperatura stabil', 'Silentios, 35 dB, plus super racire'],
+    cons: ['Fara congelator, ai nevoie de unul separat', 'Peste 2900 de lei', 'Doua pareri'],
+    verdict: 'Bosch KIR41VFE0 e un frigider incorporabil fara congelator, cu 204 litri numai de racire, la aceeasi inaltime de coloana medie ca Beko de alaturi. Il alegi cand vrei mult spatiu de frigider si congelezi separat, iar avantajul Bosch e eficienta: doar 101 kWh pe an la 204 litri, foarte putin, plus 35 de decibeli, silentios. FreshSense monitorizeaza si mentine temperatura stabila indiferent de cate ori deschizi usa, iar sertarul MultiBox ajuta la legume. E o alegere premium, peste 2900 de lei, cu doar doua pareri, deci luata pe specificatii si pe increderea in brand. Se potriveste bine intr-o bucatarie unde congelatorul e un aparat separat, incorporat dedesubt sau tinut in alta parte. Il iei cand vrei un larder Bosch econom si silentios.' },
+  { g: 'coloana', id: 'DM2ZC3MBM', rol: 'Combina cu congelator, cel mai verificat', short: 'Beko 220 l (K3)', cap: '220 l', tip: 'Coloana medie', clasa: 'F', pret: '2541 lei',
+    specs: ['220 litri: 176 frigider + 44 congelator', 'combina incorporabila cu doua usi', 'montare cu sistem culisant, rafturi Safety Glass', 'clasa F, 232 kWh, 37 dB, inaltime 144.8 cm'],
+    pros: ['14 pareri, de departe cel mai verificat incorporabil', 'Are un congelator adevarat de 44 de litri', 'Doua compartimente separate, frigider si congelator', 'Rafturi din sticla securizata'],
+    cons: ['Clasa F si 232 kWh, cel mai mare consum din articol', 'Nota 4.07, buna, nu de varf'],
+    verdict: 'Beko BDSA250K3SN e singurul incorporabil din articol cu adevarat verificat, cu 14 pareri, mult peste rest, si e o combina reala: frigider sus, 176 de litri, si congelator jos, 44 de litri, in doua compartimente separate. E alegerea cand vrei si racire, si congelare intr-un singur aparat incorporat, fara sa adaugi un congelator separat. Se monteaza cu sistem culisant, iar rafturile sunt din sticla securizata. Compromisul e clar la consum: fiind combina, cu un congelator care merge la minus 18 grade, ajunge la clasa F si 232 kWh pe an, cel mai mult din articol. Nota de 4.07 e buna, nu de top, dar vine pe un numar de pareri real, ceea ce da incredere. Il iei cand vrei o combina incorporabila dovedita, cu frigider si congelator la un loc.' },
+  { g: 'coloana', id: 'DX0H3DYBM', rol: 'Aceeasi combina, mai ieftina', short: 'Beko 220 l (K4)', cap: '220 l', tip: 'Coloana medie', clasa: 'E', pret: '1299 lei',
+    specs: ['220 litri: 176 frigider + 44 congelator', 'aceeasi combina, dar clasa E, 186 kWh', 'montare culisanta, rafturi Safety Glass', '37 dB, inaltime 144.8 cm'],
+    pros: ['Cel mai mic pret din grupa, sub 1300 de lei', 'Clasa E si 186 kWh, mai eficienta decat varianta K3', 'Acelasi congelator de 44 de litri', 'Nota 5, chiar daca pe putine pareri'],
+    cons: ['Doar 5 pareri, mai putin verificat decat K3', 'Aceleasi dimensiuni, nimic in plus la spatiu'],
+    verdict: 'Beko BDSA250K4SN e practic aceeasi combina incorporabila ca modelul K3 de dinainte, cu doua diferente in favoarea ei: e mai ieftina, sub 1300 de lei fata de peste 2500, si e mai eficienta, clasa E si 186 kWh in loc de clasa F si 232. Aceeasi impartire, 176 de litri frigider si 44 congelator, aceeasi montare culisanta si aceleasi rafturi din sticla. Practic, daca esti dispus sa te bazezi pe mai putine pareri, 5 fata de 14, primesti un aparat mai bun la energie si mai ieftin. E genul de situatie in care numarul de pareri si nu specificatiile face diferenta: K3 e mai testat, K4 e mai eficient si mai ieftin. Il iei cand vrei aceeasi combina, la pret mai mic si consum mai mic, si nu te deranjeaza istoricul mai subtire.' },
+  // --- C. Coloana inalta, 177 cm (310 l) ---
+  { g: 'inalta', id: 'D2S33TYBM', rol: 'Cel mai mare, coloana intreaga', short: 'Bosch 310 l', cap: '310 l', tip: 'Coloana inalta', clasa: 'E', pret: '4000 lei',
+    specs: ['310 litri, totul frigider, fara congelator', 'ocupa o coloana intreaga, 177 cm inaltime', 'clasa E, 114 kWh pe an, FreshSense', '35 dB, super racire, temperatura ajustabila'],
+    pros: ['310 litri numai de racire, cel mai mult din articol', 'Consum mic pentru marime, 114 kWh', 'FreshSense pentru temperatura stabila', 'Silentios, 35 dB'],
+    cons: ['Fara congelator, iti trebuie unul separat', 'Peste 4000 de lei', 'O singura parere'],
+    verdict: 'Bosch KIR81VFE0 e frigiderul incorporabil pentru cine are o coloana intreaga de mobilier de dedicat racirii: 310 litri, toti de frigider, pe o inaltime de 177 de centimetri. E cel mai mare din articol si logica lui e limpede, mult spatiu de proaspete, cu congelarea tinuta separat, de obicei intr-un congelator incorporat sub el sau intr-unul de sine statator. Chiar la volumul asta, consumul ramane mic, 114 kWh pe an, iar FreshSense tine temperatura stabila. E o alegere premium, peste 4000 de lei, cu o singura parere, deci pe increderea in Bosch si pe specificatii. Perechea lui fireasca e <a href="/cele-mai-bune-congelatoare/">un congelator separat</a>. Il iei cand vrei maximum de frigider incorporat pe o coloana intreaga.' },
+  { g: 'inalta', id: 'D7S33TYBM', rol: 'VitaFresh, cel mai econom mare', short: 'Bosch 310 l VitaFresh', cap: '310 l', tip: 'Coloana inalta', clasa: 'D', pret: '4761 lei',
+    specs: ['310 litri, totul frigider, cu VitaFresh', 'clasa D, doar 91 kWh pe an, cel mai econom mare', 'FreshSense, MultiBox, super racire', 'cel mai silentios, 34 dB, inaltime 177 cm'],
+    pros: ['Clasa D si 91 kWh, cel mai econom aparat mare', '34 dB, cel mai silentios din articol', 'VitaFresh pastreaza legumele si carnea proaspete mai mult', 'Aceeasi coloana de 310 litri, cu dotari in plus'],
+    cons: ['Cel mai scump din articol, peste 4700 de lei', 'Fara congelator', 'Latime 55.8 cm, verifica nisa'],
+    verdict: 'Bosch KIR81ADD0 e varianta de top a coloanei de 310 litri, si diferenta fata de KIR81VFE0 se vede la doua lucruri. Primul e eficienta: clasa D si doar 91 kWh pe an, cel mai mic consum din tot articolul la un aparat mare, ceea ce pe termen lung conteaza la un frigider care merge nonstop. Al doilea e VitaFresh, un sertar cu temperatura si umiditate controlate care tine legumele, fructele, carnea si pestele proaspete considerabil mai mult. E si cel mai silentios din articol, 34 de decibeli. Pretul e insa varf, peste 4700 de lei, iar latimea de 55.8 cm e putin peste standard, deci masoara nisa. Are doua pareri, ambele maxime. Il iei cand vrei cel mai bun frigider incorporabil pe coloana, cu pastrare superioara si consum minim, si bugetul permite.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const SUBBLAT = PICKS.filter(x => x.g === 'subblat');
+const COLOANA = PICKS.filter(x => x.g === 'coloana');
+const INALTA = PICKS.filter(x => x.g === 'inalta');
+
+const hero = '/imagini/articole/cele-mai-bune-frigidere-incorporabile.webp';
+const figSubblat = '/imagini/articole/frig-inc-sub-blat.webp';
+const figColoana = '/imagini/articole/frig-inc-coloana.webp';
+const figInalta = '/imagini/articole/frig-inc-inalta.webp';
+const published = '2026-07-22T18:38:53+03:00';
+
+const faq = [
+  { question: 'Ce inseamna frigider incorporabil?', answer: 'E un frigider proiectat sa fie montat ascuns intr-un corp de mobilier de bucatarie, in spatele unei usi de mobila, in loc sa stea la vedere ca un frigider obisnuit, numit si de sine statator. Fata lui e prinsa de usa dulapului, asa ca in bucatarie nu vezi frigiderul, ci fronturile de mobilier, uniforme. De aceea dimensiunile sunt standardizate: aparatele au in jur de 54 cm latime ca sa intre intr-o nisa de mobilier de 56-60 cm, iar inaltimea corpului spune in ce fel de dulap incap, sub blat, la mijloc de coloana sau pe toata inaltimea.' },
+  { question: 'Cum aleg dimensiunea potrivita pentru nisa?', answer: 'Masoara nisa din mobilier pe toate cele trei dimensiuni, latime, adancime si inaltime, inainte de orice. Latimea standard a nisei e de 56-60 cm, iar aparatele au circa 54 cm, cu cateva exceptii mai late, ca Electrolux de 59.6 sau Bosch VitaFresh de 55.8 cm, care cer o nisa mai mare, deci verifica exact. Inaltimea decide tipul: pana in 90 cm intra un model sub blat, in jur de 122 cm unul de coloana medie, iar la 177 cm unul care ocupa o coloana intreaga. Lasa mereu si spatiu de ventilatie in jurul aparatului, altfel se supraincalzeste si consuma mai mult.' },
+  { question: 'Care e diferenta intre montarea cu usa fixa si cea culisanta?', answer: 'Sunt cele doua metode de a prinde usa de mobilier pe frigiderul incorporabil. La montarea fixa, usa de mobila se prinde direct de usa aparatului, iar cele doua se deschid impreuna, pana la aproximativ 90 de grade; integrarea e foarte stransa, dar greutatea panoului apasa pe balamalele frigiderului. La montarea culisanta, usa de mobila se fixeaza pe corpul dulapului si e legata de usa aparatului prin sine care gliseaza; se deschide mai larg, in jur de 112 grade, iar greutatea panoului o duc balamalele mobilierului, nu ale frigiderului, ceea ce e mai bine la usi grele. Sistemul culisant, cum au modelele Beko din articol, e in general mai iertator la aliniere.' },
+  { question: 'De ce trebuie ventilatie in jurul frigiderului incorporabil?', answer: 'Pentru ca un frigider elimina caldura prin partea din spate, iar cand e inchis intr-un corp de mobilier, aerul cald trebuie sa aiba pe unde iesi. Fara ventilatie, caldura se aduna in nisa, compresorul lucreaza mai mult, consuma mai mult curent si se uzeaza mai repede. De aceea mobila pentru incorporabile prevede grile de aerisire, de obicei jos, la plinta, si sus, plus un spatiu liber in spate. Cand montezi, respecta indicatiile producatorului privind fantele de aer; e un detaliu pe care il ignora multi si care se traduce direct in factura la curent si in durata de viata a aparatului.' },
+  { question: 'De ce au frigiderele incorporabile clasa E, F sau D?', answer: 'Din martie 2021, eticheta energetica a fost rescrisa de la A la G, iar vechile A+, A++ si A+++ au disparut. Scara a fost inasprita intentionat, cu clasele A si B lasate goale la inceput, deci aproape toate frigiderele de azi sunt E sau F, iar unele modele mai vechi de fabricatie, D. O clasa D, E sau F nu inseamna un aparat prost. Ce conteaza este cifra reala de consum in kWh pe an: la incorporabile e adesea mica, pentru ca multe sunt frigidere fara congelator sau de dimensiuni reduse. Bosch VitaFresh din articol, de exemplu, e clasa D dar consuma doar 91 kWh pe an, cel mai putin din selectie.' },
+  { question: 'Incorporabil sau frigider obisnuit, de sine statator?', answer: 'Depinde de bucatarie si de buget. Un incorporabil dispare in mobilier si da un aspect uniform, curat, cerut mai ales in bucatariile moderne cu fronturi continue. In schimb, la aceeasi capacitate costa de obicei mai mult decat unul de sine statator, are volum interior ceva mai mic la acelasi gabarit, din cauza carcasei de incastrare, si cere mobila facuta pe masura lui. Un frigider obisnuit e mai ieftin, il gasesti in mai multe capacitati si il muti usor, dar se vede in incapere. Daca renovezi bucataria din temelii si vrei fronturi uniforme, incorporabilul merita; daca inlocuiesti doar frigiderul, unul de sine statator e mai practic si mai ieftin.' },
+  { question: 'Frigiderele incorporabile au congelator?', answer: 'Unele au, altele nu, si e important de verificat inainte. Multe modele din aceasta categorie sunt frigidere fara congelator, adica tot volumul e spatiu de racire, pentru ca in bucatariile cu mobilier pe comanda congelatorul e adesea un aparat separat, incorporat dedesubt. Altele sunt combine, cu un compartiment de congelator, cum e Beko de 220 de litri din articol, cu 44 de litri de congelator. Iar cele mici, sub blat, au uneori un congelator mic de 14-19 litri, cat pentru strictul necesar. Decide intai daca vrei congelator in acelasi aparat sau separat, apoi alege tipul potrivit.' },
+  { question: 'Cat costa un frigider incorporabil?', answer: 'In selectia noastra, preturile merg de la 750 de lei pentru un mic aparat sub blat de 45 de litri pana la peste 4700 pentru o coloana Bosch de 310 litri cu VitaFresh. In general, incorporabilele sunt mai scumpe decat frigiderele de sine statatoare de aceeasi capacitate, iar pretul urca cu volumul, cu brandul si cu dotarile, ca No Frost, controlul electronic sau sertarele speciale de pastrare. Categoria are si mai putine modele si mai putine pareri decat frigiderele obisnuite, asa ca merita comparat pe specificatii, dimensiuni de nisa, consum, tip de montare, nu doar pe pret.' },
+];
+
+const images = [hero, figSubblat, figColoana, figInalta, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune frigidere incorporabile in ${SEO_YEAR}: cum alegi dupa nisa din bucatarie`}
+  description="10 frigidere incorporabile comparate pe dimensiuni de nisa, tip de montare si consum, de la 45 la 310 litri. Sub blat, in coloana medie sau pe toata inaltimea."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune frigidere incorporabile' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune frigidere incorporabile</span>
+    </nav>
+
+    <h1>Cele mai bune frigidere incorporabile</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune frigidere incorporabile, de la modele sub blat la coloane intregi ascunse in mobilier" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>La un frigider incorporabil, mobila hotaraste inaintea ta: aparatul dispare intr-o nisa de bucatarie de latime fixa, in jur de 56-58 cm, iar inaltimea nisei spune direct ce model incape. De aceea prima intrebare nu e ce brand, ci ce loc ai. Daca vrei si congelator in acelasi aparat, <strong>Beko BDSA250K3SN</strong>, o combina de 220 de litri, e singurul din selectie cu adevarat verificat, cu 14 pareri. Daca vrei doar frigider, fara congelator, <strong>Beko BSSA300</strong> de 175 de litri e cel mai accesibil, sub 1500 de lei, si singurul No Frost. Iar pentru o chicineta sau un birou, <strong>Adler de 45 de litri</strong> intra sub orice blat, la 750 de lei.</p>
+      <p>Merita spus direct, de la inceput: frigiderele incorporabile sunt o piata mai mica decat cele obisnuite, cu mai putine modele si <strong>mult mai putine pareri</strong>. Doua dintre cele de aici au 7 si 14 recenzii, restul au intre una si cinci. De aceea le-am ales dupa specificatii, dimensiuni de nisa, consum, tip de montare, nu dupa numarul de recenzii, si spunem la fiecare cat de verificat e.</p>
+      <p>Le-am grupat dupa <strong>inaltimea la care se monteaza</strong>, pentru ca asta e constrangerea reala: sub blat pana in 90 cm, in coloana medie in jur de 122-145 cm si pe o coloana intreaga la 177 cm. Daca ai nevoie de congelare separata, perechea fireasca a unui frigider incorporabil fara congelator e <a href="/cele-mai-bune-congelatoare/">un congelator dedicat</a>.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#subblat">Sub blat, pana in 90 cm (45-136 l)</a></li>
+        <li><a href="#coloana">Medii, in coloana (175-220 l)</a></li>
+        <li><a href="#inalta">Coloana inalta, 177 cm (310 l)</a></li>
+        <li><a href="#nisa">Cum alegi dupa nisa din bucatarie</a></li>
+        <li><a href="#congelator">Cu congelator, fara sau separat</a></li>
+        <li><a href="#montare">Montarea usii: culisanta sau fixa</a></li>
+        <li><a href="#ventilatie">Ventilatia: detaliul care conteaza la incastrare</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Montaj</th><th>Clasa</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.tip}</td>
+              <td>{x.clasa}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="subblat">Sub blat, pana in 90 cm (45-136 l)</h2>
+    <p>Astea sunt modelele scunde, care intra sub un blat de bucatarie sau intr-un corp de mobilier jos, cu inaltimi intre 45 si 89 de centimetri. Le iei pentru o chicineta, o garsoniera, un birou sau ca al doilea frigider. Volumul e mic, iar unele au si un congelator minuscul, cat pentru strictul necesar. Le-am asezat de la cel mai mic la cel mai incapator.</p>
+    {SUBBLAT.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figSubblat} alt="Frigidere incorporabile sub blat, Adler 45 l, Bomann 118 l si Bosch 136 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="coloana">Medii, in coloana (175-220 l)</h2>
+    <p>Zona de mijloc, cu aparate inalte de 121-145 cm, care se monteaza intr-o coloana de mobilier, nu chiar pe toata inaltimea ei. Aici gasesti si singurul No Frost din articol, si singura combina cu congelator adevarat, si cele mai multe pareri. E grupa cea mai echilibrata pentru o bucatarie obisnuita.</p>
+    {COLOANA.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figColoana} alt="Frigidere incorporabile de coloana medie, Beko 175 l No Frost, Bosch 204 l si Beko 220 l combina" width="1600" height="900" loading="lazy" />
+
+    <h2 id="inalta">Coloana inalta, 177 cm (310 l)</h2>
+    <p>Modelele care ocupa o coloana intreaga de mobilier, de 177 de centimetri, si iti dau cel mai mult spatiu de frigider din articol, 310 litri. Ambele sunt Bosch, fara congelator, gandite pentru o bucatarie unde congelarea se face separat. Sunt premium, cu putine pareri, dar cu specificatii solide.</p>
+    {INALTA.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figInalta} alt="Frigidere incorporabile de coloana inalta, Bosch 310 litri FreshSense si VitaFresh" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-frigidere-incorporabile').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate frigiderele incorporabile la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="nisa">Cum alegi dupa nisa din bucatarie</h2>
+    <p>La un frigider incorporabil, spre deosebire de unul de sine statator, nu tu alegi liber marimea: o alege nisa deja existenta in mobilier. De aceea, primul pas nu e sa te uiti la modele, ci sa masori locul, latime, adancime si inaltime.</p>
+    <p><strong>Latimea</strong> e aproape mereu standard: nisa are 56-60 cm, iar aparatele in jur de 54, ca sa incapa cu jocul necesar. Atentie insa la exceptii, ca Electrolux de 59.6 cm sau Bosch VitaFresh de 55.8, care cer o nisa mai lata. Masoara exact, un centimetru conteaza.</p>
+    <p><strong>Inaltimea</strong> decide tipul de aparat, si dupa ea am si grupat articolul:</p>
+    <ul>
+      <li><strong>Pana in 90 cm:</strong> model sub blat, pentru un corp de mobilier jos. Volum mic, 45-136 litri.</li>
+      <li><strong>In jur de 122-145 cm:</strong> coloana medie, aparat asezat intr-o parte de coloana. Volum de 175-220 litri, aici incape si o combina cu congelator.</li>
+      <li><strong>177 cm:</strong> coloana intreaga, cel mai mult spatiu de frigider, 310 litri.</li>
+    </ul>
+    <p><strong>Adancimea</strong> nisei e de obicei in jur de 55 cm si se potriveste cu aparatele, dar verific-o oricum, mai ales in mobilierul mai vechi. Si nu uita spatiul de aerisire, despre care revenim mai jos.</p>
+
+    <h2 id="congelator">Cu congelator, fara sau separat</h2>
+    <p>O decizie importanta, pe care multi o rateaza, e daca vrei congelator in acelasi aparat. La incorporabile, situatia difera de frigiderele obisnuite, unde combina cu congelator jos e norma.</p>
+    <ul>
+      <li><strong>Fara congelator.</strong> Multe incorporabile sunt frigidere pure, cu tot volumul dedicat racirii. E logica din bucatariile cu mobilier pe comanda, unde congelatorul e un aparat separat, incorporat dedesubt. Asa sunt Bosch de 136, 204 si 310 litri din articol.</li>
+      <li><strong>Cu congelator mic.</strong> Modelele mici, sub blat, au uneori un compartiment de 14-19 litri, cat pentru inghetata si cateva pungi. Cazul Bomann, Electrolux si Beko de 175 de litri.</li>
+      <li><strong>Combina.</strong> Un singur aparat cu frigider si congelator adevarat, ca Beko de 220 de litri, cu 44 de litri de congelator. Il iei cand vrei totul intr-un corp, fara sa adaugi un congelator separat.</li>
+    </ul>
+    <p>Daca alegi un frigider fara congelator, gandeste din start si perechea lui, <a href="/cele-mai-bune-congelatoare/">un congelator dedicat</a>, incorporat sau de sine statator, ca sa nu ramai fara spatiu de congelare.</p>
+
+    <h2 id="montare">Montarea usii: culisanta sau fixa</h2>
+    <p>Ce face un frigider sa para incorporat e usa de mobilier prinsa pe fata lui, iar aceasta se poate monta in doua feluri. Diferenta pare tehnica, dar se simte la folosire si la montaj.</p>
+    <p>La <strong>montarea fixa</strong>, numita si usa pe usa, panoul de mobila se prinde direct de usa aparatului, iar cele doua se deschid impreuna, pana la circa 90 de grade. Integrarea e foarte stransa, dar toata greutatea panoului apasa pe balamalele frigiderului.</p>
+    <p>La <strong>montarea culisanta</strong>, usa de mobila se fixeaza pe corpul dulapului si e legata de usa aparatului prin sine care gliseaza una peste alta. Se deschide mai larg, in jur de 112 grade, iar greutatea panoului o duc balamalele mobilierului, nu ale frigiderului, ceea ce ajuta la usile grele si prelungeste viata balamalelor aparatului. In plus, sistemul culisant e mai iertator la aliniere, deci mai usor de montat corect. Modelele Beko din articol folosesc acest sistem.</p>
+    <p>Pentru majoritatea bucatariilor, montarea culisanta e alegerea mai comoda; cea fixa da o integrare ceva mai stransa, dar cere aliniere mai precisa si incarca balamalele frigiderului.</p>
+
+    <h2 id="ventilatie">Ventilatia: detaliul care conteaza la incastrare</h2>
+    <p>Un frigider elimina caldura prin partea din spate. La unul de sine statator, caldura pleaca liber in incapere; la unul incorporat, inchis intr-un corp de mobilier, aerul cald trebuie sa aiba pe unde iesi, altfel se aduna in nisa.</p>
+    <p>Consecintele lipsei de ventilatie sunt concrete: compresorul lucreaza mai mult ca sa compenseze caldura acumulata, <strong>consuma mai mult curent si se uzeaza mai repede</strong>. De aceea mobila pentru incorporabile prevede grile de aerisire, de regula jos, la plinta, si sus, plus un spatiu liber in spatele aparatului.</p>
+    <p>Cand se monteaza, respectarea indicatiilor producatorului privind fantele de aer nu e optionala: e diferenta dintre un frigider care merge eficient ani buni si unul care consuma mai mult si cedeaza mai devreme. E un detaliu pe care il ignora multi la montaj si care nu se vede, dar se simte pe factura.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Nu masori nisa inainte.</strong> La incorporabile, aparatul trebuie sa incapa exact. Masoara latime, adancime si inaltime, si tine cont de exceptiile mai late, ca Electrolux de 59.6 cm.</li>
+      <li><strong>Uiti de ventilatie.</strong> Fara grile de aer si spatiu in spate, frigiderul se supraincalzeste, consuma mai mult si se strica mai repede.</li>
+      <li><strong>Presupui ca are congelator.</strong> Multe incorporabile sunt frigidere pure. Verifica daca vrei congelator in acelasi aparat sau il tii separat.</li>
+      <li><strong>Ignori sistemul de montare a usii.</strong> Culisant sau fix schimba cat de larg se deschide si cat de usor se aliniaza panoul de mobilier.</li>
+      <li><strong>Crezi ca o clasa D sau F e slaba.</strong> Dupa eticheta din 2021, sunt normale. Uita-te la kWh pe an: la incorporabile sunt adesea mici.</li>
+      <li><strong>Te astepti la fel de multe pareri ca la frigiderele obisnuite.</strong> Categoria e mai mica; multe modele bune au putine recenzii, asa ca decizia se ia mai mult pe specificatii.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la frigiderele incorporabile in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model. Spunem deschis un lucru: <strong>categoria are putine recenzii</strong>. Doar doua modele din selectie au 7 si 14 pareri; restul au intre una si cinci. Intr-o astfel de situatie, numarul de recenzii nu poate fi criteriul principal, asa ca am ales pe specificatii reale, capacitate, consum, dimensiuni de nisa, tip de montare si de racire, si am scris la fiecare cat de verificat este, ca sa stii unde te bazezi pe pareri si unde pe fisa tehnica.</p>
+    <p>Le-am grupat dupa inaltimea de montare, pentru ca la un incorporabil nisa din mobilier e prima constrangere. Am inclus modele sub blat, de coloana medie si de coloana intreaga, si am acoperit ambele cazuri, cu congelator si fara, ca sa poti alege dupa nevoie.</p>
+    <p>Am lasat deoparte categoriile care au articolul lor: frigiderele obisnuite, de sine statatoare, <a href="/cele-mai-bune-frigidere-no-frost/">cele No Frost</a> si <a href="/frigider-side-by-side-pentru-familie/">cele side by side</a>. Nu testam aparatele in laborator si nu pretindem asta: ne bazam pe specificatii de la producator, pe parerile existente si pe documentare, apoi le traducem in recomandari clare. Un frigider incorporabil fara congelator se completeaza cel mai bine cu <a href="/cele-mai-bune-congelatoare/">un congelator separat</a>.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 750 la 4761 de lei, iar pretul urmeaza marimea, brandul si dotarile.</p>
+    <p><strong>Sub 1500 de lei</strong> stau modelele mici si accesibile: Adler de 45 de litri la 750, Bomann de 118 cu congelator mic si Beko de 175 de litri No Frost, cel mai bun punct de intrare. Pentru o chicineta, o garsoniera sau o bucatarie mica.</p>
+    <p><strong>Intre 1500 si 3000 de lei</strong> e grosul selectiei: combina Beko de 220 de litri, in cele doua variante, plus Bosch de 136 sub blat. Aici gasesti si congelator, si branduri consacrate, la preturi rezonabile pentru categorie.</p>
+    <p><strong>Peste 3000 de lei</strong> intri la premium: Electrolux cu control electronic, Bosch de 204 litri si coloanele Bosch de 310 litri, pana la 4761 de lei pentru varianta VitaFresh, cea mai econoama si mai silentioasa. Platesti pentru volum mare, pastrare superioara si finisaj de brand. Peste tot, tine minte ca incorporabilele costa in general mai mult decat frigiderele de sine statatoare de aceeasi marime.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-frigidere-incorporabile" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-frigidere-incorporabile" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

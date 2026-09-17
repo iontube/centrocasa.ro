@@ -1,0 +1,286 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['mobila-living'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Ansambluri living ---
+  { g: 'ansambluri', id: 'DNWD3KMBM', badge: 'Cel mai vandut ansamblu',
+    specs: ['ansamblu din 4 piese', 'comoda TV, 2 corpuri, o polita', 'PAL 16 mm, fronturi MDF', '200 x 171 cm'],
+    pros: ['Cel mai vandut din tot topul, 447 de pareri', 'Vine ca 4 piese: comoda TV, doua corpuri suspendate si o polita', 'Fronturi din MDF cu balamale soft-close', 'Multe variante de culoare, de la 599 de lei'],
+    cons: ['Se monteaza pe perete, cere prindere buna', 'Corpul e din PAL de 16 mm, subtire', 'Latime fixa de 200 cm'],
+    verdict: 'Cel mai vandut ansamblu de living de pe eMAG si punctul de plecare firesc pentru un perete de televizor. Vine ca patru piese: o comoda TV lunga, doua corpuri suspendate cu geam si o polita, care impreuna compun un perete intreg. Fronturile sunt din MDF, cu balamale soft-close, iar corpul din PAL cu intarituri. Se gaseste in multe combinatii de culoare, de la Mov cu alb la Stejar, incepand de la 599 de lei. Cele 447 de pareri il fac cel mai testat din selectie. E gandit pentru montaj pe perete, deci ai nevoie de prindere buna, iar PAL-ul de 16 mm e mai subtire decat la piesele mai scumpe. Pentru un living obisnuit, la buget corect, e alegerea sigura.' },
+  { g: 'ansambluri', id: 'DP922WMBM', badge: 'Cel mai mare si mai apreciat',
+    specs: ['ansamblu 285 cm', 'Stejar cu Negru lucios', 'loc central pentru TV', 'corpuri sus si jos'],
+    pros: ['Cea mai buna nota la ansambluri, 4.74', 'Cel mai lat, 285 cm, umple un perete mare', 'Contrast Stejar cu Negru lucios, aspect modern', 'Peste 250 de pareri'],
+    cons: ['Are nevoie de un perete de peste 2,8 metri', 'Fronturile lucioase se amprenteaza mai usor'],
+    verdict: 'Cel mai apreciat ansamblu din selectie si alegerea daca ai un perete mare de umplut. Cu 285 cm, e cel mai lat din top si acopera un perete intreg de living, cu loc central pentru televizor si corpuri atat sus cat si jos. Combinatia de Stejar cu Negru lucios da un aspect modern, cu contrast mat-lucios care scoate in evidenta ecranul. Nota de 4.74 din peste 250 de pareri e cea mai buna dintre ansambluri. Are nevoie de un perete pe masura, de peste 2,8 metri liberi, iar fronturile lucioase prind amprente si cer sters mai des. Il iei pentru un living spatios, cand vrei un perete de televizor complet si un aspect elegant.' },
+  { g: 'ansambluri', id: 'DNB383YBM', badge: 'Alternativa de brand',
+    specs: ['ansamblu 265 cm', 'brand Forte', 'biblioteca cu loc de TV', 'depozitare inchisa si deschisa'],
+    pros: ['Brand consacrat de mobila, Forte', '265 cm, perete aproape intreg', 'Combina depozitare inchisa si rafturi deschise', 'Nota buna, 4.70'],
+    cons: ['Numar mai mic de pareri', 'Latime mare, cere spatiu'],
+    verdict: 'O alternativa solida la modelele Irim si KringX, de la Forte, un brand de mobila cunoscut. Ansamblul are 265 cm si combina depozitare inchisa, in spatele usilor, cu rafturi deschise unde pui carti si obiecte decorative, plus locul pentru televizor. Aspectul e curat si echilibrat, iar nota de 4.70 arata clienti multumiti, chiar daca numarul de pareri e mai mic. Fiind lat, cere un perete de peste 2,6 metri. Il alegi daca preferi un brand consacrat si vrei un mix intre depozitare ascunsa si rafturi la vedere, pe un perete mare.' },
+  { g: 'ansambluri', id: 'DV0T3HMBM', badge: 'Cu iluminare LED',
+    specs: ['ansamblu 210 cm', 'iluminare LED inclusa', 'Sonoma', 'accent de lumina seara'],
+    pros: ['Iluminare LED inclusa, efect de accent seara', '210 cm, se potriveste in living mediu', 'Culoare Sonoma calda', 'Combina corpuri si polite'],
+    cons: ['Cel mai scump ansamblu, peste 1299 de lei', 'LED-ul e un plus estetic, nu functional'],
+    verdict: 'Ansamblul de ales daca vrei si un pic de atmosfera, nu doar depozitare. Irim Niko vine cu iluminare LED integrata, care seara scoate in evidenta rafturile si da un accent placut peretelui de televizor, ceva ce lipseste la modelele mai ieftine. Are 210 cm, deci intra intr-un living mediu, si o culoare Sonoma calda. Nota de 4.59 e buna. E cel mai scump ansamblu din top, peste 1299 de lei, iar LED-ul e mai mult estetic decat util, deci il iei pentru aspect. Il alegi cand vrei ca peretele de living sa arate bine si seara, cu lumina de accent, si ai bugetul pentru asta.' },
+  // --- Biblioteci de sine statatoare ---
+  { g: 'biblioteci', id: 'DC48MBMBM', badge: 'Cea mai buna biblioteca compacta',
+    specs: ['biblioteca compacta', '137 x 143 cm', 'Sonoma Dark', 'rafturi si usi jos'],
+    pros: ['Nota foarte buna, 4.79', 'Compacta, incape langa canapea sau intr-un colt', 'Rafturi deschise sus, usi jos pentru ascuns', 'Peste 60 de pareri'],
+    cons: ['Depozitare medie, nu pentru colectii mari', 'O singura culoare'],
+    verdict: 'Cea mai buna biblioteca compacta din selectie si alegerea daca vrei o piesa de sine statatoare, nu un perete intreg. Are 137 cm latime si 143 inaltime, deci incape langa canapea, intr-un colt sau langa peretele de televizor, fara sa domine camera. Combina rafturi deschise sus, unde pui carti si obiecte la vedere, cu usi jos, unde ascunzi ce nu vrei sa se vada. Culoarea Sonoma Dark e calda si se asorteaza usor. Nota de 4.79 din peste 60 de pareri e printre cele mai bune. Depozitarea e medie, buna pentru o casa obisnuita, nu pentru o colectie mare de carti. O iei cand vrei o biblioteca frumoasa si practica, fara sa ocupe tot peretele.' },
+  { g: 'biblioteci', id: 'DZ9L7WBBM', badge: 'Cea mai buna cu compartimente',
+    specs: ['10 compartimente tip cub', 'depozitare deschisa', 'stil modern', 'sub 350 de lei'],
+    pros: ['10 compartimente egale, ordonate', 'Stil modern, aspect de raft cub', 'Buna si ca separator de camera', 'Pret mic, sub 350 de lei'],
+    cons: ['Depozitare deschisa, se vede tot', 'Fara usi sau sertare'],
+    verdict: 'Alegerea daca iti place aspectul de rafturi cub, ordonat si modern, la un pret mic. VASAGLE are 10 compartimente egale in care organizezi carti, cutii sau obiecte decorative, iar structura deschisa o face buna si ca separator intre living si bucatarie sau hol. E printre cele mai ieftine din top, sub 350 de lei, si are o nota buna. Fiind complet deschisa, tot ce pui pe ea se vede, deci vrei sa o tii ordonata sau sa folosesti cutii pentru lucrurile marunte. O iei cand vrei un raft modern si ieftin, care merge si ca separator, nu o biblioteca cu usi.' },
+  { g: 'biblioteci', id: 'DNGNF1MBM', badge: 'Cea mai inalta, alba',
+    specs: ['biblioteca inalta 196 cm', '4 polite', 'alba', 'rafturi deschise'],
+    pros: ['196 cm inaltime, foloseste peretele in sus', 'Alba, potriveste in orice camera', '4 polite pentru carti si obiecte', 'Ingusta, ocupa putin la sol'],
+    cons: ['Nota medie, 4.20', 'Deschisa, fara usi', 'Se prinde de perete la partea de sus'],
+    verdict: 'Biblioteca de ales daca ai putin loc la sol dar perete gol pe inaltime. Are 196 cm si patru polite, deci castiga depozitare pe verticala, acolo unde de obicei ramane perete nefolosit, si ocupa doar 70 cm latime. Albul o face discreta si potrivita in orice camera, mai ales una mica, unde culorile deschise dau senzatia de spatiu. Fiind inalta si deschisa, se prinde de perete la partea de sus, ca sa nu se rastoarne. Nota de 4.20 e medie, la nivelul pretului. O iei cand vrei sa folosesti inaltimea peretelui pentru carti, intr-un spatiu ingust.' },
+  { g: 'biblioteci', id: 'D1TWHFYBM', badge: 'Cea mai ingusta, pentru colt',
+    specs: ['ingusta, 60 cm latime', '160 cm inaltime', 'rafturi inalte', 'pentru spatii mici'],
+    pros: ['Doar 60 cm latime, intra in orice colt', 'Nota excelenta, 4.95', 'Rafturi inalte, buna pentru carti mari', 'Aspect subtire, discret'],
+    cons: ['Numar mic de pareri, 21', 'Depozitare limitata de latime'],
+    verdict: 'Cea mai ingusta biblioteca din selectie si solutia pentru un colt sau un spatiu unde nimic altceva nu incape. Cu doar 60 cm latime si 160 inaltime, se strecoara langa o usa, intr-un colt sau intre doua piese de mobila, si ofera rafturi inalte, bune pentru carti mari sau bibelouri. Are cea mai buna nota din grup, 4.95, chiar daca vine de la un numar mai mic de pareri. Depozitarea e limitata de latimea mica, deci e o piesa de completare, nu biblioteca principala a casei. O iei cand ai un spatiu ingust de umplut si vrei o piesa subtire, care nu inghesuie camera.' },
+  { g: 'biblioteci', id: 'D55MYKMBM', badge: 'Cea mai ieftina',
+    specs: ['raft de podea, 8 nivele', 'rafturi in forma de V', 'deschis', 'cel mai mic pret'],
+    pros: ['Cel mai mic pret din top', 'Nota foarte buna, 4.92', 'Aspect de raft-scara, decorativ', 'Usor de mutat si de reasezat'],
+    cons: ['Rafturi mici, doar pentru obiecte usoare', 'Deschis, fara depozitare inchisa'],
+    verdict: 'Cea mai ieftina piesa din top si o alegere buna daca vrei un raft decorativ, nu o biblioteca serioasa. VASAGLE de podea are opt nivele mici, in forma de V, care dau un aspect de raft-scara, potrivit pentru plante, rame, bibelouri si cateva carti. E foarte ieftin, are o nota excelenta si e usor de mutat, deci il reasezi cand vrei sa schimbi ceva in camera. Rafturile fiind mici, sunt pentru obiecte usoare, nu pentru carti grele sau depozitare mare. Il iei ca piesa decorativa, pentru un colt de living, la cel mai mic pret.' },
+  // --- Comoda TV ---
+  { g: 'comoda', id: 'D0X26C3BM', badge: 'Cea mai buna comoda TV',
+    specs: ['comoda TV suspendata', 'cu polite laterale', 'aeriseste spatiul', 'cel mai mic pret'],
+    pros: ['Suspendata, elibereaza podeaua si pare mai usoara', 'Nota excelenta, 4.95', 'Polite laterale pentru obiecte', 'Cel mai mic pret din top'],
+    cons: ['Numar mic de pareri, 21', 'Se prinde de perete, nu sta pe picioare'],
+    verdict: 'Alegerea daca vrei doar o comoda pentru televizor, nu un ansamblu intreg, si iti place aspectul aerisit. Fiind suspendata, se prinde de perete si lasa podeaua libera dedesubt, ceea ce face camera sa para mai mare si mai usor de curatat. Are polite laterale unde pui boxa, decodorul sau obiecte decorative, iar nota de 4.95 e printre cele mai bune, chiar daca de la putine pareri. E cea mai ieftina piesa de acest fel din top. Fiind suspendata, cere prindere buna in perete, nu sta pe picioare. O iei cand ai deja restul livingului si vrei doar o comoda TV moderna, care sa nu incarce camera.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ANSAMBLURI = PICKS.filter(x => x.g === 'ansambluri');
+const BIBLIOTECI = PICKS.filter(x => x.g === 'biblioteci');
+const COMODE = PICKS.filter(x => x.g === 'comoda');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/mobila-living.webp';
+const figAnsambluri = '/imagini/articole/mobila-living-ansambluri.webp';
+const figBiblioteci = '/imagini/articole/mobila-living-biblioteci.webp';
+const figStil = '/imagini/articole/mobila-living-stil.webp';
+const published = '2026-07-17T20:30:00+03:00';
+
+const faq = [
+  { question: 'Ansamblu de living sau piese separate?', answer: 'Un ansamblu, adica biblioteca cu loc de televizor, iti da un perete gata compus, cu piese care se potrivesc intre ele, si e cel mai simplu daca vrei un rezultat unitar. Piesele separate, o comoda TV plus o biblioteca aleasa aparte, iti dau libertate: le potrivesti la spatiul tau si le schimbi pe rand. Pentru un perete de televizor clasic, ia un ansamblu; daca ai un living aparte sau vrei sa combini singur, mergi pe piese.' },
+  { question: 'La ce inaltime se pune televizorul in living?', answer: 'Centrul ecranului trebuie sa fie la nivelul ochilor cand stai pe canapea, adica in jur de 100-110 cm de la podea. Daca il pui prea sus, deasupra unui semineu de exemplu, iti forteaza gatul. Distanta buna intre canapea si televizor e cam de 2-3 ori diagonala ecranului. Comodele TV joase, ca cele suspendate, ajuta sa tii ecranul la inaltimea corecta.' },
+  { question: 'Ce culoare de mobila aleg pentru un living mic?', answer: 'Culorile deschise, alb, bej, crem sau stejar deschis, fac o camera mica sa para mai mare si mai luminoasa, pentru ca reflecta lumina. Rafturile deschise, in loc de corpuri masive cu usi, reduc si ele senzatia de aglomerat. Daca vrei contrast, combina o piesa deschisa cu un accent inchis sau lucios, dar tine fundalul deschis. Intr-un living mare si luminos poti merge linistit pe culori inchise sau lucioase.' },
+  { question: 'Din ce material e mobila de living si conteaza?', answer: 'Cele mai multe piese sunt din PAL melaminat, economic si rezistent la zgarieturi, uneori cu fronturi din MDF, care arata mai bine si rezista mai mult. Grosimea conteaza: PAL de 18 mm e mai robust decat cel de 16 mm la rafturi lungi. Pentru living, unde nu e umezeala ca in bucatarie, PAL-ul e suficient; fronturile MDF si balamalele soft-close sunt un plus de calitate si de aspect.' },
+  { question: 'Cum se prind corpurile suspendate de perete?', answer: 'Corpurile si comodele suspendate se fixeaza in perete cu suporturi si dibluri potrivite pentru tipul de zid. Pe caramida sau beton, diblurile obisnuite tin bine; pe gips-carton ai nevoie de dibluri speciale, tip fluture sau metalice, altfel piesa cade cand o incarci. Verifica greutatea pe care o va sustine si, daca nu esti sigur pe perete, cheama un montator, mai ales la ansamblurile mari.' },
+];
+
+const images = [hero, figAnsambluri, figBiblioteci, figStil, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune piese de mobila pentru living in 2026: ansambluri, biblioteci si comode TV"
+  description="Cum iti mobilezi livingul in 2026: ansambluri biblioteca cu loc de TV, biblioteci de sine statatoare si comode TV comparate, cu pareri reale. Plus cum asezi televizorul si ce culori alegi."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Ioana Stan"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobila si Dormitor', url: '/mobila-dormitor/' }, { name: 'Cele mai bune piese de mobila pentru living' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobila-dormitor/">Mobila si Dormitor</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune piese de mobila pentru living</span>
+    </nav>
+
+    <h1>Cele mai bune piese de mobila pentru living in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/ioana-stan/">Ioana Stan</a>, Consultant Amenajari Dormitor · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune piese de mobila pentru living: ansambluri, biblioteci si comode TV" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Daca vrei un perete de televizor gata compus, cel mai bun ansamblu este <strong>Irim Pascale</strong>: patru piese care se potrivesc, de la 599 de lei. Pentru un perete mare, <strong>KringX Maia</strong> are 285 cm si cea mai buna nota. Daca vrei doar o biblioteca separata, <strong>Irim Clara</strong> e cea mai buna compacta, iar <strong>VASAGLE</strong> e cea mai ieftina. Pentru televizor, o comoda suspendata ca <strong>UnicUtil</strong> tine camera aerisita.</p>
+      <p>Livingul nu se rezolva cu o singura piesa, ci cu cateva care lucreaza impreuna: un loc pentru televizor, rafturi pentru carti si obiecte, si depozitare pentru ce vrei sa ascunzi. De aceea am impartit selectia pe roluri, nu pe pret: intai ansamblurile care compun un perete intreg, apoi bibliotecile de sine statatoare, apoi comoda TV.</p>
+      <p>Am pornit de la cele mai vandute piese de living de pe eMAG, le-am verificat constructia si dimensiunile si le-am grupat dupa ce fac in camera, ca sa iti fie usor sa iti compui livingul din ce ai nevoie. Vezi separat <a href="/cele-mai-bune-canapele/">canapelele</a>, <a href="/covor-modern-pentru-living/">covoarele moderne</a> si <a href="/draperii-elegante-pentru-living/">draperiile elegante</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#compui">Cum gandesti un perete de living</a></li>
+        <li><a href="#ansambluri">Ansambluri: biblioteca cu loc de televizor</a></li>
+        <li><a href="#biblioteci">Biblioteci de sine statatoare</a></li>
+        <li><a href="#comoda">Comoda TV</a></li>
+        <li><a href="#televizor">Cum asezi televizorul</a></li>
+        <li><a href="#culoare">Culoare si stil</a></li>
+        <li><a href="#materiale">Materiale si montaj</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="compui">Cum gandesti un perete de living</h2>
+    <p>Un truc simplu de la designeri: imagineaza-ti un dreptunghi mare pe peretele unde va sta televizorul si incearca sa incadrezi toate piesele in el. Asa peretele arata ordonat, iar ecranul se aseaza natural in mijlocul compozitiei, nu razlet. De aici pornesc doua cai:</p>
+    <ul>
+      <li><strong>Un ansamblu gata compus</strong>, adica o biblioteca cu loc de televizor, unde toate piesele vin potrivite intre ele. E cel mai simplu si da un rezultat unitar.</li>
+      <li><strong>Piese separate</strong>, o comoda TV plus o biblioteca aleasa aparte. Iti da libertate sa potrivesti la spatiul tau si sa schimbi pe rand, dar trebuie sa le asortezi singur.</li>
+    </ul>
+    <p>Mai jos ai intai ansamblurile, pentru cine vrea totul dintr-o bucata, apoi bibliotecile si comoda, pentru cine isi compune livingul din piese.</p>
+
+    <h2 id="ansambluri">Ansambluri: biblioteca cu loc de televizor</h2>
+    <p>Astea sunt piesele centrale ale livingului: umplu un perete intreg si vin cu comoda TV, corpuri si polite deja potrivite. Le-am aranjat de la cea mai vanduta la cea cu iluminare LED.</p>
+    <div class="rd-grid">
+      {ANSAMBLURI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAnsambluri} alt="Ansambluri de living: Irim Pascale, KringX Maia si Irim Niko cu LED" width="1200" height="675" loading="lazy" />
+
+    <h2 id="biblioteci">Biblioteci de sine statatoare</h2>
+    <p>Daca ai deja unde pune televizorul sau vrei o piesa separata, o biblioteca aduce rafturi pentru carti si obiecte fara sa ocupi tot peretele. De la compacte cu usi la rafturi deschise, ieftine.</p>
+    <div class="rd-grid">
+      {BIBLIOTECI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBiblioteci} alt="Biblioteci de living: VASAGLE, Irim Clara si UnicUtil Slim" width="1200" height="675" loading="lazy" />
+
+    <h2 id="comoda">Comoda TV</h2>
+    <p>Cand ai nevoie doar de un loc pentru televizor, nu de un perete intreg, o comoda TV rezolva simplu. Cele suspendate lasa podeaua libera si fac camera sa para mai mare.</p>
+    <div class="rd-grid">
+      {COMODE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <h2 id="televizor">Cum asezi televizorul</h2>
+    <p>Degeaba ai o mobila frumoasa daca televizorul e asezat gresit. Doua reguli simple, pe care le uita multi:</p>
+    <ul>
+      <li><strong>Inaltimea:</strong> centrul ecranului la nivelul ochilor cand stai pe canapea, adica in jur de 100-110 cm de la podea. Prea sus, deasupra unui semineu, iti forteaza gatul. De aceea comodele joase, mai ales cele suspendate reglabil, ajuta.</li>
+      <li><strong>Distanta:</strong> intre canapea si televizor, cam de 2-3 ori diagonala ecranului. La un televizor mare pus prea aproape, ochii obosesc; prea departe, pierzi din detalii.</li>
+    </ul>
+    <p>Gandeste locul televizorului inainte sa cumperi mobila, ca inaltimea comodei si a corpurilor sa il aseze corect, nu invers.</p>
+
+    <h2 id="culoare">Culoare si stil</h2>
+    <p>La living, culoarea si stilul conteaza mai mult decat la orice alta mobila, pentru ca e camera in care stai si primesti oaspeti. Cateva repere:</p>
+    <p><strong>Living mic:</strong> mergi pe culori deschise, alb, bej, crem sau stejar deschis. Reflecta lumina si fac camera sa para mai mare. Rafturile deschise, in loc de corpuri masive cu usi, reduc senzatia de aglomerat.</p>
+    <p><strong>Living mare si luminos:</strong> poti merge linistit pe culori inchise sau fronturi lucioase, ca la KringX Maia, care dau un aer modern si elegant.</p>
+    <p><strong>Contrast:</strong> secretul care scoate in evidenta televizorul e combinatia mat cu lucios sau deschis cu inchis. Un fundal deschis cu o piesa de accent inchisa functioneaza aproape mereu.</p>
+
+    <img class="rd-fig" src={figStil} alt="Culori deschise si rafturi deschise fac livingul mic sa para mai mare" width="1200" height="675" loading="lazy" />
+
+    <h2 id="materiale">Materiale si montaj</h2>
+    <p>Cele mai multe piese de living sunt din PAL melaminat, economic si rezistent la zgarieturi, uneori cu fronturi din MDF, care arata mai bine si tin mai mult. Pentru living, unde nu e umezeala ca in bucatarie, PAL-ul e suficient; grosimea conteaza mai mult, iar 18 mm e mai robust decat 16 mm la rafturile lungi.</p>
+    <p>Partea de care sa tii cont e montajul. Multe piese, mai ales ansamblurile si comodele suspendate, se prind de perete:</p>
+    <ul>
+      <li><strong>Zid de caramida sau beton:</strong> dibluri si suruburi obisnuite tin bine.</li>
+      <li><strong>Gips-carton:</strong> ai nevoie de dibluri speciale, tip fluture sau metalice, altfel piesele cad cand le incarci cu carti.</li>
+      <li><strong>Ansambluri mari:</strong> merita montate cu grija sau de un profesionist, ca sa iasa drept si sa reziste in timp.</li>
+    </ul>
+    <p>Verifica intotdeauna cu o nivela cand montezi, ca rafturile sa fie orizontale si usile sa se inchida drept.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-mobila-living')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toata mobila de living la oferta</strong>
+        <span>Reducerile din acest moment la ansambluri, biblioteci si comode, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">IS</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/ioana-stan/" class="author-name-link">Ioana Stan</a></p>
+        <p class="author-role">Consultant Amenajari Dormitor</p>
+        <p class="author-bio">Ioana ajuta de peste 7 ani oameni sa isi aleaga si sa isi compuna mobila potrivita pentru casa lor, cu focus pe spatiu, materiale si stil.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-piese-de-mobila-pentru-living" currentCategory="mobila-dormitor" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-piese-de-mobila-pentru-living" currentCategory="mobila-dormitor" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

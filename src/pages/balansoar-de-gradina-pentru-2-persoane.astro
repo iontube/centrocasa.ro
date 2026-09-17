@@ -1,232 +1,307 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Balansoar de gradina pentru 2 persoane",
-  excerpt: "Ah, balansoarul acela de gradina pentru 2 persoane! Ce vis frumos. Sincer sa fiu, am cautat mult pana am gasit ceva pe placul meu, si m-am gandit sa va povestesc si voua despre experienta mea. Poate va ajuta sa nu faceti aceleasi greseli ca mine la inceput.",
-  image: "/images/articles/balansoar-de-gradina-pentru-2-persoane.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-01-06T15:51:33.210Z",
-  modifiedDate: "2026-01-27T15:51:33.736Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat de greu este de asamblat un balansoar de gradina?", answer: "Depinde de model. Cele din lemn sau cele mai simple pot fi asamblate rapid, uneori chiar si in mai putin de o ora. Modelele mai complexe, cu baldachin sau structuri metalice elaborate, pot necesita mai mult timp si atentie. Cititi mereu specificatiile si parerile altor cumparatori legate de montaj." },
-  { question: "Pot lasa balansoarul afara pe timp de iarna?", answer: "Nu este recomandat, mai ales daca e din lemn sau metal netratat corespunzator. Ploaia, zapada si inghetul pot deteriora materialele. Cel mai bine este sa il depozitati intr-un spatiu protejat sau sa folositi o husa impermeabila de calitate." },
-  { question: "Ce materiale sunt cele mai rezistente la intemperii?", answer: "In general, balansoarele din ratan sintetic de calitate sau cele din metal cu vopsea electrostatica sunt cele mai rezistente. Lemnul tratat corespunzator poate rezista, dar necesita intretinere periodica." },
-  { question: "Cum curat petele de pe pernele balansoarului?", answer: "Verificati eticheta pernelor. De obicei, se pot curata cu o carpa umeda si un detergent bland. Pentru pete mai dificile, puteti folosi solutii specifice pentru tapiterie, dar testati intai pe o zona mai putin vizibila." },
-  { question: "Cat de stabil ar trebui sa fie un balansoar pentru 2 persoane?", answer: "Un balansoar bun, de calitate, trebuie sa fie stabil si sa nu se clatine periculos. Verificati constructia, picioarele si imbinarile. Ar trebui sa aiba o greutate maxima suportata de cel putin 150-200 kg pentru a asigura siguranta." },
-  { question: "Exista balansoare de gradina pliabile?", answer: "Da, exista si modele pliabile, insa acestea sunt mai rare si adesea mai putin confortabile sau rezistente decat cele fixe. Sunt utile daca aveti spatiu limitat si vreti sa il depozitati usor." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un balansoar de gradina pentru 2 persoane?", id: "de-ce-ai-nevoie-de-un-balansoar-de-gradina-pentru-2-persoane" },
-  { title: "Top recomandari de balansoare de gradina pentru 2 persoane", id: "top-recomandari-de-balansoare-de-gradina-pentru-2-persoane" },
-  { title: "Cum alegi corect balansoarul de gradina potrivit?", id: "cum-alegi-corect-balansoarul-de-gradina-potrivit" },
-  { title: "Avantaje si dezavantaje ale unui balansoar de gradina pentru 2 persoane", id: "avantaje-si-dezavantaje-ale-unui-balansoar-de-gradina-pentru-2-persoane" },
-  { title: "Sfaturi practice si greseli de evitat", id: "sfaturi-practice-si-greseli-de-evitat" },
-  { title: "Parerea mea finala despre balansoarul de gradina pentru 2 persoane", id: "parerea-mea-finala-despre-balansoarul-de-gradina-pentru-2-persoane" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['balansoar-2-persoane'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Pentru 2 persoane (2 locuri, 200 kg) ---
+  { g: 'doi', id: 'DVGL9Q3BM', badge: 'Cel mai bun pentru 2', short: 'Metalic 2 persoane TOPSCAUNE', locuri: '2', cap: '200 kg', mat: 'Fier', dim: '100 x 125 x 165 cm',
+    specs: ['2 locuri reale, capacitate 200 kg', 'cadru de fier, rezistent', '125 cm latime, 165 cm inaltime', 'nota maxima, 5 din 5'],
+    pros: ['Doua locuri adevarate, cu 200 kg capacitate', 'Cadru de fier solid, sta bine si la doi adulti', 'Cea mai buna nota din selectie, 5 din 5', 'Format clasic de banca-balansoar, comod pentru relaxare in doi'],
+    cons: ['Fierul cere protectie contra ruginii in timp', 'Fara acoperis la acest cod, il pui la umbra sau adaugi o husa'],
+    verdict: 'Alegerea clara daca vrei un balansoar real pentru doua persoane, nu un scaun suspendat pentru unul singur. Modelul metalic TOPSCAUNE are doua locuri si o capacitate de 200 kg, adica sustine confortabil doi adulti, pe un cadru de fier solid de 125 cm latime si 165 cm inaltime, care nu se clatina cand va legati amandoi. E cel mai bine cotat din toata selectia, cu nota maxima de la cumparatori, semn ca structura si stabilitatea sunt in regula. Fiind din fier, are nevoie in timp de putina grija impotriva ruginii, mai ales daca sta in ploaie, iar la acest cod nu vine cu acoperis, deci il asezi la umbra sau ii adaugi o husa de protectie. Il iei cand vrei formatul clasic de banca-balansoar pentru doi, cu cel mai bun raport intre pret, capacitate si nota.' },
+  { g: 'doi', id: 'DBYTDSYBM', badge: 'Raport bun', short: 'DeHome Joy 300 dublu', locuri: '2', cap: '200 kg', mat: 'Metal', dim: '120 cm latime',
+    specs: ['Leagan tip cuib dublu, 2 locuri', 'capacitate 200 kg', 'suport si perne incluse', '120 cm latime'],
+    pros: ['Vine cu suport si perne incluse, gata de folosit', 'Doua locuri, 200 kg, pentru relaxare in doi', 'Tip cuib, cu plasa care imbratiseaza corpul', 'Pret rezonabil pentru un leagan dublu complet'],
+    cons: ['Ocupa mai mult spatiu decat o banca simpla', 'Plasa cuibului cere curatare periodica'],
+    verdict: 'Varianta moderna de balansoar pentru doi, sub forma de leagan tip cuib. DeHome Joy 300 vine ca set complet, cu suport si perne incluse, deci nu mai cumperi nimic separat: il montezi si te intinzi in el. Are doua locuri si o capacitate de 200 kg, iar forma de cuib, cu plasa impletita, imbratiseaza corpul si e mult mai relaxanta decat o banca dreapta, buna pentru lenevit dupa-amiaza sau chiar pentru un pui de somn afara. Cei 120 cm latime ii dau loc pentru doi asezati apropiat sau pentru unul intins comod. Ocupa mai mult spatiu decat o banca-balansoar clasica si plasa cuibului trebuie curatata periodic de praf si frunze. Il iei cand vrei confortul unui cuib dublu, complet echipat, la un pret cumpatat.' },
+  { g: 'doi', id: 'D3YTDSYBM', badge: 'Mai spatios', short: 'DeHome Joy 400 dublu', locuri: '2', cap: '200 kg', mat: 'Metal', dim: '120 cm latime',
+    specs: ['Leagan tip cuib dublu, mai mare', '2 locuri, capacitate 200 kg', 'suport si perne incluse', 'plasa generoasa pentru doi'],
+    pros: ['Cuib mai spatios decat modelul Joy 300', 'Doua locuri incapatoare, 200 kg', 'Set complet, cu suport si perne', 'Confort de leagan-pat pentru relaxare lunga'],
+    cons: ['Pret mai mare decat Joy 300', 'Are nevoie de spatiu generos in gradina'],
+    verdict: 'Pasul urmator fata de Joy 300, pentru cine vrea un cuib mai incapator. DeHome Joy 400 pastreaza aceeasi formula, leagan tip cuib dublu cu suport si perne incluse si capacitate de 200 kg, dar cu o plasa mai generoasa, in care doi oameni stau mai lejer sau unul se intinde ca intr-un pat suspendat. E genul de balansoar in care ajungi sa petreci ore intregi, cu o carte sau la o siesta, pentru ca forma de cuib sustine tot corpul, nu doar spatele. Costa mai mult decat Joy 300 si cere ceva mai mult loc in gradina, asa ca masoara inainte spatiul, inclusiv cursa de leganare. Il iei cand vrei confort maxim de cuib pentru doi si nu te opresti la cel mai mic pret.' },
+  { g: 'doi', id: 'D4WQPLYBM', badge: 'Cel mai mare', short: 'DeHome Luna 600 dublu', locuri: '2', cap: '200 kg', mat: 'Metal', dim: '135 cm latime',
+    specs: ['Cel mai lat cuib dublu, 135 cm', '2 locuri, capacitate 200 kg', 'suport si perne incluse', 'cel mai spatios din selectie'],
+    pros: ['Cel mai lat cuib din selectie, 135 cm', 'Loc real pentru doi, cu 200 kg capacitate', 'Set complet, suport si perne incluse', 'Cel mai apropiat de un leagan-pat de exterior'],
+    cons: ['Cel mai scump dintre modelele pentru doi', 'Cere cel mai mult spatiu de montaj'],
+    verdict: 'Varful pentru cine vrea cel mai incapator balansoar de doua persoane din selectie. DeHome Luna 600 are 135 cm latime, cel mai lat cuib de aici, deci doi adulti stau relaxati unul langa altul, iar cine il foloseste singur se intinde practic ca intr-un pat suspendat. Vine ca set complet, cu suport si perne, si sustine 200 kg. E cel mai apropiat lucru de un leagan-pat de gradina, ideal daca vrei o zona de relaxare in doi in curte, nu doar un loc de stat. In schimb, e cel mai scump dintre modelele pentru doua persoane si cere si cel mai mult spatiu, asa ca verifica din timp unde il asezi. Il iei cand vrei cel mai mult confort si cea mai mare suprafata de leganare pentru doi.' },
+  // --- Individuale: scaune si cuiburi suspendate ---
+  { g: 'unu', id: 'DNSV7K2BM', badge: 'Cel mai confortabil individual', short: 'Cuib suspendat TOPSCAUNE', locuri: '1', cap: '120 kg', mat: 'Ratan, otel, textil', dim: '107 x 116 x 195 cm',
+    specs: ['Cuib rotund suspendat cu perne', 'ratan sintetic, otel si textil', 'capacitate 120 kg, cu suport', 'nota 4.93, aproape maxima'],
+    pros: ['Ratan sintetic, rezistent la soare si apa, intretinere mica', 'Perne incluse, confort ridicat', 'Nota aproape maxima, 4.93 din 72 de pareri', 'Vine cu suport propriu, nu cauti unde-l agati'],
+    cons: ['Un singur loc, nu pentru doi adulti', 'Cel mai scump scaun suspendat din selectie'],
+    verdict: 'Cel mai confortabil loc individual din selectie, pentru cine vrea un cuib de o persoana, dar de calitate. Modelul TOPSCAUNE e un cuib rotund suspendat, din ratan sintetic pe structura de otel, cu perne incluse: ratanul sintetic e rezistent la raze UV si la apa si cere putina intretinere, spre deosebire de cel natural. Sustine 120 kg si vine cu suport propriu, deci nu depinzi de o grinda sau o creanga. Are o nota aproape maxima, 4.93 din 72 de pareri, cele mai multe pareri bune dintre scaunele suspendate. E gandit pentru o singura persoana, nu pentru doi adulti, si e cel mai scump din grupul individual. Il iei cand vrei confortul si durabilitatea unui cuib de ratan sintetic pentru relaxarea ta, cu suport inclus.' },
+  { g: 'unu', id: 'DV6VZSYBM', badge: 'Cel mai vandut', short: 'Galaxia cu perna', locuri: '1', cap: '150 kg', mat: 'Poliester, bumbac', dim: '80 x 80 x 135 cm',
+    specs: ['Scaun rotund suspendat cu perna', 'poliester si bumbac, 150 kg', 'cel mai vandut din selectie, 98 pareri', 'nota 4.79'],
+    pros: ['De departe cel mai vandut, 98 de pareri, nota 4.79', 'Vine cu perna, mai comod din prima', 'Capacitate buna, 150 kg, pentru un scaun individual', 'Pret mic, sub 150 de lei'],
+    cons: ['Un singur loc', 'Ai nevoie de o grinda sau o creanga solida de care sa-l agati'],
+    verdict: 'Cel mai popular si mai accesibil loc de relaxare din selectie. Scaunul rotund Galaxia e cel mai vandut model de aici, cu 98 de pareri si nota 4.79, iar la un pret sub 150 de lei e greu de batut. Vine cu perna, deci e comod din prima, e facut din poliester si bumbac si sustine 150 kg, bine pentru un scaun de o persoana. E genul de fotoliu suspendat rotund in care te cuibaresti cu o carte sau cu telefonul, pe terasa sau sub un copac. Are un singur loc si, spre deosebire de modelele cu suport propriu, trebuie agatat de o grinda, un carlig de tavan de terasa sau o creanga solida, deci asigura-te ca ai de ce. Il iei cand vrei cel mai bun raport pret-confort pentru un loc de relaxare individual, verificat de sute de cumparatori.' },
+  { g: 'unu', id: 'DJ6VZSYBM', badge: 'Clasic, ieftin', short: 'Galaxia fara perna', locuri: '1', cap: '150 kg', mat: 'Poliester, bumbac', dim: '80 x 80 x 135 cm',
+    specs: ['Scaun rotund suspendat, fara perna', 'poliester si bumbac, 150 kg', 'nota 4.79 din 98 de pareri', 'cel mai ieftin fotoliu suspendat cu nota mare'],
+    pros: ['Acelasi model iubit, la un pret si mai mic', 'Capacitate 150 kg', 'Nota 4.79, aceeasi baza de pareri buna', 'Adaugi perna preferata separat, daca vrei'],
+    cons: ['Fara perna inclusa, o cumperi separat pentru confort maxim', 'Un singur loc, nevoie de punct de agatare'],
+    verdict: 'Aceeasi baza iubita ca la varianta cu perna, pentru cine vrea pretul cel mai mic. Scaunul rotund Galaxia fara perna are exact aceeasi structura si aceeasi nota, 4.79 din 98 de pareri, dar costa si mai putin pentru ca nu include perna. Sustine 150 kg si e din poliester cu bumbac. E alegerea logica daca ai deja o perna decorativa acasa sau vrei sa iti pui una anume, pe culoarea terasei: adaugi perna preferata si obtii acelasi confort la un pret redus. Ca la orice fotoliu suspendat fara suport, ai nevoie de un punct solid de agatare, o grinda sau o creanga. Il iei cand vrei modelul cel mai vandut la cel mai mic pret si nu te deranjeaza sa iti alegi separat perna.' },
+  { g: 'unu', id: 'D4WZ7JYBM', badge: 'Tip hamac', short: 'Hamac suspendat', locuri: '1', cap: '150 kg', mat: 'Bumbac', dim: '100 x 130 cm',
+    specs: ['Hamac tip leagan suspendat', 'bumbac, capacitate 150 kg', 'pentru casa sau gradina', 'senzatie de leagan clasic'],
+    pros: ['Bumbac moale, senzatie de hamac clasic', '150 kg capacitate', 'Se preteaza si in casa, si in gradina', 'Ocupa putin, il strangi usor cand nu-l folosesti'],
+    cons: ['Un singur loc', 'Materialul textil cere adus in casa cand ploua'],
+    verdict: 'O alternativa pentru cine prefera senzatia de hamac in locul unui scaun rigid. Modelul e un hamac tip leagan suspendat din bumbac, moale si respirabil, cu 150 kg capacitate, potrivit atat in casa, intr-un colt de relaxare, cat si afara, in gradina sau pe terasa. Bumbacul da acel confort de hamac clasic in care te infasori, iar cand nu-l folosesti il strangi usor, deci ocupa mult mai putin decat un cuib cu suport. E pentru o persoana si, fiind textil natural, e bine sa-l aduci in casa cand ploua sau sa-l tii la adapost, ca sa nu se ude si sa nu mucegaiasca. Il iei cand vrei o solutie simpla, ieftina si comoda de leagan textil, pe care o poti muta usor intre casa si gradina.' },
+  { g: 'unu', id: 'D628LB2BM', badge: 'Cel mai ieftin', short: 'ZOYA Severno', locuri: '1', cap: '100 kg', mat: 'Plastic', dim: '42 x 17 cm sezut',
+    specs: ['Leagan simplu, sezut de plastic', 'capacitate 100 kg', 'cel mai ieftin din selectie', 'usor de agatat'],
+    pros: ['Cel mai mic pret din tot articolul', 'Plastic rezistent la intemperii, usor de curatat', 'Usor si simplu de agatat', 'Bun ca leagan ocazional sau pentru copii mai mari'],
+    cons: ['Sezut mic, format simplu de leagan, nu de relaxare in doi', 'Capacitate mai mica, 100 kg'],
+    verdict: 'Cea mai ieftina solutie de leagan din selectie, pentru un uz simplu si ocazional. Modelul ZOYA e un leagan clasic cu sezut de plastic, cu o capacitate de 100 kg, la cateva zeci de lei: nu e un balansoar de relaxare in doi, ci un leagan propriu-zis, bun pentru o creanga din curte, pentru copiii mai mari sau pentru cine vrea doar un loc simplu de leganat. Plasticul rezista bine la soare si ploaie si se curata usor, iar montajul e cat se poate de simplu, il agati de o franghie sau un lant solid. Are sezutul mic si o capacitate mai redusa decat celelalte. Il iei cand vrei cel mai mic pret posibil pentru un leagan functional, fara pretentii de fotoliu suspendat.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const DOI = PICKS.filter(x => x.g === 'doi');
+const UNU = PICKS.filter(x => x.g === 'unu');
+
+const hero = '/images/articles/balansoar-de-gradina-pentru-2-persoane.webp';
+const figDoi = '/imagini/articole/balansoar-2-persoane.webp';
+const figUnu = '/imagini/articole/balansoar-individual.webp';
+const published = '2026-07-18T17:53:34+03:00';
+
+const faq = [
+  { question: 'Cati kilograme suporta un balansoar de gradina pentru 2 persoane?', answer: 'Modelele pentru doua persoane suporta in general 200 kg, exact cazul tuturor celor patru balansoare de doi din selectie, de la banca metalica pana la cuiburile duble DeHome. Balansoarele si scaunele individuale sustin de obicei intre 100 si 150 kg, iar variantele mari cu trei locuri pot ajunge la 250-300 kg. Capacitatea de 200 kg acopera confortabil doi adulti, dar respecta mereu limita indicata de producator si nu o depasi, mai ales cand va legati cu avant, pentru ca socurile solicita suplimentar structura si punctele de prindere.' },
+  { question: 'Ce e mai bun, un balansoar metalic de tip banca sau un leagan tip cuib dublu?', answer: 'Depinde de cum vrei sa stai. Banca-balansoar metalica, cum e modelul TOPSCAUNE de 2 persoane, te tine asezat drept, ocupa mai putin loc si e formatul clasic de curte, potrivit pentru a sta la o cafea sau la o discutie. Leaganul tip cuib dublu, ca modelele DeHome Joy si Luna, are o plasa care imbratiseaza corpul si e mult mai relaxant pentru lenevit, citit sau chiar un pui de somn, dar cere mai mult spatiu. Daca vrei sedere activa si economie de loc, alegi banca; daca vrei relaxare profunda, ca intr-un leagan-pat, alegi cuibul.' },
+  { question: 'Din ce material sa aleg cadrul, ca sa reziste afara?', answer: 'Cele mai comune materiale sunt metalul, lemnul si ratanul sintetic. Metalul si fierul, ca la modelele din selectie, sunt solide si sustin greutate mare, dar au nevoie de protectie contra ruginii daca stau permanent in ploaie; cauta cadrele vopsite in camp electrostatic sau zincate. Ratanul sintetic, folosit la cuibul TOPSCAUNE, rezista foarte bine la raze UV si la apa si cere putina intretinere. Lemnul arata cald si natural, dar trebuie tratat periodic cu ulei sau lac. Indiferent de material, un balansoar tinut la umbra sau sub o husa de protectie rezista mult mai mult.' },
+  { question: 'Acoperisul sau copertina chiar conteaza la un balansoar?', answer: 'Da, mai ales daca il tii in plin soare. O copertina te fereste de arsita si de o ploaie usoara, iar pe modelele pentru doua-trei persoane e chiar recomandata, pentru ca prelungeste timpul in care poti sta afara si protejeaza pernele de decolorare. Nu toate modelele vin cu acoperis: cand alegi unul fara, ca banca metalica din selectie, ai doua solutii, fie il asezi la umbra unui copac sau a terasei, fie ii adaugi o husa de protectie pentru cand nu-l folosesti, ca sa nu se degradeze pernele si cadrul.' },
+  { question: 'Pernele sunt incluse si cum le ingrijesc?', answer: 'La cuiburile duble DeHome si la modelul TOPSCAUNE pernele sunt incluse, la fel ca la scaunul Galaxia cu perna; varianta Galaxia fara perna o cumperi separat. Pentru durabilitate, cauta perne cu husa detasabila, pe care o poti scoate si spala, si un material rezistent la apa sau macar cu uscare rapida. Pernele sunt partea care sufera cel mai repede de la soare si umezeala, asa ca strange-le sub o husa sau adu-le in casa cand nu folosesti balansoarul mai mult timp sau cand se anunta ploaie, si le vei pastra culoarea si forma mult mai mult.' },
+  { question: 'Balansoarele cu suport propriu sau cele care se agata sunt mai bune?', answer: 'Cele cu suport propriu, ca toate cuiburile duble din selectie si cuibul TOPSCAUNE, sunt cele mai comode: le asezi oriunde in curte, fara sa depinzi de o grinda sau un copac, si le muti cand vrei. Scaunele si hamacele care se agata, ca modelele Galaxia sau hamacul din selectie, sunt mai ieftine si ocupa mai putin, dar au nevoie de un punct de prindere solid, un carlig de tavan de terasa, o grinda de pergola sau o creanga groasa si sanatoasa. Daca nu ai unde sa le agati, alege un model cu suport inclus, ca sa nu ramai cu leaganul in cutie.' },
+  { question: 'De cat spatiu am nevoie pentru un balansoar de doua persoane?', answer: 'Mai mult decat pare, pentru ca trebuie sa socotesti si cursa de leganare. Un cuib dublu are in jur de 120-135 cm latime, iar suportul mai adauga la baza, deci lasa spatiu liber in fata si in spate ca leaganul sa se poata misca fara sa loveasca un perete, un gard sau alte mobile. Inainte sa comanzi, masoara locul in care il pui, atat suprafata bazei, cat si spatiul de deasupra si din jur pentru miscare. Modelul cel mai lat din selectie, Luna 600, are 135 cm si cere cel mai mult loc; banca metalica, mai compacta la 125 cm, se descurca in curti mai mici.' },
+  { question: 'Cum intretin un balansoar de gradina ca sa reziste ani buni?', answer: 'Cu putina grija regulata. Verifica periodic toata constructia si strange suruburile care s-au slabit de la leganare, inlocuieste orice piesa de prindere uzata si nu astepta sa cedeze. La cadrele de metal, trateaza din timp orice urma de rugina si, daca poti, vopseste sau protejeaza suprafata; la lemn, aplica ulei sau lac o data pe sezon. Curata plasa cuiburilor si pernele de praf, frunze si gainat, iar cand vine sezonul rece sau ploua mult, strange balansoarul sub o husa de protectie sau adu partile textile in casa. Asa eviti rugina, mucegaiul si decolorarea si prelungesti mult viata produsului.' },
+];
+
+const images = [hero, figDoi, figUnu, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Balansoar de gradina pentru 2 persoane - CentroCasa"
-  description="Ah, balansoarul acela de gradina pentru 2 persoane! Ce vis frumos. Sincer sa fiu, am cautat mult pana am gasit ceva pe placul meu, si m-am gandit sa va povestesc si voua despre experienta mea. Poate va ajuta sa nu faceti aceleasi greseli ca mine la inceput."
-  image="/images/articles/balansoar-de-gradina-pentru-2-persoane.webp"
+  title="Cele mai bune balansoare de gradina pentru 2 persoane in 2026: pe tip, capacitate si buget"
+  description="Care sunt cele mai bune balansoare de gradina pentru 2 persoane in 2026: banca metalica si cuiburi duble DeHome de 200 kg, plus scaune si cuiburi suspendate individuale, comparate pe capacitate, material, acoperis si pret. Plus cum alegi, unde il asezi si cum il intretii."
+  image={hero}
   type="article"
-  publishedTime="2026-01-06T15:51:33.210Z"
-  modifiedTime="2026-01-27T15:51:33.736Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune balansoare de gradina pentru 2 persoane' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/mobilier-gradina/">Mobilier Gradina</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Balansoar de gradina pentru 2 persoane</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune balansoare de gradina pentru 2 persoane</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
-        <span class="article-date">27 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Balansoar de gradina pentru 2 persoane</h1>
-    </header>
+    <h1>Cele mai bune balansoare de gradina pentru 2 persoane</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/balansoar-de-gradina-pentru-2-persoane.webp" alt="Balansoar de gradina pentru 2 persoane" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune balansoare de gradina pentru 2 persoane: banca metalica si cuiburi duble" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-balansoar-de-gradina-pentru-2-persoane">
-        <h2>De ce ai nevoie de un balansoar de gradina pentru 2 persoane?</h2>
-        <p>Stiti cum e, vine primavara, apoi vara, si parc-aici se anunta deja zilele alea frumoase in care vrei doar sa te relaxezi in aer liber. Eu am o curte micuta, dar cu mult suflet, si mereu am visat la un colt de rai unde sa pot savura cafeaua de dimineata sau o carte buna. Problema era ca nu aveam unde sa stau comod, impreuna cu sotia, sa ne bucuram de liniste.</p><p>Scaunele de pe terasa erau ok, dar nu aveau farmecul acela. Si atunci mi-a venit ideea: un balansoar de <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a> pentru 2 persoane! E perfect pentru cupluri, pentru prieteni care vin in vizita si vor sa schimbe o vorba la aer curat, sau chiar pentru tine si copilul tau, sa va legati de povesti.</p><p>Practic, rezolva problema spatiului de relaxare in aer liber. Nu mai trebuie sa stai pe iarbă sau pe scaune incomode. Ai un loc dedicat, confortabil, unde poti petrece ore in sir fara sa te plictisesti. Pentru mine, a fost o investitie in liniste si in momente de calitate.</p><p>Potrivit este pentru oricine are un spatiu exterior, fie el balcon, terasa sau <a href="/umbrela-de-gradina-rezistenta-la-vant/">gradina</a>. Nu trebuie sa fie mare. Chiar si un balcon mai generos poate gazdui un balansoar de 2 persoane, aducand un plus de farmec si functionalitate. Daca locuiesti la bloc si ai un balcon, gandeste-te cat de frumos ar fi sa ai acolo un mic refugiu.</p><p>Am văzut multe modele, de la cele mai simple, din lemn, la cele mai sofisticate, din metal, cu baldachin. Fiecare are farmecul lui, depinde de stilul casei si de bugetul pe care il ai. Dar ideea de baza ramane aceeasi: un loc unde doi oameni se pot legăna linistiți, bucurându-se de aerul proaspăt.</p><p>Am început să caut online și am realizat că există o varietate uimitoare de modele. De la cele clasice, din lemn, care au un farmec aparte și se potrivesc oricărui stil de grădină, la cele moderne, din metal sau ratan sintetic, care sunt mai rezistente la intemperii și necesită mai puțină întreținere. Fiecare are avantajele și dezavantajele sale, dar scopul principal este același: să ofere un loc de relaxare și de petrecere a timpului liber în aer liber.</p><p>Pentru mine, balansoarul de <a href="/sezlong-pentru-plaja-si-gradina/">gradina</a> pentru 2 persoane a devenit piesa centrală a terasei mele. Îmi place să mă așez acolo dimineața, cu o cafea, să ascult păsările și să mă bucur de liniște, înainte de a începe ziua. Seara, este locul perfect pentru a discuta cu soția despre cum a fost ziua, sau pur și simplu pentru a admira stelele.</p>
-      </section>
-
-      <section id="top-recomandari-de-balansoare-de-gradina-pentru-2-persoane">
-        <h2>Top recomandari de balansoare de gradina pentru 2 persoane</h2>
-        <p>Dupa ce am batut internetul la lung si la lat, am reusit sa fac o selectie de cateva modele care mi s-au parut interesante. Sincer sa fiu, a fost greu sa ma decid, dar am tinut cont de pret, materiale si parerile altor cumparatori.</p><p><strong>1. Balansoar Gradina "Rattan Elegance" (2 Locuri) - pret aproximativ 1200 RON</strong></p><p>Acesta este un model din ratan sintetic, cu o structura metalica rezistenta. Vine cu perne groase si confortabile, de obicei in culori neutre. Ce mi-a placut la el: arata foarte modern si elegant, se curata usor, iar ratanul sintetic rezista bine la soare si ploaie. Dezavantajul ar fi ca, desi e rezistent, poate fi mai sensibil la lovituri puternice si, uneori, pernele se pot murdari mai greu daca nu le cureti imediat.</p><p><strong>2. Balansoar Gradina "Clasic din Lemn" (2 Locuri) - pret aproximativ 850 RON</strong></p><p>Daca vreti ceva traditional, acest model din lemn masiv (de obicei pin sau brad, tratat pentru exterior) este o alegere buna. Are un farmec aparte, rustic. Avantaje: aspect natural, usor de integrat in orice gradina. Dezavantaje: lemnul necesita intretinere periodica (lăcuire, vopsire) pentru a rezista in timp si, daca nu e tratat corespunzator, poate fi sensibil la umezeala si insecte.</p><p><strong>3. Balansoar Gradina "Metal Robust" (2 Locuri) cu baldachin - pret aproximativ 1500 RON</strong></p><p>Acesta e mai mult un "<a href="/fotoliu-suspendat-pentru-gradina/" class="interlink">fotoliu suspendat</a>" sau un balansoar mai solid, cu o structura din otel vopsit electrostatic. Vine adesea cu un baldachin generos care ofera protectie solara. Pro: foarte rezistent, stabil, baldachinul e un mare plus pentru zilele insorite. Contra: poate fi mai greu de mutat, iar baldachinul, desi util, poate aduna praf si trebuie curatat.</p><p><strong>4. Balansoar Gradina "Compact & Modern" (2 Locuri) - pret aproximativ 950 RON</strong></p><p>Acesta e un model mai micut, perfect pentru balcoane sau terase nu foarte mari. Materialele pot varia, dar adesea gasesti combinatii de metal si plastic rezistent sau tesaturi pentru sezut. Avantaj: nu ocupa mult spatiu, usor de asamblat. Dezavantaj: confortul poate fi mai redus comparativ cu modelele mai mari, iar rezistenta in timp poate fi mai scazuta daca materialele nu sunt de cea mai buna calitate.</p><p><strong>5. Balansoar Gradina "Premium Rattan" (2 Locuri) - pret aproximativ 1800 RON</strong></p><p>Acesta e un model mai scump, dar de obicei calitatea materialelor e superioara. Rattanul poate fi mai gros, mai bine impletit, iar pernele sunt din materiale impermeabile si rezistente la UV. Pro: confort sporit, durabilitate mare, aspect deosebit. Contra: pretul este pe masura calitatii, deci e o investitie mai mare.</p><p>Am incercat sa va dau o idee generala despre ce gasiti pe piata, cu preturi aproximative. Pretul poate varia mult in functie de magazin, de reduceri si de brand. Sfatul meu e sa cititi mereu parerile altor cumparatori, ca sa va faceti o idee despre fiabilitatea produsului.</p>
-      </section>
-
-      <section id="cum-alegi-corect-balansoarul-de-gradina-potrivit">
-        <h2>Cum alegi corect balansoarul de gradina potrivit?</h2>
-        <p>Alegerea unui balansoar de gradina pentru 2 persoane nu e chiar ca si cum ai cumpara o floare de pus in vaza. E o piesa de mobilier, pana la urma, si vrei sa te bucuri de ea cativa ani buni. Asa ca, hai sa vedem la ce sa te uiti.</p><p><strong>1. Materialul:</strong> Asta e primul criteriu. Lemnul arata superb, rustic, dar necesita ingrijire. Rattanul sintetic e la moda, usor de intretinut si rezistent. Metalul e cel mai durabil, dar poate fi mai greu si uneori poate rugini daca vopseaua e zgariata. Am vazut si modele din plastic rezistent, dar parca nu au aceeasi calitate.</p><p><strong>2. Dimensiunile:</strong> Masoara-ti spatiul! Chiar daca e balansoar pentru 2 persoane, ele vin in diverse latimi. Asigura-te ca ai loc sa il plasezi, dar si sa te misti in jur. E bine sa ai spatiu si in fata, sa te poti balansa linistit.</p><p><strong>3. Confortul:</strong> Asta e esential. Verifica grosimea pernelor. Sunt detasabile? Materialul din care sunt facute e <a href="/pavilion-de-gradina-rezistent-la-apa/" class="interlink">rezistent la</a> apa si la soare? Sincer, am stat pe niste balansoare unde pernele erau subtiri ca o foaie si nu stateai deloc bine. E bine sa fie si ergonomice, sa te poti relaxa cu adevarat.</p><p><strong>4. Stabilitatea:</strong> Un balansoar trebuie sa fie stabil. Verifica constructia. Cum sunt imbinate piesele? Are picioare solide? Nu vrei sa se clatine periculos cand te balansezi.</p><p><strong>5. Stilul si designul:</strong> Asta e subiectiv, dar important. Vrei ceva modern, rustic, clasic? Balansoarul trebuie sa se potriveasca cu restul mobilierului din gradina sau de pe terasa ta. Eu am ales unul din ratan sintetic pentru ca se potrivea cu masa si scaunele pe care le aveam deja.</p><p><strong>6. Pretul:</strong> E clar ca bugetul conteaza. Dar nu te uita doar la cel mai ieftin. Uneori, platesti mai mult pentru calitate si durabilitate. Am facut greseala sa cumpar un balansoar ieftin la inceput, si s-a deteriorat in primul sezon. A trebuit sa cumpar altul.</p><p><strong>7. Greutatea maxima suportata:</strong> Verifica specificatiile. Un balansoar pentru 2 persoane ar trebui sa sustina cel putin 150-200 kg, dar e bine sa verifici. Nu vrei sa ai surprize neplacute.</p><p><strong>8. Montajul:</strong> Unele balansoare vin gata asamblate, altele necesita montaj. Daca nu esti priceput la "facut chestii", alege unul care se monteaza usor sau ai pe cineva care sa te ajute. Am vazut instrucțiuni de montaj complicate rau de tot.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ale-unui-balansoar-de-gradina-pentru-2-persoane">
-        <h2>Avantaje si dezavantaje ale unui balansoar de gradina pentru 2 persoane</h2>
-        <p>Ca orice lucru, si balansoarul de gradina pentru 2 persoane are partile lui bune si mai putin bune. Sincer sa fiu, eu m-am gandit mult la asta inainte sa cumpar, si cred ca e important sa stii ambele fete ale monedei.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Relaxare sporita:</strong> E clar cel mai mare avantaj. Te poti legana linistit, savurand o bautura, citind o carte sau pur si simplu admirand natura. E ca o mica terapie.</li><li><strong>Spatiu social:</strong> Perfect pentru a petrece timp de calitate cu sotia/sotul, cu prietenii sau cu copiii. E un loc unde se creeaza amintiri.</li><li><strong>Estetica:</strong> Un balansoar frumos poate transforma complet aspectul gradinii sau terasei. Adauga un plus de farmec si personalitate.</li><li><strong>Versatilitate:</strong> Poate fi folosit pentru relaxare, dar si ca un loc de joaca <a href="/piscina-gonflabila-pentru-copii/" class="interlink">pentru copii</a> (cu supraveghere, evident) sau chiar ca un loc de admirat privelistea.</li><li><strong>Rezistenta (la modelele de calitate):</strong> Daca alegi un model bun, din materiale rezistente, te poti bucura de el ani de zile.</li><li><strong>Imbunatateste starea de spirit:</strong> Simplul act de a te legana are un efect calmant. Ajuta la reducerea stresului si la imbunatatirea starii generale.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Pretul:</strong> Modelele de calitate pot fi destul de scumpe. Trebuie sa ai un buget alocat.</li><li><strong>Intretinerea (la anumite materiale):</strong> Lemnul necesita lăcuire, vopsire, protejare. Chiar si rattanul sintetic, desi mai usor de intretinut, poate necesita curatare periodica.</li><li><strong>Spatiul ocupat:</strong> Chiar si cele "compacte" ocupa un anumit spatiu. Daca ai o terasa mica, trebuie sa te gandesti bine unde il plasezi.</li><li><strong>Greutatea:</strong> Unele modele sunt destul de grele si nu pot fi mutate usor dintr-un loc in altul.</li><li><strong>Sensibilitatea la intemperii:</strong> Daca nu e protejat corespunzator, un balansoar poate fi afectat de ploaie, soare puternic, inghet.</li><li><strong>Posibile zgarieturi sau deteriorari:</strong> In functie de material, poate fi sensibil la zgarieturi, lovituri sau uzura in timp.</li></ul><p>Eu, de exemplu, am invatat ca e mai bine sa investesc mai mult intr-un produs de calitate, decat sa cumpar ceva ieftin si sa il schimb dupa un an. E mai economic pe termen lung si, cel mai important, ma bucur cu adevarat de el.</p><p>De asemenea, am observat ca multe modele vin cu perne care, desi arata bine, nu sunt cele mai rezistente la apa. Daca vrei sa le protejezi, mai ales daca stai in zone cu ploi frecvente, ar fi bine sa te gandesti la huse de protectie sau sa le depozitezi pe timpul iernii.</p><p>Si inca ceva: verificati mereu daca pernele sunt detasabile. E mult mai usor de curatat asa. Am patit sa am perne atasate, si a fost un chin sa le dau jos sa le spal. Nu recomand.</p>
-      </section>
-
-      <section id="sfaturi-practice-si-greseli-de-evitat">
-        <h2>Sfaturi practice si greseli de evitat</h2>
-        <p>Dupa ce m-am "luptat" cu alegerea si achizitionarea primului meu balansoar <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">de gradina</a>, am acumulat cateva sfaturi care sper sa va fie de folos. Si, bineinteles, am invatat din propriile greseli.</p><p><strong>1. Cititi specificatiile tehnice!</strong> Nu va grabiti. Verificati dimensiunile exacte, greutatea maxima suportata, materialele folosite. Uneori, pozele pot fi inselatoare. E ca atunci cand cumperi haine online, trebuie sa te uiti la tabelul de marimi.</p><p><strong>2. Ganditi-va la locatia finala.</strong> Unde vreti sa puneti balansoarul? Daca il puneti pe gazon, s-ar putea ca in timp sa se lase si sa nu mai fie stabil. Daca aveti o terasa, e ideal. Daca e pe pamant, poate ar fi bine sa ii faceti o fundatie mica, din dale de pavaj, de exemplu.</p><p><strong>3. Protejati-l de intemperii.</strong> Asta e o greseala pe care am facut-o la inceput. Am lasat balansoarul afara toata iarna. Rezultatul? Lemnul s-a umflat, vopseaua s-a scorojit. Acum, fie il depozitez intr-un garaj/magazie, fie folosesc o husa impermeabila de calitate. Merita investitia!</p><p><strong>4. Curatarea regulata.</strong> Nu asteptati sa se murdareasca prea tare. Praful, polenul, urmele de la pasari – toate pot afecta aspectul si chiar durabilitatea materialelor. O carpa umeda si un pic de detergent bland sunt de obicei suficiente.</p><p><strong>5. Verificati suruburile si imbinarile.</strong> Dupa o perioada, e bine sa verificati daca toate suruburile sunt stranse. Miscarile repetate pot duce la slabirea lor. E un gest simplu, dar care asigura siguranta.</p><p><strong>6. Nu subestimati confortul pernelor.</strong> Am spus-o si mai sus, dar e important. Daca pernele sunt prea tari sau prea moi, nu o sa va puteti relaxa. Unele modele permit inlocuirea pernelor, ceea ce e un mare plus, ca sa le puteti schimba cand se uzeaza sau daca vreti un alt look.</p><p><strong>7. Atentie la montaj!</strong> Daca alegeti un model care necesita asamblare, asigurati-va ca aveti toate uneltele necesare si, daca nu sunteti priceputi, cereti ajutor. Uneori, instrucțiunile sunt neclare, si sfarsiti prin a monta piese gresit, ceea ce poate afecta stabilitatea.</p><p><strong>8. Investiti in accesorii.</strong> O perna suplimentara pentru ceafa, o patura subtire pentru serile mai racoroase, o masuta mica pe care sa va puneti cafeaua sau cartea – toate acestea pot imbunatati experienta balansoarului.</p><p><strong>Greseala mea cea mai mare:</strong> Am cumparat un balansoar ieftin, crezand ca "ce mare lucru, e doar un balansoar". L-am lasat afara si, dupa primul sezon, arata jalnic. A trebuit sa cumpar altul, mai scump. Deci, sfatul meu e: mai bine cumparati o data ceva de calitate.</p>
-      </section>
-
-      <section id="parerea-mea-finala-despre-balansoarul-de-gradina-pentru-2-persoane">
-        <h2>Parerea mea finala despre balansoarul de gradina pentru 2 persoane</h2>
-        <p>Sincer sa fiu, balansoarul de gradina pentru 2 persoane a fost una dintre cele mai bune achizitii pe care le-am facut pentru curtea mea. A transformat un simplu spatiu exterior intr-un colt de relaxare, un loc unde pot fugi de agitatia zilnica si ma pot bucura de liniste.</p><p>Pentru mine, a devenit un ritual. Dimineata, cu cafeaua in mana, ma asez pe el si ma gandesc la ce am de facut in ziua respectiva. Seara, dupa cina, e locul perfect pentru a discuta cu sotia sau pentru a citi cateva pagini dintr-o carte. E un sentiment de calm si de apartenenta pe care greu il gasesti in alta parte.</p><p>Recomand un balansoar de gradina pentru 2 persoane oricui isi doreste sa isi amenajeze un spatiu de relaxare in aer liber. Nu conteaza daca aveti o curte mare sau un balcon mic. Exista modele pentru toate gusturile si buzunarele.</p><p>Daca aveti de gand sa cumparati unul, sfatul meu este sa nu va zgârciti la capitolul calitate. Investiti intr-un produs bun, din materiale rezistente, si va veti bucura de el ani de zile. Verificati specificatiile, cititi parerile altor utilizatori si, daca aveti posibilitatea, incercati-l inainte sa il cumparati.</p><p>Pentru mine, balansoarul de gradina pentru 2 persoane este mai mult decat o piesa de mobilier. Este un simbol al relaxarii, al timpului petrecut cu cei dragi si al bucuriei simple de a trai in armonie cu natura. E un "must-have" pentru orice iubitor de casa si gradina.</p><p>Daca va mai ganditi, incercati sa va imaginati cum ar fi sa stati acolo, sa simtiti briza usoara, sa ascultati sunetul pasarilor… Cred ca o sa va convingeti ca merita din plin investitia. E o investitie in fericire, cum ar veni.</p><p>In concluzie, daca vreti sa adaugati un strop de farmec si confort in spatiul vostru exterior, un balansoar de gradina pentru 2 persoane este alegerea perfecta. Nu o sa regretati!</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de greu este de asamblat un balansoar de gradina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde de model. Cele din lemn sau cele mai simple pot fi asamblate rapid, uneori chiar si in mai putin de o ora. Modelele mai complexe, cu baldachin sau structuri metalice elaborate, pot necesita mai mult timp si atentie. Cititi mereu specificatiile si parerile altor cumparatori legate de montaj.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot lasa balansoarul afara pe timp de iarna?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nu este recomandat, mai ales daca e din lemn sau metal netratat corespunzator. Ploaia, zapada si inghetul pot deteriora materialele. Cel mai bine este sa il depozitati intr-un spatiu protejat sau sa folositi o husa impermeabila de calitate.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce materiale sunt cele mai rezistente la intemperii?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                In general, balansoarele din ratan sintetic de calitate sau cele din metal cu vopsea electrostatica sunt cele mai rezistente. Lemnul tratat corespunzator poate rezista, dar necesita intretinere periodica.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum curat petele de pe pernele balansoarului?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Verificati eticheta pernelor. De obicei, se pot curata cu o carpa umeda si un detergent bland. Pentru pete mai dificile, puteti folosi solutii specifice pentru tapiterie, dar testati intai pe o zona mai putin vizibila.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de stabil ar trebui sa fie un balansoar pentru 2 persoane?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un balansoar bun, de calitate, trebuie sa fie stabil si sa nu se clatine periculos. Verificati constructia, picioarele si imbinarile. Ar trebui sa aiba o greutate maxima suportata de cel putin 150-200 kg pentru a asigura siguranta.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Exista balansoare de gradina pliabile?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, exista si modele pliabile, insa acestea sunt mai rare si adesea mai putin confortabile sau rezistente decat cele fixe. Sunt utile daca aveti spatiu limitat si vreti sa il depozitati usor.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Daca vrei un balansoar de gradina real pentru <strong>doua persoane</strong>, cel mai bun raport il da <strong>modelul metalic TOPSCAUNE de 2 locuri</strong>, cu 200 kg capacitate si nota maxima. Daca preferi confortul unui leagan tip cuib in care te intinzi, <strong>DeHome Joy 300</strong> e alegerea echilibrata, iar <strong>DeHome Luna 600</strong>, cel mai lat, e aproape un leagan-pat. Pentru un singur loc, la buget mic, <strong>scaunul suspendat Galaxia</strong> e de departe cel mai vandut.</p>
+      <p>La un balansoar de doua persoane conteaza in primul rand <strong>capacitatea</strong> (un model pentru doi trebuie sa sustina 200 kg), apoi <strong>tipul</strong> (banca clasica sau cuib dublu), <strong>materialul</strong> si rezistenta la vreme, daca are <strong>acoperis si perne</strong>, si <strong>spatiul</strong> pe care il ai in curte. Le luam pe rand mai jos, cu tot ce trebuie sa stii inainte sa alegi.</p>
+      <p>Am pornit de la balansoarele si leaganele de gradina in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe numar de locuri, capacitate, material si dimensiuni, si le-am impartit in doua: modele reale pentru doua persoane si variante individuale, pentru un singur loc, la buget mai mic. Pentru relaxare in curte, vezi si <a href="/hamac-cu-suport-pentru-curte/">hamacele cu suport</a> si <a href="/sezlong-pentru-plaja-si-gradina/">sezlongurile de gradina</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#locuri">Cate locuri si ce capacitate</a></li>
+        <li><a href="#tip">Ce tip de balansoar alegi</a></li>
+        <li><a href="#material">Materialul si rezistenta la vreme</a></li>
+        <li><a href="#acoperis">Acoperisul, pernele si confortul</a></li>
+        <li><a href="#spatiu">Suportul, stabilitatea si spatiul</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#doi">Balansoare pentru 2 persoane</a></li>
+        <li><a href="#unu">Scaune si cuiburi individuale</a></li>
+        <li><a href="#intretinere">Unde il asezi si cum il intretii</a></li>
+        <li><a href="#cat-costa">Cat costa un balansoar de gradina</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="locuri">Cate locuri si ce capacitate</h2>
+    <p>Prima intrebare, si cea mai importanta pentru un balansoar de doua persoane, e capacitatea. Nu te lua doar dupa cate locuri scrie in titlu: verifica <strong>greutatea maxima suportata</strong>, cifra care iti spune cu adevarat daca sustine doi adulti. Regula in categorie e clara: balansoarele si scaunele individuale duc in general <strong>100-150 kg</strong>, modelele pentru <strong>doua-trei persoane duc 200-300 kg</strong>.</p>
+    <p>Toate cele patru modele reale pentru doi din selectie au <strong>200 kg</strong> capacitate, adica sustin confortabil doi adulti. E important sa nu depasesti limita, mai ales cand va legati cu avant: legarea nu adauga doar greutatea statica, ci si socuri care solicita structura si punctele de prindere. Daca esti in dubiu intre un model de 150 kg si unul de 200 kg pentru doua persoane, alege-l pe cel de 200 kg, chiar daca e ceva mai scump: diferenta se simte in stabilitate si in cat rezista in timp. Atentie si la scaunele suspendate individuale, gandite pentru o singura persoana, nu pentru doi adulti asezati impreuna.</p>
+
+    <h2 id="tip">Ce tip de balansoar alegi</h2>
+    <p>Pentru doua persoane, ai in esenta doua forme, foarte diferite ca senzatie:</p>
+    <ul>
+      <li><strong>Banca-balansoar clasica</strong>, de obicei metalica: te tine asezat drept, ca pe o bancheta care se leagana. Ocupa relativ putin loc, e formatul traditional de curte si e potrivita pentru a sta la o cafea, o discutie sau a privi gradina. E si cea mai stabila senzatie, apropiata de un scaun normal.</li>
+      <li><strong>Leaganul tip cuib dublu</strong>: o plasa impletita, montata pe un suport, care imbratiseaza corpul. E mult mai relaxant, aproape ca un leagan-pat, ideal pentru lenevit, citit sau chiar un pui de somn afara. In schimb, cere mai mult spatiu si te asezi mai jos, ceea ce nu convine tuturor.</li>
+    </ul>
+    <p>Pe langa acestea, exista si varianta <strong>individuala</strong>, sub forma de scaun rotund suspendat sau hamac, pentru o singura persoana. E cea mai ieftina si ocupa cel mai putin, dar nu inlocuieste un balansoar de doi: e pentru cine are spatiu mic sau vrea un colt personal de relaxare. Pe scurt: alege <strong>banca</strong> daca vrei sedere activa si economie de loc, <strong>cuibul dublu</strong> daca vrei relaxare profunda in doi, si un <strong>scaun suspendat</strong> daca ai loc sau buget doar pentru unul.</p>
+
+    <h2 id="material">Materialul si rezistenta la vreme</h2>
+    <p>Un balansoar sta afara luni intregi, deci materialul decide cat rezista. Cele trei optiuni comune sunt metalul, lemnul si ratanul sintetic, fiecare cu punctele lui:</p>
+    <ul>
+      <li><strong>Metal si fier:</strong> cele mai solide si cele care sustin greutatea cea mai mare, cazul modelelor din selectie. Punctul slab e rugina, daca stau permanent in ploaie; cauta cadre vopsite in camp electrostatic sau zincate si trateaza din timp orice urma de rugina.</li>
+      <li><strong>Ratan sintetic:</strong> folosit la cuibul TOPSCAUNE, imita ratanul natural, dar rezista mult mai bine la raze UV, apa si uzura, cu intretinere minima. E alegerea buna daca vrei aspect placut si putina bataie de cap.</li>
+      <li><strong>Lemn:</strong> cald si natural, dar cere tratare periodica cu ulei de in, lac sau vopsea, ca sa nu crape si sa nu putrezeasca.</li>
+    </ul>
+    <p>Indiferent de material, doua lucruri prelungesc mult viata unui balansoar: sa-l tii <strong>la umbra</strong>, nu in soare direct tot timpul, si sa-l acoperi cu o <strong>husa de protectie</strong> cand nu-l folosesti perioade mai lungi sau iarna. Partile textile, plasa cuibului si pernele, se degradeaza cel mai repede, deci pe ele merita sa le protejezi in primul rand.</p>
+
+    <h2 id="acoperis">Acoperisul, pernele si confortul</h2>
+    <p>Confortul real vine din trei detalii pe care lumea le trece cu vederea: acoperisul, pernele si adancimea sederii.</p>
+    <p><strong>Acoperisul sau copertina</strong> conteaza mai ales daca tii balansoarul in plin soare: te fereste de arsita si de o ploaie usoara si, pentru modelele de doua-trei persoane, e chiar recomandat, pentru ca prelungeste timpul in care stai afara si fereste pernele de decolorare. Nu toate modelele vin cu acoperis; cand alegi unul fara, il asezi la umbra sau ii adaugi o husa.</p>
+    <p><strong>Pernele</strong> fac diferenta intre a sta cinci minute si a sta o ora. La cuiburile duble DeHome si la modelul TOPSCAUNE pernele sunt incluse, la fel ca la Galaxia cu perna; varianta Galaxia fara perna o cumperi separat, ceea ce iti da libertatea sa alegi culoarea si grosimea. Cauta, daca poti, perne cu <strong>husa detasabila si lavabila</strong>, pe care o scoti si o speli, si un material cu uscare rapida. Pernele sunt partea care sufera cel mai repede de la soare si umezeala, asa ca strange-le la adapost cand nu le folosesti.</p>
+
+    <h2 id="spatiu">Suportul, stabilitatea si spatiul</h2>
+    <p>Un balansoar se leagana, deci are nevoie de mai mult loc decat pare la prima vedere. Trebuie sa socotesti nu doar suprafata bazei, ci si <strong>cursa de leganare</strong>, spatiul liber in fata si in spate ca leaganul sa se miste fara sa loveasca un perete, un gard sau alte mobile de gradina.</p>
+    <p>Conteaza si <strong>tipul de suport</strong>. Modelele cu <strong>suport propriu</strong>, ca toate cuiburile duble din selectie si cuibul TOPSCAUNE, se aseaza oriunde in curte, fara sa depinzi de o grinda sau un copac, si le muti cand vrei. Scaunele si hamacele care <strong>se agata</strong>, ca Galaxia sau hamacul din selectie, sunt mai ieftine si ocupa mai putin, dar cer un punct de prindere solid: un carlig de tavan de terasa, o grinda de pergola sau o creanga groasa si sanatoasa. Daca nu ai unde sa le agati, alege un model cu suport inclus. Nu in ultimul rand, aseaza balansoarul pe <strong>teren plan si ferm</strong>: pe pamant moale sau inclinat, un leagan incarcat cu doi adulti se poate rasturna.</p>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Locuri</th><th>Capacitate</th><th>Material</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.locuri}</td>
+              <td>{x.cap}</td>
+              <td>{x.mat}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="doi">Balansoare pentru 2 persoane</h2>
+    <p>Modele reale pentru doi, toate cu 200 kg capacitate: o banca-balansoar metalica clasica si trei cuiburi duble DeHome, de la cel echilibrat pana la cel mai lat, aproape un leagan-pat. Toate cuiburile vin la pachet cu suport si perne.</p>
+    <div class="rd-grid">
+      {DOI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figDoi} alt="Balansoare de gradina pentru 2 persoane: banca metalica si cuiburi duble DeHome" width="1200" height="675" loading="lazy" />
+
+    <h2 id="unu">Scaune si cuiburi individuale</h2>
+    <p>Daca ai spatiu sau buget doar pentru un loc, variantele individuale sunt cea mai ieftina cale spre un colt de relaxare: un cuib premium de ratan sintetic, cel mai vandut scaun rotund suspendat, un hamac textil si un leagan simplu, sub 65 de lei. Toate sunt pentru o singura persoana.</p>
+    <div class="rd-grid">
+      {UNU.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figUnu} alt="Scaune si cuiburi suspendate individuale pentru gradina" width="1200" height="675" loading="lazy" />
+
+    <h2 id="intretinere">Unde il asezi si cum il intretii</h2>
+    <p>Un balansoar bine asezat si ingrijit tine ani buni; unul lasat in voia sortii ruginetste si se decoloreaza intr-un sezon. Cateva reguli simple fac toata diferenta.</p>
+    <p><strong>Locul.</strong> Aseaza-l pe teren plan si ferm, pe o terasa, pe dale sau pe iarba batatorita, nu pe pamant moale unde piciorul suportului se poate infunda. Alege, daca poti, un colt <strong>la umbra</strong>, sub un copac, o pergola sau streasina casei: soarele direct permanent decoloreaza pernele si incalzeste metalul. Lasa spatiu de jur imprejur pentru leganare si evita sa-l pui langa un gard, un geam sau alte mobile pe care le-ar putea lovi.</p>
+    <p><strong>Montajul.</strong> La modelele cu suport, strange bine toate suruburile la montaj si verifica sa fie totul fixat inainte sa te asezi. La cele care se agata, foloseste un punct de prindere cu adevarat solid si carlige pe masura greutatii; o creanga trebuie sa fie groasa si sanatoasa, nu una uscata.</p>
+    <p><strong>Intretinerea.</strong> Verifica periodic constructia si <strong>strange suruburile slabite</strong> de la leganare, inlocuieste orice piesa de prindere uzata si nu astepta sa cedeze. La cadrele de metal, trateaza din timp urmele de rugina si, unde e cazul, vopseste sau protejeaza suprafata; la lemn, da un strat de ulei sau lac o data pe sezon. Curata plasa cuibului si pernele de praf, frunze si gainat. Iar cand vine sezonul rece sau se anunta ploi lungi, strange balansoarul sub o <strong>husa de protectie</strong> sau adu partile textile in casa: asa eviti rugina, mucegaiul si decolorarea.</p>
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-balansoar-2-persoane').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate balansoarele de gradina la oferta</strong>
+        <span>Reducerile din acest moment la balansoare si leagane de gradina, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa un balansoar de gradina</h2>
+    <p>Preturile depind mult de tip si de numarul de locuri:</p>
+    <p><strong>Balansoare pentru 2 persoane:</strong> banca metalica de doua locuri porneste in jur de 780 de lei, iar cuiburile duble DeHome, cu suport si perne incluse, merg de la circa 1000 de lei pentru Joy 300, la 1300 pentru Joy 400 si spre 1500 de lei pentru cel mai lat, Luna 600. Cu cat cuibul e mai spatios, cu atat urca pretul.</p>
+    <p><strong>Cuiburi si scaune individuale:</strong> cuibul premium de ratan sintetic TOPSCAUNE e in jur de 970 de lei, dar scaunele rotunde suspendate Galaxia costa sub 150 de lei, iar varianta fara perna, si mai putin. Un hamac textil e in jur de 115 lei.</p>
+    <p><strong>Leagane simple:</strong> un leagan de plastic de baza, ca modelul ZOYA, se gaseste la sub 65 de lei, dar e un leagan propriu-zis, nu un balansoar de relaxare in doi.</p>
+    <p>Pe langa pret, tine cont ca modelele cu <strong>suport si perne incluse</strong> nu mai cer cheltuieli suplimentare, in timp ce la un scaun care se agata trebuie sa ai deja un punct de prindere, iar la unul fara perna adaugi costul pernei. Socoteste pretul intreg, nu doar cel de pe eticheta. Pentru un colt clasic de sezut, o alternativa fixa e <a href="/banca-de-gradina-din-lemn-masiv/">banca de gradina din lemn masiv</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in design interior si amenajari exterioare, cu accent pe mobilierul de gradina si zonele de relaxare de pe terase si in curti. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="balansoar-de-gradina-pentru-2-persoane"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="balansoar-de-gradina-pentru-2-persoane"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="balansoar-de-gradina-pentru-2-persoane" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="balansoar-de-gradina-pentru-2-persoane" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

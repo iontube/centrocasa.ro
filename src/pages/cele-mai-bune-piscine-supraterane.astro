@@ -1,0 +1,331 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['piscine'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Mici, copii, curte mica ---
+  { g: 'mici', id: 'DGVRMTMBM', badge: 'Cea mai ieftina', tip: 'Cadru metalic', marime: 'D 244 x 51 cm', filtrare: 'fara pompa',
+    specs: ['cadru metalic, rotunda', 'diametru 244 cm, adancime 51 cm', 'volum ~1800 l', 'fara pompa inclusa'],
+    pros: ['Cel mai mic pret din selectie, sub 350 de lei', 'Cadru metalic, sta ridicata singura, nu gonflabila', 'Se monteaza in cateva minute', 'Buna pentru copii sau o curte mica'],
+    cons: ['Nu vine cu pompa de filtrare, o iei separat', 'Mica si putin adanca, doar pentru racorit'],
+    verdict: 'Pentru bugetul cel mai mic, ai o piscina adevarata in curte, cu cadru metalic, nu gonflabila. Are 244 cm diametru si doar 51 cm adancime, deci e pentru copii sau pentru cei mari care vor doar sa se racoreasca, nu sa inoate. Cadrul metalic o tine ridicata singura si se monteaza in cateva minute pe un teren drept. Atentie, la pretul asta nu vine cu pompa de filtrare, deci fie iei una separat, fie schimbi apa des, ceea ce merge la un volum mic. O iei cand vrei o piscina simpla, ieftina si rapida, pentru copii sau spatii mici.' },
+  { g: 'mici', id: 'DFB2DFBBM', badge: 'Pentru copii mici', tip: 'Cadru metalic', marime: '122 x 122 x 30 cm', filtrare: 'fara pompa',
+    specs: ['cadru metalic, patrata', '122 x 122 cm, adancime 30 cm', 'volum 0.34 m³', 'inaltime mica, sigura pentru copii'],
+    pros: ['Adancime mica, 30 cm, sigura pentru copii mici', 'Cadru metalic stabil, nu gonflabila', 'Se umple si se goleste repede', 'Pret mic si ocupa putin loc'],
+    cons: ['Foarte mica, strict pentru copii', 'Fara sistem de filtrare'],
+    verdict: 'Piscina potrivita pentru copii mici, cu doar 30 cm adancime, cat sa se joace in siguranta sub supraveghere. Are cadru metalic, deci sta ridicata singura si e mai stabila decat un bazinel gonflabil, iar la 122 x 122 cm incape pe orice terasa sau colt de curte. Se umple si se goleste repede, asa ca poti schimba apa des fara filtrare, exact ce vrei la o piscina de copii. Nu astepta sa intre si adultii, e strict pentru cei mici. O iei cand ai copii mici si vrei ceva sigur, ieftin si usor de gestionat.' },
+  { g: 'mici', id: 'DWS99FBBM', badge: 'Cea mai vanduta gonflabila', tip: 'Gonflabila (Easy Set)', marime: 'D 457 x 84 cm', filtrare: 'pompa cu cartus',
+    specs: ['gonflabila, inel superior', 'diametru 457 cm, adancime 84 cm', 'volum ~9800 l, vine cu pompa cu filtru', 'se ridica pe masura ce se umple'],
+    pros: ['Cea mai vanduta din selectie, peste 100 de pareri', 'Mare, 457 cm, dar se monteaza foarte simplu', 'Vine cu pompa cu filtru inclusa', 'Se strange usor pentru iarna'],
+    cons: ['Gonflabila, mai putin rezistenta decat un cadru metalic', 'Peretele se poate deforma daca terenul nu e perfect drept'],
+    verdict: 'Piscina Easy Set e cel mai simplu tip: umfli inelul de sus, incepi sa torni apa si peretele se ridica singur pe masura ce se umple. La 457 cm diametru e surprinzator de mare pentru cat de usor se pune, si vine cu pompa cu filtru, deci ai apa in miscare, nu statuta. E cea mai vanduta din selectie, cu peste o suta de pareri, semn ca merge bine pentru multa lume. Fiind gonflabila, e mai putin rezistenta decat un cadru metalic si cere un teren perfect drept, altfel peretele se deformeaza. O iei cand vrei o piscina mare, ieftina si rapida, si nu te deranjeaza ca e gonflabila.' },
+  // --- Familie, cadru metalic ---
+  { g: 'familie', id: 'DPLY9ZBBM', badge: 'Alegerea pentru familie', tip: 'Cadru metalic', marime: 'D 366 x 76 cm', filtrare: 'pompa cu cartus',
+    specs: ['cadru metalic, rotunda', 'diametru 366 cm, adancime 76 cm', 'volum ~6500 l, cu pompa de filtrare', 'cel mai bun echilibru marime-pret'],
+    pros: ['Marimea ideala pentru familie, 366 cm', 'Cadru metalic solid, sta ridicata singura', 'Vine cu pompa de filtrare', 'Foarte cautata, peste 85 de pareri, pret bun'],
+    cons: ['76 cm adancime, buna de racorit, nu de inot serios', 'Cere un teren drept si putin loc in jur'],
+    verdict: 'Recomandarea mea principala pentru o familie: destul de mare cat sa va racoriti mai multi deodata, dar inca simpla si accesibila. Intex 28212 are 366 cm diametru, cadru metalic care o tine ridicata singura si vine cu pompa de filtrare, deci apa ramane curata fara sa o schimbi mereu. E una dintre cele mai vandute din categorie, cu peste 85 de pareri, un semn bun de fiabilitate. La 76 cm adancime e perfecta pentru racorire si joaca, dar nu conta pe ea pentru inot adevarat. O iei cand vrei cea mai buna piscina de familie la un pret rezonabil, fara batai de cap la montaj.' },
+  { g: 'familie', id: 'D9D49WBBM', badge: 'Premium, cadru gri', tip: 'Cadru metalic', marime: 'D 366 x 76 cm', filtrare: 'pompa cu cartus',
+    specs: ['Prism Frame, cadru metalic gri', 'diametru 366 cm, adancime 76 cm', 'volum ~6500 l', 'design mai rezistent si mai elegant'],
+    pros: ['Cadru Prism Frame, mai rezistent decat modelul standard', 'Aspect gri, elegant, se integreaza mai bine in curte', 'Aceeasi marime buna de familie, 366 cm', 'Nota buna de la cumparatori'],
+    cons: ['Mai scumpa decat modelul standard de aceeasi marime', 'Tot 76 cm adancime, pentru racorire'],
+    verdict: 'Aceeasi marime buna de familie ca modelul de mai sus, dar cu un cadru Prism Frame mai rezistent si un aspect gri mai elegant. Fata de varianta albastra standard, aici platesti pentru o structura mai solida, cu picioare in forma de A, si pentru un design care se integreaza mai frumos intr-o curte amenajata. Are tot 366 cm si 76 cm adancime, deci acopera aceeasi nevoie de racorire in familie. Nu vine mereu cu pompa, verifica in pachet inainte sa comanzi. O iei cand vrei o piscina de familie care sa reziste mai multi ani si sa arate mai bine, si esti dispus sa dai ceva in plus.' },
+  { g: 'familie', id: 'DRTF4VMBM', badge: 'Dreptunghiulara accesibila', tip: 'Cadru metalic', marime: '400 x 211 x 81 cm', filtrare: 'pompa (optional)',
+    specs: ['Bestway Steel Pro, dreptunghiulara', '400 x 211 cm, adancime 81 cm', 'volum ~5700 l', 'forma buna pentru curti alungite'],
+    pros: ['Forma dreptunghiulara, se aseaza mai bine intr-o curte alungita', 'Cadru metalic Steel Pro, stabil', 'Pret bun pentru o piscina de 4 metri', 'Adancime 81 cm, mai buna decat multe rotunde'],
+    cons: ['Vine cu putine accesorii, pompa poate fi separata', 'Bestway Steel Pro e o gama de baza, nu premium'],
+    verdict: 'Alegerea daca vrei o piscina dreptunghiulara fara sa dai o avere. Forma de 400 x 211 cm se aseaza mult mai bine intr-o curte lunga si ingusta decat o rotunda, si iti da si un pic mai mult spatiu sa te intinzi. Cadrul metalic Steel Pro o tine stabila, iar adancimea de 81 cm e ceva mai generoasa decat la multe modele rotunde de familie. E o gama de baza, deci vine cu putine accesorii si e posibil sa iei pompa separat, verifica pachetul. La pret, e una dintre cele mai accesibile dreptunghiulare de 4 metri. O iei cand vrei forma dreptunghiulara si buget mic.' },
+  { g: 'familie', id: 'DW16V5MBM', badge: 'Cu filtru de nisip', tip: 'Cadru metalic', marime: '404 x 201 x 100 cm', filtrare: 'pompa cu nisip',
+    specs: ['Bestway Power Steel, dreptunghiulara', '404 x 201 cm, adancime 100 cm', 'volum ~6500 l, sistem de filtrare cu nisip', 'cadru robust, adancime de un metru'],
+    pros: ['Filtru cu nisip, apa mai limpede cu mai putina bataie de cap', 'Adancime de un metru, buna si pentru miscare, nu doar racorire', 'Nota cea mai mare din selectie, 4.9', 'Cadru Power Steel robust, dreptunghiulara'],
+    cons: ['Mai scumpa decat modelele cu filtru cu cartus', 'Filtrul cu nisip cere backwash si schimb de nisip la 2-3 ani'],
+    verdict: 'Cea mai bine notata piscina din selectie si alegerea daca vrei apa limpede fara sa te chinui. Are un metru adancime, deci nu mai e doar de racorit, si un cadru Power Steel robust intr-o forma dreptunghiulara de 4 metri. Diferenta mare o face sistemul de filtrare cu nisip: fata de un filtru cu cartus, tine apa mai limpede la un volum mare si nu mai schimbi cartuse la doua saptamani, doar faci backwash si inlocuiesti nisipul o data la doi-trei ani. E mai scumpa, dar la o piscina de familie serioasa merita. O iei cand vrei o piscina de familie mai adanca, cu apa curata si intretinere mai comoda pe termen lung.' },
+  // --- Mari, pentru inot ---
+  { g: 'mari', id: 'DTLY9ZBBM', badge: 'Pentru inot', tip: 'Cadru metalic', marime: '400 x 200 x 100 cm', filtrare: 'pompa cu cartus + scara',
+    specs: ['Intex Prism Frame, dreptunghiulara', '400 x 200 cm, adancime 100 cm', 'volum ~6800 l, cu pompa si scara', 'un metru adancime, pentru miscare'],
+    pros: ['Un metru adancime, buna pentru inot si miscare reala', 'Forma dreptunghiulara, ideala pentru brate si lungimi', 'Vine completa: pompa cu filtru si scara de acces', 'Cadru Prism Frame rezistent'],
+    cons: ['Investitie serioasa, peste 4500 de lei', 'Cere un teren mare, perfect nivelat'],
+    verdict: 'Alegerea daca vrei chiar sa inoti, nu doar sa te racoresti. Are un metru adancime si forma dreptunghiulara de 400 x 200 cm, exact ce iti trebuie ca sa dai din brate si sa faci cateva lungimi, nu doar sa stai in apa. Vine completa, cu pompa cu filtru si scara de acces, deci nu mai cumperi accesorii separat. Cadrul Prism Frame o tine solida la un volum mare de apa, aproape 7000 de litri, care cere un teren mare si perfect nivelat. E o investitie serioasa, dar iti da o piscina in care chiar te misti. O iei cand vrei sa inoti acasa, ai spatiul si bugetul pentru ea.' },
+  { g: 'mari', id: 'DGCY9ZBBM', badge: 'Cea mai mare', tip: 'Cadru metalic', marime: 'D 549 x 132 cm', filtrare: 'pompa cu nisip + scara + prelata',
+    specs: ['Intex Ultra XTR, cadru robust', 'diametru 549 cm, adancime 132 cm', 'volum ~26000 l, filtru cu nisip', 'pachet complet: scara, prelata, protectie baza'],
+    pros: ['Cea mai mare din selectie, 549 cm si 132 cm adancime', 'Filtru cu nisip inclus, pentru un volum urias de apa', 'Pachet complet: scara, prelata si protectie pentru baza', 'Cadru Ultra XTR, cel mai rezistent de la Intex'],
+    cons: ['Cea mai scumpa, peste 10000 de lei', 'Peste 26000 de litri de apa, cere teren mare si intretinere pe masura'],
+    verdict: 'Cea mai impunatoare din selectie, cat mai aproape de o piscina ingropata fara sa sapi. Are 549 cm diametru si 132 cm adancime, deci intra toata familia deodata si chiar poti inota, cu peste 26000 de litri de apa. Cadrul Ultra XTR e cel mai rezistent de la Intex, iar pachetul e complet: filtru cu nisip pentru atata apa, scara, prelata de acoperire si folie de protectie pentru baza. E o investitie de peste 10000 de lei si cere un teren mare, perfect nivelat, plus intretinere si un consum de apa pe masura. O iei cand vrei cea mai mare si mai serioasa piscina supraterana, ai curtea si bugetul pentru ea.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const SHORT = {
+  DGVRMTMBM: 'Intex 28205 (244 cm)',
+  DFB2DFBBM: 'Intex Mini Frame',
+  DWS99FBBM: 'Intex Easy Set',
+  DPLY9ZBBM: 'Intex 28212 (366 cm)',
+  D9D49WBBM: 'Intex Prism Frame Premium',
+  DRTF4VMBM: 'Bestway Steel Pro',
+  DW16V5MBM: 'Bestway Power Steel',
+  DTLY9ZBBM: 'Intex Prism Frame (400x200)',
+  DGCY9ZBBM: 'Intex Ultra XTR',
+};
+
+const MICI = PICKS.filter(x => x.g === 'mici');
+const FAMILIE = PICKS.filter(x => x.g === 'familie');
+const MARI = PICKS.filter(x => x.g === 'mari');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/piscine.webp';
+const figMici = '/imagini/articole/piscine-copii.webp';
+const figFamilie = '/imagini/articole/piscine-familie.webp';
+const figMari = '/imagini/articole/piscine-inot.webp';
+const published = '2026-07-18T09:43:42+03:00';
+
+const faq = [
+  { question: 'Ce marime de piscina supraterana sa aleg?', answer: 'Depinde de cine o foloseste si de cat loc ai. Pentru copii mici, o piscina de 122-244 cm cu adancime mica ajunge. Pentru o familie care vrea sa se racoreasca, marimea ideala e in jur de 366 cm diametru, cu 76 cm adancime. Daca vrei sa si inoti, ai nevoie de o piscina de cel putin 400 cm lungime si un metru adancime, de preferat dreptunghiulara. Nu uita sa lasi loc si in jurul piscinei, pentru acces si pentru pompa.' },
+  { question: 'Gonflabila sau cu cadru metalic?', answer: 'O piscina gonflabila (tip Easy Set) are un inel care se umfla si ridica peretele pe masura ce torni apa. E cea mai simpla si ieftina, se strange usor, dar e mai putin rezistenta si cere un teren perfect drept. O piscina cu cadru metalic sta ridicata singura pe o structura de otel, e mai stabila, mai durabila si tine mai bine forma la volume mari. Pentru copii sau o solutie de sezon, gonflabila e suficienta. Pentru o piscina de familie pe care o tii mai multi ani, alege cadrul metalic.' },
+  { question: 'Filtru cu cartus sau cu nisip?', answer: 'Filtrul cu cartus e mai ieftin, usor si simplu, dar cartusul se curata sau se schimba des, cam la doua saptamani, in functie de cat foloseti piscina. Filtrul cu nisip costa mai mult la inceput, dar tine apa limpede la un volum mare cu mai putina bataie de cap: nu mai schimbi cartuse, faci doar backwash periodic si inlocuiesti nisipul o data la doi-trei ani. Pentru piscine mici si medii, cartusul e suficient. Pentru piscine mari, de familie sau de inot, filtrul cu nisip merita, chiar daca e mai greu de mutat iarna.' },
+  { question: 'Cum pregatesc terenul pentru o piscina supraterana?', answer: 'Terenul e cel mai important pas si multi il sar. Alege un loc perfect orizontal, indeparteaza iarba si pietrele, compacteaza pamantul si intinde un strat de nisip de circa cinci centimetri, ca o perna. Peste nisip pune folia de protectie inclusa. Suprafata trebuie sa fie atat de bine tasata incat o persoana de 80 de kilograme sa nu lase urme in ea. O piscina de 6000 de litri cantareste peste sase tone plina, iar pe un teren inclinat sau moale peretele se deformeaza sau chiar cedeaza. Nu o pune niciodata direct pe iarba sau pe o panta.' },
+  { question: 'Cum intretin apa din piscina?', answer: 'Apa se pastreaza curata prin filtrare zilnica si dezinfectie. Tine pompa pornita cateva ore pe zi, verifica pH-ul si mentine-l intre 7,0 si 7,4, si adauga clor cu un dozator plutitor, ca sa il eliberezi treptat. Un aspirator de fund scoate frunzele si murdaria depusa, iar o prelata pusa peste noapte tine apa curata si mai calda. Cu un test simplu de apa, verifici pH-ul si clorul si corectezi cand e nevoie. Intretinerea corecta iti scuteste schimbarea deasa a apei si prelungeste viata piscinei.' },
+  { question: 'Cat rezista o piscina supraterana?', answer: 'Depinde mult de tip si de cum o ingrijesti. O gonflabila ieftina tine un sezon-doua, mai ales daca o lasi in soare si nu o strangi iarna. O piscina cu cadru metalic bine intretinuta, golita si depozitata la adapost peste iarna, poate rezista multi ani. Cei mai mari dusmani sunt soarele puternic asupra folderului gol, terenul prost pregatit si apa lasata neingrijita. Daca pui folie de protectie dedesubt, o golesti si o depozitezi corect, iti dureaza mult mai mult.' },
+  { question: 'Pot lasa piscina afara peste iarna?', answer: 'Cele gonflabile si cele mici, nu: goleste-le, usuca-le si depoziteaza-le la adapost, altfel gerul si soarele le distrug. Piscinele mari cu cadru metalic pot ramane uneori pe loc, dar golite partial si acoperite cu o prelata de iarna, ca sa nu inghete apa in ele si sa nu se sparga peretele. Verifica intotdeauna recomandarea producatorului pentru modelul tau. In general, cea mai sigura varianta la noi, cu ierni geroase, e sa golesti si sa strangi piscina.' },
+  { question: 'Am nevoie de aviz sau autorizatie pentru o piscina supraterana?', answer: 'Piscinele supraterane demontabile, cum sunt cele din acest articol, se monteaza si se strang sezonier si in general nu cer autorizatie de constructie, spre deosebire de o piscina ingropata din beton. Totusi, regulile difera de la o localitate la alta, mai ales daca piscina e mare si ramane permanent pe loc. Daca ai dubii, intreaba la primaria locala inainte sa cumperi o piscina foarte mare. Pentru modelele de familie, demontabile, de obicei nu e nevoie de nimic.' },
+];
+
+const images = [hero, figMici, figFamilie, figMari, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune piscine supraterane in 2026: gonflabile si cu cadru metalic"
+  description="Ce piscina supraterana sa iei in 2026: modele gonflabile Easy Set si cu cadru metalic Intex si Bestway, comparate pe marime, forma si filtrare. Plus cum pregatesti terenul, cartus vs nisip si intretinerea apei."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Radu Popescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Amenajari si Instalatii', url: '/amenajari-instalatii/' }, { name: 'Cele mai bune piscine supraterane' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/amenajari-instalatii/">Amenajari si Instalatii</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune piscine supraterane</span>
+    </nav>
+
+    <h1>Cele mai bune piscine supraterane in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/radu-popescu/">Radu Popescu</a>, Consultant Amenajari · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune piscine supraterane: gonflabile si cu cadru metalic" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru o familie, cea mai buna alegere e o piscina cu <strong>cadru metalic de 366 cm</strong>, ca Intex 28212: destul de mare cat sa va racoriti mai multi, simpla de montat si la un pret bun. Daca vrei sa si <strong>inoti</strong>, ia una dreptunghiulara si adanca de un metru, ca Intex Prism Frame 400x200. Pentru copii sau o curte mica, o <strong>Mini Frame</strong> costa sub 400 de lei, iar pentru apa limpede cu efort minim la o piscina mare, alege una cu <strong>filtru de nisip</strong>, ca Bestway Power Steel.</p>
+      <p>La piscinele supraterane, trei lucruri decid alegerea: <strong>gonflabila sau cu cadru metalic</strong>, <strong>ce marime si adancime</strong> vrei, si <strong>cum filtrezi apa</strong>, cu cartus sau cu nisip. Si mai e un pas de care depinde totul si pe care multi il sar: <strong>pregatirea terenului</strong>. O piscina plina cantareste tone, iar pe un teren stramb se deformeaza sau cedeaza.</p>
+      <p>Am pornit de la piscinele vandute pe eMAG, aproape toate Intex si Bestway, le-am verificat tipul, marimea, adancimea si filtrarea, si le-am grupat pe mici (copii si curte mica), de familie si mari (pentru inot). Pentru curatarea piscinei si a curtii, vezi <a href="/masina-de-spalat-cu-presiune-pentru-acasa/">aparatele de spalat cu presiune</a>, iar pentru relaxare, <a href="/cele-mai-bune-saune-pentru-acasa/">saunele pentru acasa</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#gonflabila-cadru">Gonflabila sau cadru metalic</a></li>
+        <li><a href="#marime">Ce marime si adancime</a></li>
+        <li><a href="#mici">Piscine mici (copii, curte mica)</a></li>
+        <li><a href="#familie">Piscine de familie</a></li>
+        <li><a href="#mari">Piscine mari (pentru inot)</a></li>
+        <li><a href="#filtrare">Filtrare: cartus sau nisip</a></li>
+        <li><a href="#teren">Pregatirea terenului</a></li>
+        <li><a href="#apa">Intretinerea apei</a></li>
+        <li><a href="#cat-costa">Cat costa o piscina supraterana</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Marime</th><th>Filtrare</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (<tr><td>{SHORT[x.id]}</td><td>{x.tip}</td><td>{x.marime}</td><td>{x.filtrare}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="gonflabila-cadru">Gonflabila sau cadru metalic</h2>
+    <p>Prima alegere e felul constructiei, pentru ca schimba si pretul, si durata de viata:</p>
+    <p><strong>Gonflabila (tip Easy Set):</strong> are un inel care se umfla la partea de sus, iar peretele se ridica singur pe masura ce torni apa. E cea mai simpla si mai ieftina, se monteaza si se strange in cateva minute, dar e mai putin rezistenta si e foarte sensibila la un teren care nu e perfect drept.</p>
+    <p><strong>Cu cadru metalic (frame):</strong> peretele e sustinut de o structura de otel care o tine ridicata singura. E mai stabila, mai durabila si tine forma la volume mari de apa. Costa mai mult, dar e alegerea pentru o piscina pe care o folosesti ani la rand.</p>
+    <p>Pe scurt: gonflabila pentru copii si o solutie de sezon, cadru metalic pentru o piscina de familie serioasa.</p>
+
+    <h2 id="marime">Ce marime si adancime alegi</h2>
+    <p>A doua decizie e cat de mare, in functie de cine intra si de cat loc ai:</p>
+    <ul>
+      <li><strong>Copii mici:</strong> 122-244 cm, cu adancime mica de 30-51 cm. Sigura, se umple si se goleste repede.</li>
+      <li><strong>Familie, pentru racorire:</strong> in jur de 366 cm diametru, cu 76 cm adancime. Punctul dulce ca pret si utilitate.</li>
+      <li><strong>Inot si miscare:</strong> cel putin 400 cm lungime si un metru adancime, ideal dreptunghiulara, ca sa poti da din brate.</li>
+    </ul>
+    <p>Nu masura doar piscina, ci si <strong>locul din jur</strong>: ai nevoie de spatiu pentru acces, pentru scara si pentru pompa. Si tine minte ca adancimea conteaza: sub 60 cm e strict de racorire, un metru inseamna ca te poti si misca in apa.</p>
+
+    <h2 id="mici">Piscine mici, pentru copii si curte mica</h2>
+    <p>Ieftine, rapide, pentru copii sau spatii mici. Se umplu si se golesc usor, deci multe merg si fara filtrare, cu apa schimbata des.</p>
+    <div class="rd-grid">
+      {MICI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMici} alt="Piscine mici pentru copii: Intex Mini Frame si Easy Set" width="1200" height="675" loading="lazy" />
+
+    <h2 id="familie">Piscine de familie, cu cadru metalic</h2>
+    <p>Sweet spot-ul categoriei: destul de mari cat sa intre mai multi, cu cadru metalic solid si pompa de filtrare, la un pret rezonabil. Rotunde sau dreptunghiulare, dupa forma curtii.</p>
+    <div class="rd-grid">
+      {FAMILIE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figFamilie} alt="Piscine de familie cu cadru metalic Intex si Bestway" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mari">Piscine mari, pentru inot</h2>
+    <p>Cand vrei chiar sa inoti, nu doar sa te racoresti: forma dreptunghiulara sau diametru mare, un metru adancime si filtru pe masura volumului de apa.</p>
+    <div class="rd-grid">
+      {MARI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMari} alt="Piscine mari pentru inot: Intex Prism Frame si Ultra XTR" width="1200" height="675" loading="lazy" />
+
+    <h2 id="filtrare">Filtrare: cartus sau nisip</h2>
+    <p>Filtrarea e ce tine apa curata si te scuteste de schimbat-o mereu. Sunt doua sisteme:</p>
+    <p><strong>Filtru cu cartus:</strong> mai ieftin, usor si simplu de folosit. Cartusul retine murdaria, dar se infunda si trebuie curatat sau schimbat des, cam la doua saptamani daca folosesti piscina intens. Filtreaza chiar particule fine. E potrivit pentru piscine mici si medii.</p>
+    <p><strong>Filtru cu nisip:</strong> apa trece printr-un strat de nisip cuartos care retine impuritatile. Costa mai mult la inceput, dar tine apa limpede la volume mari cu mai putina bataie de cap: nu mai schimbi cartuse, faci doar un backwash periodic (speli nisipul invers, cateva minute) si inlocuiesti nisipul o data la doi-trei ani. E greu de mutat iarna, fiind plin cu zeci de kilograme de nisip, dar pentru o piscina mare de familie sau de inot merita.</p>
+    <p>Regula simpla: cartus pentru piscine mici si medii, nisip pentru cele mari, unde volumul de apa cere o filtrare mai serioasa.</p>
+
+    <h2 id="teren">Pregatirea terenului, pasul pe care nu il sari</h2>
+    <p>Aici se strica cele mai multe piscine, pentru ca oamenii le pun in graba direct pe iarba. O piscina de familie plina cantareste <strong>peste sase tone</strong>, iar pe un teren stramb sau moale peretele se deformeaza sau cedeaza. Asa faci corect:</p>
+    <ul>
+      <li><strong>Alege un loc perfect orizontal.</strong> Verifica planeitatea cu o nivela pe o scandura lunga; corecteaza inainte, nu dupa ce ai umplut-o.</li>
+      <li><strong>Curata si taseaza.</strong> Indeparteaza iarba, radacinile si pietrele, apoi compacteaza pamantul.</li>
+      <li><strong>Intinde un strat de nisip</strong> de circa cinci centimetri, ca o perna care protejeaza baza. Tasat bine, atat de tare incat o persoana de 80 de kilograme sa nu lase urme.</li>
+      <li><strong>Pune folia de protectie</strong> inclusa peste nisip, inainte sa asezi piscina.</li>
+      <li><strong>Lasa loc in jur</strong> pentru acces, pentru scara si pentru pompa.</li>
+    </ul>
+    <p>Un teren bine pregatit iti prelungeste mult viata piscinei si iti scuteste surprize neplacute in mijlocul verii.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-piscine')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate piscinele la oferta</strong>
+        <span>Reducerile din acest moment la piscine supraterane, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="apa">Intretinerea apei</h2>
+    <p>O piscina curata inseamna filtrare plus putina chimie, nu efort mult:</p>
+    <ul>
+      <li><strong>Filtrare zilnica:</strong> tine pompa pornita cateva ore pe zi, ca apa sa nu stea pe loc.</li>
+      <li><strong>pH intre 7,0 si 7,4:</strong> verifica-l cu un test simplu si corecteaza-l; un pH bun face si clorul sa lucreze eficient.</li>
+      <li><strong>Clor cu dozator plutitor:</strong> elibereaza treptat dezinfectantul, ca apa sa ramana limpede si sigura.</li>
+      <li><strong>Aspirator de fund:</strong> scoate frunzele si depunerile de pe fund, o data la cateva zile.</li>
+      <li><strong>Prelata peste noapte:</strong> tine apa curata, mai calda si reduce evaporarea.</li>
+    </ul>
+    <p>Cu rutina asta simpla, nu mai schimbi apa des si prelungesti viata piscinei. Un test de apa ieftin iti spune imediat cand pH-ul sau clorul au iesit din interval.</p>
+
+    <h2 id="cat-costa">Cat costa o piscina supraterana</h2>
+    <p>Preturile merg de la cateva sute la peste zece mii de lei, in functie de marime si dotari:</p>
+    <p><strong>Mici, pentru copii:</strong> 300-450 de lei pentru o piscina de 122-244 cm sau o gonflabila mica. De multe ori fara pompa, pe care o iei separat.</p>
+    <p><strong>De familie, cadru metalic:</strong> in general 700-1500 de lei pentru o piscina de 366-400 cm cu pompa cu cartus. Variantele premium sau cu filtru de nisip urca spre 2000-2300 de lei.</p>
+    <p><strong>Mari, pentru inot:</strong> de la 4500 de lei pentru o dreptunghiulara adanca de un metru, si peste 10000 de lei la cele mai mari modele cu filtru de nisip, scara si prelata incluse.</p>
+    <p>Pe langa pretul piscinei, pune la buget nisipul pentru baza, folia de protectie, chimia pentru apa si, la modelele mari, consumul de apa si de curent al pompei. Sunt cheltuieli mici fata de pretul piscinei, dar bine de stiut de la inceput.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">RP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/radu-popescu/" class="author-name-link">Radu Popescu</a></p>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Radu are peste 9 ani in amenajari si dotari pentru casa, de la usi si cabine de dus la piscine si panouri solare, si explica pe intelesul tuturor ce conteaza la marime, montaj si intretinere.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-piscine-supraterane" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-piscine-supraterane" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

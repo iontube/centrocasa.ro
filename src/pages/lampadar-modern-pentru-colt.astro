@@ -1,234 +1,272 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Lampadar modern pentru colt",
-  excerpt: "Am o pasiune pentru a-mi transforma casa intr-un spatiu cat mai primitor si functional. Azi vreau sa va povestesc despre un obiect de decor pe care l-am descoperit recent si care mi-a facut viata mai usoara: lampadarul modern pentru colt. Poate pare un detaliu mic, dar credeți-mă, face o diferență enormă.",
-  image: "/images/articles/lampadar-modern-pentru-colt.webp",
-  category: "Decoratiuni Casa",
-  categorySlug: "decoratiuni-casa",
-  date: "2026-01-14T08:50:10.368Z",
-  modifiedDate: "2026-01-29T08:50:10.789Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Ce inaltime ar trebui sa aiba un lampadar pentru colt?", answer: "Inaltimea ideala depinde de locul unde il vei plasa. Pentru citit langa o canapea, ar trebui sa ajunga cu lumina in zona capului. Pentru un colt de camera, o inaltime de 1.5 - 1.8 metri este, de obicei, potrivita. Masoara mereu spatiul inainte." },
-  { question: "Pot folosi un lampadar pentru colt ca sursa principala de lumina?", answer: "Depinde de model. Lampadarele cu lumina directa si puternica pot fi suficiente pentru camere mici sau ca sursa suplimentara. Totusi, pentru majoritatea camerelor, sunt recomandate ca iluminat ambiental sau secundar, completand lumina plafonierei." },
-  { question: "Ce tip de bec este cel mai bun pentru un lampadar modern?", answer: "Becurile LED sunt cea mai buna optiune. Sunt economice, au o durata de viata lunga si se incalzesc mai putin. Alege temperatura de culoare potrivita: calda pentru relaxare, neutra sau rece pentru activitati care necesita concentrare." },
-  { question: "Cum aleg finisajul potrivii?", answer: "Finisajul ar trebui sa se asorteze cu restul mobilierului si decoratiunilor din camera. Negrul mat, cromul si auriul sunt optiuni populare pentru stilul modern. Lemnul adauga o nota calda, potrivita pentru stiluri scandinave sau rustice." },
-  { question: "Sunt lampadarele pentru colt greu de asamblat?", answer: "Majoritatea modelelor vin cu instructiuni clare si sunt relativ usor de asamblat. De obicei, implica fixarea bazei, a piciorului si a abajurului. Unele modele mai complexe pot necesita un pic mai mult efort, dar nu este nimic complicat." },
-  { question: "Care este diferenta intre un lampadar pentru colt si unul normal?", answer: "Lampadarul pentru colt are o baza si o forma concepute special pentru a se potrivi in colturile camerei, ocupand mai putin spatiu si integrandu-se discret. Lampadarele normale pot fi plasate oriunde si au forme mai variate, uneori mai voluminoase." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un lampadar modern pentru colt?", id: "de-ce-ai-nevoie-de-un-lampadar-modern-pentru-colt" },
-  { title: "Top recomandari: Lampadare moderne pentru colt pe care le-am incercat", id: "top-recomandari-lampadare-moderne-pentru-colt-pe-care-le-am-incercat" },
-  { title: "Cum alegi corect lampadarul modern pentru colt", id: "cum-alegi-corect-lampadarul-modern-pentru-colt" },
-  { title: "Avantaje si dezavantaje ale lampadarelor moderne pentru colt", id: "avantaje-si-dezavantaje-ale-lampadarelor-moderne-pentru-colt" },
-  { title: "Sfaturi practice si greseli de evitat", id: "sfaturi-practice-si-greseli-de-evitat" },
-  { title: "Parerea mea finala despre lampadarele moderne pentru colt", id: "parerea-mea-finala-despre-lampadarele-moderne-pentru-colt" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['lampadar-colt'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- LED RGB de colt ---
+  { g: 'rgb', id: 'DK6RCD2BM', badge: 'Cel mai dotat', short: 'Qova RGB Smart 160 cm', inaltime: '160 cm', tip: 'LED RGB', control: 'Aplicatie + telecomanda',
+    specs: ['160 cm, 1000 lumeni, dimabila', '16 milioane de culori, jocuri de lumini', 'control din aplicatie si telecomanda', 'sincronizare cu muzica, temporizator'],
+    pros: ['Cea mai luminoasa din selectie, 1000 lumeni', '16 milioane de culori si multe jocuri de lumini', 'Control complet din aplicatie si telecomanda', 'Sincronizare cu muzica si temporizator'],
+    cons: ['Putine pareri inca, model relativ nou', 'Cea mai scumpa dintre lampile RGB'],
+    verdict: 'Cea mai completa lampa RGB de colt din selectie, pentru cine vrea tot pachetul. Qova are 160 cm, cea mai inalta, si 1000 de lumeni, cea mai luminoasa dintre modelele RGB, deci nu e doar decor, chiar da lumina intr-un colt. Are 16 milioane de culori, jocuri de lumini, dimare, temporizator si sincronizare cu muzica, pe care le controlezi din aplicatie sau de la telecomanda, ideal pentru un colt de gaming, un perete de living sau o ambianta de seara. Are inca putine pareri, fiind un model nou, dar nota e buna, 4.67, si e cea mai scumpa dintre lampile RGB de aici. O iei cand vrei maximul de culori, luminozitate si control smart intr-o lampa de colt.' },
+  { g: 'rgb', id: 'D4RD0K2BM', badge: 'Cea mai vanduta', short: 'Bedee RGB 120 cm', inaltime: '120 cm', tip: 'LED RGB', control: 'Aplicatie + telecomanda',
+    specs: ['120 cm, lumina ambientala colorata', 'dimabila, sincronizare cu muzica', 'control prin aplicatie sau telecomanda', 'pentru living, dormitor, camera de jocuri'],
+    pros: ['Cea mai vanduta din selectie, cu cele mai multe pareri', 'Control dublu, aplicatie si telecomanda', 'Sincronizare cu muzica pentru petreceri si gaming', 'Pret accesibil pentru o lampa RGB completa'],
+    cons: ['Nota 3.86, mai modesta', '120 cm, ceva mai scunda decat altele'],
+    verdict: 'Cea mai populara lampa RGB de colt de aici, verificata de cei mai multi cumparatori din selectie. Bedee are 120 cm, da o lumina ambientala colorata, e dimabila si se sincronizeaza cu muzica, iar controlul se face din aplicatie sau de la telecomanda, potrivit pentru living, dormitor sau camera de jocuri. E cea mai vanduta si are cel mai mare numar de pareri dintre modelele de aici, desi nota, 3.86, e mai modesta decat la altele, semn ca parerile sunt impartite. E, in schimb, accesibila pentru o lampa RGB completa. O iei cand vrei modelul cel mai testat de alti cumparatori, la un pret bun, si nu te deranjeaza ca e ceva mai scunda.' },
+  { g: 'rgb', id: 'D8QJ983BM', badge: 'Cea mai ieftina', short: 'Omelivon 360 100 cm', inaltime: '100 cm', tip: 'LED RGB', control: 'Aplicatie + telecomanda',
+    specs: ['100 cm, iluminare 360°', '44 de scenarii, sincronizare cu muzica', 'dimabila complet, control app + telecomanda', 'nota maxima, 5 din 5'],
+    pros: ['Cel mai mic pret din selectie', 'Iluminare 360° si 44 de scenarii de lumina', 'Nota maxima, 5 din 5', 'Control din aplicatie si telecomanda, dimare completa'],
+    cons: ['100 cm, cea mai scunda', 'Putine pareri deocamdata'],
+    verdict: 'Cu bani putini incerci o lampa RGB de colt, cu surprinzator de multe functii. Omelivon are 100 cm, cea mai scunda din selectie, dar aduce iluminare pe 360 de grade, 44 de scenarii de lumina si sincronizare cu muzica, plus dimare completa, toate controlate din aplicatie sau telecomanda. A luat nota maxima, 5 din 5, chiar daca deocamdata din putine pareri. E alegerea buna pentru un birou, un colt de gaming mai mic sau pur si simplu ca sa vezi daca iti place genul, fara sa investesti mult. O iei cand vrei cele mai multe efecte pe cel mai mic pret si nu ai nevoie de o lampa foarte inalta.' },
+  { g: 'rgb', id: 'DDSMMNYBM', badge: 'Aplicatie si telecomanda', short: 'NUODWELL RGB 150 cm', inaltime: '150 cm', tip: 'LED RGB', control: 'Aplicatie + telecomanda',
+    specs: ['150 cm, aliaj de aluminiu si ABS', 'control din aplicatie si telecomanda', 'usor de instalat', 'pentru gaming, living, karaoke, birou'],
+    pros: ['Corp inalt, 150 cm, din aluminiu si ABS', 'Control din aplicatie si telecomanda', 'Usor de instalat', 'Nota maxima de la primii cumparatori'],
+    cons: ['Foarte putine pareri, model nou', 'Fara detalii de luminozitate declarate'],
+    verdict: 'O lampa RGB inalta si solida, pentru cine vrea un corp de 150 cm din materiale mai bune. NUODWELL foloseste un aliaj de aluminiu si ABS, se instaleaza usor si se controleaza din aplicatie sau telecomanda, fiind gandita pentru camera de jocuri, living, karaoke sau birou. La 150 cm, umple bine un colt si se vede de departe. A primit nota maxima de la primii cumparatori, dar are inca foarte putine pareri, asa ca o iei mai mult pe increderea in specificatii decat pe volumul de recenzii. O alegere buna daca vrei o lampa RGB inalta, cu control dublu, si nu conteaza ca e un model nou, putin testat.' },
+  { g: 'rgb', id: 'DRGHPH3BM', badge: 'Cu sincronizare muzica', short: 'Lampadar RGB muzica 150 cm', inaltime: '150 cm', tip: 'LED RGB', control: 'Telecomanda',
+    specs: ['150 cm, corp subtire 30 x 30 cm baza', 'RGB multicolor', 'sincronizare cu muzica', 'design minimal de colt'],
+    pros: ['Inalta, 150 cm, pentru un colt vizibil', 'Sincronizare cu muzica', 'Design subtire, minimal, se strecoara in colt', 'RGB multicolor cu jocuri de lumini'],
+    cons: ['Foarte putine informatii si pareri', 'Fara control din aplicatie declarat'],
+    verdict: 'O optiune simpla si inalta, daca vrei doar efectul RGB cu ritm pe muzica. Lampadarul are 150 cm si un corp subtire, cu o baza de 30 pe 30 cm, deci se strecoara usor intr-un colt fara sa ocupe loc, si ofera lumina RGB multicolora cu sincronizare pe muzica. E cel mai simplu descris model din selectie, fara detalii bogate de specificatii sau control din aplicatie mentionat, si are foarte putine pareri. O iei cand vrei o lampa de colt inalta, cu jocuri de lumini pe muzica, la un design minimal, si nu ai pretentii de aplicatie sau de foarte multe scenarii.' },
+  // --- Lampadare clasice ---
+  { g: 'clasic', id: 'DKY0LSYBM', badge: 'Clasic, accesibil', short: 'Pako World 140 cm', inaltime: '140 cm', tip: 'Clasic', control: 'Intrerupator clasic',
+    specs: ['140 cm, finisaj maro', 'baza 38 x 38 cm, stabila', 'intrerupator clasic', 'lumina neutra, cu bec la alegere'],
+    pros: ['Lampadar clasic simplu, se potriveste oriunde', 'Baza lata, 38 cm, stabila', 'Pret accesibil', 'Nota maxima de la primii cumparatori'],
+    cons: ['Putine pareri', 'Fara functii de culoare sau control smart'],
+    verdict: 'Un lampadar clasic, pentru cine vrea o sursa de lumina calda intr-un colt, nu jocuri de culori. Pako World are 140 cm, un finisaj maro discret si o baza lata de 38 cm care ii da stabilitate, cu un intrerupator clasic si un soclu in care pui becul preferat, ideal unul cald pentru living sau dormitor. E cea mai simpla si una dintre cele mai accesibile optiuni de aici, gandita sa lumineze si sa decoreze un colt fara pretentii de RGB sau aplicatie. Are nota maxima, dar din putine pareri. O iei cand vrei un lampadar traditional, stabil si ieftin, pentru un colt de citit sau de relaxare.' },
+  { g: 'clasic', id: 'DP2ZW7MBM', badge: 'Retro, din lemn', short: 'Ebro Retro 152 cm', inaltime: '152 cm', tip: 'Clasic',	control: 'Intrerupator pe fir',
+    specs: ['152 cm, stil retro', 'bronz si lemn', 'intrerupator pe fir', 'aspect cald, decorativ'],
+    pros: ['Design retro cu bronz si lemn, arata bine', 'Inalt, 152 cm, prezenta in colt', 'Materiale calde, decorative', 'Intrerupator pe fir, la indemana'],
+    cons: ['Cel mai scump lampadar clasic din selectie', 'Putine pareri'],
+    verdict: 'Alegerea daca vrei un lampadar de colt care sa fie si piesa de decor, cu aspect retro. Ebro combina bronzul cu lemnul intr-un design retro cald, la 152 cm inaltime, deci are prezenta si umple frumos un colt de living sau de birou, cu un intrerupator pe fir la indemana. E mai mult despre cum arata decat despre functii, un obiect care da caracter camerei, potrivit intr-un decor clasic sau vintage. E cel mai scump dintre lampadarele clasice de aici si are putine pareri. Il iei cand pui pret pe aspect si pe materiale calde, naturale, si vrei un lampadar care sa se remarce ca decor, nu ca lampa RGB.' },
+  { g: 'clasic', id: 'DNCFB33BM', badge: 'Cu comutator de picior', short: 'HOMCOM 161 cm', inaltime: '161.5 cm', tip: 'Clasic', control: 'Comutator de picior',
+    specs: ['161.5 cm, cel mai inalt din selectie', 'metal, negru si bej', 'comutator de picior, comod', 'design modern, simplu'],
+    pros: ['Cel mai inalt din selectie, 161.5 cm', 'Comutator de picior, il aprinzi fara sa te apleci', 'Cadru de metal, solid', 'Nota maxima de la primii cumparatori'],
+    cons: ['Cel mai scump lampadar clasic', 'Putine pareri'],
+    verdict: 'Cel mai inalt lampadar din selectie, cu un detaliu practic pe care putine il au: comutatorul de picior. HOMCOM are 161.5 cm si un cadru de metal negru cu bej, un design modern si simplu, iar aprinderea se face cu piciorul, deci nu mai cauti intrerupatorul si nu te apleci, comod cand ai mainile ocupate. E solid si arata curat intr-un colt de living sau langa un fotoliu de citit. E printre cele mai scumpe lampadare clasice de aici si are putine pareri, ca mai toate din aceasta selectie. Il iei cand vrei un lampadar inalt, solid, cu aprindere la picior, pentru un colt de relaxare, nu efecte de culoare.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const RGB = PICKS.filter(x => x.g === 'rgb');
+const CLASIC = PICKS.filter(x => x.g === 'clasic');
+
+const hero = '/images/articles/lampadar-modern-pentru-colt.webp';
+const figRgb = '/imagini/articole/lampadar-rgb-colt.webp';
+const figClasic = '/imagini/articole/lampadar-clasic.webp';
+const published = '2026-07-18T18:31:57+03:00';
+
+const faq = [
+  { question: 'Ce e o lampa LED RGB de colt si pentru ce e buna?', answer: 'E un lampadar subtire, de obicei de 100-160 cm, gandit sa stea intr-un colt al camerei si sa dea lumina colorata, RGB. Spre deosebire de un lampadar clasic, care da o lumina fixa, cea RGB poate afisa milioane de culori, jocuri de lumini si, la multe modele, se sincronizeaza cu muzica. E foarte cautata pentru colturile de gaming, pentru ambianta de seara in living sau in dormitor, ca lumina in spatele televizorului sau pentru petreceri. Serveste in primul rand ca lumina decorativa si de atmosfera, nu neaparat ca sursa principala de iluminat a camerei.' },
+  { question: 'Cata lumina da si poate lumina toata camera?', answer: 'Depinde de model, dar in general lampile RGB de colt sunt gandite ca lumina de ambianta, nu ca sursa principala. Multe au un flux luminos modest, in jur de 150 de lumeni, suficient pentru atmosfera, dar nu pentru a lumina puternic o camera. Exceptie face, in selectie, modelul Qova, cu 1000 de lumeni, care da vizibil mai multa lumina. Daca vrei sa si citesti sau sa iluminezi camera, alege un model cu lumeni multi sau completeaza cu o sursa principala pe tavan; daca vrei doar ambianta si culoare, aproape orice model RGB e suficient.' },
+  { question: 'Cum controlez o lampa RGB de colt?', answer: 'In doua-trei feluri, in functie de model. Cele mai multe vin cu telecomanda, cu care alegi culoarea, reglezi intensitatea, schimbi modul si viteza de schimbare a culorilor. Modelele mai bune, ca Qova, Bedee, Omelivon sau NUODWELL din selectie, se controleaza si din aplicatia de pe telefon, unde ai mai multe scenarii si control mai fin. Iar functia de sincronizare cu muzica face lampa sa isi schimbe culorile in ritmul sunetului din camera, un efect apreciat la gaming si la petreceri. Verifica in descriere daca modelul are aplicatie, nu doar telecomanda, daca asta iti doresti.' },
+  { question: 'Ce inaltime sa aleg pentru o lampa de colt?', answer: 'Inaltimile obisnuite merg de la circa 100 la 160 cm. O lampa mai inalta, de 150-160 cm, ca Qova, NUODWELL sau HOMCOM din selectie, are mai multa prezenta, se vede de departe si lumineaza o suprafata mai mare de perete, potrivita intr-un living sau langa un televizor mare. Una mai scunda, de 100-120 cm, ca Omelivon sau Bedee, e discreta si buna pentru un birou, un dormitor sau un colt mai mic. Tine cont si de mobila din jur: langa o canapea sau un fotoliu inalt, o lampa mai inalta arata mai echilibrat.' },
+  { question: 'Se pot folosi in spatele televizorului sau pentru gaming?', answer: 'Da, e chiar una dintre cele mai populare utilizari. O lampa RGB de colt asezata langa sau in spatele televizorului da un efect de lumina ambientala pe perete, care reduce contrastul obositor dintre ecranul luminos si peretele intunecat si adauga atmosfera. Pentru gaming, modelele cu sincronizare pe muzica si multe scenarii de culoare, controlate din aplicatie, creeaza exact ambianta colorata cautata. Alege un model cu control din aplicatie si music sync, ca cele din grupul RGB al selectiei, si aseaza-l in coltul din spatele biroului sau al televizorului.' },
+  { question: 'Lampadar clasic sau lampa RGB, ce sa aleg?', answer: 'Depinde ce vrei de la coltul acela. Un lampadar clasic, ca Pako World, Ebro sau HOMCOM din selectie, da o lumina fixa, de obicei calda, si e mai mult o piesa de mobilier care lumineaza si decoreaza, potrivit pentru un colt de citit sau de relaxare, intr-un decor clasic. O lampa RGB e despre culoare, efecte si ambianta moderna, potrivita pentru gaming, petreceri sau un living tanar. Daca vrei lumina utila si aspect traditional, alegi clasicul; daca vrei culoare, control din telefon si atmosfera, alegi RGB. Nimic nu te opreste sa ai una din fiecare, in colturi diferite.' },
+];
+
+const images = [hero, figRgb, figClasic, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Lampadar modern pentru colt - CentroCasa"
-  description="Am o pasiune pentru a-mi transforma casa intr-un spatiu cat mai primitor si functional. Azi vreau sa va povestesc despre un obiect de decor pe care l-am descoperit recent si care mi-a facut viata mai usoara: lampadarul modern pentru colt. Poate pare un detaliu mic, dar credeți-mă, face o diferență enormă."
-  image="/images/articles/lampadar-modern-pentru-colt.webp"
+  title="Cele mai bune lampadare LED de colt in 2026: RGB pentru gaming si ambianta"
+  description="Care sunt cele mai bune lampadare LED de colt in 2026: lampi RGB de podea cu control din aplicatie, telecomanda si sincronizare cu muzica, plus lampadare clasice de podea, comparate pe inaltime, luminozitate si control. Plus cum alegi si unde le asezi."
+  image={hero}
   type="article"
-  publishedTime="2026-01-14T08:50:10.368Z"
-  modifiedTime="2026-01-29T08:50:10.789Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Decoratiuni Casa', url: '/decoratiuni-casa/' }, { name: 'Cele mai bune lampadare LED de colt' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/decoratiuni-casa/">Decoratiuni Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Lampadar modern pentru colt</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/decoratiuni-casa/">Decoratiuni Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune lampadare LED de colt</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/decoratiuni-casa/" class="article-category">Decoratiuni Casa</a>
-        <span class="article-date">29 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Lampadar modern pentru colt</h1>
-    </header>
+    <h1>Cele mai bune lampadare LED de colt</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/lampadar-modern-pentru-colt.webp" alt="Lampadar modern pentru colt" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune lampadare LED de colt: modele RGB si lampadare clasice de podea" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-lampadar-modern-pentru-colt">
-        <h2>De ce ai nevoie de un lampadar modern pentru colt?</h2>
-        <p>Stau si ma gandesc uneori cum puteam trai fara un anumit obiect pana cand il descopar. Exact asa a fost si cu lampadarul modern pentru colt. Pana nu am inceput sa caut solutii pentru niste spatii mai intunecoase din casa, nici nu mi-am dat seama cat de util poate fi. Si nu ma refer doar la lumina in sine, ci la cum poate transforma un colt uitat al camerei intr-un punct de interes.</p><p>Am observat ca multe case, inclusiv a mea, au colturi care raman mereu slab luminate. Fie ca e vorba de acel ungher de langa canapea unde cartea se citeste greu, fie ca e coltul din <a href="/aplica-de-perete-pentru-dormitor/">dormitor</a> unde ai vrea sa pui un fotoliu si sa te relaxezi, lipsa luminii face ca acele spatii sa fie nefolosite sau pur si simplu neplacute. Aici intervine lampadarul modern pentru colt. El este conceput special sa se potriveasca in aceste zone, oferind lumina necesara fara a ocupa mult spatiu.</p><p>Pentru cine e potrivit? Cred ca pentru oricine isi doreste sa optimizeze spatiul din casa. Daca locuiesti intr-un apartament mai mic, fiecare metru patrat conteaza. Un lampadar de acest gen nu blocheaza accesul, nu ingreuneaza circulatia si, in acelasi timp, aduce un plus de confort vizual si functional.</p>
-        <p>De asemenea, este ideal pentru cei care lucreaza de acasa si au nevoie de o sursa de lumina suplimentara langa birou, dar nu vor sa ocupe spatiu pretios pe masa. Sau pentru pasionatii de lectura, care au nevoie de lumina concentrata, dar nu ostentativa.</p><p>Am incercat sa gasesc solutii de <a href="/corpuri-de-iluminat-pentru-living-modern/">iluminat</a> si inainte, dar multe lampadare traditionale erau prea voluminoase sau nu aveau un design care sa se potriveasca cu stilul casei mele. Lampadarele moderne pentru colt vin cu un design mult mai compact si elegant. Multe au forme slim, minimaliste, care se integreaza discret in decor. Si asta e un mare plus, pentru ca nu vreau ca un obiect de iluminat sa devina punctul central, ci sa completeze ambientul.</p><p>Pe langa functionalitatea de a ilumina, aceste lampadare pot adauga si un element de design. Multe modele au finisaje moderne, cum ar fi metal negru mat, auriu sau crom. Unele au si functii suplimentare, cum ar fi lumina reglabila sau chiar un mic raft integrat.</p>
-        <p>Deci, pe langa a rezolva problema luminii, ele pot deveni si piese de decor statement. Eu personal am avut nevoie sa luminez coltul din sufragerie unde tin cateva plante si o mica biblioteca. Inainte, era un loc intunecos, iar acum a devenit un colt de relaxare, plin de viata.</p><p>Asadar, daca va confruntati cu spatii slab iluminate in casa, daca vreti sa profitati la maximum de fiecare coltisor sau daca pur si simplu cautati o solutie <a href="/corpuri-de-iluminat-pentru-living-modern/" class="interlink">de iluminat</a> moderna si eficienta, un lampadar pentru colt ar putea fi exact ceea ce va trebuie. Este o investitie mica, dar cu un impact mare asupra confortului si esteticii casei dumneavoastra.</p>
-      </section>
-
-      <section id="top-recomandari-lampadare-moderne-pentru-colt-pe-care-le-am-incercat">
-        <h2>Top recomandari: Lampadare moderne pentru colt pe care le-am incercat</h2>
-        <p>Dupa ce am decis ca am nevoie de un astfel de lampadar, am inceput cautarile. Si recunosc, oferta este destul de variata. Am vrut sa va prezint cateva modele care mi-au atras atentia si pe care chiar le-am testat sau le-am studiat indeaproape. Sper sa va fie de ajutor.</p><p><strong>1. Lampadar LED cu design minimalist (pret aproximativ 250 RON)</strong></p><p>Acesta este un model pe care l-am achizitionat pentru living. Are un design foarte simplu, un picior lung si subtire din metal negru mat si un abajur discret in partea de sus. Lumina este calda, placuta, perfecta pentru seara. Ce mi-a placut cel mai mult la el este ca nu ocupa aproape deloc spatiu si se potriveste cu orice stil de decor. Lumina este suficienta pentru a citi sau pentru a crea o atmosfera relaxanta.</p><p><em>Pro:</em> Design minimalist, economie de spatiu, lumina placuta, pret accesibil.</p><p><em>Contra:</em> Nu are functii suplimentare, lumina nu este reglabila ca intensitate.</p><p><strong>2. Lampadar cu brat flexibil si lumina reglabila (pret aproximativ 400 RON)</strong></p><p>Acest model l-am luat pentru zona de birou din dormitor. Avantajul major este ca are un brat flexibil, pe care il pot indrepta exact unde am nevoie de lumina. In plus, lumina se poate regla ca intensitate, de la o lumina ambientala mai slaba, la una mai puternica, potrivita pentru concentrare. Finisajul este tot din metal, intr-o nuanta de gri inchis, care arata foarte bine.</p><p><em>Pro:</em> Brat flexibil, lumina reglabila (intensitate si uneori temperatura de culoare), design modern.</p><p><em>Contra:</em> Pretul este putin mai ridicat, poate fi un pic mai fragil la imbinari daca nu e manevrat cu grija.</p><p><strong>3. Lampadar de colt cu iluminare indirecta (pret aproximativ 350 RON)</strong></p><p>Acesta este un model mai interesant. Nu are un abajur clasic, ci lumina este emisa de sus, in sus, spre tavan. Creeaza un joc de lumina si umbra foarte interesant pe perete si in tavan. Este perfect pentru a crea o atmosfera deosebita, mai mult de ambient. Nu il recomand pentru citit, dar pentru a da un plus de stil camerei, este excelent. Materialul este, de obicei, aluminiu.</p><p><em>Pro:</em> Creeaza o atmosfera unica, design inovator, lumina difuza si placuta.</p><p><em>Contra:</em> Nu este o sursa principala de lumina pentru activitati specifice, poate fi mai scump.</p><p><strong>4. Lampadar cu rafturi integrate (pret aproximativ 500 RON)</strong></p><p>Acesta este un model mai multifunctional. Pe langa faptul ca ilumineaza, are si cateva rafturi pe care poti pune carti, plante mici sau alte obiecte <a href="/plante-artificiale-decorative-pentru-interior/">decorative</a>. Este ideal pentru cei care vor sa maximizeze spatiul. Designul este de obicei din lemn sau MDF, cu un stil mai scandinav sau modern. Lumina este de obicei calda, data de un bec LED.</p><p><em>Pro:</em> Multifunctional (iluminat + depozitare), design practic, se potriveste in diverse stiluri de decor.</p><p><em>Contra:</em> Poate fi mai voluminos decat alte modele, pretul este pe masura functionalitatii.</p><p><strong>5. Lampadar curbat cu LED (pret aproximativ 300 RON)</strong></p><p>Acesta este un model mai sculptural. Are o forma curba, eleganta, care poate deveni un element de design in sine. Lumina LED este integrata si, de obicei, poate fi reglata ca intensitate. Este o optiune buna pentru cei care cauta ceva cu un aer mai artistic. Finisajul este adesea din metal cromat sau negru.</p><p><em>Pro:</em> Design deosebit, lumina LED integrata, reglabila.</p><p><em>Contra:</em> Poate fi mai greu de gasit, pretul poate varia destul de mult in functie de brand.</p><p>Am incercat sa acopar o gama variata de preturi si functionalitati. Alegerea depinde mult de nevoile si preferintele fiecaruia.</p>
-      </section>
-
-      <section id="cum-alegi-corect-lampadarul-modern-pentru-colt">
-        <h2>Cum alegi corect lampadarul modern pentru colt</h2>
-        <p>Stiu, pare simplu sa alegi un lampadar, dar cand vine vorba de cel pentru colt, sunt cateva aspecte pe care eu le consider esentiale si pe care ar trebui sa le aveti in vedere. Nu vreti sa cumparati ceva ce apoi sta si va incomodeaza, nu?</p><p>Primul lucru pe care il analizez mereu este <strong>dimensiunea si forma</strong>. Un lampadar pentru colt trebuie sa se potriveasca in acel spatiu fara sa-l aglomereze. Majoritatea au o baza mai ingusta sau o forma triunghiulara care se muleaza pe perete. Verificati inaltimea – sa fie potrivita pentru zona unde il veti plasa. Daca il puneti langa o masuta, nu vreti sa fie prea inalt si sa deranjeze. Daca il puneti langa o canapea, ar fi ideal sa ajunga cu lumina undeva in zona de citit.</p><p>Apoi, vine <strong>tipul de lumina</strong>. Aici sunt cateva optiuni:</p><ul><li><strong>Lumina directa:</strong> Aceasta vine de obicei de deasupra unui abajur si este buna pentru activitati care necesita concentrare, cum ar fi cititul sau lucrul.</li><li><strong>Lumina indirecta:</strong> Lumina este directionata spre tavan sau perete si se reflecta in camera. Creeaza o atmosfera calda si relaxanta, dar nu este ideala pentru activitati care necesita lumina multa.</li><li><strong>Lumina reglabila:</strong> Unele lampadare vin cu optiunea de a regla intensitatea luminii (dimmer) sau chiar temperatura de culoare (de la alb cald la alb rece). Aceasta este o functie excelenta pentru versatilitate.</li></ul><p><strong>Materialul si finisajul</strong> sunt importante pentru estetica. Lampadarele moderne sunt adesea facute din metal (inox, otel, aluminiu), lemn sau plastic. Finisajele pot fi: negru mat, alb, cromat, auriu, cupru. Alegeti ceva ce se potriveste cu restul mobilierului si decoratiunilor din camera.</p><p><strong>Sursa de lumina</strong> este de obicei LED. Becurile LED sunt economice, au o durata de viata lunga si se incalzesc mai putin. Verificati daca becul este inclus sau daca trebuie achizitionat separat, si daca este usor de inlocuit. Unele modele au LED-uri integrate, care nu se pot schimba, dar au o garantie destul de lunga.</p><p><strong>Functionalitatile suplimentare</strong> pot fi un mare plus. Cum am mentionat, bratele flexibile, rafturile, sau chiar un mic sertar pot face lampadarul mult mai util. Daca aveti spatiu limitat, un model 2-in-1 (lampadar + raft) este o alegere excelenta.</p><p><strong>Pretul</strong> este, evident, un factor. Am observat ca preturile variaza destul de mult, de la modele simple sub 200 RON, la cele mai complexe si de designer care pot ajunge si la 700-800 RON. Sincer sa fiu, cred ca merita sa investiti putin mai mult pentru un produs de calitate, mai ales daca va doriti ceva durabil si cu un design frumos.</p><p>Nu uitati sa cititi <strong>recenziile altor cumparatori</strong>. Parerile celor care au folosit deja produsul va pot oferi informatii valoroase despre calitatea, durabilitatea si usurinta in utilizare. Eu asa am evitat cateva achizitii mai putin inspirate.</p><p>Inainte de a cumpara, masurati spatiul unde vreti sa puneti lampadarul. Este cel mai important pas. Un lampadar prea mare sau prea mic poate strica toata estetica si functionalitatea. Si ganditi-va la prizele din apropiere. Asigurati-va ca cablul ajunge confortabil.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ale-lampadarelor-moderne-pentru-colt">
-        <h2>Avantaje si dezavantaje ale lampadarelor moderne pentru colt</h2>
-        <p>Ca orice produs, si lampadarele moderne pentru colt au plusurile si minusurile lor. Eu incerc mereu sa vad ambele parti ale monedei inainte de a ma hotari. Si cred ca e important sa stiti si voi la ce sa va asteptati.</p><p>Sa incepem cu <strong>avantajele</strong>, ca sunt multe si frumoase.</p><p>Unul dintre cele mai mari avantaje este <strong>optimizarea spatiului</strong>. Daca locuiti intr-un <a href="/aer-conditionat-pentru-apartament-mic/" class="interlink">apartament mic</a> sau pur si simplu vreti sa profitati de fiecare coltisor, aceste lampadare sunt perfecte. Designul lor este gandit sa se potriveasca in acele zone mai greu de utilizat, fara sa blocheze accesul sau sa creeze senzatia de aglomerare.</p><p><strong>Iluminatul suplimentar</strong> este, bineinteles, un avantaj major. Ele aduc lumina acolo unde ai nevoie, fie ca e vorba de o zona de citit, un colt de relaxare sau un spatiu de lucru. Lumina ambientala pe care o creeaza poate transforma complet atmosfera unei camere, facand-o mai primitoare si mai confortabila.</p><p><strong>Designul modern si variat</strong> este un alt punct forte. Astazi gasesti lampadare pentru colt in toate stilurile, de la minimalist si industrial, la scandinav sau chiar mai clasic. Poti gasi usor ceva care sa se potriveasca cu decorul casei tale si chiar sa devina un element de design in sine.</p><p><strong>Versatilitatea</strong> este un alt aspect pe care il apreciez. Multe modele au functii suplimentare: lumina reglabila, brat flexibil, rafturi. Asta inseamna ca un singur obiect poate rezolva mai multe nevoi.</p><p><strong>Eficienta energetica</strong>, mai ales la modelele cu LED, este un avantaj pe termen lung. Consuma mai putina energie si au o durata de viata mai lunga, ceea ce inseamna ca economisesti bani si contribui la protejarea mediului.</p><p>Acum, sa vorbim si despre <strong>dezavantaje</strong>, ca sa fim complet sinceri.</p><p>Un dezavantaj ar putea fi <strong>pretul</strong>, in comparatie cu lampadarele mai simple. Modelele cu design deosebit sau cu functii multiple pot fi destul de scumpe. Totusi, cred ca e o investitie care merita daca produsul este de calitate.</p><p>Unele modele, mai ales cele cu functii complexe sau cu LED-uri integrate, pot fi <strong>mai greu de reparat</strong> daca se defecteaza. Daca un bec se arde la un lampadar clasic, il schimbi usor. La cele cu LED integrat, daca se defecteaza LED-ul, intreg lampadarul poate deveni inutil.</p><p><strong>Calitatea materialelor</strong> poate varia. Nu toate lampadarele sunt facute din materiale premium. Unele modele mai ieftine pot parea fragile sau pot avea finisaje care nu rezista in timp. E important sa verificati recenziile si sa alegeti producatori de incredere.</p><p><strong>Luminozitatea</strong> poate fi uneori insuficienta pentru anumite activitati. Daca vreti sa cititi mult sau sa lucrati, un lampadar cu lumina indirecta sau prea slaba s-ar putea sa nu fie cea mai buna optiune. E bine sa alegeti un model cu lumina directionata sau reglabila.</p><p><strong>Instalarea</strong> poate fi uneori un pic mai dificila, mai ales la modelele mai complexe, dar de obicei vine cu instructiuni clare.</p><p>In concluzie, cred ca avantajele depasesc cu mult dezavantajele, mai ales daca sunteti atenti la ce cumparati. E un obiect care aduce un plus de confort, functionalitate si estetica in casa, daca este ales corect.</p>
-      </section>
-
-      <section id="sfaturi-practice-si-greseli-de-evitat">
-        <h2>Sfaturi practice si greseli de evitat</h2>
-        <p>Am invatat din experienta, si uneori din greseli, cateva lucruri despre achizitionarea si utilizarea lampadarelor moderne pentru colt. Vreau sa va impartasesc si voua, ca sa nu treceti prin aceleasi frustrari.</p><p>Un prim sfat, si cel mai important in opinia mea: <strong>masurati spatiul de 3 ori, cumparati o data</strong>. Nu va bazati doar pe poze. Luati o rula de metru si masurati exact coltul unde vreti sa puneti lampadarul. Ganditi-va la inaltime, latime si adancime. Nu vreti sa cumparati ceva ce nu se potriveste sau care va blocheaza usa sau accesul la fereastra.</p><p><strong>Gresala numarul 1 pe care am facut-o eu:</strong> Am cumparat un lampadar cu un design superb, dar care emana o lumina prea rece. Lumina rece este buna pentru birou, dar pentru zona de relaxare din sufragerie, nu face decat sa creeze o atmosfera clinica. Cautati becuri cu o temperatura de culoare calda (in jur de 2700K-3000K) pentru zonele de relaxare si cele cu lumina neutra sau rece (peste 4000K) pentru zonele de lucru.</p><p><strong>Sfat practic:</strong> Daca este posibil, alegeti un lampadar cu lumina reglabila. Asa, puteti ajusta intensitatea si temperatura de culoare in functie de momentul zilei si de activitatea pe care o desfasurati. Este o investitie care merita din plin.</p><p><strong>Gresala numarul 2:</strong> Am ignorat calitatea materialelor. Am cumparat initial un lampadar foarte ieftin, dar s-a dovedit a fi din plastic de proasta calitate, care s-a zgariat usor si s-a cam deformat in timp. Sincer sa fiu, mai bine investesc un pic mai mult intr-un produs din metal sau lemn, care stiu ca va rezista.</p><p><strong>Sfat practic:</strong> Verificati stabilitatea lampadarului. O baza solida este esentiala, mai ales daca aveti copii sau animale de companie. Un lampadar care se rastoarna usor poate fi periculos.</p><p><strong>Gresala numarul 3:</strong> Am crezut ca toate becurile LED sunt la fel. Nu este asa. Unele becuri LED pot avea un flicker (pâlpâire) imperceptibil pentru ochi, dar care poate cauza oboseala oculara sau dureri de cap pe termen lung. Cautati becuri de calitate, de la producatori recunoscuti.</p><p><strong>Sfat practic:</strong> Ganditi-va la pozitionarea lampadarului fata de prize. Asigurati-va ca cablul de alimentare ajunge confortabil si ca nu va trebui sa folositi prelungitoare inestetice.</p><p><strong>Gresala numarul 4:</strong> Am ales un model prea sofisticat pentru nevoile mele. Avea 5 functii pe care nu le-am folosit niciodata. Mai simplu este adesea mai bun. Daca aveti nevoie doar de o sursa de lumina placuta pentru colt, nu va complicati cu modele prea complexe.</p><p><strong>Sfat practic:</strong> Curatati lampadarul in mod regulat. Praful se acumuleaza si poate diminua intensitatea luminii, mai ales la cele cu abajururi textile. Folositi o carpa moale, uscata sau usor umeda, in functie de material.</p><p><strong>Gresala numarul 5:</strong> Am pus lampadarul intr-un loc unde lumina lui nu era eficienta. De exemplu, am pus un lampadar cu lumina indirecta intr-un colt unde aveam nevoie sa citesc. Nu, nu a functionat. Ganditi-va la scopul principal al lampadarului atunci cand il pozitionati.</p><p><strong>Sfat practic:</strong> Daca aveti un lampadar cu brat flexibil, asigurati-va ca imbinarile sunt suficient de rigide incat sa tina bratul in pozitia dorita. Unele modele pot avea tendinta sa se lase in jos.</p><p>Acestea sunt cateva din lucrurile pe care le-am invatat. Sper sa va fie de folos si sa va ajute sa faceti cea mai buna alegere <a href="/statueta-decorativa-pentru-casa/" class="interlink">pentru casa</a> voastra.</p>
-      </section>
-
-      <section id="parerea-mea-finala-despre-lampadarele-moderne-pentru-colt">
-        <h2>Parerea mea finala despre lampadarele moderne pentru colt</h2>
-        <p>Dupa toata aceasta discutie, cred ca este clar ca eu sunt un mare fan al lampadarelor moderne pentru colt. Le consider niste piese de mobilier esentiale, mai ales in casele de astazi, unde spatiul este adesea o provocare.</p><p>Parerea mea sincera este ca un astfel de lampadar nu este doar un obiect de decor, ci o investitie in confortul si functionalitatea casei tale. El rezolva o problema comuna – spatiile slab iluminate – si o face intr-un mod elegant si eficient. Am observat cum un colt intunecos si nefolosit din sufragerie, unde am plasat un lampadar modern, a devenit brusc un loc primitor, unde pot citi, asculta muzica sau pur si simplu ma pot relaxa.</p><p>Pentru cine as recomanda acest tip de lampadar? Practic, pentru oricine. Daca locuiti intr-un apartament mic, este o solutie excelenta pentru a maximiza spatiul. Daca locuiti intr-o casa mai mare, dar aveti zone pe care vreti sa le puneti in evidenta sau sa le faceti mai confortabile, tot un lampadar pentru colt este ideal. Pentru cei care lucreaza de acasa, este o sursa de lumina suplimentara excelenta, fara a aglomera biroul.</p><p>Personal, prefer modelele cu lumina reglabila si cele cu un design minimalist, care se integreaza usor in orice decor. Dar stiu ca sunt si oameni care cauta piese statement, iar astazi exista o varietate atat de mare incat toata lumea isi poate gasi ceva pe gustul sau. Cele cu functii multiple, cum ar fi rafturile, sunt o optiune fantastica pentru cei care vor sa combine utilitatea cu estetica.</p><p>Cred ca cel mai important este sa alegeti un produs de calitate, care sa va serveasca ani de zile. Nu va fie teama sa investiti un pic mai mult intr-un lampadar bun. Un produs bine facut nu doar ca arata mai bine, dar va si rezista mai mult si va oferi o experienta de utilizare mult mai placuta.</p><p>Inainte de a cumpara, ganditi-va bine la ce aveti nevoie. Aveti nevoie de lumina pentru citit? Vreti doar lumina ambientala? Aveti nevoie de spatiu de depozitare? Raspunsurile la aceste intrebari va vor ghida spre alegerea potrivita.</p><p>In final, sfatul meu este sa nu subestimati puterea unui corp de iluminat bine ales. Un lampadar <a href="/covor-modern-pentru-living/" class="interlink">modern pentru</a> colt poate transforma radical aspectul si atmosfera unei camere, aducand atat lumina, cat si stil. Eu sunt foarte multumit de alegerile pe care le-am facut si nu regret niciun moment investitia.</p><p>Asadar, daca va ganditi sa imbunatatiti aspectul casei dumneavoastra sau pur si simplu aveti nevoie de o sursa de lumina suplimentara, va recomand cu caldura sa luati in considerare un lampadar modern pentru colt. Este o solutie simpla, dar cu un impact vizibil.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inaltime ar trebui sa aiba un lampadar pentru colt?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Inaltimea ideala depinde de locul unde il vei plasa. Pentru citit langa o canapea, ar trebui sa ajunga cu lumina in zona capului. Pentru un colt de camera, o inaltime de 1.5 - 1.8 metri este, de obicei, potrivita. Masoara mereu spatiul inainte.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi un lampadar pentru colt ca sursa principala de lumina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde de model. Lampadarele cu lumina directa si puternica pot fi suficiente pentru camere mici sau ca sursa suplimentara. Totusi, pentru majoritatea camerelor, sunt recomandate ca iluminat ambiental sau secundar, completand lumina plafonierei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce tip de bec este cel mai bun pentru un lampadar modern?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Becurile LED sunt cea mai buna optiune. Sunt economice, au o durata de viata lunga si se incalzesc mai putin. Alege temperatura de culoare potrivita: calda pentru relaxare, neutra sau rece pentru activitati care necesita concentrare.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum aleg finisajul potrivii?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Finisajul ar trebui sa se asorteze cu restul mobilierului si decoratiunilor din camera. Negrul mat, cromul si auriul sunt optiuni populare pentru stilul modern. Lemnul adauga o nota calda, potrivita pentru stiluri scandinave sau rustice.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Sunt lampadarele pentru colt greu de asamblat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea modelelor vin cu instructiuni clare si sunt relativ usor de asamblat. De obicei, implica fixarea bazei, a piciorului si a abajurului. Unele modele mai complexe pot necesita un pic mai mult efort, dar nu este nimic complicat.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Care este diferenta intre un lampadar pentru colt si unul normal?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Lampadarul pentru colt are o baza si o forma concepute special pentru a se potrivi in colturile camerei, ocupand mai putin spatiu si integrandu-se discret. Lampadarele normale pot fi plasate oriunde si au forme mai variate, uneori mai voluminoase.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Daca vrei o lampa LED de colt cu efecte, cea mai completa e <strong>Qova RGB Smart</strong>, cu 16 milioane de culori, 1000 de lumeni si control din aplicatie. Cea mai vanduta e <strong>Bedee RGB</strong>, iar cea mai ieftina, <strong>Omelivon</strong>, tot cu sincronizare pe muzica. Daca preferi o lumina clasica, calda, intr-un colt de citit, <strong>HOMCOM</strong> e cel mai inalt, cu aprindere la picior.</p>
+      <p>E o categorie de nisa, cu multe <strong>modele noi, care au inca putine pareri</strong>, asa ca am ales pe cele mai bine cotate si le-am marcat cinstit unde recenziile sunt putine. Mai jos gasesti direct recomandarile, impartite in lampi <strong>RGB de colt</strong>, pentru culoare si gaming, si <strong>lampadare clasice</strong> de podea, pentru o lumina calda si decorativa. Dupa produse, un ghid scurt despre cum alegi. Vezi si <a href="/corpuri-de-iluminat-pentru-living-modern/">corpurile de iluminat pentru living</a> si <a href="/veioza-pentru-noptiera/">veiozele de noptiera</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#rgb">Lampadare LED RGB de colt</a></li>
+        <li><a href="#clasic">Lampadare clasice de podea</a></li>
+        <li><a href="#cum-alegi">Cum alegi o lampa de colt</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Inaltime</th><th>Tip</th><th>Control</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.inaltime}</td>
+              <td>{x.tip}</td>
+              <td>{x.control}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="rgb">Lampadare LED RGB de colt</h2>
+    <p>Lampi subtiri de podea, pentru colt, cu lumina colorata, jocuri de lumini si, la cele mai multe, sincronizare cu muzica si control din aplicatie. Sunt cautate pentru gaming, pentru ambianta din living sau ca lumina in spatele televizorului. Multe sunt modele noi, cu putine pareri inca.</p>
+    <div class="rd-grid">
+      {RGB.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figRgb} alt="Lampadare LED RGB de colt: Qova, Bedee, Omelivon, NUODWELL" width="1200" height="675" loading="lazy" />
+
+    <h2 id="clasic">Lampadare clasice de podea</h2>
+    <p>Daca vrei o lumina calda si fixa intr-un colt de citit sau de relaxare, nu jocuri de culori, un lampadar clasic e alegerea. Da lumina utila si e, in acelasi timp, o piesa de decor, cu baza stabila si, la unele, aprindere comoda la picior.</p>
+    <div class="rd-grid">
+      {CLASIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figClasic} alt="Lampadare clasice de podea: Pako World, Ebro Retro, HOMCOM" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-lampadar-colt').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate lampadarele de colt la oferta</strong>
+        <span>Reducerile din acest moment la lampadare si lampi de podea, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cum-alegi">Cum alegi o lampa de colt</h2>
+    <p>Dupa ce te decizi intre RGB si clasic, cateva lucruri fac diferenta reala intre doua modele.</p>
+
+    <h3>RGB de colt sau lampadar clasic</h3>
+    <p>E prima alegere si tine de ce vrei de la coltul respectiv. O <strong>lampa RGB</strong> e despre culoare, efecte si atmosfera moderna: milioane de culori, jocuri de lumini, sincronizare cu muzica, potrivita pentru gaming, petreceri sau un living tanar. Un <strong>lampadar clasic</strong> da o lumina fixa, de obicei calda, si e mai mult o piesa de mobilier care lumineaza si decoreaza, buna pentru un colt de citit, intr-un decor clasic. Daca vrei culoare si control din telefon, alegi RGB; daca vrei lumina utila si aspect traditional, alegi clasicul.</p>
+
+    <h3>Luminozitatea si temperatura culorii</h3>
+    <p>La lampile RGB, luminozitatea variaza mult: multe dau in jur de <strong>150 de lumeni</strong>, suficient pentru ambianta, dar nu pentru a lumina o camera, in timp ce modelul Qova din selectie ajunge la 1000 de lumeni, vizibil mai mult. Daca vrei si lumina utila, nu doar decor, cauta lumeni multi. La lampadarele clasice cu bec la alegere, tu decizi temperatura culorii: <strong>2700-3000K</strong> pentru o lumina calda, relaxanta, buna intr-un colt de citit sau in dormitor, si spre 4000K pentru o lumina mai neutra, de lucru.</p>
+
+    <h3>Controlul: telecomanda, aplicatie, muzica</h3>
+    <p>La modelele RGB, felul in care le comanzi conteaza mult. Aproape toate au <strong>telecomanda</strong>, cu care schimbi culoarea, intensitatea si modul. Cele mai bune se controleaza si din <strong>aplicatia de pe telefon</strong>, cu mai multe scenarii si reglaj fin, cum sunt Qova, Bedee, Omelivon si NUODWELL din selectie. Iar <strong>sincronizarea cu muzica</strong> face lampa sa isi schimbe culorile in ritmul sunetului, un efect cautat la gaming si petreceri. Daca vrei control din aplicatie, verifica in descriere ca modelul chiar il are, nu doar telecomanda.</p>
+
+    <h3>Inaltimea, amplasarea si stabilitatea</h3>
+    <p>Inaltimile merg de la circa <strong>100 la 160 cm</strong>. Una inalta, de 150-160 cm, are mai multa prezenta si lumineaza o suprafata mai mare de perete, potrivita in living sau langa un televizor mare; una mai scunda, de 100-120 cm, e discreta, buna la birou sau in dormitor. Aseaz-o intr-un colt, ideal langa televizor sau in spatele lui pentru efect de lumina pe perete, sau langa un fotoliu de citit la modelele clasice. Verifica <strong>baza</strong>: una mai lata si mai grea sta stabil si nu se rastoarna usor, mai ales daca ai copii sau animale in casa.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>E o categorie accesibila, cu preturi mici:</p>
+    <p><strong>Lampi RGB de colt:</strong> de la circa 70 de lei pentru un model de intrare, ca Omelivon, pana spre 210-235 de lei pentru cele mai dotate, cu 1000 de lumeni, control din aplicatie si multe scenarii, ca Qova.</p>
+    <p><strong>Lampadare clasice:</strong> in general 145-315 lei, in functie de inaltime, materiale si detalii, de la modelul simplu Pako World pana la Ebro retro din lemn si bronz sau HOMCOM cu comutator de picior.</p>
+    <p>Fiind o categorie de nisa, cu multe modele noi, uita-te nu doar la pret, ci si la numarul de pareri: unde recenziile sunt putine, mergi pe specificatii clare, control din aplicatie si un brand cu descriere serioasa. Langa pat, vezi si <a href="/aplica-de-perete-pentru-dormitor/">aplicele de perete pentru dormitor</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria lucreaza de 8 ani in design interior, cu accent pe iluminat, textile si amenajarea spatiilor de zi si de noapte. A colaborat cu peste 200 de clienti pentru transformarea locuintelor in spatii calde si functionale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="lampadar-modern-pentru-colt"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="lampadar-modern-pentru-colt"
-      currentCategory="decoratiuni-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="lampadar-modern-pentru-colt" currentCategory="decoratiuni-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="lampadar-modern-pentru-colt" currentCategory="decoratiuni-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

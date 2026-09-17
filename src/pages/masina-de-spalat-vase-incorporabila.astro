@@ -1,232 +1,320 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Masina de spalat vase incorporabila",
-  excerpt: "Am cam uitat cum era viata inainte sa am masina asta de spalat vase incorporabila. Nu-mi vine sa cred cat timp castig si cat de curate sunt vasele. Azi vorbim despre ele, sper sa va ajute sa va decideti.",
-  image: "/images/articles/masina-de-spalat-vase-incorporabila.webp",
-  category: "Electrocasnice Casa",
-  categorySlug: "electrocasnice-casa",
-  date: "2026-01-17T17:41:43.578Z",
-  modifiedDate: "2026-01-30T17:41:43.526Z",
-  author: "Cristian Popa",
-  authorRole: "Specialist Electrocasnice",
-  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
-};
-
-const faq = [
-  { question: "Cat de mult curent consuma o masina de spalat vase incorporabila?", answer: "Consumul variaza in functie de clasa energetica si de programul ales. Modelele eficiente, cu clasa energetica A, consuma intre 0.8 si 1 kWh pe ciclu. Programul Eco este cel mai economic. Verificati specificatiile fiecarui model pentru cifre exacte." },
-  { question: "Cat de des trebuie curatat filtrul?", answer: "Ideal, filtrul ar trebui curatat saptamanal sau cel mult o data la doua saptamani, in functie de cat de des folositi masina si de cat de murdare sunt vasele. Un filtru curat asigura o buna functionare si previne mirosurile neplacute." },
-  { question: "Ce detergent e mai bun: pudra, tablete sau gel?", answer: "Toate tipurile de detergent au avantaje. Tabletele sunt comode, dar nu mereu doza e potrivita pentru gradul de murdarie. Pudra permite dozare personalizata. Gelul e bun pentru vase mai delicate. Cel mai bine e sa incercati mai multe tipuri si sa vedeti ce vi se potriveste." },
-  { question: "Pot spala oale si tigai in masina de spalat vase?", answer: "Majoritatea oalelor si tigailor moderne, din inox sau cu strat antiaderent, pot fi spalate in masina. Verificati instructiunile producatorului. Evitati sa spalati oale cu manere din lemn sau tigai din aluminiu, deoarece se pot deteriora." },
-  { question: "Cat timp dureaza un ciclu de spalare?", answer: "Un ciclu normal poate dura intre 1.5 si 3 ore. Programele rapide sunt mult mai scurte, de obicei intre 30 si 60 de minute, dar nu la fel de eficiente pentru vase foarte murdare." },
-  { question: "Ce inseamna clasa de eficienta energetica A+++ (noua scara)?", answer: "Pe noua scara de eficienta energetica (de la G la A), clasa A reprezinta cele mai eficiente aparate. Cu cat litera e mai aproape de A (A, B, C), cu atat consumul de energie si apa este mai mic. Cautati modelele cu clasa A." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de o masina de spalat vase incorporabila", id: "de-ce-ai-nevoie-de-o-masina-de-spalat-vase-incorporabila" },
-  { title: "Top recomandari masini de spalat vase incorporabile", id: "top-recomandari-masini-de-spalat-vase-incorporabile" },
-  { title: "Cum alegi corect masina de spalat vase incorporabila", id: "cum-alegi-corect-masina-de-spalat-vase-incorporabila" },
-  { title: "Avantaje si dezavantaje ale masinii de spalat vase incorporabile", id: "avantaje-si-dezavantaje-ale-masinii-de-spalat-vase-incorporabile" },
-  { title: "Sfaturi practice din experienta mea", id: "sfaturi-practice-din-experienta-mea" },
-  { title: "Parerea mea finala despre masina de spalat vase incorporabila", id: "parerea-mea-finala-despre-masina-de-spalat-vase-incorporabila" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['masina-spalat-vase'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- 60 cm ---
+  { g: 'l60', id: 'DQ7CXWBBM', badge: 'Cel mai vandut', short: 'Bosch 13 seturi', lat: '60 cm', set: '13 seturi', clasa: 'E',
+    specs: ['60 cm, 13 seturi de vase', 'clasa E, 6 programe', 'protectie impotriva inundatiilor', 'de departe cea mai vanduta, 188 de pareri'],
+    pros: ['De departe cea mai vanduta din selectie, 188 de pareri', 'Bosch, brand de referinta la masini de spalat vase', 'Protectie impotriva inundatiilor', '13 seturi, bine pentru o familie'],
+    cons: ['Clasa E, nu cea mai eficienta', 'Doar 6 programe, fara extra-uri sofisticate'],
+    verdict: 'Cea mai sigura alegere pentru o bucatarie normala, de la brandul de referinta. Bosch SMV46KX are 60 cm latime si 13 seturi, adica incape vesela unei familii dupa o masa completa, plus protectie impotriva inundatiilor, care opreste apa daca apare o scurgere, un plus real de siguranta la un incorporabil ascuns in mobila. E de departe cea mai vanduta din selectie, cu 188 de pareri si nota 4.49, cea mai buna dovada ca merge si tine. E clasa E, nu cea mai eficienta pe noua scala, si are 6 programe, suficiente pentru uz zilnic, fara extra-uri sofisticate. O iei cand vrei o masina Bosch verificata de mii de oameni, cu capacitate buna si siguranta, pentru o familie, si nu insisti pe cea mai mica clasa de consum.' },
+  { g: 'l60', id: 'DZ5HNXMBM', badge: 'Cel mai bun raport', short: 'Beko 13 seturi', lat: '60 cm', set: '13 seturi', clasa: 'E',
+    specs: ['60 cm, 13 seturi', 'clasa E, protectie inundatii', 'indicator de sare', 'pret mic pentru 13 seturi'],
+    pros: ['Cel mai mic pret pentru un 60 cm de 13 seturi', 'Beko, brand mare cu service extins', 'Protectie impotriva inundatiilor', 'Nota buna, 4.51'],
+    cons: ['Doar 4 programe', 'Clasa E'],
+    verdict: 'Cel mai bun raport pret-capacitate din grupul de 60 cm. Beko BDIN14320 are aceleasi 13 seturi ca modelul Bosch de top, la un pret vizibil mai mic, deci iei aceeasi capacitate pentru o familie cu mai putini bani. Vine de la Beko, un brand mare cu una dintre cele mai extinse retele de service la noi, si are protectie impotriva inundatiilor. E clasa E si are doar 4 programe, mai putine decat altele, dar cele de baza, eco, intensiv, rapid, acopera nevoile obisnuite. Are nota buna, 4.51. O iei cand vrei cea mai ieftina masina de 60 cm cu 13 seturi de la un brand serios, si nu ai nevoie de multe programe speciale.' },
+  { g: 'l60', id: 'DRSSHQBBM', badge: 'Nota mare, clasa D', short: 'Electrolux 13 seturi', lat: '60 cm', set: '13 seturi', clasa: 'D',
+    specs: ['60 cm, 13 seturi, clasa D', '8 programe, cele mai multe din grup', 'auto-curatare si oprire automata', 'nota 4.67 din 110 pareri'],
+    pros: ['Clasa D, mai eficienta decat modelele clasa E', 'Cele mai multe programe, 8', 'Auto-curatare, isi intretine singura interiorul', 'Nota mare, 4.67, din multe pareri'],
+    cons: ['Mai scumpa decat Beko de aceeasi capacitate', 'Fara capacitatea extra a modelelor de 14-15 seturi'],
+    verdict: 'Alegerea daca vrei mai multa eficienta si mai multe programe, la o capacitate buna. Electrolux EES47320L are 13 seturi si e clasa D, cu o treapta mai eficienta decat modelele clasa E, deci consuma ceva mai putin pe termen lung. Are cele mai multe programe din grupul de 60 cm, 8, si o functie de auto-curatare care ii intretine singura interiorul, plus oprire automata. E foarte bine cotata, cu 4.67 din 110 pareri, semn ca lumea e multumita. Costa mai mult decat Beko de aceeasi capacitate si nu are volumul extra al modelelor de 14-15 seturi. O iei cand pui pret pe eficienta, pe programe multe si pe o nota mare, pentru o familie, si accepti un pret ceva mai ridicat.' },
+  { g: 'l60', id: 'DCFT3TYBM', badge: 'Capacitate mare', short: 'Beko 15 seturi', lat: '60 cm', set: '15 seturi', clasa: 'D',
+    specs: ['60 cm, 15 seturi, cea mai incapatoare', 'clasa D, 6 programe', 'protectie impotriva inundatiilor', 'nota 4.67'],
+    pros: ['15 seturi, cea mai mare capacitate din selectie', 'Clasa D, eficienta buna', 'Ideala pentru familii mari sau spalat rar', 'Nota mare, 4.67'],
+    cons: ['Incarci mai rar la maxim daca esti putini', 'Mai putine pareri, 30'],
+    verdict: 'Alegerea pentru o familie mare sau pentru cine spala vasele mai rar, dar mult. Beko BDIN36535 are 15 seturi, cea mai mare capacitate din selectie, deci incape vesela de la mese numeroase, oale si tavi mari, fara sa faci doua cicluri. E clasa D, cu eficienta buna, si are protectie impotriva inundatiilor. Are nota mare, 4.67, chiar daca din mai putine pareri, 30. Daca sunteti putini in casa, o incarci rar la maxim, dar avantajul e ca poti aduna vasele pe doua-trei zile si sa speli o data. O iei cand vrei cea mai mare capacitate, pentru o familie numeroasa sau pentru cine gateste mult si vrea sa spele mai rar.' },
+  { g: 'l60', id: 'D29MY5YBM', badge: 'Cel mai eficient', short: 'Bosch 14 seturi, clasa B', lat: '60 cm', set: '14 seturi', clasa: 'B',
+    specs: ['60 cm, 14 seturi, clasa B', 'cea mai eficienta din selectie', 'Bosch, 6 programe', 'nota maxima, 5 din 5'],
+    pros: ['Clasa B, de departe cea mai eficienta din selectie', '14 seturi, capacitate mare', 'Bosch, fiabilitate de referinta', 'Nota maxima, 5 din 5'],
+    cons: ['Pret de gama superioara', 'Mai putine pareri, 29'],
+    verdict: 'Alegerea daca vrei cel mai mic consum si esti dispus sa platesti pentru el. Bosch SMV4EVX11E e clasa B, singura din selectie care urca atat de sus pe noua scala energetica, unde A e maximul si foarte greu de atins: asta inseamna cel mai mic consum de curent si apa dintre toate, o economie care se aduna pe factura in anii de folosire. Are 14 seturi, deci si capacitate mare, si vine cu fiabilitatea Bosch. A luat nota maxima, 5 din 5, din 29 de pareri. E in zona de pret superioara, normal pentru clasa B. O iei cand privesti pe termen lung si vrei cea mai economica masina, cu volum mare si brand de top, si nu te opresti la pretul de la raft.' },
+  { g: 'l60', id: 'D5VVPDMBM', badge: 'Cel mai ieftin', short: 'Heinner 12 seturi', lat: '60 cm', set: '12 seturi', clasa: 'E',
+    specs: ['60 cm, 12 seturi', 'clasa E, 6 programe', 'protectie impotriva inundatiilor', 'cel mai mic pret pentru un 60 cm'],
+    pros: ['Cel mai mic pret din grupul de 60 cm', '12 seturi, suficient pentru multe familii', 'Protectie impotriva inundatiilor', '6 programe'],
+    cons: ['Brand mai putin cunoscut', 'Clasa E, nota 4.21'],
+    verdict: 'Cea mai accesibila masina de spalat vase de 60 cm incorporabila din selectie. Heinner HDW-BI6006 are 12 seturi, cu doar unul mai putin decat modelele de 13, suficient pentru multe familii, la cel mai mic pret din grupul de 60 cm. Are 6 programe si protectie impotriva inundatiilor, deci nu lipseste ce conteaza. E de la un brand mai putin cunoscut decat Bosch sau Electrolux, clasa E, cu o nota buna, 4.21, mai modesta decat la varf. O iei cand vrei o masina de 60 cm cu capacitate buna la cel mai mic pret posibil, pentru o bucatarie normala, si nu insisti pe brand sau pe cea mai buna clasa energetica.' },
+  // --- 45 cm ---
+  { g: 'l45', id: 'D54VMDMBM', badge: 'Cel mai vandut slim', short: 'Electrolux 9 seturi', lat: '45 cm', set: '9 seturi', clasa: 'F',
+    specs: ['45 cm, 9 seturi, pentru bucatarii mici', 'clasa F, 5 programe', 'semnal sonor la final', 'de departe cel mai vandut slim, 179 de pareri'],
+    pros: ['De departe cel mai vandut model slim, 179 de pareri', 'Nota mare, 4.77, cea mai buna din grupul de 45 cm', 'Electrolux, brand consacrat', 'Doar 45 cm, incape in bucatarii mici'],
+    cons: ['Clasa F, mai putin eficienta', '9 seturi, pentru 1-3 persoane'],
+    verdict: 'Cea mai buna alegere slim, verificata de cei mai multi cumparatori. Electrolux EEA71210L are 45 cm latime, deci intra intr-o bucatarie mica sau intr-un spatiu ingust unde un model de 60 cm nu are loc, si spala 9 seturi, suficient pentru 1-3 persoane. E de departe cel mai vandut model de 45 cm din selectie, cu 179 de pareri si nota 4.77, cea mai buna din grupul slim, semn ca isi face treaba bine. E clasa F, mai putin eficienta, un compromis obisnuit la modelele inguste, si are 5 programe. O iei cand ai o bucatarie mica sau sunteti putini in casa si vrei cel mai testat si mai bine cotat model slim, de la un brand consacrat.' },
+  { g: 'l45', id: 'D1VVPDMBM', badge: 'Cel mai ieftin', short: 'Heinner 10 seturi', lat: '45 cm', set: '10 seturi', clasa: 'E',
+    specs: ['45 cm, 10 seturi', 'clasa E, 6 programe', 'protectie impotriva inundatiilor', 'cel mai mic pret din selectie'],
+    pros: ['Cel mai mic pret din toata selectia', '10 seturi, mai mult decat multe modele slim', 'Clasa E, mai buna decat unele slim clasa F', 'Protectie impotriva inundatiilor'],
+    cons: ['Brand mai putin cunoscut', 'Nota 4.36, buna fara sa fie in top'],
+    verdict: 'Cea mai ieftina masina de spalat vase din toata selectia, si tot slim. Heinner HDW-BI4506 are 45 cm si, surprinzator, 10 seturi, cu unul mai mult decat multe modele slim de 9, la cel mai mic pret de aici. E clasa E, adica mai eficienta decat modelele slim clasa F, si are 6 programe plus protectie impotriva inundatiilor. Vine de la un brand mai putin cunoscut si are o nota buna, 4.36, fara sa fie in varf. E alegerea logica pentru o bucatarie mica, cu buget strans, unde vrei totusi capacitate decenta si functiile de baza. O iei cand cauti cel mai mic pret pentru un incorporabil de 45 cm si nu conteaza brandul.' },
+  { g: 'l45', id: 'DLWK52BBM', badge: 'Accesibil, Hansa', short: 'Hansa 9 seturi', lat: '45 cm', set: '9 seturi', clasa: 'E',
+    specs: ['45 cm, 9 seturi, clasa E', '4 programe, pornire programabila', 'indicator de sare', 'incarcare la jumatate'],
+    pros: ['Clasa E la un pret mic', 'Pornire programabila, o lasi sa spele noaptea', 'Functie de incarcare la jumatate, pentru putine vase', 'Bine vanduta, 78 de pareri'],
+    cons: ['Doar 4 programe', 'Nota 4.29, mai modesta'],
+    verdict: 'O alternativa slim accesibila, cu doua functii practice. Hansa ZIM 434 B are 45 cm si 9 seturi, e clasa E si vine cu pornire programabila, deci o lasi sa porneasca noaptea cand curentul e mai ieftin sau ca sa gasesti vasele curate dimineata, plus o functie de incarcare la jumatate, utila cand ai putine vase si nu vrei sa consumi ca pentru un ciclu plin. Are 4 programe si o nota mai modesta, 4.29, din 78 de pareri, deci e bine vanduta. O iei cand vrei un incorporabil de 45 cm ieftin, clasa E, cu pornire programabila si optiune de jumatate de incarcare, si nu ai nevoie de multe programe.' },
+  { g: 'l45', id: 'D4V772MBM', badge: 'Bosch, premium slim', short: 'Bosch 9 seturi', lat: '45 cm', set: '9 seturi', clasa: 'F',
+    specs: ['45 cm, 9 seturi, Bosch', 'functionare silentioasa', 'senzor de incarcare, ajusteaza ciclul', '5 programe, nota 4.85'],
+    pros: ['Bosch, cea mai buna nota din grupul de 45 cm, 4.85', 'Functionare silentioasa', 'Senzor de incarcare, adapteaza apa si timpul', 'Fiabilitate si constructie Bosch'],
+    cons: ['Cel mai scump din grupul slim', 'Clasa F'],
+    verdict: 'Alegerea slim premium, pentru cine vrea un Bosch chiar intr-o bucatarie mica. Bosch SPV2IKX10E are 45 cm si 9 seturi, cu functionare silentioasa, un plus real intr-o bucatarie deschisa spre living, si un senzor de incarcare care detecteaza cat de multe vase ai pus si ajusteaza automat consumul de apa si durata ciclului, deci nu iroseste cand speli putin. Are cea mai buna nota din grupul de 45 cm, 4.85, cu fiabilitatea si constructia Bosch in spate. E cel mai scump din grupul slim si e clasa F. O iei cand vrei brandul Bosch si spalare silentioasa, inteligenta, intr-un format ingust, si esti dispus sa platesti pentru asta.' },
+  { g: 'l45', id: 'D4BX13MBM', badge: 'Clasa D, eficient', short: 'Electrolux 9 seturi, clasa D', lat: '45 cm', set: '9 seturi', clasa: 'D',
+    specs: ['45 cm, 9 seturi, clasa D', 'cea mai eficienta din grupul slim', '8 programe, cele mai multe', 'oprire automata, nota 4.65'],
+    pros: ['Clasa D, cea mai eficienta din grupul de 45 cm', 'Cele mai multe programe din grupul slim, 8', 'Electrolux, brand consacrat', 'Nota mare, 4.65'],
+    cons: ['Mai scumpa decat modelele slim de baza', 'Mai putine pareri, 37'],
+    verdict: 'Alegerea slim daca vrei cea mai buna clasa energetica si multe programe. Electrolux EEG62300L are 45 cm si 9 seturi, dar e clasa D, cea mai eficienta din grupul slim, unde majoritatea sunt clasa E sau F, deci consuma mai putin pe termen lung. Are 8 programe, cele mai multe dintre modelele de 45 cm, si oprire automata, plus nota mare, 4.65. Costa mai mult decat modelele slim de baza si are ceva mai putine pareri, 37. O iei cand ai o bucatarie mica, dar nu vrei sa faci compromis la eficienta si la programe, si preferi un Electrolux clasa D in loc de un model slim clasa F mai ieftin.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const L60 = PICKS.filter(x => x.g === 'l60');
+const L45 = PICKS.filter(x => x.g === 'l45');
+
+const hero = '/images/articles/masina-de-spalat-vase-incorporabila.webp';
+const fig60 = '/imagini/articole/masina-vase-60.webp';
+const fig45 = '/imagini/articole/masina-vase-45.webp';
+const published = '2026-07-18T19:41:47+03:00';
+
+const faq = [
+  { question: 'Masina de spalat vase de 45 sau de 60 cm, care mi se potriveste?', answer: 'Alegerea depinde de spatiul din bucatarie si de cati sunteti in casa. Un model de 60 cm, cel standard, spala 12-16 seturi si e potrivit pentru familii sau pentru cine gateste si spala mult; are nevoie de un gol de mobila de 60 cm. Unul de 45 cm, slim, spala 9-10 seturi, potrivit pentru 1-3 persoane sau pentru bucatarii mici, unde un model de 60 cm nu incape. Regula simpla: daca ai loc, ia 60 cm pentru capacitatea mai mare; daca spatiul e limitat sau sunteti putini, cei 45 cm iti dau functionalitatea completa intr-un format compact.' },
+  { question: 'Cate seturi de vase imi trebuie?', answer: 'Un set inseamna vesela folosita de o persoana la o masa completa, farfurii, pahar, tacamuri. Un model de 45 cm are in general 9-10 seturi, suficient pentru 1-3 persoane, iar unul de 60 cm are 12, 13, 14 sau chiar 15 seturi, pentru familii de 3-5 persoane sau mai mari. Nu trebuie sa umpli masina la fiecare masa: multi aduna vasele pe o zi sau doua si spala o data, plin, ceea ce e si mai economic. Daca gatesti des si cu oale si tavi mari, alege mai multe seturi, ca modelul Beko de 15 din selectie, ca sa incapa tot.' },
+  { question: 'Ce inseamna clasa energetica la o masina de spalat vase?', answer: 'UE a schimbat vechea scala, cu A+++ pana la D, cu una noua, mai simpla si mai stricta, de la A la G. Pe noua scala, clasa A e cea mai eficienta si foarte greu de atins, iar majoritatea masinilor bune sunt intre clasa B si F. In selectie, cea mai eficienta e modelul Bosch clasa B, urmat de cateva clasa D, ca Electrolux, in timp ce multe modele accesibile sunt clasa E sau F. O clasa mai buna inseamna consum mai mic de curent si apa, deci facturi mai mici in timp; pe eticheta gasesti si consumul exact de apa pe ciclu, util pentru comparat.' },
+  { question: 'Cat de silentioasa e o masina de spalat vase incorporabila?', answer: 'Destul de silentioasa, mai ales ca sunet e atenuat de mobila in care e ascunsa. Cele mai linistite modele coboara sub 43 dB, aproape imperceptibil, iar zgomotul conteaza cel mai mult daca bucataria e deschisa spre living sau daca o pornesti seara. Modelele cu functionare silentioasa marcata, ca Bosch din selectie, sunt gandite exact pentru asta. Pentru ca e incorporabila, nivelul real perceput e si mai mic decat cifra de pe eticheta, pentru ca panoul de mobila si golul o izoleaza. Daca stai mult in bucatarie, cauta un model cu un nivel de zgomot cat mai mic.' },
+  { question: 'Ce e o masina complet incorporabila si cum difera de una partial?', answer: 'O masina complet incorporabila se ascunde total in mobila de bucatarie: pe usa ei se monteaza un panou identic cu restul fronturilor, iar panoul de comenzi e pe muchia de sus a usii, invizibil cand usa e inchisa, deci arata ca un simplu dulap. Toate modelele din aceasta selectie sunt complet incorporabile. La una partial incorporabila, panoul de comenzi ramane vizibil pe fata, deci se vede ca e o masina. Complet incorporabila da un aspect mai curat si mai unitar bucatariei, ideal daca vrei ca electrocasnicele sa dispara in mobilier.' },
+  { question: 'Cum usuca vasele o masina de spalat vase?', answer: 'Prin mai multe metode, in functie de model. Cea mai simpla e uscarea prin condensare, in care vasele se incalzesc la clatire, apoi apa se evapora si se condenseaza pe peretii mai reci ai masinii; e eficienta, dar cere ceva timp si e bine sa lasi usa intredeschisa la final. Modelele mai avansate folosesc un ventilator care circula aer cald, pentru uscare mai rapida si mai completa, iar unele premium au sisteme cu minerale care absorb umezeala. Pentru vase perfect uscate din prima, cauta un model cu uscare activa, cu ventilator; pentru un pret mai mic, uscarea prin condensare face treaba, cu putina rabdare.' },
+  { question: 'Consuma multa apa o masina de spalat vase?', answer: 'Mai putina decat spalatul manual, contrar a ce cred multi. O masina moderna foloseste in general intre 9 si 12 litri de apa pentru un ciclu complet, in timp ce spalatul acelorasi vase la robinet poate consuma de cateva ori mai mult. Consumul exact de apa e trecut pe eticheta energetica, alaturi de clasa, si merita comparat intre modele. Programele eco folosesc cea mai putina apa si energie, spaland la temperatura mai mica, dar pe durata mai lunga. Deci, pe langa timpul economisit, o masina de spalat vase te ajuta si la factura de apa, mai ales daca folosesti programul eco.' },
+  { question: 'Cat costa o masina de spalat vase incorporabila buna?', answer: 'In selectie, un model bun, de la un brand cunoscut, porneste de la circa 1470-1600 de lei, cazul modelelor Heinner, Beko sau Electrolux slim, cele mai accesibile. Modelele de 60 cm de la branduri mari, cu 13 seturi si clasa D, sunt in general 1950-2200 de lei. Cele premium, cu clasa B, capacitate mare sau brand de top ca Bosch, trec de 2600 si urca spre 3000 de lei si peste. Pe langa pret, tine cont de clasa energetica si de capacitate: o masina potrivita ca marime si eficienta se dovedeste in timp mai ieftina decat una ieftina, dar risipitoare sau prea mica.' },
+];
+
+const images = [hero, fig60, fig45, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Masina de spalat vase incorporabila - CentroCasa"
-  description="Am cam uitat cum era viata inainte sa am masina asta de spalat vase incorporabila. Nu-mi vine sa cred cat timp castig si cat de curate sunt vasele. Azi vorbim despre ele, sper sa va ajute sa va decideti."
-  image="/images/articles/masina-de-spalat-vase-incorporabila.webp"
+  title="Cele mai bune masini de spalat vase incorporabile in 2026: 45 si 60 cm, pe capacitate si buget"
+  description="Care sunt cele mai bune masini de spalat vase incorporabile in 2026, pe dimensiune: modele de 60 cm pentru familie si de 45 cm slim pentru bucatarii mici, de la Bosch, Electrolux, Beko, Hansa si Heinner, comparate pe numar de seturi, clasa energetica si zgomot. Plus cum alegi si de cat spatiu ai nevoie."
+  image={hero}
   type="article"
-  publishedTime="2026-01-17T17:41:43.578Z"
-  modifiedTime="2026-01-30T17:41:43.526Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Cristian Popa"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune masini de spalat vase incorporabile' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/electrocasnice-casa/">Electrocasnice Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Masina de spalat vase incorporabila</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune masini de spalat vase incorporabile</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/electrocasnice-casa/" class="article-category">Electrocasnice Casa</a>
-        <span class="article-date">1 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Masina de spalat vase incorporabila</h1>
-    </header>
+    <h1>Cele mai bune masini de spalat vase incorporabile</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/masina-de-spalat-vase-incorporabila.webp" alt="Masina de spalat vase incorporabila" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune masini de spalat vase incorporabile: modele de 45 si 60 cm" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-o-masina-de-spalat-vase-incorporabila">
-        <h2>De ce ai nevoie de o masina de spalat vase incorporabila</h2>
-        <p>Hai sa fim sinceri, cine mai are chef sa stea sa spele vase dupa o zi lunga? Eu, de exemplu, detest momentul ala. Ma gandesc mereu la cat timp pierd si la cate alte lucruri as putea face. Si apoi, sa fim corecti, masina de spalat vase spala mult mai bine decat mine, mai ales la capitolul grasime si pete. Nu mai am grija aia cu buretele murdar si detergentul care nu prea face fata la tot.</p><p>Stiu, poate va ganditi ca e un lux. Initial si eu am stat pe ganduri. Dar cand am pus in balanta timpul castigat, efortul salvat si rezultatele, mi-am dat seama ca e de fapt o investitie. Mai ales daca aveti o <a href="/frigider-side-by-side-pentru-familie/">familie</a> numeroasa sau pur si simplu vreti sa va bucurati mai mult de timpul liber, o masina de spalat vase e chiar o solutie. Nu mai stai sa te gandesti daca ai destule farfurii curate pentru invitati sau daca oala aia de la cina a iesit bine din prima spalare.</p><p>Si cand vine vorba de spatiul in <a href="/plita-cu-inductie-pentru-bucatarie/">bucatarie</a>, masina de spalat vase incorporabila e o salvare. Arata elegant, se integreaza perfect in mobilier si nu ocupa spatiu suplimentar. Eu am ales varianta asta tocmai pentru ca nu voiam sa am inca un aparat care sa imi rupa estetica bucatariei. Se vede ca e facuta sa fie ascunsa, sa nu deranjeze ochiul. E ca si cum ai avea un ajutor de nadejde, dar care nu se vede decat cand ai nevoie de el.</p><p>Practic, rezolva problema murdara a spalarii vaselor, eliberandu-ti timpul si energia. E potrivita pentru oricine care vrea sa scape de aceasta corvoada. Familiile, cuplurile, persoanele singure care detesta sa spele vase. Serios, chiar si pentru cei care gatesc mult. Eu gatesc zilnic si cantitatea de vase pe care o adun ar fi fost o bataie de cap imensa fara ajutorul ei. E un ajutor nepretuit in orice casa moderna.</p><p>Ma gandesc si la economie. Initial am crezut ca o sa consum mai multa apa si curent, dar am descoperit ca modelele noi sunt mult mai eficiente. Si spalatul manual, mai ales daca stai cu apa curgatoare, poate consuma chiar mai mult. Deci, pe termen lung, poate fi si mai avantajos din punct de vedere al consumului.</p><p>Un alt aspect e igiena. Masinile de spalat vase ating temperaturi mult mai ridicate decat putem noi suporta cu mana. Asta inseamna ca bacteriile sunt eliminate mult mai eficient. Pentru mine, asta e un mare plus, mai ales cand vine vorba de tacamuri si pahare.</p>
-      </section>
-
-      <section id="top-recomandari-masini-de-spalat-vase-incorporabile">
-        <h2>Top recomandari masini de spalat vase incorporabile</h2>
-        <p>Dupa multe cautari si pareri citite pe net, am ajuns la cateva modele care mi s-au parut a fi cele mai bune optiuni. Vreau sa va spun sincer parerea mea despre fiecare, bazata pe ce am vazut si ce spun alti utilizatori.</p><p><strong>1. Bosch Serie 6 SMV6ZCX07E</strong></p><p>Asta e printre favoritele mele. Bosch e un brand de incredere, iar seria 6 e destul de bine dotata. Are 10 programe, inclusiv unul de igienizare si unul rapid. Mi-a placut mult ca e silentioasa, nu ma deranjeaza deloc cand merge. Consumul de apa e si el bun. Pretul e in jur de <strong>3000 RON</strong>, poate un pic mai mult, depinde de oferte.</p><p><em>Pro:</em> Foarte silentioasa, clasa energetica buna, programe variate, design elegant.</p><p><em>Contra:</em> Pretul poate fi un pic piperat pentru unii.</p><p><strong>2. Siemens SN65ZX49CE</strong></p><p>Siemens e tot pe acolo cu Bosch, sunt practic in aceeasi familie. Modelul asta mi s-a parut interesant pentru ca are tehnologia Zeolith Drying, care usuca vasele foarte bine si <a href="/cum-sa-cureti-eficient-casa/" class="interlink">eficient</a> energetic. E si asta destul de incapatoare, cu 14 seturi. Pretul e undeva la <strong>3200 RON</strong>.</p><p><em>Pro:</em> Uscare excelenta cu Zeolith, capacitate mare, eficienta energetica.</p><p><em>Contra:</em> Similar cu Bosch, pretul.</p><p><strong>3. Whirlpool WIC 3C26 F X</strong></p><p>Asta e o optiune mai accesibila, in jur de <strong>2000 RON</strong>. Are 14 seturi, 8 programe, deci destul de multe optiuni pentru pretul lui. Am auzit pareri bune despre fiabilitatea lui. E o alegere buna daca bugetul e un pic mai restrans, dar tot vreti ceva bun.</p><p><em>Pro:</em> Pret bun, capacitate mare, multe programe.</p><p><em>Contra:</em> Poate fi un pic mai zgomotoasa decat modelele mai scumpe, uscarea nu e la fel de performanta ca la Siemens.</p><p><strong>4. Beko DVN05C20W</strong></p><p>Beko e cunoscut pentru raportul calitate-pret. Modelul asta se invarte pe la <strong>1800 RON</strong>. Are 15 seturi, ceea ce e foarte mult, si 5 programe. E o optiune buna daca spalam multe vase odata sau daca avem o familie mare. Nu exceleaza la capitolul design, dar isi face treaba.</p><p><em>Pro:</em> Capacitate mare, pret foarte accesibil.</p><p><em>Contra:</em> Programe mai putine, design mai simplu, consumul de apa poate fi un pic mai mare.</p><p><strong>5. Electrolux EEM43300L</strong></p><p>Electrolux e un alt brand respectabil. Modelul asta e undeva la <strong>2500 RON</strong>. Are 13 seturi, 5 programe. E destul de compacta, dar incapatoare. Mi-a placut cum arata, designul e modern. Si e destul de eficienta la consum.</p><p><em>Pro:</em> Design modern, buna eficienta energetica, dimensiuni rezonabile.</p><p><em>Contra:</em> Pretul e mediu, nu are atatea programe ca modelele mai scumpe.</p><p>Astea sunt cateva dintre modelele pe care le-am analizat. Parerea mea e ca depinde mult de ce aveti nevoie si de buget. Daca vreti topul absolut, mergeti pe Bosch sau Siemens. Daca vreti un echilibru bun, Electrolux sau Whirlpool sunt alegeri sigure. Iar daca bugetul e mic, Beko e o solutie viabila.</p>
-      </section>
-
-      <section id="cum-alegi-corect-masina-de-spalat-vase-incorporabila">
-        <h2>Cum alegi corect masina de spalat vase incorporabila</h2>
-        <p>Alegerea unei masini de spalat vase incorporabile poate parea complicata la prima vedere, dar daca stii la ce sa te uiti, devine mult mai simplu. Eu am petrecut ore bune citind specificatii si comparand modele, asa ca am invatat cateva lucruri pe care vreau sa le impartasesc cu voi.</p><p><strong>Dimensiunea si capacitatea</strong> sunt primordiale. Masinile incorporabile vin de obicei in doua dimensiuni standard: 60 cm latime (pentru 12-15 seturi) si 45 cm latime (pentru 8-10 seturi). Daca aveti o familie mare sau gatiti des si adunati multe vase, alegeti varianta de 60 cm. Pentru cupluri sau persoane singure, 45 cm e suficient. Un set inseamna, in mare, o farfurie intinsa, una adanca, una de desert, o cana, o furculita, un cutit, o lingura, o lingurita.</p><p><strong>Clasa energetica</strong> conteaza mult. Cautati modele cu clasa A, A+, A++ sau chiar A+++ (cele mai noi au o noua scara, cautati A). O clasa energetica mai buna inseamna un consum mai mic de electricitate si, implicit, facturi mai mici. Nu va uitati doar la clasa energetica, ci si la consumul specific de apa si energie pe ciclu de spalare, mentionat in kWh si litri.</p><p><strong>Consumul de apa</strong> este un alt aspect important. Modelele mai noi sunt mult mai eficiente, consumand intre 8 si 12 litri pe ciclu. Daca spalam manual cu apa curgatoare, consumul poate fi mult mai mare. Deci, o masina eficienta e si economica pe termen lung.</p><p><strong>Nivelul de zgomot</strong>. Daca aveti o bucatarie deschisa catre living sau daca porniti masina noaptea, nivelul de zgomot (masurat in decibeli, dB) e crucial. Modelele bune au intre 40 si 45 dB, ceea ce inseamna ca abia o auzi. Cele peste 50 dB se pot simti deranjant.</p><p><strong>Programele de spalare</strong>. Majoritatea masinilor au programe standard: Normal, Intensiv, Eco, Rapid. Dar cautati si optiuni suplimentare care va pot fi utile: Auto (detecteaza gradul de murdarie), Igienizare (la temperaturi inalte, pentru bebelusi sau bolnavi), Program pentru pahare delicate, Program pentru vase foarte murdare. Un program rapid de 30-60 minute e excelent pentru vasele folosite zilnic, dar nu foarte murdare.</p><p><strong>Sistemul de uscare</strong>. Cele mai comune sunt uscarea prin condensare (apa fierbinte de la ultima clatire se evapora si condenseaza pe peretii reci ai masinii) si uscarea cu Zeolith (un mineral care absoarbe umiditatea si elibereaza <a href="/uscator-de-rufe-cu-pompa-de-caldura/">caldura</a>). Uscarea cu Zeolith e mai eficienta si mai rapida, dar si mai scumpa.</p><p><strong>Flexibilitatea interioara</strong>. Verificati cum sunt organizate cosurile. Exista modele cu un al treilea sertar pentru tacamuri, in loc de cosul traditional. Asta elibereaza spatiu in cosul de jos. Ajustarea pe inaltime a cosului superior este si ea foarte utila pentru a face loc vaselor mai mari (oale, tavi).</p><p><strong>Sistemele de siguranta</strong>. Verificati daca masina are protectie impotriva inundatiilor (AquaStop) si blocare pentru copii. Sunt detalii care fac diferenta.</p><p><strong>Brandul si garantia</strong>. E bine sa alegeti un brand cunoscut pentru fiabilitate, cum sunt Bosch, Siemens, Whirlpool, Electrolux. Verificati si garantia oferita. O garantie mai lunga va ofera liniste sufleteasca.</p><p>Nu va fie teama sa cititi recenziile altor utilizatori. Parerile lor va pot oferi o perspectiva reala asupra performantei si durabilitatii in timp.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ale-masinii-de-spalat-vase-incorporabile">
-        <h2>Avantaje si dezavantaje ale masinii de spalat vase incorporabile</h2>
-        <p>Sincer sa fiu, de cand am masina asta de spalat vase incorporabila, viata mea in bucatarie s-a schimbat radical. Dar, ca orice lucru, are si bune si rele. Hai sa le luam pe rand, ca sa stiti si voi la ce sa va asteptati.</p><p><strong>Avantaje:</strong></p><p><strong>Timp castigat</strong>. Asta e cel mai mare avantaj, fara discutie. In loc sa stau 20-30 de minute (sau mai mult, daca am multe vase) sa frec, acum apas pe un buton si gata. Timpul asta il pot folosi pentru a ma relaxa, a citi o carte, a ma juca cu copiii sau pur si simplu a face altceva. E un castig enorm pentru calitatea vietii mele.</p><p><strong>Vase curate si igienizate</strong>. Masinile de spalat vase moderne ating temperaturi mult mai inalte decat poate suporta mana umana. Asta inseamna ca grasimea, resturile de mancare si bacteriile sunt eliminate mult mai eficient. Vasele ies curate, stralucitoare, fara urme de detergent. Iar tacamurile si paharele sunt impecabile.</p><p><strong>Economie de apa si energie</strong>. Desi poate parea contraintuitiv, modelele noi de masini de spalat vase sunt foarte eficiente. Ele folosesc o cantitate controlata de apa si energie pe ciclu. Spalarea manuala, mai ales daca lasi apa sa curga, poate consuma chiar mai mult. Deci, pe termen lung, e si o varianta mai economica.</p><p><strong>Design si estetica</strong>. Masina de spalat vase incorporabila se integreaza perfect in mobilierul din bucatarie. Nu iese in evidenta, nu ocupa spatiu suplimentar vizual. Arata curat si ordonat, ca si cum ar fi fost acolo dintotdeauna. E ideala pentru bucatariile moderne, unde estetica conteaza mult.</p><p><strong>Reducerea conflictelor casnice</strong>. Ha! Asta e un avantaj pe care nu-l gasesti in specificatiile tehnice, dar e real. Nu mai exista discutii despre cine spala vasele sau despre vase lasate nespalate. E o sarcina in minus pentru toata lumea.</p><p><strong>Dezavantaje:</strong></p><p><strong>Investitie initiala</strong>. Masinile de spalat vase, mai ales cele incorporabile, nu sunt tocmai ieftine. Pretul poate varia destul de mult, dar tot e o suma considerabila. Trebuie sa te gandesti la asta ca la o investitie pe termen lung.</p><p><strong>Consumul de detergent si solutii speciale</strong>. Pe langa consumabilele obisnuite (detergent, sare, luciu), mai ai nevoie de solutii de curatare periodica <a href="/aspirator-pentru-masina-auto/" class="interlink">pentru masina</a>. E un cost suplimentar, dar nu foarte mare.</p><p><strong>Necesita instalare profesionala</strong>. Pentru ca e incorporabila, are nevoie de o instalare corecta, conectata la apa si la canalizare. De obicei, acest lucru se face de catre un instalator, ceea ce poate adauga un cost la achizitie.</p><p><strong>Nu poti spala orice</strong>. Anumite ustensile din lemn, cutite de calitate superioara (cu manere din lemn sau lipite), vase din aluminiu sau cupru, anumite tipuri de plastic sau vesela cu decoratiuni delicate nu pot fi spalate in masina. Trebuie sa fii atent la etichete sau sa verifici manual.</p><p><strong>Spatiul ocupat</strong>. Chiar daca e incorporabila, tot ocupa spatiu in mobilier. Daca ai o bucatarie foarte mica, ar trebui sa te gandesti bine daca merita sa sacrifici un corp de mobilier pentru masina de spalat vase.</p><p><strong>Necesita intretinere</strong>. Filtrul trebuie curatat periodic, la fel si bratele de pulverizare. Din cand in cand, e bine sa rulezi un program de igienizare. Nu e complicat, dar necesita putina atentie.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea">
-        <h2>Sfaturi practice din experienta mea</h2>
-        <p>Dupa ce am trecut prin procesul de achizitie si am folosit masina de spalat vase zilnic, am acumulat cateva trucuri si am invatat din greseli. Sper sa va fie de folos si voua.</p><p><strong>Nu supra-aglomera masina</strong>. Asta e o greseala pe care am facut-o la inceput. Am vrut sa bag cat mai multe vase odata, sa o pornesc mai rar. Dar asta duce la rezultate slabe. Vasele nu se spala bine, detergentul nu ajunge peste tot. Lasati loc intre ele, astfel incat jetul de apa sa ajunga in toate colturile.</p><p><strong>Clateste vasele de resturi mari</strong>. Nu e nevoie sa le speli cu buretele, dar daca ai resturi mari de mancare (oase, coji, bucati mari de cartofi), e bine sa le arunci la gunoi. Acestea pot infunda filtrul masinii si pot afecta performanta.</p><p><strong>Foloseste <a href="/detergent-ecologic-pentru-casa/" class="interlink">detergent</a> de calitate</strong>. Am incercat si variante mai ieftine, dar nu au facut fata. Detergentii de calitate spala mai bine, protejeaza masina si vasele. Fie ca e sub forma de pudra, tablete sau gel, alege un brand bun.</p><p><strong>Nu uita de sare si de lichid de luciu</strong>. Sarea e esentiala pentru dedurizarea apei, mai ales in zonele cu apa dura. Fara sare, se pot forma depuneri de calcar pe vase si pe masina. Lichidul de luciu ajuta la uscarea rapida a vaselor si previne aparitia petelor de apa, in special pe pahare.</p><p><strong>Curata filtrul regulat</strong>. Asta e o chestie pe care multi o omit. Filtrul colecteaza resturile mici de mancare. Daca nu il cureti saptamanal sau la doua saptamani (depinde de cat de des folosesti masina), poate duce la mirosuri neplacute si la o spalare mai slaba.</p><p><strong>Foloseste programele potrivite</strong>. Nu porni mereu programul intens. Daca ai vase doar un pic murdare, programul Eco sau cel rapid sunt suficiente si consuma mai putina energie. Programul Auto e o optiune buna, pentru ca masina isi regleaza singura parametrii.</p><p><strong>Aranjeaza vasele corect</strong>. Pune farfuriile si bolurile in pozitie inclinata, cu fata in jos, pentru ca apa sa poata curge. Tacamurile se pun in cosul lor, cu manerele in jos (pentru a fi spalate mai bine) sau in sus (pentru siguranta, daca ai copii mici). Nu pune obiecte mari in fata bratului de pulverizare.</p><p><strong>Verifica bratele de pulverizare</strong>. Din cand in cand, verifica daca bratele de pulverizare nu sunt blocate de vreun obiect. Daca sunt infundate, apa nu va ajunge eficient la toate vasele. Le poti desface usor si clati sub jet de apa.</p><p><strong>Nu lasa vasele murdare prea mult timp</strong>. Daca le lasi peste noapte, resturile de mancare se usuca si devin mai greu de indepartat. Masina se va chinui mai mult, iar rezultatele nu vor fi optime.</p><p><strong>Uita-te la etichetele vaselor</strong>. Cum am zis si mai sus, nu totul se poate spala in masina. Verifica intotdeauna daca vesela ta are simbolul masinii de spalat vase. Daca nu, e mai sigur sa le speli manual.</p>
-      </section>
-
-      <section id="parerea-mea-finala-despre-masina-de-spalat-vase-incorporabila">
-        <h2>Parerea mea finala despre masina de spalat vase incorporabila</h2>
-        <p>Dupa atatea randuri scrise, cred ca v-am convins deja cat de mult ma bucur ca am facut aceasta achizitie. Pentru mine, masina de spalat vase incorporabila a fost o transformare. Nu mai vad vasele murdare ca pe un cosmar, ci ca pe o sarcina care se rezolva singura.</p><p>Sincer, regret ca nu am facut pasul asta mai devreme. Am stat prea mult pe ganduri, am crezut ca e un lux de care nu am nevoie. Dar timpul castigat si confortul oferit sunt nepretuite. E ca si cum ai avea un membru nou in familie, unul care nu cere nimic in schimb, doar face treaba.</p><p>Pentru cine recomand? Pentru absolut toata lumea care isi permite. Fie ca esti la inceput de drum, ca ai o familie numeroasa sau ca esti singur, masina de spalat vase iti va face viata mai usoara. E o investitie in confortul tau si in timpul tau liber. Si, sa fim seriosi, cine nu isi doreste mai mult timp liber si mai putina corvoada?</p><p>Daca ar fi sa aleg din nou, probabil as merge tot pe un brand premium, gen Bosch sau Siemens, pentru fiabilitate si performanta. Dar daca bugetul e mai limitat, nu va feriti de alternativele bune de la Whirlpool sau Electrolux. Chiar si Beko face modele decente la preturi accesibile.</p><p>Important e sa alegi ce se potriveste nevoilor tale: capacitate, programe, consum. Nu te grabi, citeste, compara. Dar, inainte de toate, ia in calcul ca o masina de spalat vase incorporabila e un ajutor de nadejde in casa.</p><p>Eu, personal, nu m-as mai intorce la viata fara ea. E una dintre cele mai bune decizii pe care le-am luat pentru bucataria si pentru mine. Sper ca si voi sa va bucurati de aceleasi beneficii. Este un electrocasnic esential in casa moderna, care nu ar trebui sa lipseasca din nicio <a href="/plita-cu-inductie-pentru-bucatarie/" class="interlink">bucatarie</a>.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de mult curent consuma o masina de spalat vase incorporabila?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Consumul variaza in functie de clasa energetica si de programul ales. Modelele eficiente, cu clasa energetica A, consuma intre 0.8 si 1 kWh pe ciclu. Programul Eco este cel mai economic. Verificati specificatiile fiecarui model pentru cifre exacte.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie curatat filtrul?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Ideal, filtrul ar trebui curatat saptamanal sau cel mult o data la doua saptamani, in functie de cat de des folositi masina si de cat de murdare sunt vasele. Un filtru curat asigura o buna functionare si previne mirosurile neplacute.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce detergent e mai bun: pudra, tablete sau gel?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Toate tipurile de detergent au avantaje. Tabletele sunt comode, dar nu mereu doza e potrivita pentru gradul de murdarie. Pudra permite dozare personalizata. Gelul e bun pentru vase mai delicate. Cel mai bine e sa incercati mai multe tipuri si sa vedeti ce vi se potriveste.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot spala oale si tigai in masina de spalat vase?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea oalelor si tigailor moderne, din inox sau cu strat antiaderent, pot fi spalate in masina. Verificati instructiunile producatorului. Evitati sa spalati oale cu manere din lemn sau tigai din aluminiu, deoarece se pot deteriora.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat timp dureaza un ciclu de spalare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un ciclu normal poate dura intre 1.5 si 3 ore. Programele rapide sunt mult mai scurte, de obicei intre 30 si 60 de minute, dar nu la fel de eficiente pentru vase foarte murdare.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna clasa de eficienta energetica A+++ (noua scara)?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pe noua scara de eficienta energetica (de la G la A), clasa A reprezinta cele mai eficiente aparate. Cu cat litera e mai aproape de A (A, B, C), cu atat consumul de energie si apa este mai mic. Cautati modelele cu clasa A.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru o familie, cea mai buna masina de spalat vase incorporabila e <strong>Bosch de 60 cm</strong>, de departe cea mai vanduta, cu 13 seturi si protectie la inundatii. Daca vrei sa economisesti, <strong>Beko de 60 cm</strong> da aceeasi capacitate mai ieftin, iar pentru consum minim, <strong>Bosch clasa B</strong> e cel mai eficient. Ai o bucatarie mica? <strong>Electrolux slim de 45 cm</strong> e cel mai vandut model ingust.</p>
+      <p>La un incorporabil, prima decizie e <strong>dimensiunea</strong>, 45 sau 60 cm, legata de spatiul din bucatarie si de cati sunteti, apoi <strong>numarul de seturi</strong>, <strong>clasa energetica</strong> si <strong>zgomotul</strong>. Mai jos gasesti direct recomandarile, impartite pe cele doua latimi, iar dupa ele un ghid despre cum alegi.</p>
+      <p>Am pornit de la masinile de spalat vase complet incorporabile, in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe latime, numar de seturi, clasa energetica si dotari, si le-am grupat in cele de 60 cm, pentru familie, si cele de 45 cm, slim. Pentru restul bucatariei, vezi <a href="/plita-cu-inductie-pentru-bucatarie/">plitele cu inductie</a> si <a href="/frigider-side-by-side-pentru-familie/">frigiderele side by side</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#l60">De 60 cm, pentru familie</a></li>
+        <li><a href="#l45">De 45 cm, slim</a></li>
+        <li><a href="#dimensiune">45 sau 60 cm si cate seturi</a></li>
+        <li><a href="#clasa">Clasa energetica si consumul</a></li>
+        <li><a href="#zgomot">Zgomotul si uscarea</a></li>
+        <li><a href="#incorporabila">Complet incorporabila si montajul</a></li>
+        <li><a href="#functii">Programe si functii utile</a></li>
+        <li><a href="#greseli">Greseli de evitat</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Latime</th><th>Seturi</th><th>Clasa</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.lat}</td>
+              <td>{x.set}</td>
+              <td>{x.clasa}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="l60">De 60 cm, pentru familie</h2>
+    <p>Formatul standard, cu 12-15 seturi, pentru familii si pentru cine spala mult. Aici sunt cele mai vandute modele: Bosch de referinta, Beko cu cel mai bun raport, Electrolux eficient si un Bosch clasa B, cel mai economic din selectie.</p>
+    <div class="rd-grid">
+      {L60.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={fig60} alt="Masini de spalat vase incorporabile de 60 cm: Bosch, Beko, Electrolux" width="1200" height="675" loading="lazy" />
+
+    <h2 id="l45">De 45 cm, slim</h2>
+    <p>Pentru bucatarii mici sau spatii inguste, unde un model de 60 cm nu incape: 9-10 seturi, suficient pentru 1-3 persoane. De la cel mai vandut Electrolux la cel mai ieftin Heinner si un Bosch premium silentios.</p>
+    <div class="rd-grid">
+      {L45.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={fig45} alt="Masini de spalat vase incorporabile de 45 cm slim: Electrolux, Heinner, Hansa, Bosch" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-masina-spalat-vase').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate masinile de spalat vase incorporabile la oferta</strong>
+        <span>Reducerile din acest moment la masini de spalat vase incorporabile, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="dimensiune">45 sau 60 cm si cate seturi</h2>
+    <p>E prima si cea mai importanta decizie la un incorporabil, pentru ca dimensiunea trebuie sa se potriveasca golului din mobila si nevoii tale de spalare.</p>
+    <p>Un model de <strong>60 cm</strong>, cel standard, spala intre 12 si 16 seturi si e potrivit pentru familii de 3-5 persoane sau pentru cine gateste si spala mult. Un model de <strong>45 cm</strong>, slim, spala 9-10 seturi si e gandit pentru 1-3 persoane sau pentru bucatarii mici, unde un aparat lat nu are loc. Un set inseamna vesela unei persoane la o masa completa, farfurii, pahar si tacamuri.</p>
+    <p>Regula practica: masoara intai <strong>golul disponibil in bucatarie</strong>; daca ai 60 cm, ia formatul standard pentru capacitatea mai mare, chiar daca sunteti putini, pentru ca poti aduna vasele pe cateva zile si spala o data, plin. Daca spatiul e limitat, cei 45 cm iti dau toate functiile intr-un corp ingust. In selectie, capacitatea merge de la 9 seturi, la modelele slim, pana la 15 seturi, la Beko de 60 cm.</p>
+
+    <h2 id="clasa">Clasa energetica si consumul</h2>
+    <p>O masina de spalat vase merge de sute de ori pe an, deci consumul conteaza pe factura. Aici e o capcana des intalnita: eticheta a fost <strong>recalibrata</strong>, de la vechea scala cu A+++ pana la D, la o scala noua, mai stricta, de la <strong>A la G</strong>. Pe noua scala, clasa A e cea mai eficienta si foarte greu de atins, iar majoritatea masinilor bune sunt intre <strong>clasa B si F</strong>.</p>
+    <p>In selectie, cea mai eficienta este modelul Bosch <strong>clasa B</strong>, singurul care urca atat de sus, urmat de cateva <strong>clasa D</strong>, ca Electrolux, in timp ce multe modele accesibile sunt clasa E sau F, un compromis obisnuit, mai ales la cele slim. Dincolo de litera, uita-te pe eticheta si la <strong>consumul de apa</strong> pe ciclu si la cel de curent, pentru ca doua modele de aceeasi clasa pot consuma diferit. O clasa mai buna costa mai mult la cumparare, dar se plateste in timp prin facturi mai mici.</p>
+
+    <h2 id="zgomot">Zgomotul si uscarea</h2>
+    <p>Doua detalii care schimba experienta zilnica, dar sunt usor trecute cu vederea.</p>
+    <p><strong>Zgomotul</strong> conteaza mai ales daca bucataria e deschisa spre living sau daca pornesti masina seara. Cele mai silentioase coboara sub 43 dB, aproape imperceptibil, iar pentru ca aparatul e ascuns in mobila, nivelul perceput e si mai mic decat cifra de pe eticheta. Modelele cu functionare silentioasa marcata, ca Bosch din selectie, sunt gandite exact pentru asta.</p>
+    <p><strong>Uscarea</strong> se face prin mai multe metode. Cea prin condensare, cea mai raspandita, lasa apa sa se evapore de pe vasele calde si sa se condenseze pe peretii masinii; e eficienta, dar cere ceva timp si e bine sa lasi usa intredeschisa la final. Modelele mai avansate au un ventilator care circula aer cald, pentru uscare mai rapida si mai completa. Daca vrei vase perfect uscate din prima, cauta uscare activa; daca nu, condensarea face treaba cu putina rabdare.</p>
+
+    <h2 id="incorporabila">Complet incorporabila si montajul</h2>
+    <p>Toate modelele din aceasta selectie sunt <strong>complet incorporabile</strong>, adica se ascund total in mobila: pe usa masinii montezi un panou identic cu restul fronturilor de bucatarie, iar panoul de comenzi e pe muchia de sus a usii, invizibil cand usa e inchisa. Rezultatul e o bucatarie curata, unitara, in care masina arata ca un simplu dulap. La un model partial incorporabil, panoul de comenzi ar ramane vizibil pe fata.</p>
+    <p>La montaj, tine cont ca ai nevoie de un <strong>gol de mobila</strong> de dimensiunea potrivita, 60 sau 45 cm latime, plus racord de apa, scurgere si o priza in apropiere. Montarea panoului de mobila si conectarea se fac de obicei de catre cine iti monteaza bucataria sau de un instalator; nu e complicat, dar cere sa ai pregatite racordurile. Masoara bine golul si verifica inaltimea, mai ales sub blaturile mai joase.</p>
+
+    <h2 id="functii">Programe si functii utile</h2>
+    <p>Dincolo de dimensiune si clasa, cateva functii fac diferenta la folosire:</p>
+    <ul>
+      <li><strong>Protectia impotriva inundatiilor:</strong> opreste apa daca apare o scurgere, importanta la un aparat ascuns in mobila, pe care nu-l vezi. O au majoritatea modelelor din selectie.</li>
+      <li><strong>Programul eco:</strong> foloseste cea mai putina apa si energie, spaland la temperatura mai mica pe durata mai lunga; e cel mai economic pentru uzul zilnic.</li>
+      <li><strong>Pornirea programabila:</strong> o lasi sa porneasca noaptea sau cand vrei sa gasesti vasele curate, ca la modelul Hansa din selectie.</li>
+      <li><strong>Senzorul de incarcare:</strong> detecteaza cate vase ai pus si ajusteaza apa si durata, ca la Bosch slim, ca sa nu iroseasca la spalari mici.</li>
+      <li><strong>Auto-curatarea:</strong> un program care intretine singur interiorul masinii, ca la Electrolux, pentru mai putin miros si depuneri.</li>
+    </ul>
+
+    <h2 id="greseli">Greseli de evitat</h2>
+    <p>La un incorporabil, cateva greseli te pot lasa cu o masina care nu incape sau nu se potriveste nevoii. Le eviti usor daca le stii dinainte:</p>
+    <ul>
+      <li><strong>Nu masori corect golul din mobila:</strong> masoara latimea, dar si inaltimea si adancimea nisei, mai ales sub blaturile mai joase. O masina de 60 cm nu intra intr-un gol de 45, si invers, ramane spatiu gol urat.</li>
+      <li><strong>Iei prea mic ca sa economisesti:</strong> daca sunteti o familie, un model de 45 cm de 9 seturi te obliga sa speli des sau in doua ture. Daca ai loc de 60 cm, ia formatul standard.</li>
+      <li><strong>Ignori clasa energetica:</strong> o masina clasa F ieftina consuma mai mult ani la rand. Compara si consumul de apa si curent, nu doar pretul de raft.</li>
+      <li><strong>Nu pregatesti racordurile:</strong> ai nevoie de apa, scurgere si priza in dreptul masinii. Verifica-le inainte de a comanda, ca sa nu descoperi la montaj ca lipsesc.</li>
+      <li><strong>Confunzi complet cu partial incorporabila:</strong> daca vrei ca masina sa dispara total in mobila, ia una complet incorporabila, cu panoul de comenzi ascuns pe muchia usii, ca toate cele din selectie.</li>
+      <li><strong>Uiti de panoul de mobila:</strong> la modelele complet incorporabile, frontul de mobila care se prinde pe usa se comanda separat, odata cu bucataria; socoteste-l in buget si in montaj.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de dimensiune, capacitate, clasa si brand:</p>
+    <p><strong>Accesibile:</strong> de la circa 1470-1600 de lei pentru modelele slim Heinner, Hansa sau Electrolux si pentru Beko de 60 cm de baza, cu functiile esentiale.</p>
+    <p><strong>Branduri mari, 60 cm:</strong> in general 1950-2200 de lei pentru Bosch sau Electrolux cu 13 seturi si clasa D, mai eficiente si mai bine dotate.</p>
+    <p><strong>Premium:</strong> peste 2600 de lei, spre 3000 si peste, pentru clasa B, capacitate mare sau Bosch slim silentios.</p>
+    <p>Pe langa pret, tine cont de <strong>clasa energetica si de capacitate</strong>: o masina potrivita ca marime si eficienta se dovedeste in timp mai ieftina decat una ieftina, dar risipitoare sau prea mica pentru cati sunteti. Daca amenajezi bucataria, vezi si <a href="/cele-mai-bune-seturi-de-mobila-de-bucatarie/">seturile de mobila de bucatarie</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">CP</div>
       <div class="author-info">
-        <h4><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></h4>
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
         <p class="author-role">Specialist Electrocasnice</p>
-        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="masina-de-spalat-vase-incorporabila"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="masina-de-spalat-vase-incorporabila"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="masina-de-spalat-vase-incorporabila" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="masina-de-spalat-vase-incorporabila" currentCategory="electrocasnice-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

@@ -1,0 +1,270 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = [ ...(emag['usi-exterior'] || []), ...(emag['usi-interior'] || []), ...(emag['usi-garaj'] || []) ];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Usi de intrare (exterior) ---
+  { g: 'intrare', id: 'DY4VKVBBM', badge: 'Cea mai vanduta de intrare',
+    specs: ['usa dubla de exterior', 'termopan PVC', 'cu insertii de geam', 'izolatie termica'],
+    pros: ['Cea mai vanduta usa de intrare din top, 16 pareri', 'Termopan PVC, izolatie termica buna', 'Dubla, cu insertii de geam pentru lumina', 'Multe variante de culoare si design'],
+    cons: ['Se monteaza cu tehnician, cere masuratori exacte', 'PVC-ul e mai putin rezistent la efractie decat metalul'],
+    verdict: 'Cea mai vanduta usa de intrare din selectie si alegerea firesca pentru cei mai multi. Kira e o usa dubla din termopan PVC, cu insertii de geam care lasa lumina in hol, si o izolatie termica buna care tine caldura in casa iarna si racoarea vara. PVC-ul are avantajul ca vine in multe culori si modele si nu cere intretinere ca lemnul. Cele 16 pareri o fac cea mai testata usa de intrare de aici, desi la usi numarul de pareri e mereu mai mic decat la produse mici. Se monteaza de un tehnician, cu masuratori exacte ale golului. Fiind PVC, e mai putin rezistenta la efractie decat una metalica, dar sistemele moderne cu inchidere in mai multe puncte compenseaza. O iei cand vrei o usa de intrare izolata termic, cu aspect placut, la un pret bun.' },
+  { g: 'intrare', id: 'DY1PGJBBM', badge: 'Metalica, pentru securitate',
+    specs: ['usa metalica dubla', 'izolatie interioara', 'cu vizor', 'rezistenta la efractie'],
+    pros: ['Metalica, cea mai rezistenta la efractie', 'Izolatie in interiorul foii', 'Are vizor inclus', 'Dubla, pentru o intrare larga'],
+    cons: ['Nota mai mica, 3.80, si putine pareri', 'Mai putine optiuni de design decat PVC-ul', 'Grea, cere montaj solid'],
+    verdict: 'Alegerea daca pui securitatea pe primul loc la usa de intrare. Fiind metalica, rezista mult mai bine la efractie decat una din PVC, motiv pentru care e des folosita la case si la intrari expuse. Are izolatie in interiorul foii, ca sa nu fie o simpla tabla rece, si vine cu vizor inclus. E dubla, potrivita pentru o intrare mai larga. Nota de 3.80 e mai mica si vine de la putine pareri, iar optiunile de culoare si design sunt mai limitate decat la PVC. Fiind grea, cere un montaj solid, in zid rezistent. O iei cand vrei in primul rand o usa sigura si robusta, iar aspectul si izolatia termica sunt pe locul doi.' },
+  { g: 'intrare', id: 'D7GFCXMBM', badge: 'Cea mai ieftina de intrare',
+    specs: ['PVC cu 5 camere', 'izolatie termica buna', 'culoare alb', 'cel mai mic pret'],
+    pros: ['Cel mai mic pret la o usa de intrare din top', 'Profil PVC cu 5 camere, izoleaza bine', 'Alb clasic, se potriveste usor', 'Nota maxima de la cumparatori'],
+    cons: ['Foarte putine pareri', 'Alb simplu, fara geam', 'Tot cere montaj profesionist'],
+    verdict: 'Cea mai ieftina usa de intrare din selectie si o alegere buna daca vrei termopan PVC fara sa dai mult. Modelul Hamburg are un profil cu 5 camere, adica cinci compartimente de aer in interiorul ramei, care imbunatatesc izolatia termica si fonica, la un pret sub cel al usilor cu geam. E alba, clasica, si se potriveste la aproape orice fatada. Are nota maxima, chiar daca de la putine pareri, ceea ce e normal la usi. Nu are geam, deci holul primeste mai putina lumina, si, ca orice usa de exterior, cere montaj profesionist. O iei cand vrei o usa de intrare izolata, simpla si ieftina, fara insertii de geam.' },
+  // --- Usi de interior ---
+  { g: 'interior', id: 'DH4SZ1BBM', badge: 'Usa plianta, cea mai vanduta',
+    specs: ['usa plianta (acordeon)', 'PVC', 'ocupa cativa cm', 'pentru spatii mici'],
+    pros: ['Cea mai vanduta usa de interior, 47 de pareri', 'Se plaza, ocupa doar cativa cm pe lateral', 'Nu cere spatiu pe perete sau in fata', 'Cel mai simplu de montat'],
+    cons: ['Aspect simplu, de PVC', 'Izolatie fonica slaba', 'Nu inlocuieste o usa clasica la o camera'],
+    verdict: 'Cea mai vanduta usa de interior din selectie si solutia practica pentru un spatiu mic. Usa plianta, tip acordeon, se strange lateral si ocupa doar cativa centimetri cand e deschisa, deci nu cere loc pe perete, ca una culisanta, si nici in fata, ca una clasica. E ideala pentru o debara, o camara, o baie mica sau ca separator intre doua zone. Cu 47 de pareri, e de departe cea mai testata usa de interior de aici. Aspectul e simplu, de PVC, si nu izoleaza fonic, deci nu o pui la un dormitor unde vrei liniste. O iei cand ai un spatiu mic si vrei sa inchizi o zona ieftin, fara sa pierzi loc.' },
+  { g: 'interior', id: 'D99NRHYBM', badge: 'Cea mai ieftina de interior',
+    specs: ['usa plianta PVC', 'cel mai mic pret', 'alba', 'debara sau camara'],
+    pros: ['Cel mai mic pret din top, sub 190 de lei', 'Se monteaza usor, fara tocarie complicata', 'Alba, discreta', 'Nota foarte buna, 4.80'],
+    cons: ['Doar pentru debara, camara sau separator', 'Material subtire', 'Fara izolatie fonica'],
+    verdict: 'Cu cel mai mic pret inchizi o debara, o camara sau un colt, la sub 190 de lei. Usa plianta Accordion e din PVC, se monteaza simplu pe un profil, fara tocarie complicata, si se strange ca un acordeon cand o deschizi. E alba si discreta, iar nota de 4.80 arata cumparatori multumiti pentru ce costa. Fiind subtire si fara izolatie fonica, e strict pentru spatii utilitare sau ca separator, nu pentru o camera de locuit. O iei cand vrei sa acoperi o deschidere mica, ieftin si repede, si nu conteaza aspectul sau izolatia, ci doar sa inchida spatiul.' },
+  { g: 'interior', id: 'D9VT31BBM', badge: 'Usa culisanta, aspect premium',
+    specs: ['usa culisanta pe perete', 'aspect modern', 'economiseste spatiu', 'model Boss Duo'],
+    pros: ['Aspect modern, premium, imbunatateste camera', 'Culisanta, aluneca pe langa perete, economiseste spatiu', 'Se deschide fara sa ocupe loc in fata', 'Constructie de calitate'],
+    cons: ['Cea mai scumpa usa de interior din top', 'Cere spatiu liber de perete langa deschidere', 'Montaj mai pretentios'],
+    verdict: 'Alegerea daca vrei o usa de interior care arata bine, nu doar una practica. Usa culisanta Boss Duo aluneca pe langa perete pe o sina, deci se deschide fara sa ocupe loc in fata, cum ar face o usa clasica, si da un aspect modern, curat, mai ales intr-un living sau o bucatarie deschisa. Fata de usa plianta, e o piesa de design, nu doar o solutie utilitara. E cea mai scumpa usa de interior din top si cere spatiu liber de perete langa deschidere, pe unde sa alunece foaia, plus un montaj mai atent. O iei cand vrei sa economisesti spatiu si sa castigi si la aspect, intr-o camera unde usa se vede.' },
+  // --- Usi de garaj ---
+  { g: 'garaj', id: 'DLZK9FBBM', badge: 'Usa de garaj tip rulou',
+    specs: ['garaj tip rulou', 'aluminiu, electrica', 'montaj simplu', 'se ruleaza sus'],
+    pros: ['Se ruleaza sus, nu ocupa loc pe tavan', 'Montaj mai simplu, pe sau in zid', 'Aluminiu, electrica, cu telecomanda', 'Nota maxima de la cumparatori'],
+    cons: ['Lamelele subtiri izoleaza mai slab', 'Reduce putin inaltimea libera de trecere', 'Putine pareri'],
+    verdict: 'Alegerea daca vrei o usa de garaj simplu de montat, care nu ocupa loc pe tavan. Usa tip rulou e formata din lamele orizontale de aluminiu care se ruleaza pe un ax deasupra golului, ca o jaluzea, deci nu are sine pe tavan si se monteaza mai usor, aplicata pe zid sau in golul lui. E electrica, cu telecomanda, si are nota maxima, chiar daca de la putine pareri, ceea ce e normal la usi de garaj. Compromisul e izolatia: lamelele subtiri nu tin caldura si sunetul la fel de bine ca panourile groase, iar ruloul de sus reduce putin inaltimea libera de trecere. O iei cand vrei montaj simplu si nu ai un garaj incalzit lipit de casa.' },
+  { g: 'garaj', id: 'DP4Y45BBM', badge: 'Usa de garaj sectionala',
+    specs: ['garaj sectionala automata', 'panouri cu spuma poliuretanica', 'izolatie superioara', 'lamele 55 mm'],
+    pros: ['Panouri groase cu spuma, cea mai buna izolatie', 'Se ridica spre tavan, elibereaza golul', 'Automata, cu telecomanda', 'Buna pentru garaj lipit de casa sau incalzit'],
+    cons: ['Cere sine pe tavan si montaj mai complex', 'Ocupa spatiu pe plafon', 'Cea mai scumpa din top'],
+    verdict: 'Alegerea daca garajul e lipit de casa sau vrei sa il tii cald, pentru ca panourile groase de 55 mm, umplute cu spuma poliuretanica, izoleaza mult mai bine termic si fonic decat lamelele subtiri de la rulou. Usa sectionala e formata din panouri rigide care se ridica pe sine spre tavan si se strang paralel cu plafonul, eliberand complet golul de intrare. E automata, cu telecomanda. Compromisurile: cere sine montate pe tavan, deci un montaj mai complex, ocupa spatiu pe plafon si e cea mai scumpa optiune de garaj din top. O iei cand vrei izolatie buna la garaj, esti dispus la un montaj mai laborios si ai spatiu pe tavan pentru sine.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const INTRARE = PICKS.filter(x => x.g === 'intrare');
+const INTERIOR = PICKS.filter(x => x.g === 'interior');
+const GARAJ = PICKS.filter(x => x.g === 'garaj');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/usi.webp';
+const figIntrare = '/imagini/articole/usi-intrare.webp';
+const figTipuri = '/imagini/articole/usi-tipuri.webp';
+const figGaraj = '/imagini/articole/usi-garaj.webp';
+const published = '2026-07-18T07:34:17+03:00';
+
+const faq = [
+  { question: 'Usa de intrare din PVC sau metalica?', answer: 'Termopanul din PVC izoleaza foarte bine termic si fonic, vine in multe culori si modele si e mai ieftin, deci e alegerea celor mai multi. Usa metalica e mai rezistenta la efractie si mai robusta, potrivita cand securitatea e prioritatea, dar are mai putine optiuni de design. Daca vrei izolatie si aspect, mergi pe PVC cu inchidere in mai multe puncte; daca vrei maxim de siguranta, alege metalica.' },
+  { question: 'Ce inseamna profil cu 5 camere la o usa PVC?', answer: 'Camerele sunt compartimentele de aer din interiorul profilului de PVC. Cu cat sunt mai multe, cu atat izolatia termica si fonica e mai buna, pentru ca aerul din ele franeaza trecerea caldurii si a zgomotului. Un profil cu 5 camere izoleaza mai bine decat unul cu 3, la un plus mic de pret. Pentru o usa de intrare, 5 camere sau mai multe sunt o alegere buna, mai ales in zonele cu ierni reci.' },
+  { question: 'Usa de interior plianta sau culisanta?', answer: 'Usa plianta, tip acordeon, se strange lateral si ocupa doar cativa centimetri, e cea mai ieftina si nu cere spatiu pe perete sau in fata, buna pentru debara, camara sau o baie mica. Usa culisanta aluneca pe langa perete, arata mult mai bine si economiseste si ea spatiu, dar costa mai mult si are nevoie de perete liber langa deschidere. Pentru un spatiu utilitar, ia plianta; pentru o camera unde usa se vede, culisanta.' },
+  { question: 'Usa de garaj rulou sau sectionala?', answer: 'Usa rulou se strange pe un ax deasupra golului, ca o jaluzea, se monteaza mai simplu si nu ocupa loc pe tavan, dar lamelele subtiri izoleaza mai slab. Usa sectionala are panouri groase cu spuma, care izoleaza mult mai bine termic si fonic, si se ridica spre tavan, dar cere sine pe plafon si un montaj mai complex. Pentru un garaj neincalzit, ruloul e suficient; pentru unul lipit de casa sau pe care vrei sa il tii cald, alege sectionala.' },
+  { question: 'Cat de important e montajul la usi?', answer: 'Foarte important, mai mult decat la alte produse. O usa montata stramb sau intr-un gol masurat gresit nu inchide etans, pierde caldura, se blocheaza sau lasa curenti. La usile de intrare si de garaj, montajul se face de un tehnician, cu masuratori exacte ale golului in mai multe puncte. Masoara latimea si inaltimea in cel putin doua locuri si foloseste valoarea cea mai mica, iar daca ai dubii, cere sfatul unui specialist inainte sa comanzi.' },
+  { question: 'Se pot automatiza usile de garaj?', answer: 'Da, atat cele tip rulou cat si cele sectionale se pot actiona electric, cu motor si telecomanda, iar cele din selectie sunt deja automate. Deschizi si inchizi garajul de la distanta, fara sa cobori din masina, ceea ce conteaza mai ales iarna sau pe ploaie. Motorul se poate lega si la sisteme smart, ca sa comanzi usa din telefon. La montaj, verifica sa ramana si o deblocare manuala, pentru cazul in care ramai fara curent.' },
+  { question: 'De ce au usile mai putine pareri decat alte produse?', answer: 'Pentru ca sunt cumparaturi rare si mari: schimbi o usa de intrare sau una de garaj o data la multi ani, nu ca un produs mic pe care il ia multa lume des. De aceea, la usi, numarul de pareri e mereu mic, iar o nota buna de la 10-16 cumparatori conteaza mai mult decat pare. Cand alegi o usa, uita-te si la material, la profil si la constructie, nu doar la numarul de note, pentru ca astea spun cel mai mult despre cat va tine.' },
+];
+
+const images = [hero, figIntrare, figTipuri, figGaraj, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune usi pentru casa in 2026: de intrare, de interior si de garaj"
+  description="Ce usi sa iti iei in 2026: usi de intrare din PVC sau metalice, usi de interior pliante si culisante, si usi de garaj rulou sau sectionale, comparate cu pareri reale. Plus material, izolatie si montaj."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Radu Popescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Amenajari si Instalatii', url: '/amenajari-instalatii/' }, { name: 'Cele mai bune usi pentru casa' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/amenajari-instalatii/">Amenajari si Instalatii</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune usi pentru casa</span>
+    </nav>
+
+    <h1>Cele mai bune usi pentru casa in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/radu-popescu/">Radu Popescu</a>, Consultant Amenajari · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune usi pentru casa: de intrare, de interior si de garaj" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>La usa de intrare, cea mai buna alegere pentru cei mai multi este <strong>Kirchberger Kira</strong>, termopan PVC izolat, iar daca vrei maxim de securitate, o usa <strong>metalica</strong>. La interior, o <strong>usa plianta</strong> rezolva ieftin un spatiu mic, iar una <strong>culisanta</strong> arata premium. La garaj, alegi intre <strong>rulou</strong>, simplu de montat, si <strong>sectionala</strong>, mai bine izolata.</p>
+      <p>Usa nu e un singur produs, ci trei decizii diferite: usa de intrare tine de izolatie si securitate, cea de interior de spatiu si aspect, iar cea de garaj de montaj si izolatie. De aceea am impartit selectia pe cele trei tipuri, fiecare cu ce conteaza la el. La usi, numarul de pareri e mai mic decat la produse mici, asa ca ne-am uitat si la material si constructie, nu doar la note.</p>
+      <p>Am pornit de la cele mai vandute usi de pe eMAG, le-am verificat materialul, tipul si modul de montaj si le-am grupat pe intrare, interior si garaj, ca sa gasesti repede ce cauti. Pentru baie, vezi si <a href="/cele-mai-bune-cabine-de-dus/">cabinele de dus</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#intrare">Usi de intrare (exterior)</a></li>
+        <li><a href="#interior">Usi de interior</a></li>
+        <li><a href="#garaj">Usi de garaj</a></li>
+        <li><a href="#securitate">Izolatie si securitate</a></li>
+        <li><a href="#montaj">Montajul si masuratorile</a></li>
+        <li><a href="#cat-costa">Cat costa o usa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="intrare">Usi de intrare (exterior)</h2>
+    <p>Usa de intrare tine caldura in casa si tine afara pe cine nu vrei, deci conteaza izolatia si securitatea. Alegerea mare e intre termopan PVC, mai bine izolat si cu mai multe modele, si metal, mai rezistent la efractie.</p>
+    <div class="rd-grid">
+      {INTRARE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figIntrare} alt="Usi de intrare: Kirchberger termopan PVC si NOVO metalica" width="1200" height="675" loading="lazy" />
+
+    <h2 id="interior">Usi de interior</h2>
+    <p>La interior, alegerea tine de spatiu si aspect. Usile pliante economisesc loc si sunt ieftine, bune pentru debara si spatii mici; cele culisante arata mai bine si sunt pentru camere unde usa se vede.</p>
+    <div class="rd-grid">
+      {INTERIOR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figTipuri} alt="Usi de interior pliante si culisante si usa de garaj rulou" width="1200" height="675" loading="lazy" />
+
+    <h2 id="garaj">Usi de garaj</h2>
+    <p>La garaj, decizia e intre rulou, simplu de montat dar mai slab izolat, si sectionala, cu panouri groase care tin caldura, dar cu montaj mai complex. Ambele se automatizeaza cu telecomanda.</p>
+    <div class="rd-grid">
+      {GARAJ.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <h2 id="securitate">Izolatie si securitate</h2>
+    <p>Doua lucruri care fac o usa buna, mai ales la intrare:</p>
+    <p><strong>Izolatia</strong> la usile termopan tine de numarul de camere din profil, adica de compartimentele de aer din rama: mai multe camere, izolatie mai buna. Un profil cu 5 camere e o alegere buna pentru o usa de exterior. La garaj, izolatia vine din grosimea panourilor: cele sectionale, cu spuma poliuretanica, tin caldura mult mai bine decat lamelele subtiri de rulou.</p>
+    <p><strong>Securitatea</strong> la usa de intrare tine de material si de broasca. O usa metalica rezista cel mai bine la efractie, dar si una din PVC cu inchidere in mai multe puncte, adica cu zavoare care se blocheaza pe mai multe laturi, ofera un nivel bun de siguranta. Daca alegi termopan cu geam, cere geam securizat, mult mai greu de spart.</p>
+
+    <img class="rd-fig" src={figGaraj} alt="Usa de garaj rulou sau sectionala cu spuma poliuretanica" width="1200" height="675" loading="lazy" />
+
+    <h2 id="montaj">Montajul si masuratorile</h2>
+    <p>La usi, montajul conteaza mai mult decat la orice alt produs din casa: o usa pusa stramb sau intr-un gol masurat gresit nu inchide etans, pierde caldura si se blocheaza. Cateva reguli:</p>
+    <ul>
+      <li><strong>Masoara golul in mai multe puncte.</strong> Ia latimea si inaltimea in cel putin doua locuri si foloseste valoarea cea mai mica. Verifica si daca zidul e drept.</li>
+      <li><strong>Usile de intrare si de garaj se monteaza de un tehnician.</strong> Sunt grele, cer fixare solida in zid si reglaj fin ca sa inchida etans si sa functioneze automatizarea.</li>
+      <li><strong>Usile pliante de interior le poti monta si singur,</strong> pe un profil simplu, fara tocarie complicata; cele culisante cer mai multa atentie la sina si la nivel.</li>
+    </ul>
+    <p>Daca ai dubii la masuratori sau la tipul de zid, cere sfatul unui specialist inainte sa comanzi. O usa gresit dimensionata nu se poate ajusta oricum dupa livrare.</p>
+
+    <h2 id="cat-costa">Cat costa o usa, pe tipuri</h2>
+    <p>Preturile difera enorm intre tipuri, deci merita sa stii la ce sa te astepti la fiecare:</p>
+    <p><strong>Usi de interior:</strong> cele mai ieftine sunt cele pliante, de la sub 200 de lei, bune pentru debara si spatii mici. O usa culisanta de calitate, ca piesa de design, sare de 3000 de lei, plus montajul. Intre ele stau usile de interior clasice, cu toc, la cateva sute de lei.</p>
+    <p><strong>Usi de intrare:</strong> o usa termopan PVC izolata incepe pe la 1000 de lei pentru modelele simple, cu 5 camere, si urca spre 2000-3000 de lei la cele duble, cu geam si finisaje mai bune. Usile metalice, pentru securitate, sunt in aceeasi zona de pret. La toate, adauga montajul de tehnician.</p>
+    <p><strong>Usi de garaj:</strong> sunt cele mai scumpe, pentru ca vin cu automatizare. O usa tip rulou sau una sectionala automata pornesc pe la 3300-3800 de lei si urca dupa dimensiune si izolatie. La garaj, montajul e o parte importanta din cost, mai ales la sectionale, care cer sine pe tavan.</p>
+    <p>Peste tot, pune la buget si montajul, care la usile de intrare si de garaj nu e optional, ci face diferenta intre o usa care inchide etans si una care da probleme. Pentru o casa mai eficienta energetic, vezi si <a href="/cele-mai-bune-panouri-solare/">panourile solare</a>.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-usi')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate usile la oferta</strong>
+        <span>Reducerile din acest moment la usi de intrare, interior si garaj, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">RP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/radu-popescu/" class="author-name-link">Radu Popescu</a></p>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Radu are peste 9 ani in amenajari si dotari pentru casa, de la usi si cabine de dus la panouri solare, si explica pe intelesul tuturor ce conteaza la montaj, materiale si eficienta.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-usi-pentru-casa" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-usi-pentru-casa" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

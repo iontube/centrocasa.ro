@@ -1,238 +1,338 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Mop cu aburi pentru podele",
-  excerpt: "Stiti, sotia mea tot imi zicea ca podelele nu sunt curate cum trebuie. Si avea dreptate. Am incercat tot felul de solutii, dar tot parca lipsea ceva. Pana cand am descoperit mopul cu aburi pentru podele. E o chestie care chiar a schimbat jocul in casa noastra.",
-  image: "/images/articles/mop-cu-aburi-pentru-podele.webp",
-  category: "Curatenie si Intretinere",
-  categorySlug: "curatenie-intretinere",
-  date: "2026-02-03T13:18:09.644Z",
-  modifiedDate: "2026-02-03T13:18:09.644Z",
-  author: "Elena Dragomir",
-  authorRole: "Consultant Amenajari",
-  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
-};
-
-const faq = [
-  { question: "Pot folosi un mop cu aburi pe orice tip de podea?", answer: "In general, da, pe majoritatea suprafetelor dure precum gresia, faianta, linoleumul. Pentru parchet laminat sau PVC, este recomandat sa folosesti un nivel scazut de abur si sa nu insisti pe aceeasi zona, pentru a evita deteriorarea. Verifica intotdeauna specificatiile mopului si recomandarile producatorului." },
-  { question: "Cat de mult dureaza pana se incalzeste un mop cu aburi?", answer: "Majoritatea mopurilor moderne se incalzesc foarte repede, in aproximativ 15-30 de secunde. Modelele mai vechi sau cele cu rezervor foarte mare pot dura putin mai mult, pana la 1-2 minute. Verificati specificatiile produsului pentru un timp exact." },
-  { question: "Pot adauga substante chimice sau parfum in rezervorul de apa?", answer: "Nu, categoric nu. Mopurile cu aburi sunt concepute sa functioneze doar cu apa. Adaugarea de detergenti, parfumuri sau alte substante chimice poate deteriora iremediabil aparatul si poate anula garantia." },
-  { question: "Cat de des trebuie sa curat rezervorul de apa si filtrul?", answer: "Este recomandat sa golesti si sa clatesti rezervorul de apa dupa fiecare utilizare. Pentru a preveni depunerile de calcar, curata-l temeinic o data pe luna cu o solutie de decalcifiere sau otet diluat, urmand instructiunile producatorului." },
-  { question: "Un mop cu aburi chiar omoara bacteriile?", answer: "Da, aburul la temperaturi ridicate (peste 100 de grade Celsius) este eficient in uciderea a 99.9% din bacterii, virusuri si alti germeni, fara a fi nevoie de substante chimice. Este o metoda excelenta de igienizare profunda." },
-  { question: "Ce fac daca mopul cu aburi lasa prea multa apa pe podea?", answer: "Daca podeaua ramane prea umeda, inseamna ca folosesti prea mult abur sau ca treci prea incet. Incearca sa reduci cantitatea de abur (daca modelul permite) sau sa te deplasezi mai repede. Pentru parchet, sterge imediat cu o carpa uscata." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un mop cu aburi? Povestea mea si a sotiei", id: "de-ce-ai-nevoie-de-un-mop-cu-aburi-povestea-mea-si-a-sotiei" },
-  { title: "Top 5 Mopuri cu Aburi pe care le-am analizat (si unul pe care l-am luat)", id: "top-5-mopuri-cu-aburi-pe-care-le-am-analizat-si-unul-pe-care-l-am-luat" },
-  { title: "Cum sa alegi corect: criteriile mele de selectie", id: "cum-sa-alegi-corect-criteriile-mele-de-selectie" },
-  { title: "Avantaje si Dezavantaje: Sincer, ce mi-a placut si ce nu", id: "avantaje-si-dezavantaje-sincer-ce-mi-a-placut-si-ce-nu" },
-  { title: "Sfaturi practice si trucuri din experienta mea", id: "sfaturi-practice-si-trucuri-din-experienta-mea" },
-  { title: "Parerea mea finala: Merita investitia?", id: "parerea-mea-finala-merita-investitia" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['mop-aburi'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Verticale, pentru podele ---
+  { g: 'vert', id: 'DM20YQBBM', badge: 'Cel mai vandut', short: 'Rowenta RY6597', putere: '1200 W', incalzire: '30 s', cablu: '7 m',
+    specs: ['1200 W, rezervor 0.6 l', 'gata de folosit in 30 de secunde', 'cablu lung, 7 m', 'de departe cel mai vandut vertical, 158 de pareri'],
+    pros: ['De departe cel mai vandut mop vertical din selectie, 158 de pareri', 'Se incalzeste rapid, in 30 de secunde', 'Cablu lung, 7 m, acoperi o camera fara sa schimbi priza', 'Rowenta, brand cunoscut, cu service la noi'],
+    cons: ['Clasic, fara accesorii de aparat multifunctional', 'Rezervor mediu, 0.6 l'],
+    verdict: 'Cea mai sigura alegere pentru curatarea zilnica a podelelor, verificata de cei mai multi cumparatori. Rowenta RY6597 e un mop vertical de 1200 W care se incalzeste in doar 30 de secunde, deci il pornesti si te apuci imediat de treaba, fara asteptare. Rezervorul de 0.6 l si cablul generos de 7 metri iti acopera o camera intreaga fara sa muti priza, iar aburul igienizeaza gresia si suprafetele sigilate fara detergent. E de departe cel mai vandut mop vertical din selectie, cu 158 de pareri, si vine de la Rowenta, cu service la noi. E un mop clasic, fara accesoriile unui aparat multifunctional. Il iei cand vrei cel mai verificat mop vertical, simplu si rapid, pentru intretinerea zilnica a podelelor.' },
+  { g: 'vert', id: 'DL7TCXYBM', badge: 'Cel mai bun raport', short: 'Cecotec HydroSteam', putere: '1500 W', incalzire: 'rapida', cablu: '',
+    specs: ['1500 W, incalzire rapida', 'putere mare pentru un pret mic', 'pentru curatarea si igienizarea podelelor', 'nota 4.36 din 55 de pareri'],
+    pros: ['Cel mai bun raport pret-putere din grupul vertical', '1500 W, abur consistent', 'Nota buna, 4.36, din multe pareri', 'Cecotec, brand cu preturi bune'],
+    cons: ['Mai putine detalii de dotari declarate', 'Fara accesorii multifunctionale'],
+    verdict: 'Cel mai bun raport intre pret si putere din grupul de mopuri verticale. Cecotec HydroSteam are 1500 W, mai mult decat multe modele mai scumpe, la un pret dintre cele mai mici din selectie, deci scoti abur consistent pentru curatarea si igienizarea podelelor fara sa dai multi bani. Are o nota buna, 4.36, din 55 de pareri, semn ca lumea e multumita, si vine de la Cecotec, un brand cu preturi agresive si gama larga de electrocasnice. E un mop simplu, fara accesoriile unui aparat multifunctional, gandit sa faca bine treaba de baza. Il iei cand vrei cea mai multa putere pe cei mai putini bani, pentru intretinerea curenta a podelelor.' },
+  { g: 'vert', id: 'DFQ4HCBBM', badge: 'Vileda, nota buna', short: 'Vileda steam', putere: '1550 W', incalzire: '4 min', cablu: '6 m',
+    specs: ['1550 W, cablu de 6 m', 'de la Vileda, specialist in curatenie', 'nota 4.41 din 61 de pareri', 'pentru podele sigilate'],
+    pros: ['Vileda, brand specializat in produse de curatenie', 'Nota buna, 4.41, din 61 de pareri', '1550 W, abur puternic', 'Cablu de 6 m, mobilitate buna'],
+    cons: ['Se incalzeste mai lent, 4 minute', 'Fara accesorii multifunctionale'],
+    verdict: 'O alegere solida de la un brand specializat in curatenie. Mopul Vileda steam are 1550 W si un cablu de 6 metri, cu abur puternic pentru gresie si podele sigilate, si vine de la Vileda, un nume de referinta in produsele de curatenie, ceea ce da incredere in calitatea lavetelor si a materialelor. Are o nota buna, 4.41, din 61 de pareri. Singurul minus notabil e timpul de incalzire mai mare, circa 4 minute, fata de cele 30 de secunde ale altor modele, deci astepti un pic mai mult pana pornesti. Il iei cand pui pret pe un brand specializat in curatenie si pe o nota buna, si nu te deranjeaza sa astepti cateva minute pana se incalzeste.' },
+  { g: 'vert', id: 'DB4N72MBM', badge: 'Accesibil, de brand', short: 'Black+Decker FSM13E1', putere: '1300 W', incalzire: '30 s', cablu: '4 m',
+    specs: ['1300 W, rezervor 0.38 l', 'gata in 30 de secunde', 'presiune abur 0.5 bar', 'de la Black+Decker'],
+    pros: ['De la Black+Decker, brand cunoscut, la un pret mic', 'Se incalzeste rapid, in 30 de secunde', 'Usor si manevrabil, rezervor mic', 'Nota decenta, 4.15, din 47 de pareri'],
+    cons: ['Cablu scurt, 4 m', 'Rezervor mic, 0.38 l, reumpli mai des'],
+    verdict: 'Un mop vertical accesibil de la un brand cunoscut, pentru cine vrea simplu si ieftin. Black+Decker FSM13E1 are 1300 W si se incalzeste in 30 de secunde, deci e gata repede, iar rezervorul mic il face usor si manevrabil, bun pentru curatari scurte si dese. Are o nota decenta, 4.15, din 47 de pareri, si aduce increderea brandului Black+Decker la un pret mic. Compromisurile tin de dimensiuni: cablul e scurt, 4 metri, deci schimbi priza mai des, iar rezervorul de 0.38 l se goleste mai repede, asa ca il reumpli mai frecvent la suprafete mari. Il iei cand vrei un mop de brand ieftin, usor, pentru un apartament sau curatari rapide, si nu ai suprafete foarte mari.' },
+  { g: 'vert', id: 'DTLDZTYBM', badge: 'Karcher, premium', short: 'Karcher SC 2 Upright', putere: '1600 W', incalzire: '30 s', cablu: '5 m',
+    specs: ['1600 W, rezervor 0.4 l', 'gata in 30 de secunde', 'de la Karcher, referinta in curatare cu abur', 'cablu de 5 m'],
+    pros: ['Karcher, brandul de referinta in curatarea cu abur', 'Putere mare, 1600 W', 'Se incalzeste rapid, in 30 de secunde', 'Constructie si fiabilitate de calitate'],
+    cons: ['Pret de gama premium', 'Nota 4.02, mai modesta la acest cod'],
+    verdict: 'Alegerea daca vrei un mop de la brandul de referinta in curatarea cu abur. Karcher SC 2 Upright are 1600 W, cea mai mare putere din grupul vertical, si se incalzeste in 30 de secunde, cu rezervor de 0.4 l si cablu de 5 metri. Karcher e numele care a facut cunoscuta curatarea cu abur si e apreciat pentru constructie si fiabilitate, un plus real daca vrei un aparat care sa tina ani buni. E in zona de pret premium pentru un mop vertical, iar nota la acest cod, 4.02, e ceva mai modesta decat la modelele de top. Il iei cand pui pret pe brandul si calitatea Karcher si vrei putere mare, si esti dispus sa platesti pentru asta.' },
+  // --- Multifunctionale si portabile ---
+  { g: 'multi', id: 'DPS6622BM', badge: 'Cel mai vandut', short: 'SeveShop SC-06 10 in 1', putere: '1200 W', incalzire: '15 s', cablu: '7 m',
+    specs: ['aparat 10 in 1, mop plus portabil cu accesorii', '1200 W, presiune 2 bar', 'gata in 15 secunde', 'de departe cel mai vandut din selectie, 191 de pareri'],
+    pros: ['De departe cel mai vandut din toata selectia, 191 de pareri, nota 4.87', 'Multifunctional, se transforma in aparat portabil cu duze', 'Se incalzeste foarte rapid, in 15 secunde', 'Cablu lung, 7 m, si presiune buna, 2 bar'],
+    cons: ['Multe accesorii de gestionat si depozitat', 'Corp ceva mai greu ca un mop simplu'],
+    verdict: 'Cel mai vandut si mai bine cotat aparat din toata selectia, pentru cine vrea sa curete mai mult decat podelele. SeveShop SC-06 e un 10 in 1: il folosesti ca mop vertical pentru podele, dar il si transformi intr-un aparat portabil cu tot felul de duze, pentru gresie, rosturi, geamuri, chiuvete, tapiterii sau bucatarie. Are 1200 W, presiune de 2 bar si se incalzeste foarte repede, in 15 secunde, cu cablu lung de 7 metri. E de departe cel mai vandut, cu 191 de pareri si nota 4.87, cea mai buna din selectie. In schimb, are multe accesorii de gestionat si e ceva mai greu decat un mop simplu. Il iei cand vrei un singur aparat care sa curete cu abur in toata casa, nu doar pe jos, si iti place ca e cel mai verificat de cumparatori.' },
+  { g: 'multi', id: 'D4T53FYBM', badge: 'Cel mai ieftin', short: 'Adler AD7038', putere: '2000 W', incalzire: 'rapida', cablu: '2.7 m',
+    specs: ['aparat portabil cu aburi, 2000 W', 'presiune mare, 3.5 bar', 'cu accesorii pentru diverse suprafete', 'cel mai ieftin din selectie'],
+    pros: ['Cel mai mic pret din selectie', 'Putere mare, 2000 W, si presiune de 3.5 bar', 'Portabil, cu accesorii pentru mai multe suprafete', 'Nota buna, 4.39, din 49 de pareri'],
+    cons: ['Cablu scurt, 2.7 m', 'Format portabil, nu mop vertical clasic'],
+    verdict: 'Cu cel mai mic pret, cureti cu abur in toata casa, cu un aparat portabil puternic. Adler AD7038 are 2000 W si o presiune mare, de 3.5 bar, deci scoate un jet consistent de abur, si vine cu accesorii pentru mai multe suprafete: gresie, rosturi, bucatarie, baie. E un aparat portabil, de mana, nu un mop vertical clasic, potrivit pentru curatari punctuale si igienizare, nu pentru maturat rapid podeaua in picioare. Cablul e scurt, 2.7 metri, deci te leaga mai mult de priza. Are o nota buna, 4.39, din 49 de pareri. Il iei cand vrei putere de abur si versatilitate la cel mai mic pret, si nu te deranjeaza formatul portabil in locul unui mop vertical.' },
+  { g: 'multi', id: 'DZLW9HMBM', badge: 'Shark, usor si cotat', short: 'Shark S6003EU', putere: '1200 W', incalzire: 'rapida', cablu: '8 m',
+    specs: ['1200 W, rezervor 350 ml, doar 2.7 kg', 'cel mai lung cablu, 8 m', 'de la Shark, brand apreciat', 'nota 4.72 din 29 de pareri'],
+    pros: ['Foarte usor, 2.7 kg, manevrabil', 'Cel mai lung cablu din selectie, 8 m', 'Nota mare, 4.72', 'Shark, brand apreciat pentru curatenie'],
+    cons: ['Rezervor mic, 350 ml', 'Pret mai ridicat'],
+    verdict: 'Alegerea daca vrei un mop usor si manevrabil, de la un brand apreciat. Shark S6003EU cantareste doar 2.7 kg, deci il plimbi lejer prin casa si il ridici usor pe scari, si are cel mai lung cablu din selectie, 8 metri, care iti da mobilitate maxima fara sa schimbi priza. Are 1200 W si o nota mare, 4.72, din partea cumparatorilor, cu increderea brandului Shark in spate. Rezervorul e mic, 350 ml, deci il reumpli mai des la suprafete mari, iar pretul e mai ridicat decat al modelelor de baza. Il iei cand pui pret pe greutate mica si mobilitate, cu un brand bine cotat, si nu te deranjeaza sa reumpli rezervorul mai des.' },
+  { g: 'multi', id: 'DZH20QMBM', badge: '10 in 1, pliabil', short: 'Ariete 4175', putere: '1500 W', incalzire: '0 s', cablu: '',
+    specs: ['aparat 10 in 1, pliabil pentru depozitare', '1500 W, presiune 3.5 bar', 'abur aproape instant', 'multe accesorii incluse'],
+    pros: ['10 in 1, acopera multe tipuri de curatare', 'Se pliaza, ocupa putin la depozitare', '1500 W si presiune buna, 3.5 bar', 'Abur aproape instant'],
+    cons: ['Foarte putine pareri, 5', 'Multe accesorii de gestionat'],
+    verdict: 'O alternativa multifunctionala care se pliaza, pentru cine are spatiu putin de depozitare. Ariete 4175 e un aparat 10 in 1 cu 1500 W si presiune de 3.5 bar, care scoate abur aproape instant si vine cu multe accesorii pentru podele, suprafete verticale, geamuri si colturi. Marele lui atu practic e ca se pliaza, deci il strangi si il pui intr-un dulap fara sa ocupe mult, spre deosebire de aparatele voluminoase. Are inca foarte putine pareri, doar 5, asa ca il iei mai mult pe specificatii, si, ca orice aparat multifunctional, are multe accesorii de gestionat. Il iei cand vrei versatilitatea unui 10 in 1 intr-un corp care se strange compact.' },
+  // --- Cu aspirare si pentru covoare ---
+  { g: 'covor', id: 'D9BSXRYBM', badge: 'Aspira si spala', short: 'Shark S8201EU', putere: '1120 W', incalzire: 'rapida', cablu: '',
+    specs: ['aspira si curata cu abur in acelasi timp', 'de la Shark, sistem automat', 'ridica mizeria si igienizeaza dintr-o trecere', 'nota 4.59 din 46 de pareri'],
+    pros: ['Aspira si spala cu abur simultan, dintr-o singura trecere', 'Iti scuteste pasul de aspirat inainte', 'Shark, brand apreciat, nota 4.59', 'Bun pentru curatenie completa a podelelor'],
+    cons: ['Cel mai scump din selectie', 'Mai greu si mai voluminos'],
+    verdict: 'Alegerea daca vrei sa aspiri si sa speli podeaua in acelasi timp, dintr-o singura trecere. Shark S8201EU combina aspirarea cu curatarea cu abur: ridica firimiturile, praful si parul si, in aceeasi miscare, igienizeaza cu abur, deci nu mai trebuie sa aspiri intai si apoi sa treci cu mopul, faci totul odata. Vine de la Shark, cu o nota buna, 4.59, din 46 de pareri, si e gandit pentru o curatenie completa a podelelor. E cel mai scump din selectie si, fiind doi aparati intr-unul, e mai greu si mai voluminos. Il iei cand vrei sa economisesti timp si sa faci aspiratul si spalatul intr-un singur pas, si esti dispus sa platesti pentru asta.' },
+  { g: 'covor', id: 'DP74B83BM', badge: 'Pentru covoare, putere mare', short: 'Excitat 2500W', putere: '2500 W', incalzire: 'rapida', cablu: '',
+    specs: ['2500 W, cea mai mare putere din selectie', 'rezervor mare, 1600 ml', 'potrivit si pentru covoare', 'nota 4.66 din 29 de pareri'],
+    pros: ['Cea mai mare putere din selectie, 2500 W', 'Rezervor generos, 1600 ml, reumpli rar', 'Bun si pentru improspatarea covoarelor', 'Nota mare, 4.66'],
+    cons: ['Putere mare inseamna si consum mai mare', 'Corp mai voluminos'],
+    verdict: 'Alegerea pentru cea mai multa putere si un rezervor mare, bun si pe covoare. Modelul Excitat are 2500 W, de departe cea mai mare putere din selectie, deci scoate abur din belsug pentru murdaria incapatanata si pentru improspatarea covoarelor, nu doar a podelelor dure. Rezervorul generos de 1600 ml inseamna ca lucrezi mult fara sa reumpli, un plus la suprafete mari. Are o nota mare, 4.66, din 29 de pareri. Puterea mare vine cu un consum pe masura si un corp mai voluminos. Il iei cand vrei abur din plin, un rezervor mare si posibilitatea de a improspata si covoarele, nu doar gresia si parchetul sigilat.' },
+  { g: 'covor', id: 'DL4RQGYBM', badge: 'Covoare, accesibil', short: 'STEAM-IT Max 2 in 1', putere: '1300 W', incalzire: '15 s', cablu: '5 m',
+    specs: ['2 in 1, cu accesoriu pentru covoare', '1300 W, presiune mare, 10 bar', 'gata in 15 secunde', 'nota 4.33 din 27 de pareri'],
+    pros: ['Vine cu accesoriu special pentru covoare', 'Presiune foarte mare, 10 bar', 'Se incalzeste rapid, in 15 secunde', 'Pret accesibil'],
+    cons: ['Putere medie, 1300 W', 'Mai putine pareri, 27'],
+    verdict: 'Fara sa dai multi bani, cureti cu abur si podelele, si covoarele. STEAM-IT Max e un 2 in 1 care vine cu un accesoriu special pentru covoare, cu care improspatezi mocheta si covorul, pe langa gresie si parchetul sigilat. Are 1300 W, dar o presiune foarte mare, de 10 bar, ceea ce ajuta la desprinderea murdariei, si se incalzeste rapid, in 15 secunde. Are o nota buna, 4.33, din 27 de pareri, la un pret accesibil. Puterea de 1300 W e medie, iar numarul de pareri e mai mic decat la modelele de top. Il iei cand vrei un mop care sa prinda si covoarele, cu presiune mare si pret mic, si nu ai nevoie de cea mai mare putere.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const VERT = PICKS.filter(x => x.g === 'vert');
+const MULTI = PICKS.filter(x => x.g === 'multi');
+const COVOR = PICKS.filter(x => x.g === 'covor');
+
+const hero = '/images/articles/mop-cu-aburi-pentru-podele.webp';
+const figVert = '/imagini/articole/mop-verticale.webp';
+const figMulti = '/imagini/articole/mop-multifunctionale.webp';
+const figCovor = '/imagini/articole/mop-covoare.webp';
+const published = '2026-07-18T21:06:10+03:00';
+
+const faq = [
+  { question: 'Cum functioneaza un mop cu aburi si chiar igienizeaza?', answer: 'Un mop cu aburi incalzeste apa dintr-un rezervor la peste 100°C si o transforma in abur, pe care il elibereaza printr-o laveta de microfibra ce aluneca pe podea. Aburul fierbinte dizolva murdaria si grasimea si, foarte important, igienizeaza: elimina pana la 99,9% dintre bacterii si germeni, ca E. coli sau Salmonella, folosind doar puterea aburului, fara detergenti chimici. E motivul pentru care e apreciat in casele cu copii mici sau cu animale, unde vrei podele curate si dezinfectate fara urme de substante. Practic, cureti si dezinfectezi intr-o singura trecere, doar cu apa.' },
+  { question: 'Pe ce tipuri de pardoseala pot folosi un mop cu aburi?', answer: 'Excelent pe gresie, ceramica si linoleum, unde aburul curata si igienizeaza fara probleme. Cu parchetul si laminatul trebuie sa fii mai atent: le poti curata cu abur doar daca sunt perfect sigilate, adica laminat cu strat rezistent la umiditate sau lemn tratat cu lacuri impermeabile. Nu folosi niciodata aburul pe lemn masiv nefinisat sau pe suprafete ceruite, pentru ca umezeala si caldura le pot deforma sau pata. Daca nu esti sigur ca podeaua e bine sigilata, verifica recomandarile producatorului pardoselii sau incearca intai pe o zona ascunsa. Pentru covoare, ai nevoie de un model cu accesoriu dedicat.' },
+  { question: 'Ce putere si ce timp de incalzire sa aleg?', answer: 'Puterea, intre circa 1200 si 2500 W in selectie, influenteaza cat de repede si de consistent produce aburul: mai multi watti inseamna abur mai bogat, util pentru murdaria incapatanata si covoare. Timpul de incalzire conteaza pentru confortul zilnic: modelele bune sunt gata in 15-30 de secunde, ca Rowenta, SeveShop sau STEAM-IT din selectie, deci le pornesti si te apuci imediat de treaba. Cateva modele, ca Vileda, cer mai mult, in jur de 4 minute. Pentru o curatenie rapida si deasa, alege un aparat cu incalzire sub 30 de secunde; pentru murdarie grea si covoare, uita-te si la o putere mai mare.' },
+  { question: 'Ce e mai bun, un mop simplu vertical sau unul multifunctional?', answer: 'Depinde ce vrei sa cureti. Un mop vertical clasic, ca Rowenta sau Karcher din selectie, e gandit strict pentru podele: il pornesti, treci cu el si gata, simplu si comod pentru intretinerea zilnica. Un aparat multifunctional, ca SeveShop 10 in 1 sau Ariete, se transforma intr-un aparat portabil cu duze pentru gresie, rosturi, geamuri, bucatarie, baie sau tapiterii, deci cureti cu abur in toata casa, nu doar pe jos. In schimb, are mai multe accesorii de gestionat si e ceva mai greu. Daca vrei doar podele curate rapid, alegi verticalul; daca vrei un singur aparat pentru toata casa, alegi multifunctionalul.' },
+  { question: 'Trebuie sa folosesc detergent cu mopul cu aburi?', answer: 'Nu, si acesta e chiar marele avantaj. Mopul cu aburi curata si igienizeaza folosind exclusiv puterea aburului fierbinte, fara niciun detergent chimic, ceea ce e mai sanatos pentru casele cu copii si animale si mai bine pentru mediu. Nu adauga detergenti in rezervor decat daca producatorul spune explicit ca se poate, pentru ca cei mai multi cer doar apa, iar substantele straine pot infunda sau deteriora aparatul. Daca ai apa foarte dura, cu mult calcar, unele modele recomanda apa distilata sau demineralizata, ca sa nu se depuna calcar in interior. In rest, doar apa e suficienta.' },
+  { question: 'Cat de des trebuie sa schimb sau sa spal lavetele?', answer: 'Lavetele de microfibra se spala si se refolosesc de multe ori, deci nu sunt un consumabil pe care il arunci. Dupa fiecare folosire, scoate laveta si spal-o, pentru ca in ea raman praful si murdaria ridicate de pe podea; daca o lasi murdara, data urmatoare doar imprastii mizeria. Cauta un mop care vine cu doua sau mai multe lavete lavabile, ca sa ai mereu una curata la schimb cat se usuca cealalta. Cu grija, o laveta buna tine mult timp fara sa isi piarda puterea de absorbtie, ceea ce inseamna economie si o solutie mai ecologica decat consumabilele de unica folosinta.' },
+  { question: 'Un mop cu aburi inlocuieste aspiratorul?', answer: 'Nu complet, decat daca alegi un model care aspira si spala in acelasi timp, ca Shark S8201 din selectie. Un mop cu aburi obisnuit spala si igienizeaza, dar nu ridica firimiturile, praful si parul de pe jos, deci ideal aspiri sau maturi intai, apoi treci cu mopul cu abur, ca aburul sa lucreze pe o podea deja curata de resturi mari. Modelele care combina aspirarea cu aburul fac ambele lucruri dintr-o trecere si iti scutesc pasul de aspirat, dar sunt mai scumpe si mai grele. Pentru majoritatea, un mop cu aburi completeaza aspiratorul, nu il inlocuieste.' },
+  { question: 'Cat costa un mop cu aburi bun?', answer: 'In selectie, un mop vertical bun porneste de la circa 220-330 de lei, cazul modelelor Black+Decker, Cecotec sau STEAM-IT, cu tot ce trebuie pentru intretinerea zilnica. Modelele de la branduri mari, ca Rowenta, Vileda sau Karcher, si aparatele multifunctionale 10 in 1, ca SeveShop, sunt in general 460-610 lei. Cele premium, cu aspirare integrata sau brand de top ca Shark, trec de 700 si urca spre 930 de lei. Pe langa pret, gandeste-te ce vrei sa cureti: doar podele sau toata casa, si daca ai nevoie de accesoriu pentru covoare, pentru ca astea decid ce categorie ti se potriveste.' },
+];
+
+const images = [hero, figVert, figMulti, figCovor, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Mop cu aburi pentru podele - CentroCasa"
-  description="Stiti, sotia mea tot imi zicea ca podelele nu sunt curate cum trebuie. Si avea dreptate. Am incercat tot felul de solutii, dar tot parca lipsea ceva. Pana cand am descoperit mopul cu aburi pentru podele. E o chestie care chiar a schimbat jocul in casa noastra."
-  image="/images/articles/mop-cu-aburi-pentru-podele.webp"
+  title="Cele mai bune mopuri cu aburi pentru podele in 2026: verticale, multifunctionale si pentru covoare"
+  description="Care sunt cele mai bune mopuri cu aburi pentru podele in 2026: modele verticale de la Rowenta, Karcher si Vileda, aparate multifunctionale 10 in 1 si variante care aspira sau curata covoare, comparate pe putere, timp de incalzire si dotari. Plus cum functioneaza, pe ce pardoseli si cum alegi."
+  image={hero}
   type="article"
-  publishedTime="2026-02-03T13:18:09.644Z"
-  modifiedTime="2026-02-03T13:18:09.644Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Elena Dragomir"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cele mai bune mopuri cu aburi pentru podele' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Mop cu aburi pentru podele</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune mopuri cu aburi pentru podele</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/curatenie-intretinere/" class="article-category">Curatenie si Intretinere</a>
-        <span class="article-date">3 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Mop cu aburi pentru podele</h1>
-    </header>
+    <h1>Cele mai bune mopuri cu aburi pentru podele</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/mop-cu-aburi-pentru-podele.webp" alt="Mop cu aburi pentru podele" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune mopuri cu aburi pentru podele: verticale, multifunctionale si pentru covoare" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-mop-cu-aburi-povestea-mea-si-a-sotiei">
-        <h2>De ce ai nevoie de un mop cu aburi? Povestea mea si a sotiei</h2>
-        <p>Salutare, dragilor! Azi vreau sa va povestesc despre ceva ce mi-a facut viata mai usoara in casa. Si cand zic asta, ma refer la curatenie. Pentru ca, sa fim sinceri, cine iubeste sa curete podelele? Eu, unul, nu sunt mare fan. Sotia mea, in schimb, e mult mai meticuloasa. Si de multe ori, dupa ce facea ea curat, tot ii murmura prin casa ca parca nu e totul cum trebuie. Zice ca vede urme, ca nu e igienizat cum trebuie.</p><p>Am incercat tot felul de solutii. Am luat solutii de curatat speciale, am incercat cu otet, cu bicarbonat... tot felul de retete de pe net. Unele dadeau un rezultat, altele deloc. Problema e ca multe din solutiile alea chimice imi lasau un miros puternic in casa, iar eu am un nas mai sensibil. Plus ca, sa freci pe genunchi sau sa te apleci ore in sir nu e deloc sanatos, mai ales pentru spate. Si nici nu simteam ca am scapat de toti microbii aia invizibili.</p><p>Asa ca am inceput sa ma gandesc la alternative. Am tot auzit vorbindu-se despre mopurile cu aburi. La inceput am fost sceptic. Cum adica, curata doar cu aburi? Fara chimicale? Pare prea frumos sa fie adevarat, nu? Dar am zis ca merit sa ma interesez mai bine. Sotia era si ea curioasa, asa ca am inceput sa cautam informatii.</p><p>Si am aflat ca un mop cu aburi e, de fapt, o chestie destul de simpla, dar <a href="/cum-sa-cureti-eficient-casa/">eficient</a>a. Incalzeste apa pana la o temperatura destul de ridicata, transformand-o in abur. Acest abur fierbinte este eliberat sub <a href="/masina-de-spalat-cu-presiune-pentru-acasa/">presiune</a> si, sincer sa fiu, e fantastic ce poate face. Dizolva murdaria, grasimea, si, cel mai important, omoara bacteriile si germenii. Fara niciun fel de substanta chimica.</p><p>Pentru cine e potrivit? Pentru oricine isi doreste o curatenie mai eficienta si mai igienica. Daca ai copii mici, animale de companie, sau pur si simplu iti pasa de sanatatea familiei tale, un mop cu aburi e o investitie buna. E potrivit pentru majoritatea tipurilor de podele: gresie, faianta, parchet laminat (cu grija la cantitate de abur), linoleum, chiar si mochete. E o solutie buna si pentru persoanele cu alergii sau astm, pentru ca nu elibereaza vapori chimici in aer.</p><p>Am realizat ca problema noastra principala era lipsa unei igienizari profunde. Cu mopul clasic, oricat de mult as freca, simteam ca doar imprastii murdaria sau ca nu ajung in toate colturile. Aburul, in schimb, penetreaza si dizolva murdaria greu accesibila, lasand in urma o suprafata curata si igienizata. Si asta, fara efort fizic mare si fara chimicale. Exact ce cautam!</p>
-      </section>
-
-      <section id="top-5-mopuri-cu-aburi-pe-care-le-am-analizat-si-unul-pe-care-l-am-luat">
-        <h2>Top 5 Mopuri cu Aburi pe care le-am analizat (si unul pe care l-am luat)</h2>
-        <p>Dupa ce m-am hotarat ca am nevoie de un astfel de aparat, a urmat partea cea mai grea: sa aleg. Piata e plina de modele, fiecare cu promisiuni mai mari ca ale altuia. Am stat zile intregi pe net, am citit pareri, am comparat specificatii. Si am ajuns la o lista scurta, pe care va zic si voua, poate va ajuta.</p><p><strong>1. Karcher SC 3 EasyFix</strong>. Asta e unul dintre cele mai cunoscute si laudate.</p>
-        <p>Are o presiune buna a aburului si se incalzeste foarte repede, in vreo 30 de secunde. Vine cu o gramada de accesorii, inclusiv un accesoriu special pentru podele, cu o duza plata care prinde bine murdaria. Pretul lui e cam in jur de <strong>800 - 950 RON</strong>.</p>
-        <p>Avantaje: incalzire rapida, putere buna, accesorii multe. Dezavantaje: poate fi un pic cam greu de manevrat pentru unii, si pretul e mai ridicat.</p><p><strong>2. Ariete Steam Mop 2-in-1 (cod 4164)</strong>. Asta mi-a atras atentia pentru ca e si detasabil. Adica, poti folosi partea de sus ca pe un <a href="/aparat-de-curatat-cu-aburi/" class="interlink">aparat de curatat cu aburi</a> de mana, pentru blaturi, aragaz, baia. E destul de usor si se descurca bine pe podele. Il gasiti pe la <strong>400 - 500 RON</strong>. Avantaje: versatil (2-in-1), pret accesibil, usor de folosit. Dezavantaje: rezervorul de apa e mai mic, deci trebuie reumplut mai des la suprafete mari.</p><p><strong>3. Philips Steam Plus (FC7020/01)</strong>. Philips e un nume de incredere, si mopul asta nu m-a dezamagit pe hartie. Are un design elegant si promite o curatare rapida si eficienta. Se incalzeste in jumatate de minut. Pretul lui e undeva intre <strong>600 - 750 RON</strong>. Avantaje: brand recunoscut, design placut, incalzire rapida. Dezavantaje: unii utilizatori spun ca nu vine cu suficiente accesorii pentru diverse suprafete.</p><p><strong>4. Vileda Steam Mop</strong>. Vileda e un brand pe care il cunoastem cu totii de la produse de curatenie.</p>
-        <p>Modelul lor cu aburi e destul de popular si se gaseste la un pret bun, cam <strong>350 - 450 RON</strong>. E simplu de folosit, se incalzeste in vreo 15 secunde si vine cu o laveta din microfibra care se poate spala. Avantaje: pret foarte bun, incalzire extrem de rapida, laveta detasabila si lavabila.</p>
-        <p>Dezavantaje: nu are functia de aparat de mana detasabil, si puterea aburului e poate un pic mai mica decat la modelele mai scumpe.</p><p><strong>5. Black+Decker Steam-it (fara cod specific, sunt mai multe modele)</strong>. Black+Decker face si ei chestii bune, si mopul asta cu aburi e destul de performant.</p>
-        <p>Unele modele ajung la peste 100 de grade Celsius, ceea ce e excelent pentru igienizare. Pretul variaza mult, dar am gasit modele intre <strong>500 - 700 RON</strong>. Avantaje: temperatura ridicata a aburului, putere buna.</p>
-        <p>Dezavantaje: designul poate fi un pic mai greoi la unele modele, si disponibilitatea accesoriilor poate fi limitata.</p><p><strong>Ce am ales eu?</strong> Dupa multe deliberari, am mers pe <strong>Ariete Steam Mop 2-in-1 (cod 4164)</strong>. De ce? Pentru ca am vrut sa testez si functia de aparat de mana, si pentru ca pretul era foarte bun. Si, sincer sa fiu, sunt multumit. Nu e cel mai puternic de pe piata, dar pentru nevoile noastre, e perfect. Curata bine podelele si am putut sa-l folosesc si pe chiuveta din bucatarie, unde se aduna mereu mizerie.</p>
-      </section>
-
-      <section id="cum-sa-alegi-corect-criteriile-mele-de-selectie">
-        <h2>Cum sa alegi corect: criteriile mele de selectie</h2>
-        <p>Alegerea unui mop cu aburi nu e chiar ca si cum ai lua un <a href="/aspirator-cu-spalare-pentru-covoare/">aspirator</a>. Sunt cateva chestii la care trebuie sa te uiti atent, ca sa nu iei ceva ce nu ti se potriveste. Eu, cand am cautat, am tinut cont de cateva aspecte cheie, si vreau sa le impartasesc cu voi.</p><p><strong>1. Puterea si presiunea aburului</strong>. Asta e cel mai important. Un abur puternic, sub presiune, dizolva murdaria mai usor si igienizeaza mai bine. Uita-te la specificatii: de obicei se masoara in grame pe minut (g/min) sau bari (presiunea). Cu cat valorile astea sunt mai mari, cu atat mai bine. Eu am cautat ceva cu minim 15-20 g/min.</p><p><strong>2. Timpul de incalzire</strong>. Nimeni nu vrea sa astepte jumatate de ora pana sa inceapa sa curete. Modelele mai noi se incalzesc in 15-30 de secunde, ceea ce e super comod. E un plus mare daca vrei sa faci o curatenie rapida.</p><p><strong>3. Capacitatea rezervorului de apa</strong>. Daca ai o casa mare sau vrei sa cureti toata casa dintr-o data, ai nevoie de un rezervor mai mare. Daca rezervorul e mic, vei fi nevoit sa il reumpli des, ceea ce intrerupe procesul. Eu am cautat ceva cu minim 300-400 ml, dar am ales unul cu 500 ml.</p><p><strong>4. Greutatea si manevrabilitatea</strong>. Un mop prea greu o sa te oboseasca repede. Si daca nu ajunge in toate colturile, nu prea isi face treaba. Uita-te la greutatea aparatului, la lungimea cablului de alimentare si la cat de usor se manevreaza. Unele au si un sistem de rotire a capului, ceea ce e util.</p><p><strong>5. Accesoriile incluse</strong>. Asta depinde mult de ce vrei sa cureti. Daca vrei sa cureti doar podele, poate nu ai nevoie de multe accesorii. Dar daca vrei sa cureti si rosturile de la faianta, chiuveta, aragazul, sau chiar geamurile, cauta un model cu o varietate de duze si perii. Unele modele au si functia de aparat de curatat cu aburi detasabil, ceea ce e un mare plus pentru versatilitate.</p><p><strong>6. Tipul de podea</strong>. Asta e crucial. Majoritatea mopurilor cu aburi sunt sigure pentru gresie si faianta. Pentru parchet laminat sau PVC, trebuie sa fii mai atent. Aburul in exces poate deteriora stratul protector al parchetului. Cauta modele care permit ajustarea cantitatii de abur sau care au un mod special pentru parchet. Eu am parchet laminat in living si am ales sa folosesc un nivel mai scazut de abur si sa nu insist in aceeasi zona prea mult.</p><p><strong>7. Pretul</strong>. Pretul e, bineinteles, un factor important. Am vazut mopuri cu aburi de la 200 RON pana la peste 1500 RON. Regula generala e ca cele mai scumpe au, de obicei, o putere mai mare, mai multe functii si sunt mai durabile. Dar asta nu inseamna ca un model mai ieftin nu poate fi bun. Trebuie sa gasesti un echilibru intre ce iti permiti si ce ai nevoie.</p><p>Am analizat si parerile altor utilizatori. Pe forumuri, pe site-urile magazinelor, peste tot. Ce spun oamenii despre fiabilitate, despre cat de usor se curata, despre cat de mult rezista.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-sincer-ce-mi-a-placut-si-ce-nu">
-        <h2>Avantaje si Dezavantaje: Sincer, ce mi-a placut si ce nu</h2>
-        <p>Acum ca am folosit mopul cu aburi destul de mult timp, am o parere destul de clara despre el. Nu e perfect, dar are multe plusuri care compenseaza micile neajunsuri. Vreau sa fiu sincer cu voi, ca un vecin la o cafea.</p><p><strong>Avantaje:</strong></p><ul><li><strong>Curatenie si igienizare profunda</strong>. Asta e, fara indoiala, cel mai mare avantaj. Aburul fierbinte omoara 99.9% din bacterii si germeni, lucru pe care un mop clasic cu apa rece nu il poate face. Simt ca podelele sunt mult mai curate, mai ales in bucatarie si baie, unde conteaza mult igiena.</li><li><strong>Fara chimicale daunatoare</strong>. Nu mai trebuie sa imi fac griji cu privire la vapori toxici in casa. E perfect pentru familiile cu copii mici sau animale de companie, sau pentru persoanele cu alergii. Mirosul din casa e mult mai curat, fara acel iz chimic puternic.</li><li><strong>Eficienta pe diverse tipuri de murdarie</strong>. Am observat ca aburul dizolva destul de usor si urmele de grasime, si murdaria uscata, si petele. Nu mai trebuie sa frec la fel de mult ca inainte.</li><li><strong>Economie pe termen lung</strong>. Desi investitia initiala poate fi mai mare, nu mai cumpar solutii <a href="/robot-de-curatat-geamuri/" class="interlink">de curatat</a> scumpe. Apa e gratis! Si lavetele din microfibra se pot spala si refolosi de multe ori.</li><li><strong>Versatilitate (la unele modele)</strong>. Daca alegi un model 2-in-1, cum am facut eu, poti curata si alte suprafete pe langa podele: blaturi, aragaz, rosturi, chiar si tapiterii (cu accesoriile potrivite).</li><li><strong>Usor de utilizat</strong>. Dupa ce te obisnuiesti putin cu el, e destul de simplu. Nu necesita efort fizic mare.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Timpul de uscare</strong>. Dupa ce treci cu mopul cu aburi, podeaua ramane putin umeda. Daca ai parchet, trebuie sa ai grija si sa nu lasi apa sa balteasca. In general, se usuca destul de repede, in cateva minute, dar tot trebuie sa tii cont de asta.</li><li><strong>Nu e pentru orice tip de parchet</strong>. Daca ai parchet din lemn masiv sau parchet vechi, cu finisaj deteriorat, aburul poate fi prea agresiv. Trebuie sa verifici specificatiile si sa fii precaut.</li><li><strong>Necesita intretinere</strong>. Rezervorul de apa trebuie curatat periodic, ca sa nu se depuna calcar. Si lavetele trebuie spalate. Nu e ceva complicat, dar e un pas in plus.</li><li><strong>Capacitatea rezervorului</strong>. La modelele mai mici, rezervorul se goleste destul de repede si trebuie sa il reumpli, ceea ce poate fi un pic deranjant.</li><li><strong>Costul initial</strong>. Un mop cu aburi de calitate poate fi o investitie, comparativ cu un mop clasic. Trebuie sa te gandesti daca beneficiile pe termen lung justifica pretul.</li><li><strong>Manevrabilitatea poate fi o problema</strong>. Unele modele sunt mai greoaie, mai ales cele cu rezervor mare de apa. Daca ai multe obstacole prin casa (mobilier), poate fi un pic dificil sa ajungi peste tot.</li></ul><p>Sincer, pentru mine, avantajele depasesc cu mult dezavantajele. Beneficiul de a avea o casa mai igienica, fara chimicale, si cu un efort fizic redus, merita din plin.</p>
-      </section>
-
-      <section id="sfaturi-practice-si-trucuri-din-experienta-mea">
-        <h2>Sfaturi practice si trucuri din experienta mea</h2>
-        <p>Dupa ce am inceput sa folosesc mopul cu aburi, am mai descoperit cateva chestii care mi-au facut viata mai usoara. Sunt mici trucuri, chestii pe care le inveti pe parcurs, si pe care vreau sa vi le impartasesc.</p><p><strong>1. Foloseste apa distilata sau demineralizata</strong>. Asta e important, mai ales daca stai intr-o zona cu apa calcaroasa. Calcarul se depune in timp si poate infunda aparatul. Daca folosesti apa distilata, prelungesti durata de viata a mopului si il tii in forma.</p><p><strong>2. Nu te grabi cu parchetul</strong>. Cum am zis, parchetul e mai sensibil. Foloseste un nivel de abur scazut, daca aparatul permite asta. Si, cel mai important, nu lasa mopul sa stea in aceeasi pozitie pe parchet. Treci repede peste el si ai grija sa se usuce imediat. Poti chiar sa stergi cu o carpa uscata imediat dupa, daca simti ca e prea umed.</p><p><strong>3. Curata rezervorul de apa regulat</strong>. Nu astepta sa vezi depuneri de calcar. Dupa fiecare utilizare, daca se poate, goleste si clateste rezervorul. O data pe luna, foloseste o solutie speciala pentru decalcifiere (daca producatorul recomanda) sau otet diluat, lasa-l sa actioneze, apoi clateste bine.</p><p><strong>4. Foloseste lavetele potrivite</strong>. Majoritatea mopurilor vin cu lavete din microfibra. Sunt bune, dar daca ai murdarie mai grea, poti incerca sa folosesti o laveta dintr-un material mai absorbant sau cu o textura mai aspra (dar nu prea aspra, sa nu zgarii podeaua).</p><p><strong>5. Nu folosi detergenti in rezervorul de apa</strong>. Asta e o greseala pe care am vazut ca o fac unii. Mopul cu aburi functioneaza cu apa. Detergentii pot deteriora aparatul si pot lasa reziduuri pe podea.</p><p><strong>6. Nu uita de colturile greu accesibile</strong>. Multe mopuri au un cap rotativ, dar tot sunt locuri unde nu ajunge. Poti folosi accesoriile de mana (daca ai un model 2-in-1) sau o perie mica pentru a curata colturile si marginile.</p><p><strong>7. Aeriseste camera dupa utilizare</strong>. Desi nu folosesti chimicale, aburul poate creste umiditatea in camera. E bine sa aerisesti putin, mai ales daca ai parchet sau mobila din lemn.</p><p><strong>8. Testeaza pe o zona mai putin vizibila</strong>. Inainte sa treci mopul cu aburi pe toata podeaua, mai ales daca e un tip de suprafata noua pentru tine (gen parchet nou), testeaza-l pe o portiune mica, intr-un colt, ca sa vezi cum reactioneaza materialul.</p><p><strong>9. <a href="/cutii-de-depozitare-pentru-debara/" class="interlink">Depozitare</a> corecta</strong>. Dupa ce l-ai folosit si curatat, lasa-l sa se usuce complet inainte de a-l depozita. Asta previne aparitia mucegaiului sau a mirosurilor neplacute.</p><p>Am facut si greseli, sincer sa fiu. Am incercat sa curat cu aburi o podea din lemn vechi, si am lasat prea mult abur. S-a umflat putin intr-o zona. Am invatat atunci ca trebuie sa fiu mult mai atent la tipul de material.</p>
-      </section>
-
-      <section id="parerea-mea-finala-merita-investitia">
-        <h2>Parerea mea finala: Merita investitia?</h2>
-        <p>Dupa toate cele povestite, ajungem la concluzia cea mare: merita sa investesti intr-un mop cu aburi pentru podele? Din punctul meu de vedere, raspunsul e un mare DA, dar cu cateva precizari. Daca ma intrebi pe mine, un om simplu care vrea sa aiba casa curata si igienica fara prea multa bataie de cap, atunci da, merita.</p><p>Am simtit o diferenta uriasa in calitatea curateniei. Nu mai e doar o curatenie superficiala, ci una profunda, care-mi da linistea ca familia mea e protejata de microbi si bacterii. Faptul ca nu mai folosesc chimicale e un bonus imens pentru mine, mai ales ca am un copil mic in casa. E o senzatie de curatenie mult mai naturala.</p><p>Daca ai copii mici, animale de companie, sau daca cineva din familie sufera de alergii sau astm, un mop cu aburi e aproape o necesitate. E o investitie in sanatatea familiei tale. Si, pe termen lung, te scapa si de costul multor solutii de curatenie.</p><p>Pentru cine il recomand in mod special? Pentru parintii tineri, pentru stapanii de animale, pentru persoanele care vor o igiena impecabila si sunt preocupate de mediul inconjurator si de sanatatea lor. De asemenea, pentru cei care vor sa reduca efortul fizic depus in timpul curateniei.</p><p>Daca insa locuiesti intr-un <a href="/aer-conditionat-pentru-apartament-mic/" class="interlink">apartament mic</a>, cu putine podele, si esti multumit de metoda ta actuala de curatenie, poate nu e o prioritate. Sau daca ai exclusiv parchet din lemn masiv foarte vechi, trebuie sa fii foarte, foarte precaut si sa te informezi bine inainte de achizitie.</p><p>Eu sunt multumit de alegerea facuta. Am gasit un echilibru bun intre pret, performanta si functii. Nu am dat o avere, dar am un aparat care isi face treaba excelent. Mopul cu aburi a devenit un aliat de nadejde in lupta cu murdaria si bacteriile, si ma bucur ca am facut aceasta schimbare.</p><p>Deci, daca va ganditi sa va luati un mop cu aburi, va spun din experienta: documentati-va, comparati modelele, cititi pareri, dar nu va fie frica sa faceti pasul. Va poate schimba radical perspectiva asupra curateniei in casa.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi un mop cu aburi pe orice tip de podea?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                In general, da, pe majoritatea suprafetelor dure precum gresia, faianta, linoleumul. Pentru parchet laminat sau PVC, este recomandat sa folosesti un nivel scazut de abur si sa nu insisti pe aceeasi zona, pentru a evita deteriorarea. Verifica intotdeauna specificatiile mopului si recomandarile producatorului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de mult dureaza pana se incalzeste un mop cu aburi?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea mopurilor moderne se incalzesc foarte repede, in aproximativ 15-30 de secunde. Modelele mai vechi sau cele cu rezervor foarte mare pot dura putin mai mult, pana la 1-2 minute. Verificati specificatiile produsului pentru un timp exact.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot adauga substante chimice sau parfum in rezervorul de apa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nu, categoric nu. Mopurile cu aburi sunt concepute sa functioneze doar cu apa. Adaugarea de detergenti, parfumuri sau alte substante chimice poate deteriora iremediabil aparatul si poate anula garantia.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie sa curat rezervorul de apa si filtrul?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Este recomandat sa golesti si sa clatesti rezervorul de apa dupa fiecare utilizare. Pentru a preveni depunerile de calcar, curata-l temeinic o data pe luna cu o solutie de decalcifiere sau otet diluat, urmand instructiunile producatorului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Un mop cu aburi chiar omoara bacteriile?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, aburul la temperaturi ridicate (peste 100 de grade Celsius) este eficient in uciderea a 99.9% din bacterii, virusuri si alti germeni, fara a fi nevoie de substante chimice. Este o metoda excelenta de igienizare profunda.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fac daca mopul cu aburi lasa prea multa apa pe podea?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Daca podeaua ramane prea umeda, inseamna ca folosesti prea mult abur sau ca treci prea incet. Incearca sa reduci cantitatea de abur (daca modelul permite) sau sa te deplasezi mai repede. Pentru parchet, sterge imediat cu o carpa uscata.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru curatarea zilnica a podelelor, cel mai vandut mop vertical e <strong>Rowenta RY6597</strong>, rapid si de brand. Daca vrei sa cureti cu abur in toata casa, nu doar pe jos, <strong>SeveShop 10 in 1</strong> e de departe cel mai vandut din selectie. Pentru cel mai bun raport pret-putere, alegi <strong>Cecotec HydroSteam</strong>, iar daca vrei sa aspiri si sa speli dintr-o trecere, <strong>Shark S8201</strong> face ambele.</p>
+      <p>La un mop cu aburi conteaza <strong>puterea</strong> si <strong>timpul de incalzire</strong>, tipul de aparat (vertical simplu, multifunctional sau cu aspirare) si, foarte important, <strong>pe ce pardoseala</strong> il folosesti. Mai jos gasesti direct recomandarile, iar dupa ele un ghid despre cum functioneaza si cum alegi.</p>
+      <p>Am pornit de la mopurile cu aburi in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe putere, timp de incalzire, cablu si dotari, si le-am grupat in verticale pentru podele, multifunctionale si portabile, si modele care aspira sau curata covoare. Pentru curatare cu abur mai variata, vezi <a href="/aparat-de-curatat-cu-aburi/">aparatele de curatat cu aburi</a>, iar pentru covoare, <a href="/aspirator-cu-spalare-pentru-covoare/">aspiratoarele cu spalare</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#vert">Verticale, pentru podele</a></li>
+        <li><a href="#multi">Multifunctionale si portabile</a></li>
+        <li><a href="#covor">Cu aspirare si pentru covoare</a></li>
+        <li><a href="#cum-functioneaza">Cum functioneaza</a></li>
+        <li><a href="#pardoseli">Pe ce pardoseli il folosesti</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#greseli">Greseli de evitat</a></li>
+        <li><a href="#intretinere">Cum il intretii</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Putere</th><th>Incalzire</th><th>Cablu</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.putere}</td>
+              <td>{x.incalzire}</td>
+              <td>{x.cablu || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="vert">Verticale, pentru podele</h2>
+    <p>Formatul clasic, gandit strict pentru podele: il pornesti, treci cu el si gata. Cele mai vandute si mai simple de folosit pentru intretinerea zilnica, de la Rowenta si Karcher pana la Cecotec, cel mai accesibil.</p>
+    <div class="rd-grid">
+      {VERT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figVert} alt="Mopuri cu aburi verticale: Rowenta, Cecotec, Vileda, Karcher" width="1200" height="675" loading="lazy" />
+
+    <h2 id="multi">Multifunctionale si portabile</h2>
+    <p>Se transforma din mop de podea in aparat portabil cu duze, ca sa cureti cu abur in toata casa: gresie, rosturi, geamuri, bucatarie, baie. Aici e si cel mai vandut aparat din toata selectia.</p>
+    <div class="rd-grid">
+      {MULTI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMulti} alt="Aparate cu aburi multifunctionale si portabile: SeveShop, Adler, Shark, Ariete" width="1200" height="675" loading="lazy" />
+
+    <h2 id="covor">Cu aspirare si pentru covoare</h2>
+    <p>Cand vrei mai mult decat spalarea podelelor: modele care aspira si spala cu abur dintr-o singura trecere sau care vin cu accesoriu pentru improspatarea covoarelor si a mochetei.</p>
+    <div class="rd-grid">
+      {COVOR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figCovor} alt="Mopuri cu aburi cu aspirare si pentru covoare: Shark, Excitat, STEAM-IT" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-mop-aburi').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate mopurile cu aburi la oferta</strong>
+        <span>Reducerile din acest moment la mopuri cu aburi, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cum-functioneaza">Cum functioneaza</h2>
+    <p>Un mop cu aburi incalzeste apa dintr-un rezervor la <strong>peste 100°C</strong> si o transforma in abur, eliberat printr-o laveta de microfibra care aluneca pe podea. Aburul fierbinte dizolva murdaria si grasimea si, in acelasi timp, <strong>igienizeaza</strong>: elimina pana la 99,9% dintre bacterii si germeni, ca E. coli sau Salmonella, folosind exclusiv puterea aburului.</p>
+    <p>Marele avantaj e ca faci totul <strong>fara detergent</strong>, doar cu apa, ceea ce e mai sanatos in casele cu copii mici sau cu animale, care se joaca si stau pe jos, si mai bine pentru mediu. Practic, cureti si dezinfectezi intr-o singura trecere, fara urme de substante chimice pe podea si fara mirosuri puternice.</p>
+
+    <h2 id="pardoseli">Pe ce pardoseli il folosesti</h2>
+    <p>Aici e cel mai important lucru de stiut, ca sa nu iti strici podeaua:</p>
+    <ul>
+      <li><strong>Gresie, ceramica, linoleum:</strong> perfect. Aburul curata si igienizeaza fara nicio problema, sunt suprafetele ideale.</li>
+      <li><strong>Parchet si laminat:</strong> doar daca sunt <strong>perfect sigilate</strong>, adica laminat cu strat rezistent la umiditate sau lemn tratat cu lacuri impermeabile. Daca nu esti sigur, verifica recomandarile producatorului pardoselii.</li>
+      <li><strong>Lemn masiv nefinisat sau ceruit:</strong> niciodata. Umezeala si caldura il pot deforma, umfla sau pata.</li>
+      <li><strong>Covoare si mochete:</strong> doar cu un model care are accesoriu dedicat, ca STEAM-IT sau Excitat din selectie, altfel folosesti aburul degeaba.</li>
+    </ul>
+    <p>Daca ai dubii legate de o podea, incearca intai pe o zona ascunsa, intr-un colt sau sub un covor, si vezi cum reactioneaza inainte sa treci peste toata suprafata.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Dincolo de brand, cateva lucruri fac diferenta reala intre doua aparate:</p>
+    <ul>
+      <li><strong>Timpul de incalzire:</strong> cele bune sunt gata in 15-30 de secunde, deci le pornesti si te apuci imediat de treaba. Cateva cer si 4 minute, ceea ce enerveaza la o curatenie rapida.</li>
+      <li><strong>Puterea:</strong> intre 1200 si 2500 W in selectie. Mai multi watti inseamna abur mai bogat, util pentru murdarie grea si covoare.</li>
+      <li><strong>Rezervorul si cablul:</strong> un rezervor mai mare si un cablu de 6-8 metri inseamna mai putine pauze de reumplere si de schimbat priza la suprafete mari.</li>
+      <li><strong>Tipul de aparat:</strong> vertical pentru podele, multifunctional pentru toata casa, cu aspirare pentru curatenie completa dintr-o trecere.</li>
+      <li><strong>Lavetele:</strong> cauta un model cu doua sau mai multe lavete lavabile, ca sa ai mereu una curata la schimb.</li>
+    </ul>
+
+    <h2 id="greseli">Greseli de evitat</h2>
+    <p>Cateva greseli frecvente strica podeaua sau aparatul. Le eviti usor:</p>
+    <ul>
+      <li><strong>Il folosesti pe lemn masiv sau podele nesigilate:</strong> cea mai costisitoare greseala. Aburul umfla si deformeaza lemnul neprotejat. Verifica intai ce pardoseala ai.</li>
+      <li><strong>Pui detergent in rezervor:</strong> cele mai multe modele cer doar apa; substantele straine pot infunda sau strica aparatul. Adauga detergent doar daca producatorul o permite explicit.</li>
+      <li><strong>Nu speli laveta dupa folosire:</strong> o laveta murdara doar imprastie mizeria data urmatoare. Spal-o de fiecare data.</li>
+      <li><strong>Treci cu mopul peste o podea plina de firimituri:</strong> aspira sau matura intai, apoi treci cu aburul, ca sa nu impingi resturile.</li>
+      <li><strong>Ignori apa dura:</strong> daca ai apa cu mult calcar, foloseste apa distilata unde e recomandat, ca sa nu se depuna calcar in aparat.</li>
+    </ul>
+
+    <h2 id="intretinere">Cum il intretii</h2>
+    <p>Un mop cu aburi ingrijit tine ani buni si nu isi pierde puterea. Cateva obiceiuri simple fac diferenta.</p>
+    <p><strong>Goleste rezervorul dupa fiecare folosire</strong> si nu lasa apa statuta inauntru, mai ales daca aparatul sta neutilizat mai mult timp, ca sa nu prinda miros sau depuneri. <strong>Spala lavetele</strong> de fiecare data, pentru ca in microfibra raman praful si murdaria de pe podea; o laveta murdara nu mai absoarbe si doar imprastie mizeria.</p>
+    <p>Cel mai important pe termen lung: <strong>decalcifierea</strong>. Aburul se face din apa, iar apa dura, cu mult calcar, lasa depuneri care infunda duzele si scad performanta. Daca ai apa dura, foloseste apa distilata sau demineralizata acolo unde producatorul recomanda, si detartreaza periodic aparatul conform manualului. In fine, <strong>depoziteaza-l uscat</strong>, cu rezervorul gol si lavetele curate, intr-un loc ferit; modelele care se pliaza, ca Ariete din selectie, ocupa cel mai putin. Asa eviti calcarul, mirosurile si pierderea de putere.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tip, putere si brand:</p>
+    <p><strong>Verticale accesibile:</strong> de la circa 220-330 de lei pentru modele bune de la Black+Decker, Cecotec sau STEAM-IT, cu tot ce trebuie pentru intretinerea zilnica.</p>
+    <p><strong>Branduri mari si multifunctionale:</strong> in general 460-610 lei pentru Rowenta, Vileda, Karcher sau aparatele 10 in 1 ca SeveShop.</p>
+    <p><strong>Premium:</strong> peste 700 de lei, spre 930, pentru modele cu aspirare integrata sau brand de top ca Shark.</p>
+    <p>Pe langa pret, gandeste-te ce vrei sa cureti, doar podele sau toata casa, si daca ai nevoie de accesoriu pentru covoare: astea decid ce categorie ti se potriveste, mai mult decat pretul in sine. Pentru un plan complet, vezi si ghidul <a href="/cum-sa-cureti-eficient-casa/">cum sa cureti eficient casa</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">ED</div>
       <div class="author-info">
-        <h4><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></h4>
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
         <p class="author-role">Consultant Amenajari</p>
-        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+        <p class="author-bio">Elena scrie despre curatenie si intretinerea casei. Cauta aparatele care chiar usureaza treaba, nu pe cele cu cele mai multe functii pe cutie.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="mop-cu-aburi-pentru-podele"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="mop-cu-aburi-pentru-podele"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="mop-cu-aburi-pentru-podele" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="mop-cu-aburi-pentru-podele" currentCategory="curatenie-intretinere" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

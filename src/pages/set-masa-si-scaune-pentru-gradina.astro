@@ -1,276 +1,296 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Set masa si scaune pentru gradina",
-  excerpt: "Daca te gandesti sa-ti amenajezi un colt de relaxare afara, un set de masa si scaune pentru gradina e piesa centrala. E locul unde vei savura cafeaua de dimineata, vei petrece timp cu cei dragi sau pur si simplu te vei bucura de aer curat. Alegerea potrivita poate transforma spatiul tau exterior intr-o oaza de confort.",
-  image: "/images/articles/set-masa-si-scaune-pentru-gradina.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-01-20T12:32:16.789Z",
-  modifiedDate: "2026-01-31T12:32:16.263Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat de des trebuie intretinut mobilierul de gradina din lemn?", answer: "Mobilierul din lemn masiv, mai ales cel expus la soare si ploaie, ar trebui tratat cel putin o data pe an, de preferat la inceputul si sfarsitul sezonului de utilizare. Acest tratament presupune curatarea lemnului, aplicarea unui strat de ulei specific pentru lemn de exterior si, uneori, a unui lac protector. Acest proces previne uscarea, craparea si decolorarea lemnului, prelungindu-i durata de viata considerabil." },
-  { question: "Pot lasa mobilierul de gradina afara pe timp de iarna?", answer: "Depinde foarte mult de material. Mobilierul din ratan sintetic, aluminiu sau plastic de calitate superioara poate fi lasat afara peste iarna, insa este recomandat sa fie acoperit cu huse de protectie. Mobilierul din fier forjat sau lemn, mai ales daca nu a fost tratat corespunzator, nu este recomandat sa fie lasat afara fara o protectie serioasa, deoarece umezeala si inghetul pot deteriora materialul." },
-  { question: "Ce inseamna ratan sintetic si de ce e atat de popular?", answer: "Ratanul sintetic, cunoscut si sub denumirea de poliratan, este un material plastic (de obicei polietilena) impletit, care imita aspectul ratanului natural. Este foarte popular pentru ca este extrem de rezistent la intemperii (soare, ploaie, umiditate), nu se decoloreaza, nu putrezeste si este foarte usor de curatat. In plus, este mai accesibil decat ratanul natural si are o durata de viata lunga." },
-  { question: "Ce fel de perne sunt cele mai potrivite pentru exterior?", answer: "Cele mai potrivite perne pentru exterior sunt cele confectionate din materiale rezistente la apa si la razele UV, cum ar fi poliesterul tratat sau acrilicul. Cauta perne cu umplutura care nu absoarbe apa usor (de exemplu, spuma cu celula inchisa) si care se usuca rapid. De asemenea, este util ca husele sa fie detasabile si lavabile pentru o curatare facila." },
-  { question: "Cum pot curata petele de mucegai de pe mobilierul de gradina?", answer: "Pentru petele de mucegai, cel mai bine este sa folosesti o solutie de apa cu otet alb (o parte otet la doua parti apa) sau o solutie delicata de sapun si apa. Freaca usor zona afectata cu o perie moale sau un burete. Dupa ce ai curatat, clateste bine cu apa curata si lasa mobilierul sa se usuce complet la soare. Evita produsele chimice agresive care pot deteriora materialul." },
-  { question: "Exista seturi de masa si scaune all-inclusive pentru gradina?", answer: "Termenul all-inclusive se refera mai mult la pachetele turistice, dar in contextul mobilierului de gradina, poti gasi seturi care includ masa, scaune, si uneori chiar si perne, umbrela sau alte accesorii. Acestea sunt gandite sa fie o solutie completa pentru amenajarea unui spatiu exterior. Totusi, chiar si in aceste seturi, calitatea pernelor sau a accesoriilor poate varia, asa ca e bine sa verifici specificatiile." }
-];
-
-const toc = [
-  { title: "De ce un set masa si scaune pentru gradina e o idee excelenta?", id: "de-ce-un-set-masa-si-scaune-pentru-gradina-e-o-idee-excelenta" },
-  { title: "Topul meu: Seturi masa si scaune pentru gradina pe care le-as recomanda", id: "topul-meu-seturi-masa-si-scaune-pentru-gradina-pe-care-le-as-recomanda" },
-  { title: "Cum alegi corect setul de masa si scaune pentru gradina ta", id: "cum-alegi-corect-setul-de-masa-si-scaune-pentru-gradina-ta" },
-  { title: "Avantaje si dezavantaje: Ce trebuie sa stii", id: "avantaje-si-dezavantaje-ce-trebuie-sa-stii" },
-  { title: "Sfaturi practice din experienta mea", id: "sfaturi-practice-din-experienta-mea" },
-  { title: "Parerea mea finala: Ce recomand", id: "parerea-mea-finala-ce-recomand" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['set-masa-gradina'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Mici (2-4 locuri) ---
+  { g: 'mic', id: 'D2C4NCMBM', badge: 'Pentru balcon si 2 persoane', short: 'Set fier forjat, 2 locuri', material: 'Fier forjat', locuri: '2', perne: 'nu',
+    specs: ['set 3 piese, masa si 2 scaune', 'fier forjat, aspect clasic', 'pentru 2 persoane', 'compact, pentru balcon sau terasa mica'],
+    pros: ['Compact, incape pe un balcon sau o terasa mica', 'Fier forjat, robust si cu aspect clasic, elegant', 'Greu, nu il ia vantul', 'Nota maxima de la cumparatori'],
+    cons: ['Doar 2 locuri, pentru cuplu sau cafeaua de dimineata', 'Fara perne, scaunele de metal cer o perna moale'],
+    verdict: 'Alegerea pentru un balcon sau o terasa mica, unde vrei un colt de servit cafeaua sau cina in doi. Setul are o masa si doua scaune din fier forjat, cu aspect clasic, ornamental, care da un aer elegant unui spatiu mic. Fierul forjat e robust si greu, deci nu il ia vantul, si rezista bine afara daca ai grija de vopsea. Fiind din metal, scaunele cer o perna moale pentru confort la sederi lungi. Are doar doua locuri, deci e pentru cuplu, nu pentru mese cu musafiri. Il iei cand ai un spatiu mic si vrei un set frumos, solid, pentru doua persoane.' },
+  { g: 'mic', id: 'DHTGNLBBM', badge: 'Ratan pentru 4', short: 'vidaXL ratan, 4 locuri', material: 'Ratan sintetic', locuri: '4', perne: 'nu',
+    specs: ['set 5 piese, masa si 4 scaune', 'ratan sintetic pe cadru', 'pentru 4 persoane', 'aspect modern, rezistent afara'],
+    pros: ['Ratan sintetic, aspect modern si placut', 'Patru locuri, pentru o familie mica sau musafiri putini', 'Rezistent la intemperii, gandit pentru exterior', 'Mai usor de mutat decat metalul sau lemnul'],
+    cons: ['Vine fara perne, le iei separat pentru confort', 'Fara pareri inca'],
+    verdict: 'Un set de patru locuri pentru cine vrea aspectul cald al ratanului fara sa dea multi bani. vidaXL propune o masa si patru scaune din ratan sintetic tesut pe un cadru, un material gandit pentru exterior, care rezista la soare si ploaie mai bine decat pare si arata modern pe o terasa. E mai usor de mutat decat un set de metal sau lemn, deci il rearanjezi simplu. Vine fara perne, asa ca pune la buget cateva pentru sederi lungi. Nu are inca pareri, fiind un model nou. Il iei cand vrei patru locuri, aspect de ratan si un pret rezonabil.' },
+  // --- Familie (6 locuri) ---
+  { g: 'familie', id: 'D5HFNVMBM', badge: 'Cel mai bun raport', short: 'idealStore plastic, 6 locuri', material: 'Plastic', locuri: '6', perne: 'nu',
+    specs: ['set masa si 6 scaune', 'plastic rezistent, usor', 'pentru 6 persoane', 'cel mai vandut din selectie'],
+    pros: ['De departe cele mai multe pareri, sute, cu nota mare', 'Sase locuri la un pret foarte bun', 'Plastic usor, se muta si se spala usor', 'Rezistent la apa, il lasi afara fara griji'],
+    cons: ['Plasticul are un aspect mai simplu decat ratanul sau lemnul', 'La soare puternic, in ani, plasticul se poate decolora'],
+    verdict: 'Recomandarea mea principala pentru o familie: sase locuri, pret mic si sute de pareri bune, cel mai vandut set din selectie. idealStore propune o masa cu sase scaune din plastic rezistent, usor de mutat si de spalat cu un furtun, care nu se teme de ploaie si il lasi afara tot sezonul fara griji. Aspectul e mai simplu decat al ratanului sau lemnului, iar la soare puternic plasticul se poate decolora in timp, dar la pretul si la numarul de pareri e greu de batut. O iei cand vrei un set de familie, incapator si ieftin, pe care sa te bazezi sezon dupa sezon.' },
+  { g: 'familie', id: 'DMKNVD3BM', badge: 'Cel mai ieftin de 6', short: 'DacEnergy polipropilena, 6', material: 'Polipropilena', locuri: '6', perne: 'nu',
+    specs: ['set masa si 6 scaune', 'polipropilena, rezistenta la UV', 'pentru 6 persoane', 'cel mai mic pret pentru 6 locuri'],
+    pros: ['Cel mai mic pret din selectie pentru un set de 6', 'Polipropilena, rezistenta la apa si la soare', 'Usor de mutat si de curatat', 'Sase locuri, pentru toata familia'],
+    cons: ['Nota modesta de la cumparatori, in jur de 3.8', 'Aspect simplu, functional'],
+    verdict: 'Cu bugetul cel mai mic, asezi sase oameni la masa in curte. DacEnergy propune un set din polipropilena, un plastic tehnic rezistent la apa si la razele soarelui, deci nu se strica repede afara si se sterge usor. E functional si usor, il muti singur si il speli cu apa. Nota de la cumparatori e modesta, in jur de 3.8, deci asteptari realiste la un set atat de accesibil, dar isi face treaba pentru mesele din curte. O iei cand vrei sase locuri la cel mai mic pret si nu iti bati capul cu aspectul.' },
+  { g: 'familie', id: 'D0CB2XYBM', badge: 'Elegant, cu blat de sticla', short: 'Heinner Alegria, otel + sticla', material: 'Otel si sticla', locuri: '6', perne: 'da',
+    specs: ['set 7 piese, masa si 6 scaune', 'cadru din otel, blat de sticla', 'perne incluse', 'aspect elegant, modern'],
+    pros: ['Cadru de otel si blat de sticla, aspect elegant si modern', 'Vine cu perne incluse, confort din start', 'Sase locuri, pentru familie si musafiri', 'Nota buna de la cumparatori'],
+    cons: ['Mai scump decat seturile de plastic', 'Blatul de sticla cere atentie si curatare mai deasa'],
+    verdict: 'Alegerea daca vrei un set de familie care arata bine, nu doar functional. Heinner Alegria are un cadru din otel si o masa cu blat de sticla securizata, care da un aspect elegant, modern, pe o terasa amenajata, si vine cu perne incluse, deci ai confort din prima. Cele sase locuri acopera familia si cativa musafiri. E mai scump decat seturile de plastic, iar blatul de sticla se vede cand e prafuit, deci il stergi mai des, dar castigi mult la aspect. O iei cand vrei un set de sase cu tinuta, cu perne si blat de sticla, la un pret inca rezonabil.' },
+  { g: 'familie', id: 'DBZLM2MBM', badge: 'Pliabil, tip picnic', short: 'Masa + 2 banci pliabile', material: 'Plastic', locuri: '8', perne: 'nu',
+    specs: ['masa plianta si 2 banci pliabile', 'se strange tip valiza', 'pana la 8 persoane', 'nota cea mai mare din selectie'],
+    pros: ['Se plieaza tip valiza, se strange si se depoziteaza usor', 'Banci lungi, incap pana la 8 persoane', 'Nota cea mai mare din selectie, aproape de maxim', 'Ideal pentru mese ocazionale, gratare si camping'],
+    cons: ['Banci, nu scaune individuale, mai putin confortabile la sederi lungi', 'Aspect practic, nu decorativ'],
+    verdict: 'Alegerea daca nu vrei un set permanent, ci ceva de scos la mese mari si strans dupa. Setul are o masa plianta si doua banci pliabile care se strang tip valiza, deci il tii intr-o debara sau in portbagaj si il scoti la gratare, petreceri sau camping. Bancile lungi asaza pana la opt oameni, iar nota de la cumparatori e cea mai mare din selectie. Fiind banci, nu scaune cu spatar, sunt mai putin confortabile la sederi foarte lungi, iar aspectul e practic, nu decorativ. Il iei cand vrei un set flexibil, pentru multi oameni, pe care sa il strangi cand nu il folosesti.' },
+  // --- Mari si elegante (ratan cu perne) ---
+  { g: 'mare', id: 'D4TGNLBBM', badge: 'Ratan cu perne, 6 locuri', short: 'vidaXL ratan cu perne, 6', material: 'Ratan sintetic', locuri: '6', perne: 'da',
+    specs: ['set 7 piese, masa si 6 scaune', 'ratan sintetic, cu perne incluse', 'pentru 6 persoane', 'aspect de terasa amenajata'],
+    pros: ['Ratan sintetic cu perne incluse, confort si aspect elegant', 'Sase locuri, pentru familie si musafiri', 'Rezistent la intemperii, gandit pentru exterior', 'Arata a terasa amenajata, nu a mobilier de plastic'],
+    cons: ['Pretul e peste seturile de plastic de aceeasi capacitate', 'Pernele se strang la ploaie, ca sa nu se ude'],
+    verdict: 'Alegerea cand vrei ca terasa sa arate amenajat, nu doar functional, pentru sase persoane. vidaXL propune un set din ratan sintetic cu perne incluse, un material care rezista bine afara si da caldura si eleganta unei terase, mult peste un set de plastic. Cele sase locuri, cu perne, sunt confortabile pentru mese lungi si seri cu musafiri. Pretul e mai mare decat la plastic, iar pernele se strang cand ploua, ca sa nu se ude si sa se ingalbeneasca. O iei cand vrei aspect de terasa amenajata, cu ratan si perne, la sase locuri.' },
+  { g: 'mare', id: 'DCHV39MBM', badge: 'Cel mai mare, 8 locuri', short: 'Set 9 piese ratan, 8 locuri', material: 'Ratan sintetic', locuri: '8', perne: 'da',
+    specs: ['set 9 piese, masa si 8 scaune', 'ratan sintetic cu perne', 'pentru 8 persoane', 'cel mai mare si complet din selectie'],
+    pros: ['Opt locuri, pentru mese mari si petreceri', 'Ratan sintetic cu perne, aspect si confort premium', 'Set complet, 9 piese, masa si 8 scaune cu perne', 'Rezistent la exterior'],
+    cons: ['Cel mai scump din selectie, peste 4800 de lei', 'Cere o terasa mare, ocupa mult spatiu'],
+    verdict: 'Pentru cine primeste des musafiri, cel mai generos set din selectie, cu o masa mare si eleganta afara. Setul are noua piese, o masa si opt scaune din ratan sintetic cu perne, deci asaza confortabil opt oameni pentru mese lungi si petreceri de vara. Ratanul cu perne ii da un aspect si un confort premium, iar setul e complet, nu mai adaugi nimic. E cel mai scump din selectie, peste 4800 de lei, si cere o terasa mare, unde sa incapa toate piesele cu spatiu de miscare in jur. Il iei cand ai o terasa spatioasa, primesti multi oameni si vrei cel mai mare si mai elegant set de dining pentru gradina.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MIC = PICKS.filter(x => x.g === 'mic');
+const FAMILIE = PICKS.filter(x => x.g === 'familie');
+const MARE = PICKS.filter(x => x.g === 'mare');
+
+const site = 'https://centrocasa.ro';
+const hero = '/images/articles/set-masa-si-scaune-pentru-gradina.webp';
+const figMic = '/imagini/articole/set-masa-mic.webp';
+const figFamilie = '/imagini/articole/set-masa-familie.webp';
+const figMare = '/imagini/articole/set-masa-mare.webp';
+const published = '2026-07-18T11:28:50+03:00';
+
+const faq = [
+  { question: 'Ce material de set de gradina rezista cel mai bine afara?', answer: 'Toate materialele de aici sunt gandite pentru exterior, dar difera. Plasticul si polipropilena sunt cele mai fara griji: nu se tem de ploaie, se spala cu furtunul si sunt usoare, dar se pot decolora la soare puternic in ani. Ratanul sintetic rezista bine la intemperii si arata elegant, cu perne care se strang la ploaie. Metalul si fierul forjat sunt robuste si grele, dar cer atentie la vopsea, ca sa nu ruginesca. Lemnul e cel mai cald la aspect, dar cere ulei sau lazura periodic. Alege dupa cat vrei sa intretii.' },
+  { question: 'Cate locuri sa aiba setul de gradina?', answer: 'Depinde de cati sunteti si de cat loc ai. Pentru un balcon sau o terasa mica, un set de 2 pana la 4 locuri ajunge. Pentru o familie, marimea potrivita e de 6 locuri, cea mai cautata. Daca primesti des musafiri sau vrei mese mari de vara, cauta 8 locuri sau un set pliabil cu banci, care asaza multi oameni. Lasa mereu loc in jurul mesei ca scaunele sa se traga, cel putin un metru de fiecare parte.' },
+  { question: 'Set cu scaune sau cu banci?', answer: 'Scaunele individuale sunt mai confortabile, mai ales cu perne si spatar, si le muti dupa nevoie; sunt alegerea pentru un set permanent, de zi cu zi. Bancile, mai ales cele pliabile, asaza mai multi oameni pe acelasi spatiu si se strang usor, deci sunt bune pentru mese ocazionale, gratare, petreceri sau camping. Daca folosesti setul zilnic, ia scaune; daca il scoti doar la ocazii si vrei sa il depozitezi, un set cu banci pliabile e mai practic.' },
+  { question: 'Merita un set cu perne?', answer: 'Da, daca stai mult la masa. Pernele fac diferenta la confort, mai ales pe scaunele de metal, ratan sau lemn, care altfel sunt tari. Multe seturi de ratan si cele mai elegante vin cu perne incluse, iar la cele care nu au, le poti cumpara separat, potrivite pe scaun. Singura grija e ca pernele nu se lasa in ploaie: se ingalbenesc si prind mucegai, deci le strangi cand nu le folosesti sau cand se anunta vreme rea.' },
+  { question: 'Cum ingrijesc si iernez un set de gradina?', answer: 'Peste sezon, curata setul cu apa si o laveta; plasticul si ratanul se spala usor, lemnul se sterge, metalul se verifica de rugina. Pernele se strang la ploaie si se depoziteaza uscate. Iarna, cel mai sigur e sa strangi setul intr-o magazie sau un garaj; daca ramane afara, pune o folie sau o husa de protectie peste el. Lemnul cere ulei sau lazura o data pe an, iar la metal atingi zgarieturile cu vopsea, ca sa nu porneasca rugina. Asa iti dureaza mult mai mult.' },
+  { question: 'Setul de plastic e o alegere buna?', answer: 'Da, pentru cei mai multi. Un set de plastic sau polipropilena e ieftin, usor, rezistent la apa si foarte simplu de intretinut: il speli cu furtunul si il lasi afara tot sezonul. Modelele bune, ca cel de la idealStore, au sute de pareri bune, semn ca merg pentru multa lume. Singurul minus e aspectul, mai simplu decat ratanul sau lemnul, si o posibila decolorare la soare in ani. Daca vrei practic si ieftin, plasticul e alegerea; daca vrei aspect si confort, mergi pe ratan cu perne.' },
+];
+
+const images = [hero, figMic, figFamilie, figMare, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
 ---
 
 <Layout
-  title="Set masa si scaune pentru gradina - CentroCasa"
-  description="Daca te gandesti sa-ti amenajezi un colt de relaxare afara, un set de masa si scaune pentru gradina e piesa centrala. E locul unde vei savura cafeaua de dimineata, vei petrece timp cu cei dragi sau pur si simplu te vei bucura de aer curat. Alegerea potrivita poate transforma spatiul tau exterior intr-o oaza de confort."
-  image="/images/articles/set-masa-si-scaune-pentru-gradina.webp"
+  title="Set masa si scaune pentru gradina in 2026: pe marime si material"
+  description="Ce set de masa si scaune pentru gradina sa alegi in 2026: seturi mici pentru balcon, de familie cu 6 locuri si mari cu 8 locuri, din plastic, ratan, metal sau lemn. Plus ce material rezista afara si cum iernezi setul."
+  image={hero}
   type="article"
-  publishedTime="2026-01-20T12:32:16.789Z"
-  modifiedTime="2026-01-31T12:32:16.263Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Set masa si scaune pentru gradina' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/mobilier-gradina/">Mobilier Gradina</a>
-      <span class="breadcrumb-separator">/</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
       <span>Set masa si scaune pentru gradina</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
-        <span class="article-date">24 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Set masa si scaune pentru gradina</h1>
-    </header>
+    <h1>Set masa si scaune pentru gradina</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/set-masa-si-scaune-pentru-gradina.webp" alt="Set masa si scaune pentru gradina" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Set masa si scaune pentru gradina, pe terasa" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-un-set-masa-si-scaune-pentru-gradina-e-o-idee-excelenta">
-        <h2>De ce un set masa si scaune pentru gradina e o idee excelenta?</h2>
-        <p>Salutare! Dupa atatia ani de umblat prin case si gradini, pot sa spun cu mana pe inima ca un set de masa si scaune <a href="/scaune-pliabile-pentru-exterior/" class="interlink">pentru exterior</a> e una dintre cele mai bune investitii pe care le poti face. Nu vorbim doar de un simplu mobilier, ci de o invitatie la relaxare, la momente frumoase petrecute afara. Gandeste-te: o cafea savurata in liniste dimineata, cu ciripit de pasarele, o cina in aer liber cu prietenii, sau pur si simplu un loc unde copiii se pot juca in siguranta pe afara.</p>
-        <p>E practic o extensie a casei tale, un spatiu unde poti respira mai usor si te poti deconecta de la agitatia zilnica. Pentru cine e potrivit? Practic pentru oricine are un mic balcon, o terasa, o curte sau chiar si o <a href="/balansoar-de-gradina-pentru-2-persoane/">gradina</a> mai mare. Chiar si un spatiu mic poate fi transformat intr-un loc primitor cu ajutorul unui set compact.</p>
-        <p>E ideal pentru familii, cupluri, sau chiar si pentru persoanele care locuiesc singure si vor sa se bucure de natura. E acel element care da personalitate spatiului tau exterior si il face mai primitor. Nu neglija acest aspect cand vine vorba de amenajarea casei tale, pentru ca el aduce un plus de confort si bucurie pe care greu il gasesti in alta parte.</p>
-      </section>
-
-      <section id="topul-meu-seturi-masa-si-scaune-pentru-gradina-pe-care-le-as-recomanda">
-        <h2>Topul meu: Seturi masa si scaune pentru gradina pe care le-as recomanda</h2>
-        <p>Am testat destul de multe variante de-a lungul timpului, asa ca am o parere destul de clara despre ce e bun si ce nu. Iata cateva optiuni care mi s-au parut excelente, fiecare cu farmecul ei:</p>
-        <p>1.  <strong>Set din Ratan Sintetic cu Masuta de Cafea (ex: Keter Corfu Box/Set Indiana)</strong></p>
-        <p><strong>Ce imi place:</strong> E un clasic pentru ca e extrem de rezistent la intemperii, usor de curatat (un prosop umed e suficient) si arata foarte bine. Ratanul sintetic imita perfect lemnul, dar fara bataia de cap a intretinerii. Masuta de cafea e de obicei compacta, perfecta pentru o carte, o bautura sau cateva gustari. Multe modele vin si cu perne, ceea ce adauga un plus de confort.</p>
-        <p><strong>Specificatii:</strong> Se gaseste in diverse culori (gri, maro, antracit), de obicei pentru 2-4 persoane. Materialul e polipropilena de inalta calitate. Pretul variaza intre 700 - 1500 RON, in functie de numarul de piese si brand.</p>
-        <p>2.  <strong>Set din Lemn Masiv (ex: Teak sau Salcam)</strong></p>
-        <p><strong>Ce imi place:</strong> Nimic nu se compara cu senzatia si aspectul natural al lemnului. Un set din lemn masiv aduce o nota de eleganta si caldura in orice <a href="/sezlong-pentru-plaja-si-gradina/">gradina</a>. Lemnul de tec sau salcam e ideal pentru ca e rezistent la umezeala si insecte. Cu o intretinere corecta, poate dura ani buni.</p>
-        <p><strong>Specificatii:</strong> Se gaseste in configuratii de la 2 la 8+ persoane. Lemnul de tec e cel mai scump, dar si cel mai durabil (preturi de la 2000 RON in sus). Salcamul e o alternativa mai accesibila (incepand de la 1000 RON), dar necesita tratament anual. Este important sa fie tratat cu ulei pentru lemn la inceputul si sfarsitul sezonului.</p>
-        <p>3.  <strong>Set din Metal (Aluminiu sau Fier Forjat)</strong></p>
-        <p><strong>Ce imi place:</strong> Metalul, mai ales aluminiul, e o optiune usoara si <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">rezistenta la</a> rugina. Fierul forjat are un farmec aparte, clasic, dar e mai greu si poate necesita tratament anti-rugina. Aceste seturi sunt adesea simple, cu un design minimalist, dar pot fi si foarte ornate, in cazul fierului forjat.</p>
-        <p><strong>Specificatii:</strong> Aluminiul e usor de mutat si nu ruginește (preturi de la 800 RON). Fierul forjat e mai greu, dar confera un aer mediteranean (preturi de la 1200 RON). Se potrivesc bine cu perne colorate pentru a adauga un plus de confort.</p>
-        <p>4.  <strong>Set Pliabil din Plastic/Polipropilena</strong></p>
-        <p><strong>Ce imi place:</strong> Daca spatiul e o problema sau vrei flexibilitate, un set pliabil e solutia. Le poti depozita usor iarna sau cand nu le folosesti. Sunt ieftine, usoare si usor de curatat.</p>
-        <p><strong>Specificatii:</strong> De obicei, pentru 2-4 persoane. Preturi foarte accesibile, de la 200 la 600 RON. Sunt ideale pentru balcoane mici sau pentru a fi scoase la ocazie.</p>
-      </section>
-
-      <section id="cum-alegi-corect-setul-de-masa-si-scaune-pentru-gradina-ta">
-        <h2>Cum alegi corect setul de masa si scaune pentru gradina ta</h2>
-        <p>Alegerea setului perfect poate parea complicata, dar daca te gandesti la cateva aspecte cheie, totul devine mult mai simplu. Din experienta mea, primele lucruri la care te uiti sunt:</p>
-        <p><strong>Spatiul disponibil:</strong> Asta e cel mai important. Masoara cu atentie locul unde vrei sa pui setul. Nu vrei sa ajungi acasa cu un set imens care nu incape sau, dimpotriva, unul prea mic care pare pierdut in spatiu. Gandeste-te la cat loc iti trebuie pentru a te misca in jurul mesei si scaunelor. Un set pentru 4 persoane poate ocupa, de exemplu, 2x1.5 metri, dar asta variaza enorm in functie de design.</p>
-        <p><strong>Materialul:</strong> Fiecare material are avantajele si dezavantajele lui. Daca vrei intretinere minima, mergi pe ratan sintetic sau aluminiu. Daca iubesti aspectul natural si esti dispus sa acorzi putina atentie, lemnul masiv e o alegere superba. Plasticul e cel mai accesibil, dar poate fi mai putin durabil si estetic.</p>
-        <p><strong>Stilul:</strong> Gandeste-te la cum arata casa si gradina ta. Vrei ceva modern, rustic, clasic? Setul de masa si scaune ar trebui sa completeze stilul general. Un set din fier forjat arata grozav langa o casa cu arhitectura clasica, in timp ce ratanul sintetic se potriveste cu un design mai contemporan.</p>
-        <p><strong>Confortul:</strong> Nu uita ca vei petrece timp acolo! Scaunele trebuie sa fie confortabile. Verifica daca au perne, daca spatarul e la unghiul potrivit. Unele scaune au si cotiere, ceea ce poate fi un mare plus. Daca optezi pentru un set fara perne, gandeste-te la costul si disponibilitatea acestora.</p>
-        <p><strong>Durabilitatea si intretinerea:</strong> Cat de mult vrei sa te ocupi de intretinere? Lemnul necesita tratament anual, metalul poate rugini daca nu e protejat corespunzator, in timp ce ratanul sintetic sau plasticul necesita doar o curatare ocazionala. Verifica garantia oferita de producator.</p>
-        <p><strong>Bugetul:</strong> Stabileste-ti un buget de la inceput. Pretul unui set poate varia de la cateva sute de lei la cateva mii, in functie de material, brand si dimensiune. Nu uita sa incluzi in calcul si costul pernelor sau al tratamentelor de intretinere, daca e cazul.</p>
-        <p><strong>Functionalitatea:</strong> Ai nevoie de o masa mare pentru cine formale sau una mica pentru cafea? Vrei scaune care se pot baga sub masa pentru a economisi spatiu? Gandeste-te la cum vei folosi cel mai des setul.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ce-trebuie-sa-stii">
-        <h2>Avantaje si dezavantaje: Ce trebuie sa stii</h2>
-        <p>Fiecare tip de mobilier <a href="/fotoliu-suspendat-pentru-gradina/" class="interlink">pentru gradina</a> vine cu plusurile si minusurile lui, iar seturile de masa si scaune nu fac exceptie. E bine sa le cunosti dinainte ca sa nu ai surprize neplacute:</p>
-        <p><strong>Avantaje Generale:</strong></p>
-        <p><strong>Crearea unui spatiu dedicat:</strong> Principalul avantaj e ca iti ofera un loc special amenajat pentru relaxare, servirea mesei sau socializare in aer liber. Tranforma o simpla curte intr-un "colt de living" exterior.</p>
-        <p><strong>Imbunatatirea esteticii:</strong> Un set frumos ales poate ridica considerabil aspectul gradinii sau terasei, adaugand stil si personalitate.</p>
-        <p><strong>Flexibilitate:</strong> Multe seturi sunt suficient de usoare pentru a fi mutate, permitandu-ti sa schimbi aranjamentul sau sa le muti la soare/umbra dupa cum doresti.</p>
-        <p><strong>Confort:</strong> Cand sunt echipate cu perne, scaunele devin extrem de confortabile, transformand timpul petrecut afara intr-o experienta placuta.</p>
-        <p><strong>Crearea amintirilor:</strong> Aceste spatii devin fundalul multor amintiri frumoase, fie ca e vorba de sarbatori in familie, seri cu prietenii sau momente linistite cu o carte.</p>
-        <p><strong>Dezavantaje Generale:</strong></p>
-        <p><strong>Intretinerea:</strong> In functie de material, pot necesita intretinere regulata (curatare, tratament, protejare). Neglijarea intretinerii poate duce la deteriorarea prematura.</p>
-        <p><strong>Durabilitatea in conditii meteo nefavorabile:</strong> Ploaia, soarele puternic, inghetul pot afecta materialele, mai ales daca nu sunt protejate corespunzator. Unele materiale pot decolora sau crapa.</p>
-        <p><strong>Spatiul de depozitare:</strong> In afara sezonului, daca nu sunt rezistente la intemperii, pot necesita spatiu de depozitare, ceea ce poate fi o problema pentru cei cu putin loc.</p>
-        <p><strong>Costul initial:</strong> Un set de calitate poate reprezenta o investitie initiala destul de mare, desi pe termen lung se poate dovedi rentabil.</p>
-        <p><strong>Potrivirea cu spatiul:</strong> Daca nu masori corect, risti sa achizitionezi un set prea mare sau prea mic, care sa nu se potriveasca estetic sau functional cu spatiul tau.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea">
-        <h2>Sfaturi practice din experienta mea</h2>
-        <p>Dupa atatia ani in domeniu, am invatat cateva trucuri care te pot scuti de batai de cap si te ajuta sa faci cea mai buna alegere. Iata ce mi se pare mie important:</p>
-        <p><strong>Nu te grabi cu alegerea pernelor:</strong> Daca setul nu vine cu perne, acorda-le atentie la fel de mare ca si mobilierului. Alege materiale rezistente la apa si UV, care se usuca rapid si sunt usor de curatat. Culorile vii pot aduce un plus de veselie, dar cele deschise se pot murdari mai usor. Gandeste-te la ce se potriveste cu restul decorului.</p>
-        <p><strong>Protejeaza-l iarna:</strong> Chiar si cele mai rezistente materiale beneficiaza de o protectie suplimentara peste iarna. Daca nu ai un spatiu de depozitare, investeste in huse de protectie impermeabile. Acestea vor prelungi durata de viata a setului si il vor proteja de intemperii, mucegai si praf.</p>
-        <p><strong>Curata regulat:</strong> Nu astepta sa se murdareasca prea tare. O curatare rapida saptamanal, mai ales daca ai copii sau animale de companie, e mult mai usor de facut si mentine mobilierul in stare buna. Foloseste solutii de curatare blande, specifice materialului.</p>
-        <p><strong>Ia in calcul si alte accesorii:</strong> Un set de masa si scaune e baza, dar gandeste-te si la <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela</a> de soare, covorase pentru exterior, felinare sau chiar si o lada pentru depozitat pernele. Acestea completeaza amenajarea si o fac mai functionala si mai primitoare.</p>
-        <p><strong>Cumpara in extrasezon:</strong> Daca ai posibilitatea, achizitionarea mobilierului de gradina la sfarsitul verii sau in toamna poate aduce reduceri semnificative. Magazinele vor sa scape de stocuri pentru a face loc noilor colectii.</p>
-        <p><strong>Testeaza inainte de a cumpara (daca e posibil):</strong> Daca mergi in magazin, aseaza-te pe scaune, vezi cum te simti. Incearca sa misti masa, sa vezi cat de stabila e. Pozele online pot fi inselatoare, asa ca experienta directa e de nepretuit.</p>
-        <p><strong>Nu uita de suruburi si imbinari:</strong> La seturile care necesita montaj, verifica ca toate suruburile sunt bine stranse si ca imbinarile sunt solide. Un set bine asamblat va fi mult mai stabil si mai sigur.</p>
-      </section>
-
-      <section id="parerea-mea-finala-ce-recomand">
-        <h2>Parerea mea finala: Ce recomand</h2>
-        <p>Dupa atatia ani de testat si recomandat, pot sa spun ca alegerea unui set de masa si scaune <a href="/gratar-pe-carbuni-pentru-gradina/" class="interlink">pentru gradina</a> tine mult de preferintele personale si de nevoile specifice ale fiecaruia. Totusi, daca ar fi sa dau o recomandare generala, as merge pe <strong>ratan sintetic</strong>. Mi se pare ca ofera cel mai bun echilibru intre aspect, durabilitate, intretinere usoara si pret.</p>
-        <p>Un set din ratan sintetic arata modern, rezista bine in conditii meteo variate si nu necesita mult efort pentru a fi tinut in stare buna. E usor de curatat, nu se decoloreaza rapid si e o investitie care te va bucura ani de zile.</p>
-        <p>Pentru cei cu un buget mai generos si care apreciaza frumusetea naturala, un set din <strong>lemn masiv de tec</strong> este, fara indoiala, o alegere de lux. Cu putina atentie la intretinere, devine o piesa centrala spectaculoasa in orice gradina. Insa, pretul sau poate fi un factor descurajant pentru multi.</p>
-        <p>Ce am invatat e ca cel mai important e sa te gandesti la cum vei folosi spatiul. Daca e vorba de un balcon mic unde bei cafeaua dimineata, un set compact, poate chiar pliabil, e perfect. Daca vrei sa organizezi cine mari cu prietenii, vei avea nevoie de ceva mai generos.</p>
-        <p>Nu te lasa pacalit de cele mai ieftine oferte, pentru ca de cele mai multe ori calitatea lasa de dorit. Cauta un echilibru intre pret, calitate si aspect. Si, cel mai important, alege ceva ce iti place cu adevarat, pentru ca gradina ta este refugiul tau si merita sa fie amenajata cu suflet.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie intretinut mobilierul de gradina din lemn?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Mobilierul din lemn masiv, mai ales cel expus la soare si ploaie, ar trebui tratat cel putin o data pe an, de preferat la inceputul si sfarsitul sezonului de utilizare. Acest tratament presupune curatarea lemnului, aplicarea unui strat de ulei specific pentru lemn de exterior si, uneori, a unui lac protector. Acest proces previne uscarea, craparea si decolorarea lemnului, prelungindu-i durata de viata considerabil.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot lasa mobilierul de gradina afara pe timp de iarna?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde foarte mult de material. Mobilierul din ratan sintetic, aluminiu sau plastic de calitate superioara poate fi lasat afara peste iarna, insa este recomandat sa fie acoperit cu huse de protectie. Mobilierul din fier forjat sau lemn, mai ales daca nu a fost tratat corespunzator, nu este recomandat sa fie lasat afara fara o protectie serioasa, deoarece umezeala si inghetul pot deteriora materialul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna "ratan sintetic" si de ce e atat de popular?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Ratanul sintetic, cunoscut si sub denumirea de poliratan, este un material plastic (de obicei polietilena) impletit, care imita aspectul ratanului natural. Este foarte popular pentru ca este extrem de rezistent la intemperii (soare, ploaie, umiditate), nu se decoloreaza, nu putrezeste si este foarte usor de curatat. In plus, este mai accesibil decat ratanul natural si are o durata de viata lunga.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fel de perne sunt cele mai potrivite pentru exterior?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Cele mai potrivite perne pentru exterior sunt cele confectionate din materiale rezistente la apa si la razele UV, cum ar fi poliesterul tratat sau acrilicul. Cauta perne cu umplutura care nu absoarbe apa usor (de exemplu, spuma cu celula inchisa) si care se usuca rapid. De asemenea, este util ca husele sa fie detasabile si lavabile pentru o curatare facila.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum pot curata petele de mucegai de pe mobilierul de gradina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru petele de mucegai, cel mai bine este sa folosesti o solutie de apa cu otet alb (o parte otet la doua parti apa) sau o solutie delicata de sapun si apa. Freaca usor zona afectata cu o perie moale sau un burete. Dupa ce ai curatat, clateste bine cu apa curata si lasa mobilierul sa se usuce complet la soare. Evita produsele chimice agresive care pot deteriora materialul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Exista seturi de masa si scaune "all-inclusive" pentru gradina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Termenul "all-inclusive" se refera mai mult la pachetele turistice, dar in contextul mobilierului de gradina, poti gasi seturi care includ masa, scaune, si uneori chiar si perne, umbrela sau alte accesorii. Acestea sunt gandite sa fie o solutie completa pentru amenajarea unui spatiu exterior. Totusi, chiar si in aceste seturi, calitatea pernelor sau a accesoriilor poate varia, asa ca e bine sa verifici specificatiile.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru o familie, cel mai bun set e <strong>idealStore cu 6 scaune</strong> din plastic: incapator, ieftin si cu sute de pareri bune. Daca vrei ca terasa sa arate amenajat, un <strong>set de ratan cu perne</strong> e alegerea, iar pentru un balcon, un <strong>set de fier forjat de 2 locuri</strong> incape oriunde. Pentru mese mari, un set de <strong>8 locuri</strong> sau unul pliabil cu banci asaza multa lume.</p>
+      <p>La un set de dining pentru gradina, doua lucruri conteaza: <strong>cate locuri</strong> iti trebuie, dupa cati sunteti si cat loc ai, si <strong>din ce material</strong> e facut, pentru ca sta afara, in soare si ploaie. De aici pornesc si pretul, si aspectul, si cat il intretii.</p>
+      <p>Am pornit de la seturile de masa si scaune vandute pe eMAG, le-am verificat materialul, numarul de locuri si dotarea, si le-am grupat pe mici (balcon si terasa mica), de familie si mari. Daca vrei doar cateva piese in loc de un set intreg, vezi <a href="/banca-de-gradina-din-lemn-masiv/">bancile de gradina din lemn</a> sau o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela rezistenta la vant</a> pentru umbra.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#material">Din ce material</a></li>
+        <li><a href="#locuri">Cate locuri alegi</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#mic">Seturi mici (balcon, terasa mica)</a></li>
+        <li><a href="#familie">Seturi de familie (6 locuri)</a></li>
+        <li><a href="#mare">Seturi mari si elegante</a></li>
+        <li><a href="#intretinere">Cum reziste afara si iernare</a></li>
+        <li><a href="#cat-costa">Cat costa un set de gradina</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="material">Din ce material</h2>
+    <p>Materialul decide cat rezista setul afara, cat il intretii si cum arata:</p>
+    <ul>
+      <li><strong>Plastic si polipropilena:</strong> ieftine, usoare, rezistente la apa, se spala cu furtunul. Cele mai fara griji, dar cu aspect mai simplu si o posibila decolorare la soare in ani.</li>
+      <li><strong>Ratan sintetic:</strong> aspect elegant, cald, rezistent la intemperii, deseori cu perne. Arata a terasa amenajata; pernele se strang la ploaie.</li>
+      <li><strong>Metal si fier forjat:</strong> robuste, grele, nu le ia vantul, cu aspect clasic. Cer atentie la vopsea, ca sa nu ruginesca.</li>
+      <li><strong>Otel si sticla:</strong> cadru de otel cu blat de sticla securizata, aspect modern. Sticla se curata usor, dar se vede cand e prafuita.</li>
+      <li><strong>Lemn:</strong> cel mai cald la aspect, natural, dar cere ulei sau lazura periodic si e greu.</li>
+    </ul>
+
+    <h2 id="locuri">Cate locuri alegi</h2>
+    <p>A doua decizie e marimea, dupa cati sunteti si cat loc ai pe terasa:</p>
+    <ul>
+      <li><strong>2-4 locuri:</strong> pentru balcon sau terasa mica, un cuplu sau o familie mica.</li>
+      <li><strong>6 locuri:</strong> marimea de familie, cea mai cautata, pentru mese de zi cu zi si cativa musafiri.</li>
+      <li><strong>8 locuri sau pliabil:</strong> pentru cine primeste des sau vrea mese mari de vara; seturile cu banci pliabile asaza multi oameni si se strang usor.</li>
+    </ul>
+    <p>Lasa mereu loc in jurul mesei, cel putin un metru de fiecare parte, ca scaunele sa se poata trage comod.</p>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Set</th><th>Material</th><th>Locuri</th><th>Perne</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (<tr><td>{x.short}</td><td>{x.material}</td><td>{x.locuri}</td><td>{x.perne}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mic">Seturi mici, pentru balcon si terasa mica</h2>
+    <p>Compacte, pentru 2 pana la 4 locuri, cand ai un spatiu mic dar vrei un colt de servit masa afara.</p>
+    <div class="rd-grid">
+      {MIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMic} alt="Seturi mici de gradina: fier forjat si ratan" width="1200" height="675" loading="lazy" />
+
+    <h2 id="familie">Seturi de familie (6 locuri)</h2>
+    <p>Sweet spot-ul: sase locuri, pret rezonabil si materiale de la plastic accesibil la otel cu sticla. Include si o varianta pliabila pentru mese mari ocazionale.</p>
+    <div class="rd-grid">
+      {FAMILIE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figFamilie} alt="Seturi de familie de gradina: idealStore, DacEnergy si Heinner" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mare">Seturi mari si elegante</h2>
+    <p>Cand vrei o terasa amenajata si mese cu multi musafiri: ratan sintetic cu perne, de la 6 la 8 locuri, cu aspect si confort peste seturile de plastic.</p>
+    <div class="rd-grid">
+      {MARE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMare} alt="Seturi mari de gradina din ratan cu perne, 6 si 8 locuri" width="1200" height="675" loading="lazy" />
+
+    <h2 id="intretinere">Cum reziste afara si iernare</h2>
+    <p>Un set de dining sta afara luni intregi, deci putina grija ii lungeste mult viata:</p>
+    <ul>
+      <li><strong>Curatare:</strong> plasticul si ratanul se spala cu apa si o laveta; lemnul se sterge; metalul se verifica de rugina si se atinge cu vopsea unde s-a zgariat.</li>
+      <li><strong>Pernele la adapost:</strong> nu le lasa in ploaie, se ingalbenesc si prind mucegai. Strange-le cand se anunta vreme rea si tine-le uscate.</li>
+      <li><strong>Iernare:</strong> cel mai sigur e sa strangi setul intr-o magazie sau garaj; daca ramane afara, pune o folie sau o husa de protectie.</li>
+      <li><strong>Lemnul:</strong> cere ulei sau lazura o data pe an, ca sa nu crape si sa nu se cenusesca la soare.</li>
+      <li><strong>Vantul:</strong> seturile usoare de plastic se pot rasturna la vant puternic; strange-le sau ancoreaza-le cand e furtuna.</li>
+    </ul>
+
+    <div class="rd-offers" data-o={b64('oferte-set-masa-gradina')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate seturile de gradina la oferta</strong>
+        <span>Reducerile din acest moment la seturi de masa si scaune pentru gradina, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa un set de masa si scaune pentru gradina</h2>
+    <p>Preturile depind de material, numar de locuri si dotare:</p>
+    <p><strong>Seturi de plastic si polipropilena:</strong> cele mai ieftine, de la circa 550 de lei pentru un set de 6 locuri, inclusiv variantele pliabile cu banci.</p>
+    <p><strong>Seturi de metal, fier forjat sau otel cu sticla:</strong> in general 1000-1750 de lei, cu aspect mai elegant si, la unele, perne incluse.</p>
+    <p><strong>Seturi de ratan sintetic cu perne:</strong> de la circa 1100 de lei la cele de 4-6 locuri, si peste 4800 de lei la seturile mari, de 8 locuri, complete.</p>
+    <p>Pe langa pretul setului, pune la buget pernele, daca nu sunt incluse, si o husa de protectie pentru iarna. Un set bun tine multe sezoane, deci alege dupa cati sunteti si cat vrei sa il intretii, nu doar dupa pret. Pentru mai multe optiuni pe tip si material, vezi si <a href="/cele-mai-bune-seturi-de-mobilier-de-gradina/">selectia mai larga de seturi de mobilier de gradina</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria scrie despre mobilier de gradina si amenajari interioare. Se uita la materiale, dimensiuni si cat rezista lucrurile afara, peste ierni.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="set-masa-si-scaune-pentru-gradina"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="set-masa-si-scaune-pentru-gradina"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="set-masa-si-scaune-pentru-gradina" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="set-masa-si-scaune-pentru-gradina" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

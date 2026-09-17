@@ -1,256 +1,286 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Hamac cu suport pentru curte",
-  excerpt: "Daca vrei un <strong>hamac cu suport pentru curte</strong>, cel mai bun sfat e sa te uiti la modelele din otel sau lemn stratificat, cu o greutate maxima suportata de minim 150-200 kg. Un model popular si rezistent e cel de la marca X, care costa in jur de 800-1000 lei si vine cu perne incluse.",
-  image: "/images/articles/hamac-cu-suport-pentru-curte.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-02-05T13:17:47.357Z",
-  modifiedDate: "2026-02-05T13:17:47.357Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat costa un hamac cu suport pentru curte?", answer: "Un hamac cu suport pentru curte decent incepe de la aproximativ 400-500 lei pentru modele compacte, ajungand la 1000-1300 lei pentru modele din lemn sau otel rezistent, cu hamac din materiale premium." },
-  { question: "Ce material e mai bun pentru suportul de hamac?", answer: "Otelul este cel mai rezistent si accesibil, ideal daca cauti durabilitate. Lemnul stratificat ofera un aspect mai elegant, dar necesita mai multa ingrijire. Ambele sunt optiuni bune daca sunt tratate corespunzator pentru exterior." },
-  { question: "Cat de rezistent trebuie sa fie un hamac cu suport?", answer: "Un hamac bun pentru curte ar trebui sa suporte minim 150-200 kg. Verifica specificatiile tehnice ale producatorului, mai ales daca intentionezi sa-l folosesti in doi." },
-  { question: "Merita sa cumpar un hamac cu suport din lemn?", answer: "Da, merita daca pui accent pe estetica si vrei ca hamacul sa completeze designul curtii tale. Modelele din lemn stratificat sunt rezistente, dar necesita intretinere periodica pentru a-si pastra aspectul si durabilitatea." },
-  { question: "Ce sa evit la un hamac cu suport pentru curte?", answer: "Evita modelele cu preturi suspect de mici, fara specificatii clare de greutate maxima suportata si din materiale de calitate indoielnica. De asemenea, verifica finisajele si calitatea imbinarilor pentru a evita deteriorarea rapida." },
-  { question: "Cum ingrijesc un hamac cu suport pentru curte?", answer: "Curata-l regulat de praf si frunze. Daca e din bumbac, asigura-te ca se usuca bine dupa ploaie. Modelele din lemn pot fi tratate anual cu lac sau ulei special. Depoziteaza-l intr-un loc uscat pe timpul iernii." },
-  { question: "Unde gasesc un hamac cu suport pentru curte de calitate?", answer: "Poti gasi hamac cu suport pentru curte de calitate in magazinele specializate in mobilier de gradina, supermarketurile mari cu sectiune de bricolaj, sau online pe platforme de profil. Verifica review-urile si specificatiile produsului." },
-  { question: "Ce diferenta e intre un hamac simplu si unul cu suport?", answer: "Un hamac simplu necesita doi copaci sau stalpi pentru a fi prins, pe cand un hamac cu suport pentru curte are o structura proprie, permitandu-ti sa-l amplasezi oriunde in gradina sau pe terasa, fara a depinde de alte puncte de ancorare." }
-];
-
-const toc = [
-  { title: "Cum sa alegi cel mai tare hamac cu suport pentru curte", id: "cum-sa-alegi-cel-mai-tare-hamac-cu-suport-pentru-curte" },
-  { title: "Top 5 hamace cu suport pentru curte: Recomandari cu avantaje si dezavantaje", id: "top-5-hamace-cu-suport-pentru-curte-recomandari-cu-avantaje-si-dezavantaje" },
-  { title: "Cum sa alegi hamacul potrivit pentru curtea ta: Ghidul prietenului", id: "cum-sa-alegi-hamacul-potrivit-pentru-curtea-ta-ghidul-prietenului" },
-  { title: "Hamac cu suport pentru curte: Otel vs. Lemn - Cine castiga?", id: "hamac-cu-suport-pentru-curte-otel-vs-lemn---cine-castiga" },
-  { title: "Greșeli pe care le fac toți când cumpără un hamac cu suport pentru curte (și cum să le eviți)", id: "greseli-pe-care-le-fac-toti-cand-cumpara-un-hamac-cu-suport-pentru-curte-si-cum-sa-le-eviti" },
-  { title: "Verdict final: Hamac cu suport pentru curte pe categorii de buget", id: "verdict-final-hamac-cu-suport-pentru-curte-pe-categorii-de-buget" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['hamace'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Seturi complete: hamac + suport ---
+  { g: 'set', id: 'D4SKYVBBM', badge: 'Cel mai vandut', short: 'Timeless Tools', capacitate: '120 kg', locuri: '2 persoane', material: 'Metal',
+    specs: ['set complet, hamac + cadru metalic', '2 persoane, sarcina maxima 120 kg', 'inaltime reglabila, 185 x 150 x 100 cm', 'geanta de transport inclusa'],
+    pros: ['De departe cel mai vandut din selectie, 77 de pareri', 'Set gata de folosit, cu hamac si cadru metalic', 'Inaltime reglabila, il potrivesti pe inaltimea ta', 'Vine cu geanta de transport, il pliezi si il muti usor'],
+    cons: ['Sarcina de 120 kg, medie pentru doua persoane', 'Cadru mai putin robust decat modelele grele'],
+    verdict: 'Cel mai vandut hamac cu suport din selectie si cea mai sigura alegere daca vrei un set gata de pus in curte. Timeless Tools vine complet, cu hamacul si cadrul metalic in aceeasi cutie, pentru doua persoane, cu o sarcina maxima de 120 kg si inaltime reglabila, ca sa il potrivesti dupa inaltimea ta si dupa cat de jos vrei sa stai. Are 185 x 150 x 100 cm, deci intra usor pe o terasa sau intr-un colt de gradina, si include o geanta de transport in care il strangi si il muti sau il depozitezi iarna. Cu 77 de pareri si nota 4.65 e clar preferatul cumparatorilor, un semn bun ca setul isi face treaba. Cadrul e potrivit pentru uz normal, nu pentru sarcini foarte mari. Il iei cand vrei cel mai testat hamac cu suport, gata montat, reglabil si usor de mutat, pentru relaxare in doi.' },
+  { g: 'set', id: 'DXDW9XYBM', badge: 'Cea mai mare capacitate', short: 'Songmics', capacitate: '240 kg', locuri: '1-2 locuri', material: 'Metal',
+    specs: ['cadru metalic robust, reglabil la 5 inaltimi', 'sarcina maxima 240 kg, cea mai mare din selectie', '300 x 90 x 95 cm, panza poliester si bumbac', 'nota maxima, 5 din 5'],
+    pros: ['Cea mai mare capacitate din selectie, 240 kg', 'Cadru reglabil la 5 inaltimi, foarte flexibil', 'Nota maxima, 5 din 5', 'Songmics, brand cunoscut pentru mobilier si organizare'],
+    cons: ['Inca putine pareri, 16', 'Panza pentru o persoana, chiar daca robusta'],
+    verdict: 'Cel mai robust hamac cu suport din selectie, pentru cine vrea o capacitate mare si un cadru care se regleaza fin. Songmics suporta pana la 240 kg, de doua ori mai mult decat majoritatea, si are un cadru metalic reglabil la cinci inaltimi, deci il potrivesti exact cum vrei, mai intins sau mai adanc. Cu 300 cm lungime e generos, iar panza combina poliester si bumbac pentru rezistenta si confort. A luat nota maxima, 5 din 5, iar Songmics e un brand cunoscut pentru mobilier si solutii de organizare, un plus de incredere. Are inca putine pareri, 16, asa ca te bazezi si pe specificatii, si e gandit mai ales pentru o persoana, chiar daca rezista la greutate mare. Il iei cand vrei cel mai solid cadru din selectie, reglabil in cinci trepte, de la un brand de incredere.' },
+  { g: 'set', id: 'DFTGC4MBM', badge: 'Cel mai accesibil set', short: 'K-SPORT KSOZ017', capacitate: '150 kg', locuri: '1-2 locuri', material: 'Otel',
+    specs: ['hamac inclus, stelaj din otel galvanizat si vopsit', 'sarcina maxima 150 kg, rezistent la intemperii', '288 x 115 x 92 cm, cu capace de protectie', 'usor de montat, pentru gradina'],
+    pros: ['Cel mai accesibil set complet din selectie', 'Stelaj din otel galvanizat, rezistent la intemperii', 'Sarcina buna, 150 kg', 'Hamac inclus si capace de protectie anti-apa'],
+    cons: ['Nota 4, din 12 pareri', 'Greu, 27 kg, il muti mai rar'],
+    verdict: 'Cel mai accesibil set complet din selectie, pentru cine vrea hamac si suport la un pret mic. K-SPORT KSOZ017 vine cu hamacul inclus si un stelaj din otel galvanizat si vopsit electrostatic, rezistent la intemperii, deci il poti lasa afara fara grija ploii ocazionale, mai ales ca are si capace de protectie anti-apa. Suporta 150 kg, o valoare buna, are 288 x 115 x 92 cm si se monteaza usor. Cu 12 pareri si nota 4 e o alegere corecta la banii ei, verificata de primii cumparatori. Cantareste 27 kg, cel mai greu din selectie, tocmai pentru ca stelajul e robust, deci il asezi undeva si il muti mai rar. Il iei cand vrei cel mai ieftin set complet, cu un cadru solid din otel rezistent la vreme, si nu te deranjeaza ca e mai greu de mutat.' },
+  { g: 'set', id: 'DWZQPD2BM', badge: 'Pentru doua persoane', short: 'Lewer dublu', capacitate: '200 kg', locuri: '2 persoane', material: 'Otel',
+    specs: ['hamac dublu 280 x 110 cm, cadru metalic inclus', 'sarcina maxima 200 kg', 'panza bumbac densa, 1050 g/m²', 'stelaj din otel, rezistent la intemperii'],
+    pros: ['Sarcina mare pentru doi, 200 kg', 'Panza deasa din bumbac, 1050 g/m², confortabila', 'Set complet, cu cadru metalic inclus', 'Stelaj din otel rezistent la intemperii'],
+    cons: ['Inca putine pareri, 6', 'Mai scump decat seturile de baza'],
+    verdict: 'Hamacul cu suport potrivit pentru doua persoane care vor confort si o panza deasa. Lewer are un hamac dublu de 280 x 110 cm si un cadru metalic inclus, cu o sarcina maxima de 200 kg, deci sustine lejer doi adulti, iar panza din bumbac cu o densitate de 1050 g/m² e printre cele mai groase si mai placute la atins din selectie, buna pentru statul indelung. Stelajul din otel e vopsit prin pulverizare si rezistent la intemperii, gandit pentru gradina. Are inca putine pareri, 6, cu o nota de 4.33, si costa ceva mai mult decat seturile de baza. Il iei cand cauti un hamac dublu confortabil, cu panza deasa si capacitate mare pentru doi, si accepti un pret ceva mai ridicat pentru materialul mai bun.' },
+  // --- Suporturi separate ---
+  { g: 'suport', id: 'DGPGX2MBM', badge: 'Suport metalic recomandat', short: 'Timeless metal', capacitate: '120 kg', locuri: '2 locuri', material: 'Metal',
+    specs: ['suport metalic pentru hamacul tau', 'sarcina maxima 120 kg, 2 locuri', '356.5 x 89 x 104.5 cm', 'usor, 10.3 kg, cu geanta de transport'],
+    pros: ['De la Timeless, acelasi brand ca hamacul cel mai vandut', 'Usor, doar 10.3 kg, il muti si il transporti simplu', 'Vine cu geanta de transport', 'Nota buna, 4.6'],
+    cons: ['Doar suportul, hamacul se cumpara separat', 'Putine pareri, 5'],
+    verdict: 'Suportul metalic de ales daca ai deja un hamac sau vrei sa il alegi separat. Timeless Tools ofera un cadru metalic pentru hamac cu o sarcina de 120 kg si doua locuri, lung de 356 cm, deci intinzi comod un hamac clasic. Marele lui avantaj e greutatea: doar 10.3 kg, cel mai usor din selectie, plus geanta de transport inclusa, asa ca il strangi si il muti sau il iei cu tine fara efort. Vine de la acelasi brand ca hamacul cel mai vandut din selectie, un plus de compatibilitate si incredere, si are nota 4.6. Are inca putine pareri, 5, si e doar suportul, fara panza. Il iei cand vrei un cadru metalic usor si portabil, pe care sa iti pui propriul hamac, de la un brand deja verificat.' },
+  { g: 'suport', id: 'D3P4D5BBM', badge: 'Suport din lemn', short: 'Timeless lemn', capacitate: '120 kg', locuri: '2 locuri', material: 'Lemn',
+    specs: ['suport din lemn pentru hamac', 'sarcina maxima 120 kg, 2 locuri', '356.5 x 89 x 104.5 cm', 'carlige incluse, aspect natural'],
+    pros: ['Singurul din lemn din selectie, aspect natural elegant', 'Sarcina buna, 120 kg, 2 locuri', 'Se potriveste in gradini si terase amenajate natural', 'Carlige de prindere incluse'],
+    cons: ['Foarte putine pareri, 2', 'Lemnul cere mai multa grija la umezeala decat metalul'],
+    verdict: 'Suportul de ales daca vrei un aspect natural, cald, care sa se potriveasca intr-o gradina sau pe o terasa amenajata cu lemn. E singurul suport din lemn din selectie, cu o sarcina de 120 kg si doua locuri, aceleasi dimensiuni generoase ca varianta metalica de la Timeless, 356 cm lungime, si vine cu carligele de prindere incluse. Lemnul da un aer mai placut si mai elegant decat metalul, un avantaj estetic real intr-un colt de relaxare bine gandit. Are, insa, doar 2 pareri, deci te bazezi mai mult pe specificatii, si, ca orice lemn de exterior, cere ceva mai multa grija la umezeala, un strat de protectie si depozitare la adapost iarna. Il iei cand pui pret pe aspectul natural al lemnului si vrei un suport cald, estetic, pentru propriul hamac.' },
+  { g: 'suport', id: 'DTB8XYMBM', badge: 'Suport accesibil', short: 'Vivatechnix', capacitate: '120 kg', locuri: '1 loc', material: 'Metal',
+    specs: ['suport metalic VivaTechnix VMD-1013', 'sarcina maxima 120 kg', '287 x 98 x 134 cm', 'cadru inalt, pentru hamac clasic'],
+    pros: ['Pret accesibil pentru un suport metalic', 'Cadru inalt, 134 cm, pentru hamac bine intins', 'Sarcina buna, 120 kg', 'Constructie simpla, usor de montat'],
+    cons: ['Nota mai modesta, 3.57 din 7 pareri', 'Doar suportul, fara hamac'],
+    verdict: 'O optiune accesibila daca vrei doar cadrul, la un pret mic. VivaTechnix VMD-1013 e un suport metalic pentru hamac cu o sarcina de 120 kg si un cadru mai inalt, de 134 cm, deci intinzi bine un hamac clasic si stai la o inaltime comoda. Are 287 cm lungime, o constructie simpla si se monteaza usor. Cu 7 pareri si nota 3.57 e cel mai modest cotat din selectie, asa ca il iei mai ales pentru pret, nu pentru scor, si te uiti atent la parerile de pe pagina inainte. E doar suportul, fara panza. Il alegi cand ai deja un hamac si vrei cel mai ieftin cadru metalic din selectie, pentru uz obisnuit in gradina sau pe terasa.' },
+  { g: 'suport', id: 'DP421FBBM', badge: 'Pentru hamac-scaun', short: 'casa.pro', capacitate: '130 kg', locuri: '1 loc', material: 'Metal',
+    specs: ['suport metalic pentru hamac tip fotoliu', 'sarcina maxima 130 kg', '205 x 110 x 110 cm, vertical', 'design pentru scaun suspendat'],
+    pros: ['Gandit special pentru hamacul-scaun suspendat', 'Constructie verticala, ocupa putin loc', 'Sarcina buna, 130 kg', 'Nota maxima de la primii cumparatori'],
+    cons: ['Foarte putine pareri, 2', 'Cel mai scump din selectie, pentru o nisa aparte'],
+    verdict: 'Suportul de ales daca vrei un hamac-scaun suspendat, nu unul intins clasic. casa.pro e un cadru metalic vertical, de 205 cm inaltime, gandit special pentru fotoliul suspendat sau scaunul-hamac, cu o sarcina de 130 kg. Fata de suporturile lungi de hamac clasic, acesta ocupa mult mai putin loc pe orizontala, deci il pui usor pe o terasa mica, intr-un colt sau chiar in interior, langa o fereastra. A luat nota maxima de la primii cumparatori, chiar daca are doar 2 pareri, si e cel mai scump din selectie, pentru ca serveste o nevoie aparte. Il iei cand vrei un scaun suspendat de relaxare, cu un cadru vertical care nu ocupa mult spatiu, si nu un hamac intins pe orizontala.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const SET = PICKS.filter(x => x.g === 'set');
+const SUPORT = PICKS.filter(x => x.g === 'suport');
+
+const hero = '/images/articles/hamac-cu-suport-pentru-curte.webp';
+const figSet = '/imagini/articole/hamac-seturi.webp';
+const figSuport = '/imagini/articole/hamac-suporturi.webp';
+const published = '2026-07-19T11:33:14+03:00';
+
+const faq = [
+  { question: 'Hamac cu suport sau hamac de agatat intre copaci?', answer: 'Un hamac cu suport are propriul cadru, deci il pui oriunde: pe terasa, pe balcon, pe gazon sau chiar in casa, fara sa ai nevoie de doi copaci sau doi stalpi la distanta potrivita. E cea mai comoda solutie pentru majoritatea curtilor, pentru ca il muti si il pozitionezi liber, iar iarna il strangi in geanta. Hamacul de agatat e mai ieftin si mai usor, dar depinde de doua puncte de prindere solide, la circa 3-4 metri distanta, ceea ce nu ai mereu la indemana. Daca nu ai unde sa il legi sau vrei libertatea de a-l muta, alegerea evidenta e hamacul cu suport.' },
+  { question: 'Ce capacitate de greutate imi trebuie?', answer: 'Depinde de cati stau in hamac. Pentru o persoana, o sarcina de 120 kg e in general suficienta, iar modelele din selectie pornesc de aici. Pentru doua persoane sau pentru mai multa siguranta, cauta 150-200 kg, ca la K-SPORT sau Lewer, iar cel mai robust din selectie, Songmics, suporta 240 kg. E bine sa alegi cu o marja fata de greutatea reala, pentru ca in hamac te misti, te balansezi si soliciti cadrul mai mult decat greutatea statica. O capacitate mai mare inseamna, de obicei, si un cadru mai robust si mai durabil in timp.' },
+  { question: 'Suport metalic sau din lemn?', answer: 'Cadrul metalic e cel mai practic: e mai usor, mai rezistent la umezeala, se pliaza si se transporta simplu, iar multe modele vin cu geanta. E alegerea potrivita daca muti hamacul des sau il strangi peste iarna. Suportul din lemn arata mai cald si mai elegant si se potriveste frumos intr-o gradina sau pe o terasa amenajata natural, dar e mai greu si cere mai multa grija: un strat de protectie impotriva umezelii si depozitare la adapost cand nu il folosesti. Daca pui pret pe aspect si ai unde sa il tii ferit de ploi lungi, lemnul e mai frumos; daca vrei practic si usor de intretinut, alege metalul.' },
+  { question: 'Pot lasa hamacul cu suport afara peste iarna?', answer: 'Cadrul metalic vopsit sau galvanizat rezista bine la ploaie ocazionala si la soare, mai ales modelele descrise ca rezistente la intemperii, cum sunt K-SPORT sau Lewer. Panza hamacului, insa, se uzeaza mai repede la umezeala, soare puternic si inghet, asa ca cel mai bine e sa o strangi cand nu o folosesti si sa nu o lasi afara toata iarna. Multe seturi vin cu geanta de transport tocmai pentru asta: pliezi cadrul si panza si le depozitezi la adapost. Suportul din lemn cere si mai multa grija si nu ar trebui lasat neprotejat in ploi lungi. Pe scurt, cadrul poate sta afara sezonier, dar panza traieste mai mult daca o tii ferita.' },
+  { question: 'Cat de mult spatiu ocupa un hamac cu suport?', answer: 'Un hamac clasic cu suport are in general 280-360 cm lungime, deci ai nevoie de un spatiu liber de aproximativ 3-3.5 metri pe o directie, plus loc sa te dai jos comod pe laturi. Modelele din selectie au intre 185 si 356 cm, asa ca masoara locul inainte, mai ales pe o terasa sau intr-un colt mic. Daca ai spatiu putin, o alternativa buna e hamacul-scaun suspendat, cu suport vertical, ca modelul casa.pro, care ocupa mult mai putin pe orizontala, de la circa 110 cm, si intra usor intr-un colt sau chiar in interior. Alege lungimea suportului dupa cat spatiu ai efectiv in curte.' },
+  { question: 'Ce material de panza e mai bun?', answer: 'Cele mai comune sunt bumbacul, poliesterul si combinatiile dintre ele. Bumbacul e cel mai placut la atins si mai racoros vara, iar o panza deasa, ca cea de 1050 g/m² de la Lewer, e confortabila si rezistenta, buna pentru statul indelung. Poliesterul si amestecurile cu poliester, ca la Songmics, rezista mai bine la soare, la umezeala si se usuca mai repede, deci sunt mai potrivite daca hamacul sta mult afara. Densitatea panzei, exprimata in grame pe metru patrat, iti spune cat e de groasa si de durabila: cu cat valoarea e mai mare, cu atat panza e mai solida si mai confortabila.' },
+  { question: 'Cat costa un hamac cu suport bun?', answer: 'In selectie, un set complet, cu hamac si suport inclus, porneste de la circa 280 de lei, cazul K-SPORT, si urca spre 400 de lei pentru modele cu panza mai deasa sau capacitate mare, ca Lewer sau Songmics. Suporturile separate, pentru cine are deja hamacul, sunt in general 300-370 de lei, in functie de material si brand, iar cadrul special pentru hamac-scaun ajunge la circa 500 de lei. Cel mai bun raport il gasesti alegand un set complet daca pornesti de la zero, sau doar suportul daca ai deja o panza care iti place. Verifica mereu capacitatea si materialul, nu doar pretul.' },
+];
+
+const images = [hero, figSet, figSuport, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Hamac cu suport pentru curte - CentroCasa"
-  description="Daca vrei un <strong>hamac cu suport pentru curte</strong>, cel mai bun sfat e sa te uiti la modelele din otel sau lemn stratificat, cu o greutate maxima suportata de minim 150-200 kg. Un model popular si rezistent e cel de la marca X, care costa in jur de 800-1000 lei si vine cu perne incluse."
-  image="/images/articles/hamac-cu-suport-pentru-curte.webp"
+  title="Cele mai bune hamace cu suport pentru curte in 2026: seturi complete si suporturi"
+  description="Care sunt cele mai bune hamace cu suport pentru curte in 2026: seturi complete cu cadru metalic de la Timeless, Songmics, K-SPORT si Lewer, plus suporturi separate din metal si lemn, comparate pe capacitate, numar de locuri si material. Plus cum alegi, metal vs lemn si cat spatiu ocupa."
+  image={hero}
   type="article"
-  publishedTime="2026-02-05T13:17:47.357Z"
-  modifiedTime="2026-02-05T13:17:47.357Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune hamace cu suport pentru curte' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/mobilier-gradina/">Mobilier Gradina</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Hamac cu suport pentru curte</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune hamace cu suport pentru curte</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
-        <span class="article-date">5 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Hamac cu suport pentru curte</h1>
-    </header>
+    <h1>Cele mai bune hamace cu suport pentru curte</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/hamac-cu-suport-pentru-curte.webp" alt="Hamac cu suport pentru curte" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune hamace cu suport pentru curte: seturi complete si suporturi din metal si lemn" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="cum-sa-alegi-cel-mai-tare-hamac-cu-suport-pentru-curte">
-        <h2>Cum sa alegi cel mai tare hamac cu suport pentru curte</h2>
-        <p>Bun, hai sa fim direct. Vrei un <strong>hamac cu <a href="/suport-pentru-lumanari-decorativ/" class="interlink">suport pentru</a> curte</strong> si nu stii de unde sa apuci. Pai, stai putin, ca te ajut eu.</p>
-        <p>Nu te complica cu modele care arata spectaculos dar te lasa balta dupa o luna. Uita-te la constructie, la materiale. Otelul e regele rezistentei, dar poate fi greu si se poate rugini daca nu e tratat.</p>
-        <p>Lemnul stratificat arata mai elegant, dar trebuie sa fie de calitate, altfel crapa la soare. Si verifica mereu greutatea maxima suportata. Nu vrei sa te trezesti cu el pe jos cand incerci sa te relaxezi.</p><p>Pe bune, am vazut prieteni care si-au luat hamace ieftine si au ramas cu regretul. Daca ma intrebi pe mine, un <strong>hamac cu suport pentru curte</strong> bun inseamna o investitie pe termen lung. Gandeste-te la el ca la un coltar de <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a>, vrei sa te bucuri de el ani de zile, nu doar un sezon.</p><p>Materialul hamacului in sine conteaza si el. Bumbacul e moale si confortabil, dar se usuca greu si poate mucegai. Poliesterul sau amestecurile sunt mai rezistente la intemperii si se usuca mai repede. Na, asta e o chestie de preferinta, dar si de cat de mult timp vrei sa-l intretii.</p><p>Dimensiunea e importanta. Vrei sa stai singur, sa te intinzi pe lung? Sau il vrei pentru doua persoane? Masoara spatiul din curte inainte sa cumperi, ca sa nu te trezesti cu el prea mare sau prea mic.</p><p>Si inca ceva, atentie la finisaje. Cusaturi duble, inele de prindere solide, vopsea uniforma. Detaliile astea fac diferenta intre un produs de calitate si unul facut la repezeala. Uite care-i treaba, un <strong>hamac cu suport pentru curte</strong> bun nu e cel mai ieftin, dar nici cel mai scump nu trebuie sa fie.</p>
-      </section>
-
-      <section id="top-5-hamace-cu-suport-pentru-curte-recomandari-cu-avantaje-si-dezavantaje">
-        <h2>Top 5 hamace cu suport pentru curte: Recomandari cu avantaje si dezavantaje</h2>
-        <p>Am rascolit piata si am selectat cateva modele care merita atentia ta. Nu-s toate perfecte, ca nimic nu e, dar sunt alegeri solide.</p><ul><li><strong>Hamac cu Suport din Otel "Relax Pro"</strong>: Asta-i un clasic. Suportul e din otel vopsit electrostatic, deci rezista bine la rugina. Vine cu un hamac din bumbac gros, super comod. Greutate maxima suportata: 200 kg. Pret: ~950 lei. Avantaje: Foarte stabil, hamac moale, montaj relativ usor. Dezavantaje: Poate fi greu de mutat dintr-un loc in altul, bumbacul se usuca mai greu.</li><li><strong>Hamac cu Suport din Lemn Stratificat "Nature Bliss"</strong>: Arata mult mai elegant. Lemnul stratificat e tratat <a href="/scaune-pliabile-pentru-exterior/" class="interlink">pentru exterior</a>, asa ca rezista la ploaie si soare. Hamacul e din poliester rezistent, se usuca repede. Greutate maxima suportata: 180 kg. Pret: ~1200 lei. Avantaje: Aspect premium, materiale rezistente la intemperii. Dezavantaje: Mai scump, lemnul poate necesita tratament periodic, poate fi mai sensibil la zgarieturi decat otelul.</li><li><strong>Hamac cu Suport "Urban Chill" (Compact)</strong>: Daca ai spatiu mai mic sau vrei ceva usor de depozitat, asta e. Suportul e din otel, dar mai subtire, pliabil. Hamacul e din plasa textila, se usuca instant. Greutate maxima suportata: 150 kg. Pret: ~600 lei. Avantaje: Usor, pliabil, se usuca rapid, pret bun. Dezavantaje: Nu e la fel de robust ca modelele mai mari, nu e ideal pentru doua persoane mari.</li><li><strong>Hamac cu Suport "Family Fun" (Dublu)</strong>: Asta-i pentru cei care vor sa stea doi sau chiar trei. Suportul e lat si solid, din otel. Hamacul e mare, din amestec de bumbac si poliester. Greutate maxima suportata: 220 kg. Pret: ~1100 lei. Avantaje: Spatios, robust, bun pentru familii. Dezavantaje: Ocupa mult spatiu, poate fi greu de manevrat.</li><li><strong>Hamac cu Suport "Eco Relax" (Bambus)</strong>: O optiune mai ecologica. Suportul e facut din bambus, un material rezistent si usor. Hamacul e din bumbac organic. Greutate maxima suportata: 160 kg. Pret: ~1300 lei. Avantaje: Material natural, aspect unic, ecologic. Dezavantaje: Bambusul poate fi mai sensibil la zgarieturi, pretul e mai ridicat, necesita ingrijire specifica pentru bambus.</li></ul><p>Asta e o privire rapida. Fiecare are punctele lui forte si slabe. Depinde mult de ce cauti tu, de spatiul tau si de buget.</p>
-      </section>
-
-      <section id="cum-sa-alegi-hamacul-potrivit-pentru-curtea-ta-ghidul-prietenului">
-        <h2>Cum sa alegi hamacul potrivit pentru curtea ta: Ghidul prietenului</h2>
-        <p>Ok, deci vrei sa-ti iei un <strong>hamac cu suport pentru curte</strong>. Cum te decizi? In primul rand, gandeste-te la spatiu. Ai o <a href="/umbrela-de-gradina-rezistenta-la-vant/">gradina</a> mare unde poti pune un hamac lat si lung, sau stai la bloc si ai un balcon mai mic? Asta-ti dicteaza dimensiunea.</p><p>Apoi, materialul suportului. Otelul e cel mai comun si, sincer, cel mai de incredere pentru rezistenta. Cauta modele cu vopsea pulbere (powder coating) sau tratament anti-rugina. Lemnul arata spectaculos, dar ai grija sa fie tratat pentru exterior. Lemn stratificat e mai bun decat cel masiv, ca nu crapa asa usor. Bambusul e o optiune cool, dar mai draga si necesita ingrijire.</p><p>Materialul hamacului: Bumbacul e moale, dar se uda greu si poate prinde mirosuri. Poliesterul sau amestecurile cu bumbac sunt mai practice, se usuca repede si rezista mai bine la soare. Daca vrei sa-l lasi afara pe toata vara, poliesterul e regele.</p><p>Greutatea maxima suportata e cruciala. Nu lua unul care suporta doar 100 kg daca tu ai 80 kg si mai vine si nevasta-ta. Mai bine cu o marja de siguranta. 150-200 kg e un standard bun.</p><p>Designul conteaza si el. Vrei ceva clasic, cu bare la capete, sau un hamac care se muleaza pe tine? Cele cu bare sunt mai usor de intrat si iesit, dar pot fi mai putin confortabile daca te rasucesti. Cele fara bare sunt mai primitoare.</p><p>Uita-te la sistemul de prindere. Carabinerele sau sistemele de ajustare trebuie sa fie solide, nu din plastic ieftin. Si daca vin cu perne, cu atat mai bine. Adauga la confort.</p><p>Nu uita de montaj. Unele vin gata asamblate, altele necesita cateva suruburi. Daca nu esti genul tehnic, cauta un model simplu de montat.</p><p>Inainte sa cumperi, citeste review-uri. Vezi ce spun si altii despre produs. Si daca poti, vezi-l in magazin. Simte materialul, verifica sudurile.</p>
-      </section>
-
-      <section id="hamac-cu-suport-pentru-curte-otel-vs-lemn---cine-castiga">
-        <h2>Hamac cu suport pentru curte: Otel vs. Lemn - Cine castiga?</h2>
-        <p>Hai sa comparam direct. Doua dintre cele mai populare alegeri pentru un <strong>hamac cu <a href="/suport-pentru-hartie-igienica/" class="interlink">suport pentru</a> curte</strong> sunt cele din otel si cele din lemn stratificat. Fiecare are farmecul lui, dar si neajunsurile.</p><p><strong>Hamac cu Suport din Otel</strong>: Asta-i ca un tanc. E robust, stabil si de obicei cel mai ieftin dintre optiunile de calitate. Un model bun, cum ar fi "Relax Pro" de care am zis, te costa cam 950 lei. Suportul din otel, mai ales daca e vopsit electrostatic, rezista bine la rugina, dar nu-i invincibil. Nu-l lasa in ploaie toata iarna fara sa-l cureti. E mai greu de mutat, deci odata pus, acolo ramane.</p><p><strong>Hamac cu Suport din Lemn Stratificat</strong>: Asta-i ca un piesa de mobilier de designer. Arata mult mai bine in curte, da un aer mai primitor. Modelele ca "Nature Bliss" ajung pe la 1200 lei. Lemnul stratificat e tratat pentru exterior, dar tot trebuie sa-l protejezi din cand in cand, mai ales cu lac sau ulei special. E mai usor de zgariat decat otelul, si daca lemnul nu e de calitate, poate crapa la soare puternic sau la inghet.</p><p>Diferenta principala e la aspect si pret. Otelul e mai functional, lemnul e mai estetic. Ambele pot fi la fel de rezistente daca sunt de calitate si ingrijite corespunzator. Daca vrei sa tii hamacul pe terasa acoperita, ambele optiuni sunt bune. Daca il lasi in bataia soarelui si a ploii, ambele vor avea nevoie de atentie.</p><p>Personal, daca bugetul permite si vrei sa fie si o piesa de decor, merg pe lemn. Dar daca vrei fiabilitate maxima si nu te intereseaza atat de mult aspectul, otelul e alegerea sigura.</p>
-      </section>
-
-      <section id="greseli-pe-care-le-fac-toti-cand-cumpara-un-hamac-cu-suport-pentru-curte-si-cum-sa-le-eviti">
-        <h2>Greșeli pe care le fac toți când cumpără un hamac cu suport pentru curte (și cum să le eviți)</h2>
-        <p>Na, hai sa fim sinceri, mai toti facem greseli la inceput. Eu am facut si fac in continuare. Dar am invatat cate ceva pe parcurs.</p><p><strong>Prima greseala: Alegi cel mai ieftin</strong>. "Ah, uite, asta e la reducere, 300 de lei! Perfect!" Stai putin. Acel hamac ieftin probabil nu va rezista nici un sezon. Materialele sunt de proasta calitate, sudurile sunt slabe, greutatea maxima suportata e o gluma. Rezultatul? Frustrare si bani aruncati.</p><p><strong>A doua greseala: Nu verifici dimensiunile</strong>. Te uiti la poza pe net, zici "perfect". Ajunge acasa, il desfaci si realizezi ca e prea mare pentru balconul tau sau prea mic pentru cum ti-ai imaginat tu ca te intinzi in el. Masoara de doua ori, taie o data. Sau, in cazul asta, comanda o data.</p><p><strong>A treia greseala: Ignori materialul hamacului</strong>. Comanzi un hamac din bumbac 100% pentru ca suna confortabil, dar stai intr-o zona unde ploua des si e umiditate mare. In scurt timp, vei avea un hamac mucegait si cu miros neplacut. Poliesterul sau amestecurile sunt mult mai practice pentru exterior.</p><p><strong>A patra greseala: Subestimezi greutatea maxima suportata</strong>. "Ce, eu am doar 70 kg, merge si asta de 120 kg." Dar nu te gandesti ca in timp, materialele obosesc, iar o suprasolicitare constanta il poate deteriora mai repede. Mai bine o marja de siguranta.</p><p><strong>A cincea greseala: Nu te gandesti la intretinere</strong>. Crezi ca il cumperi si gata, uiti de el. Pai, un <strong>hamac cu suport <a href="/tocator-de-crengi-pentru-curte/" class="interlink">pentru curte</a></strong>, fie el de otel sau lemn, are nevoie de ingrijire. Curatat, protejat de intemperii cand nu-l folosesti, tratat periodic. Altfel, se degradeaza.</p><p><strong>Sfatul meu de insider</strong>: Daca vrei sa te bucuri de hamac, investeste intr-unul bun. Cauta producatori cu renume, citeste specificatiile tehnice si nu te teme sa intrebi vanzatorul. Si daca ai posibilitatea, testeaza-l inainte sa cumperi. Ofera-ti tie insuti confortul pe care il meriti.</p>
-      </section>
-
-      <section id="verdict-final-hamac-cu-suport-pentru-curte-pe-categorii-de-buget">
-        <h2>Verdict final: Hamac cu suport pentru curte pe categorii de buget</h2>
-        <p>Bun, am vorbit destul. Acum sa punem lucrurile la punct, pe categorii de buget. Nu exista un <strong>hamac cu suport pentru curte</strong> universal perfect, dar exista optiuni bune pentru fiecare buzunar.</p><p><strong>Buget Mic (Sub 500 lei)</strong>: Aici te uiti la modelele "Urban Chill" sau altele similare. De obicei, suportul e din otel mai subtire, uneori pliabil, iar hamacul e din plasa textila sau poliester. Sunt bune pentru o persoana, pentru relaxare ocazionala. Nu te astepta la o rezistenta iesita din comun pe termen lung, dar pentru un inceput sau daca nu vrei sa investesti mult, e o solutie. Principalul dezavantaj e ca nu sunt la fel de robuste si durabile ca cele mai scumpe.</p><p><strong>Buget Mediu (500 - 1000 lei)</strong>: Aici intri in teritorul "Relax Pro" sau echivalente. Suport din otel mai gros, vopsit electrostatic, hamac din bumbac sau poliester de calitate. Capacitate de greutate de 150-200 kg. Acestea sunt alegeri solide, echilibrate intre pret si calitate. Un <strong>hamac cu suport pentru curte</strong> din aceasta categorie iti va oferi confort si durabilitate pentru multi ani, daca il ingrijesti.</p><p><strong>Buget Mare (Peste 1000 lei)</strong>: Aici vorbim despre "Nature Bliss" (lemn stratificat) sau "Eco Relax" (bambus), sau modele din otel super-premium, cu hamace din materiale speciale. Acestea sunt pentru cei care vor un design deosebit, materiale ecologice sau o rezistenta sporita si confort maxim. Sunt piese care pot deveni punctul central al gradinii tale. Investitia e mai mare, dar si satisfactia pe termen lung.</p><p>Deci, ca sa zic pe scurt: pentru inceput si buzunar usor, mergi pe varianta compacta si ieftina. Pentru utilizare serioasa si ani buni de relaxare, bugetul mediu e ideal. Iar daca vrei lux, design si materiale de top, pregateste-te sa investesti mai mult.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat costa un hamac cu suport pentru curte?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un <strong>hamac cu suport pentru curte</strong> decent incepe de la aproximativ 400-500 lei pentru modele compacte, ajungand la 1000-1300 lei pentru modele din lemn sau otel rezistent, cu hamac din materiale premium.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce material e mai bun pentru suportul de hamac?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Otelul este cel mai rezistent si accesibil, ideal daca cauti durabilitate. Lemnul stratificat ofera un aspect mai elegant, dar necesita mai multa ingrijire. Ambele sunt optiuni bune daca sunt tratate corespunzator pentru exterior.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de rezistent trebuie sa fie un hamac cu suport?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un hamac bun pentru curte ar trebui sa suporte minim 150-200 kg. Verifica specificatiile tehnice ale producatorului, mai ales daca intentionezi sa-l folosesti in doi.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar un hamac cu suport din lemn?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca pui accent pe estetica si vrei ca hamacul sa completeze designul curtii tale. Modelele din lemn stratificat sunt rezistente, dar necesita intretinere periodica pentru a-si pastra aspectul si durabilitatea.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce sa evit la un hamac cu suport pentru curte?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Evita modelele cu preturi suspect de mici, fara specificatii clare de greutate maxima suportata si din materiale de calitate indoielnica. De asemenea, verifica finisajele si calitatea imbinarilor pentru a evita deteriorarea rapida.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum ingrijesc un hamac cu suport pentru curte?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Curata-l regulat de praf si frunze. Daca e din bumbac, asigura-te ca se usuca bine dupa ploaie. Modelele din lemn pot fi tratate anual cu lac sau ulei special. Depoziteaza-l intr-un loc uscat pe timpul iernii.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Unde gasesc un hamac cu suport pentru curte de calitate?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti gasi <strong>hamac cu suport pentru curte</strong> de calitate in magazinele specializate in mobilier de gradina, supermarketurile mari cu sectiune de bricolaj, sau online pe platforme de profil. Verifica review-urile si specificatiile produsului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce diferenta e intre un hamac simplu si unul cu suport?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un hamac simplu necesita doi copaci sau stalpi pentru a fi prins, pe cand un <strong>hamac cu suport pentru curte</strong> are o structura proprie, permitandu-ti sa-l amplasezi oriunde in gradina sau pe terasa, fara a depinde de alte puncte de ancorare.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru o curte fara copaci de care sa legi un hamac, cel mai simplu e un <strong>set complet cu suport</strong>, iar aici cel mai vandut e <strong>Timeless Tools</strong>, reglabil si cu geanta de transport. Daca vrei capacitate mare, <strong>Songmics</strong> suporta pana la 240 kg, iar pentru doua persoane, <strong>Lewer</strong> are panza deasa din bumbac. Daca ai deja hamacul, iei doar suportul, din metal sau din lemn.</p>
+      <p>La un hamac cu suport pentru curte conteaza <strong>capacitatea de greutate</strong>, <strong>numarul de locuri</strong> si <strong>materialul</strong> cadrului, metal sau lemn. Mai jos gasesti direct recomandarile, impartite in seturi complete si suporturi separate, iar sub ele un ghid scurt despre cum alegi.</p>
+      <p>Am pornit de la hamacele cu suport in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe capacitate, dimensiuni si material, si le-am impartit in seturi complete, cu hamac si cadru la un loc, si suporturi separate, pentru cine are deja panza. E o nisa mai mica, cu produse inca putin recenzate, asa ca am fost onesti si am notat unde parerile sunt inca putine. Pentru alte moduri de relaxare in curte, vezi si <a href="/balansoar-de-gradina-pentru-2-persoane/">balansoarele de gradina pentru 2 persoane</a> si <a href="/sezlong-pentru-plaja-si-gradina/">sezlongurile de gradina</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#set">Seturi complete: hamac cu suport</a></li>
+        <li><a href="#suport">Suporturi separate pentru hamac</a></li>
+        <li><a href="#de-ce">De ce un hamac cu suport</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#metal-lemn">Metal sau lemn</a></li>
+        <li><a href="#intretinere">Amplasare si intretinere</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Locuri</th><th>Material</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.capacitate}</td>
+              <td>{x.locuri}</td>
+              <td>{x.material}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="set">Seturi complete: hamac cu suport</h2>
+    <p>Vin gata de folosit, cu hamacul si cadrul in aceeasi cutie, deci nu trebuie sa potrivesti nimic separat. Alegerea cea mai simpla daca pornesti de la zero si vrei un colt de relaxare montat repede.</p>
+    <div class="rd-grid">
+      {SET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSet} alt="Seturi complete hamac cu suport: Timeless, Songmics, K-SPORT, Lewer" width="1200" height="675" loading="lazy" />
+
+    <h2 id="suport">Suporturi separate pentru hamac</h2>
+    <p>Doar cadrul, pentru cine are deja un hamac care ii place sau vrea sa aleaga panza separat. Le gasesti din metal, usor si practic, sau din lemn, mai elegant, plus o varianta verticala pentru hamacul-scaun.</p>
+    <div class="rd-grid">
+      {SUPORT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSuport} alt="Suporturi separate pentru hamac: metal, lemn si pentru hamac-scaun" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-hamac-suport').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate hamacele cu suport la oferta</strong>
+        <span>Reducerile din acest moment la hamace si suporturi, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce un hamac cu suport</h2>
+    <p>Un hamac clasic are nevoie de doua puncte de prindere solide, de obicei doi copaci sau doi stalpi la circa trei-patru metri distanta. In realitate, putine curti au exact asta la indemana, iar in balcon sau pe terasa e aproape imposibil. Aici intervine <strong>hamacul cu suport</strong>: are propriul cadru, deci il pui unde vrei, fara sa depinzi de nimic.</p>
+    <p>Avantajul cel mai mare e <strong>libertatea de amplasare</strong>. Il asezi pe gazon, pe terasa, pe balcon sau chiar in casa, il muti dupa cum se plimba umbra si il intorci spre priveliste. Multe seturi se pliaza si vin cu geanta, asa ca il strangi usor peste iarna sau il iei cu tine in vacanta. Fata de un hamac agatat, castigi in flexibilitate si in simplitatea montajului, iar diferenta de pret se justifica prin faptul ca primesti si structura, gata de folosit, nu doar panza.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua hamace cu suport:</p>
+    <ul>
+      <li><strong>Capacitatea de greutate:</strong> 120 kg ajung pentru o persoana; pentru doi sau pentru siguranta in plus, cauta 150-200 kg, iar cel mai robust din selectie suporta 240 kg. Lasa o marja, pentru ca te balansezi si soliciti cadrul.</li>
+      <li><strong>Numarul de locuri:</strong> modelele pentru o persoana sunt mai inguste; cele duble, ca Lewer, au panza lata si sarcina mai mare, pentru statul in doi.</li>
+      <li><strong>Materialul cadrului:</strong> metalul e usor, rezistent la umezeala si se transporta simplu; lemnul e mai elegant, dar cere mai multa grija la umezeala.</li>
+      <li><strong>Dimensiunile:</strong> un hamac clasic are 280-360 cm lungime, deci masoara locul din curte inainte sa cumperi.</li>
+      <li><strong>Panza:</strong> bumbacul e placut si racoros, poliesterul rezista mai bine la soare si umezeala. O panza deasa, peste 1000 g/m², e mai confortabila si mai durabila.</li>
+      <li><strong>Extras utile:</strong> inaltimea reglabila, geanta de transport si capacele de protectie anti-apa fac hamacul mai practic zi de zi.</li>
+    </ul>
+
+    <h2 id="metal-lemn">Metal sau lemn</h2>
+    <p>Cele mai multe suporturi de hamac sunt din <strong>metal</strong>, si dintr-un motiv bun: e usor, rezistent la umezeala, se pliaza si se transporta simplu, iar multe modele vin cu geanta. Un cadru metalic vopsit sau galvanizat rezista bine la ploaie ocazionala si la soare, deci il lasi afara sezonier fara grija. E alegerea practica daca muti hamacul des sau il strangi peste iarna.</p>
+    <p>Suportul din <strong>lemn</strong> joaca alta carte: arata mai cald si mai elegant si se potriveste frumos intr-o gradina sau pe o terasa amenajata natural, cu mobilier de lemn. Compromisul e ca lemnul e mai greu si cere mai multa grija: un strat de protectie impotriva umezelii si depozitare la adapost cand nu il folosesti, altfel se degradeaza in ploi lungi. Daca pui pret pe aspect si ai unde sa il tii ferit, lemnul infrumuseteaza coltul de relaxare; daca vrei practic si fara batai de cap, metalul ramane alegerea sigura.</p>
+
+    <h2 id="intretinere">Amplasare si intretinere</h2>
+    <p>Alege un loc <strong>drept si stabil</strong>, ferit de vant puternic, si lasa spatiu liber pe laturi ca sa te dai jos comod. Un hamac clasic cere aproximativ trei metri pe lungime; daca ai spatiu putin, o varianta verticala pentru hamac-scaun ocupa mult mai putin. Verifica la montaj ca toate suruburile sunt stranse si ca panza e prinsa corect in carlige inainte sa te asezi.</p>
+    <p>Pentru durabilitate, <strong>strange panza</strong> cand nu o folosesti si nu o lasa expusa toata vara la soare puternic sau toata iarna la umezeala; multe seturi au geanta tocmai pentru asta. Cadrul metalic il stergi de praf si il verifici periodic de rugina la imbinari; cel din lemn cere un strat de ulei sau lac de exterior o data pe sezon. Cu grija asta simpla, un hamac cu suport tine multe veri si ramane la fel de confortabil.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tip, material si capacitate:</p>
+    <p><strong>Seturi complete, hamac cu suport:</strong> de la circa 280 de lei, cazul K-SPORT, si pana spre 400 de lei pentru modele cu panza mai deasa sau capacitate mare, ca Lewer sau Songmics. E cea mai buna alegere daca pornesti de la zero.</p>
+    <p><strong>Suporturi separate:</strong> in general 300-370 de lei, in functie de material si brand, pentru cine are deja hamacul si vrea doar cadrul, din metal sau din lemn.</p>
+    <p><strong>Suport pentru hamac-scaun:</strong> spre 500 de lei, pentru cadrul vertical special, gandit pentru fotoliul suspendat.</p>
+    <p>Pe langa pret, uita-te la <strong>capacitate si material</strong>, nu doar la cifra de pe eticheta. Un set complet iti da tot ce iti trebuie dintr-o data, iar un suport separat merita doar daca ai deja o panza care iti place. Fiind o categorie cu produse inca putin recenzate, citeste si parerile de pe pagina inainte sa comanzi.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de <a href="/balansoar-de-gradina-pentru-2-persoane/">gradina</a> si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria scrie despre mobilier de gradina si amenajari interioare. Se uita la materiale, dimensiuni si cat rezista lucrurile afara, peste ierni.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="hamac-cu-suport-pentru-curte"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="hamac-cu-suport-pentru-curte"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="hamac-cu-suport-pentru-curte" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="hamac-cu-suport-pentru-curte" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

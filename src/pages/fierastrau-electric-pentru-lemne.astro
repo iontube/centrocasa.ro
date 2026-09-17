@@ -1,236 +1,345 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Fierastrau electric pentru lemne",
-  excerpt: "Ah, lemnul! E o poveste veche pe la noi, fie ca vorbim de focul din soba iarna, fie ca vrem sa ne facem un mic proiect in curte. Dar cand vine vorba de taiat, mai ales daca ai de-a face cu lemne groase sau vrei sa faci treaba repede, un fierastrau electric pentru lemne devine un aliat de nadejde. M-am tot jucat eu cu diverse modele si azi vreau sa va spun cum stau lucrurile, ca sa nu dati cu capul in zid ca mine la inceput.",
-  image: "/images/articles/fierastrau-electric-pentru-lemne.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-02-04T17:12:07.775Z",
-  modifiedDate: "2026-02-04T17:12:07.775Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "Ce tip de fierastrau electric e mai bun: cu acumulator sau cu fir?", answer: "Depinde de nevoile tale. Cele cu acumulator ofera libertate de miscare si sunt ideale pentru gradini mari sau locuri fara acces la curent. Cele cu fir sunt, de obicei, mai puternice si mai ieftine, dar te limiteaza cablul. Pentru uz casnic, ambele pot fi bune, dar cele pe acumulator sunt mai comode." },
-  { question: "Ce inseamna \"solo\" la pretul unui fierastrau electric pe acumulator?", answer: "\"Solo\" inseamna ca produsul vine fara acumulator si incarcator. Acestea trebuie achizitionate separat, ceea ce poate fi avantajos daca deja detii acumulatori compatibili de la alte unelte ale aceluiasi brand." },
-  { question: "Cat de des trebuie sa ascut lantul unui fierastrau electric?", answer: "Frecventa depinde de cat de mult si de ce fel de lemn tai. In general, e bine sa verifici ascutimea lantului dupa ce ai taiat aproximativ 10-15 metri cubi de lemn. Daca taierea devine mai greoaie sau daca fierastraul incepe sa scoata rumegus fin in loc de span, e semn ca trebuie ascutit." },
-  { question: "Pot folosi un fierastrau electric pentru lemne pentru a taia alte materiale?", answer: "Fierastraiele electrice pentru lemne sunt proiectate specific pentru lemn. Taierea altor materiale, cum ar fi metalul sau plasticul, cu un astfel de fierastrau poate fi periculoasa, ineficienta si poate deteriora unealta. Foloseste intotdeauna unealta potrivita pentru fiecare material." },
-  { question: "Ce echipament de protectie este obligatoriu cand folosesc un fierastrau electric?", answer: "Este esential sa porti ochelari de protectie pentru a-ti proteja ochii de rumegus, manusi rezistente pentru o priza mai buna si protectie a mainilor, si casti antifonice pentru a-ti proteja auzul de zgomotul puternic. Daca tai lemne groase, cizmele de protectie sunt recomandate." },
-  { question: "Cum intretin corect un fierastrau electric pentru lemne?", answer: "Curata fierastraul dupa fiecare utilizare, indepartand rumegusul. Verifica si mentine nivelul corect de ulei pentru ungerea lantului, intinde lantul la tensiunea potrivita si asigura-te ca este ascutit. Depoziteaza unealta intr-un loc uscat, ferit de umezeala si, daca e pe acumulator, scoate bateria." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de un fierastrau electric pentru lemne si pentru cine e potrivit", id: "de-ce-ai-nevoie-de-un-fierastrau-electric-pentru-lemne-si-pentru-cine-e-potrivit" },
-  { title: "Top recomandari: Fierastraie electrice pentru lemne pe care le-am incercat", id: "top-recomandari-fierastraie-electrice-pentru-lemne-pe-care-le-am-incercat" },
-  { title: "Cum alegi corect un fierastrau electric pentru lemne: Criterii si specificatii", id: "cum-alegi-corect-un-fierastrau-electric-pentru-lemne-criterii-si-specificatii" },
-  { title: "Avantaje si dezavantaje: Sinceritatea mea despre fierastraiele electrice", id: "avantaje-si-dezavantaje-sinceritatea-mea-despre-fierastraiele-electrice" },
-  { title: "Sfaturi practice: Trucuri din experienta si greseli de evitat", id: "sfaturi-practice-trucuri-din-experienta-si-greseli-de-evitat" },
-  { title: "Parerea mea finala: Pentru cine recomand un fierastrau electric pentru lemne", id: "parerea-mea-finala-pentru-cine-recomand-un-fierastrau-electric-pentru-lemne" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['fierastrau-electric'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Mini fierastraie pe acumulator ---
+  { g: 'mini', id: 'DDRLRNYBM', badge: 'Cel mai vandut', short: 'Folixs 8 inch', putere: '1000 W', lama: '8" (25 cm)', alim: 'Acumulator 21 V',
+    specs: ['1000 W, motor fara perii, 21 V', 'lama 8 inch, taiere pana la 25 cm', 'viteza lant 11 m/s, 45 de dinti', '2 baterii 2600 mAh, 2 lanturi, incarcare 2 h'],
+    pros: ['De departe cel mai vandut din selectie, 204 pareri', 'Motor fara perii, mai durabil si mai eficient', 'Vine cu 2 baterii si 2 lanturi de rezerva', 'Reglare automata a lantului si lubrifiere'],
+    cons: ['Lama de 8 inch limiteaza busteanul la 20-22 cm', 'Nota 4.33, buna dar nu maxima'],
+    verdict: 'Cel mai vandut fierastrau din toata selectia si cel mai simplu de recomandat pentru crengi, pomi fructiferi si lemn subtire de foc. Folixs are un motor fara perii de 1000 W la 21 V, mai eficient si mai durabil decat variantele cu perii, o lama de 8 inch cu care tai bucati de pana la 20-22 cm si o viteza a lantului de 11 m/s. Pachetul e generos: doua baterii de 2600 mAh, deci lucrezi in timp ce una se incarca, doua lanturi de rezerva si reglarea automata a lantului, plus lubrifiere cu realimentare. Cu 204 pareri e cel mai testat model de aici, iar nota 4.33 e solida pentru volumul asta. Il iei cand vrei un fierastrau usor, cu doi acumulatori si accesorii incluse, pentru toaletat pomi si taiat lemn subtire, fara cablu si fara benzina.' },
+  { g: 'mini', id: 'D4HNYWYBM', badge: 'Cel mai bine notat', short: 'Herrgut 12 inch', putere: '1200 W', lama: '12" (30 cm)', alim: 'Acumulator, 2x4000 mAh',
+    specs: ['1200 W, motor fara perii, fast charging', 'lama 12 inch, taiere pana la 30.5 cm', 'viteza lant 15 m/s, cea mai mare din grupul mini', '2 baterii 4000 mAh, sistem de lubrifiere'],
+    pros: ['Cea mai mare nota din selectie, 4.93 din 140 de pareri', 'Lama de 12 inch, taie busteni mai grosi decat un mini obisnuit', 'Viteza lant de 15 m/s, taiere rapida', 'Motor fara perii si baterii mari de 4000 mAh'],
+    cons: ['Mai scump decat mini fierastraiele mici', 'Ramane un aparat de o mana, pentru lemn mediu, nu gros'],
+    verdict: 'Cel mai bine notat fierastrau din tot articolul, cu 4.93 din 140 de pareri, un scor rar de vazut la volumul asta. E la granita dintre mini fierastrau si o drujba adevarata: lama de 12 inch taie busteni de pana la 30 cm, cu peste jumatate mai mult decat un mini de 6 inch, iar viteza lantului de 15 m/s il pune la nivelul drujbelor mari. Motorul fara perii de 1200 W si cele doua baterii de 4000 mAh cu fast charging ii dau autonomie si putere pentru sesiuni serioase de taiat lemn de foc subtire spre mediu. Are si sistem de lubrifiere a lantului, esential ca sa nu se supraincalzeasca. Il alegi cand vrei cel mai apreciat fierastrau pe acumulator din selectie si o lama mai lunga, care sa treaca de crengi si sa taie si lemn de foc, ramanand usor si portabil.' },
+  { g: 'mini', id: 'DQQQ4KYBM', badge: 'Cel mai accesibil util', short: 'Herrgut 6 inch', putere: '550 W', lama: '6" (15 cm)', alim: 'Acumulator 24 V',
+    specs: ['550 W, 24 V, motor cu perii', 'lama 6 inch, taiere pana la 15 cm', 'viteza lant 9.8 m/s, doar 65 dB', '2 baterii 2000 mAh incluse'],
+    pros: ['Pret mic pentru un fierastrau de brand bine notat', 'Nota mare, 4.83 din 104 pareri', 'Foarte usor si silentios, 65 dB', 'Doua baterii incluse, lucrezi pe rand'],
+    cons: ['Lama de 6 inch, doar pentru crengi si lemn subtire', 'Motor cu perii, mai putin durabil decat variantele brushless'],
+    verdict: 'Cel mai accesibil fierastrau cu adevarat util din selectie, ideal pentru curatat pomi, taiat crengi si lemn subtire in curte. Herrgut are 550 W la 24 V si o lama de 6 inch cu care tai pana la 15 cm, exact cat trebuie pentru munca marunta din gradina, iar cele 65 de dB il fac dintre cele mai silentioase de aici. Vine cu doua baterii de 2000 mAh, deci nu stai dupa incarcare, si a strans o nota excelenta, 4.83 din 104 pareri, semn ca isi face treaba pentru care e gandit. Motorul e cu perii, mai simplu si mai ieftin, dar si mai putin durabil in timp decat cele fara perii. Il iei cand vrei un fierastrau usor si ieftin pentru crengi si lemn subtire, de la un brand deja verificat de sute de cumparatori, si nu ai nevoie sa tai busteni grosi.' },
+  { g: 'mini', id: 'DZ3MHCYBM', badge: 'Cel mai mic pret', short: 'Kardett 4 inch', putere: '', lama: '4" (10 cm)', alim: 'Acumulator 24 V',
+    specs: ['mini drujba portabila de 4 inch', 'taiere pana la 10 cm, 24 V', '2 acumulatori reincarcabili inclusi', 'compacta, o folosesti cu o mana'],
+    pros: ['Cel mai mic pret din toata selectia', 'Extrem de usoara si compacta, o tii cu o mana', 'Doi acumulatori inclusi', 'Nota buna, 4.37 din 67 de pareri'],
+    cons: ['Lama de 4 inch, doar crengi si lemn foarte subtire', 'Putere nedeclarata, pentru munca usoara'],
+    verdict: 'Pentru bani putini, ai un fierastrau electric in curte, pentru crengi si lemn foarte subtire. Kardett e o mini drujba de 4 inch pe acumulator de 24 V, cu care tai bucati de pana la 10 cm, gandita pentru toaletat pomi, curatat vita de vie sau taiat lemnisor pentru foc. E atat de mica si de usoara incat o manevrezi comod cu o singura mana, ajungand usor printre ramuri, si vine cu doi acumulatori inclusi ca sa lucrezi mai mult fara pauza. Cu 67 de pareri si nota 4.37 e o alegere verificata la banii ei. Nu inlocuieste o drujba: lama scurta o limiteaza la crengi si lemn subtire. O iei cand vrei cel mai ieftin fierastrau din selectie, ultraportabil, pentru munca marunta de gradina, si stii ca nu ataci busteni grosi cu el.' },
+  // --- Drujbe electrice cu cablu ---
+  { g: 'cablu', id: 'DVN346MBM', badge: 'Cea mai vanduta cu cablu', short: 'Einhell GC-EC 1935', putere: '1900 W', lama: '35 cm', alim: 'Cablu 230 V',
+    specs: ['1900 W, cea mai mare putere dintre cele cu cablu', 'lama 35 cm, taiere 32.5 cm', 'rezervor ulei 160 ml, ungere automata', 'de la Einhell, brand consacrat de unelte'],
+    pros: ['Cea mai vanduta drujba cu cablu din selectie, 121 pareri', 'Cea mai puternica dintre cele cu cablu, 1900 W', 'Einhell, brand cunoscut, cu piese si service', 'Nota mare, 4.78, si pret rezonabil'],
+    cons: ['Zgomotoasa, 108 dB', 'Cablul te tine legat de priza'],
+    verdict: 'Cea mai vanduta si cea mai puternica drujba cu cablu din selectie, alegerea de baza pentru taiat lemn de foc la un punct fix, langa priza sau un prelungitor. Einhell GC-EC 1935 are 1900 W, cel mai puternic motor dintre modelele cu cablu de aici, o lama de 35 cm cu care tai busteni de pana la 30-32 cm si un rezervor de ulei de 160 ml cu ungere automata a lantului. Fiind de la Einhell, gasesti usor lanturi, lame si piese de schimb, un avantaj real pe termen lung. Cu 121 de pareri si nota 4.78 e clar preferata cumparatorilor la aceasta categorie. E zgomotoasa, 108 dB, deci pui casti, iar cablul te leaga de o sursa de curent. O iei cand tai regulat lemn de foc in curte, ai priza aproape si vrei putere multa, autonomie nelimitata si un brand de incredere.' },
+  { g: 'cablu', id: 'DJV6FVBBM', badge: 'Brand accesibil', short: 'Heinner VDE002', putere: '1800 W', lama: '35 cm', alim: 'Cablu 230 V',
+    specs: ['1800 W, 230 V', 'lama 35 cm, viteza lant 13.5 m/s', 'pas lant 3/8, rezervor ulei 150 ml', 'de la Heinner, brand cu service la noi'],
+    pros: ['Pret bun pentru o drujba cu cablu de brand', 'Heinner, marca cunoscuta cu service in Romania', '1800 W si lama de 35 cm, putere buna', 'Viteza lant de 13.5 m/s, taiere eficienta'],
+    cons: ['Nota 4.32, ceva mai jos decat Einhell', 'Fara sistem rapid de tensionare a lantului'],
+    verdict: 'O drujba cu cablu de brand la un pret accesibil, pentru cine vrea un nume cunoscut si service la noi fara sa dea multi bani. Heinner VDE002 are 1800 W, o lama de 35 cm si o viteza a lantului de 13.5 m/s, tot ce trebuie pentru taiat lemn de foc de grosime medie in curte. Pasul lantului de 3/8 si rezervorul de ulei de 150 ml cu ungere automata sunt standardele obisnuite la categoria asta, iar Heinner are avantajul unei retele de service in Romania, util daca apare o defectiune. Cu 59 de pareri si nota 4.32 e o alegere solida, chiar daca scorul e ceva mai jos decat la Einhell. Nu are un sistem rapid de tensionare a lantului, deci umbli cu cheia. O iei cand vrei o drujba cu cablu de brand, cu putere buna si service la noi, la cel mai bun pret.' },
+  { g: 'cablu', id: 'D5QLCMMBM', badge: 'Cel mai mic pret cu cablu', short: 'Procraft K1800', putere: '1800 W', lama: '35 cm', alim: 'Cablu 220 V',
+    specs: ['1800 W, 9500 rpm', 'lama 35 cm, viteza lant 14 m/s', '26 de dinti, rezervor ulei 260 ml', 'greutate 4 kg'],
+    pros: ['Cel mai mic pret dintre drujbele cu cablu', '1800 W si viteza lant de 14 m/s, taiere rapida', 'Rezervor de ulei mare, 260 ml', 'Nota buna, 4.53 din 57 de pareri'],
+    cons: ['Brand mai putin cunoscut', 'Zgomot ridicat, 106 dB'],
+    verdict: 'Cea mai ieftina drujba cu cablu din selectie, pentru cine vrea putere multa la buget mic. Procraft K1800 are 1800 W la 9500 de rotatii pe minut, o lama de 35 cm si o viteza a lantului de 14 m/s, printre cele mai mari de aici, deci taie repede lemnul de foc. Rezervorul de ulei de 260 ml e cel mai generos dintre modelele cu cablu, asa ca umpli mai rar, iar cele 4 kg o fac usor de manuit la un punct fix. Cu 57 de pareri si nota 4.53 e bine cotata la banii ei, chiar daca vine de la un brand mai putin raspandit. E zgomotoasa, 106 dB, deci porti casti. O iei cand vrei cea mai accesibila drujba cu cablu care taie repede si nu te intereseaza brandul, ci raportul putere-pret pentru taiat lemn in curte.' },
+  { g: 'cablu', id: 'D7LX6JMBM', badge: 'Cea mai comoda de folosit', short: 'Bosch UniversalChain 35', putere: '1800 W', lama: '35 cm', alim: 'Cablu',
+    specs: ['1800 W, lama 35 cm, lant Oregon', 'sistem SDS de tensionare fara scule', 'ungere automata, viteza lant 12 m/s', 'greutate 4.2 kg, 102 dB'],
+    pros: ['Sistem SDS: tensionezi lantul fara scule, din mana', 'Lant Oregon, calitate recunoscuta', 'Bosch, brand premium cu piese peste tot', 'Cea mai silentioasa dintre cele cu cablu, 102 dB'],
+    cons: ['Mai scumpa decat Heinner sau Procraft', 'Viteza lant ceva mai mica, 12 m/s'],
+    verdict: 'Cea mai comoda drujba cu cablu de folosit, pentru cine pune pret pe calitate si pe usurinta intretinerii. Bosch UniversalChain 35 are 1800 W, o lama de 35 cm cu lant Oregon, marca recunoscuta la lanturi, si mai ales sistemul SDS, cu care intinzi si schimbi lantul din mana, fara scule, un mare avantaj cand lucrezi si lantul se destinde. Ungerea automata cu vizor pentru nivelul de ulei si cele 102 dB, cele mai putine dintre modelele cu cablu, o fac placuta la folosit. Cu 50 de pareri si nota 4.68 e apreciata, iar Bosch inseamna piese si service oriunde. Costa mai mult decat Heinner sau Procraft si are o viteza a lantului ceva mai mica, 12 m/s. O iei cand vrei o drujba cu cablu de brand premium, usor de intretinut si de tensionat fara scule, pentru taiat lemn de foc constant in curte.' },
+  { g: 'cablu', id: 'DCGKKMBBM', badge: 'Cea mai profesionala', short: 'Makita UC4041A', putere: '1800 W', lama: '40 cm', alim: 'Cablu 230 V',
+    specs: ['1800 W, clasa profesionala', 'lama de 40 cm, cea mai lunga cu cablu', 'viteza lant 14.5 m/s, vibratie mica 3.8 m/s²', 'greutate 4.4 kg, 101 dB'],
+    pros: ['Cea mai lunga lama cu cablu, 40 cm, busteni mai grosi', 'Clasa profesionala Makita, constructie de durata', 'Viteza lant mare, 14.5 m/s', 'Vibratii mici, 3.8 m/s², obosesti mai greu'],
+    cons: ['Cea mai scumpa dintre modelele cu cablu', 'Putere ca la restul, 1800 W, dar pret mai mare'],
+    verdict: 'Cea mai profesionala drujba cu cablu din selectie, pentru cine taie mult lemn si vrea un aparat de durata. Makita UC4041A e din clasa profesionala, cu o lama de 40 cm, cea mai lunga dintre cele cu cablu, deci ataci busteni mai grosi, si o viteza a lantului de 14.5 m/s, printre cele mai mari de aici. Vibratiile mici, 3.8 m/s², si cele 101 dB o fac mai putin obositoare la sesiuni lungi, iar constructia Makita e facuta sa reziste la folosire intensa. Cu 42 de pareri si nota 4.81 e cel mai bine cotat model cu cablu de aici. E cea mai scumpa dintre ele, iar puterea ramane 1800 W, ca la restul, deci platesti pentru calitate si lama lunga, nu pentru wati in plus. O iei cand tai lemn de foc des si serios, ai priza la indemana si vrei un aparat profesional care sa tina ani buni.' },
+  // --- Drujbe pe acumulator full-size ---
+  { g: 'acu', id: 'DB3BT5BBM', badge: 'Cea mai vanduta pe acumulator', short: 'Einhell GE-LC 18 Li', putere: '18 V (max 720 W)', lama: '25 cm', alim: 'Acumulator 18 V',
+    specs: ['acumulator 18 V, sistem Power X-Change', 'lama Oregon 25 cm, taiere 23 cm', 'usoara, doar 2.9 kg', 'kit complet: acumulator 2.5 Ah + incarcator'],
+    pros: ['Cea mai vanduta drujba pe acumulator din selectie, 124 pareri', 'Vine kit complet, cu acumulator si incarcator', 'Foarte usoara, 2.9 kg, si lant Oregon', 'Sistem PXC: bateria merge la alte scule Einhell'],
+    cons: ['Lama de 25 cm, pentru crengi si lemn mediu', 'Un singur acumulator, autonomie limitata la sesiuni scurte'],
+    verdict: 'Cea mai vanduta drujba pe acumulator din selectie si cea mai buna poarta de intrare in taiatul fara cablu. Einhell GE-LC 18 Li merge pe sistemul Power X-Change, deci acelasi acumulator de 18 V il folosesti la zeci de alte scule Einhell, un mare avantaj daca ai sau vrei mai multe unelte. Are o lama Oregon de 25 cm cu care tai busteni de pana la 23 cm, cantareste doar 2.9 kg, deci o manevrezi lejer si deasupra capului la toaletat pomi, si vine kit complet, cu acumulator de 2.5 Ah si incarcator. Cu 124 de pareri si nota 4.52 e clar favorita la aceasta categorie. Un singur acumulator inseamna autonomie pentru sesiuni scurte; pentru mai mult iei o baterie in plus. O iei cand vrei libertate fata de cablu, un aparat usor pentru crengi si lemn mediu si un sistem de baterii pe care il extinzi mai tarziu.' },
+  { g: 'acu', id: 'D1TVXFBBM', badge: 'Bosch, cu SDS', short: 'Bosch UniversalChain 18', putere: '18 V', lama: '20 cm', alim: 'Acumulator 18 V',
+    specs: ['acumulator 18 V, lant Oregon', 'lama 20 cm, sistem SDS fara scule', 'usoara, 2.7 kg', 'kit: acumulator 2.5 Ah + incarcator'],
+    pros: ['Sistem SDS, tensionezi lantul fara scule', 'Cea mai usoara drujba full-size, 2.7 kg', 'Lant Oregon si brand Bosch', 'Kit complet, cu acumulator si incarcator'],
+    cons: ['Lama de doar 20 cm, pentru crengi si lemn subtire', 'Viteza lant mica, 4.5 m/s'],
+    verdict: 'Drujba pe acumulator pentru cine vrea un Bosch usor si comod, cu tensionarea lantului fara scule. UniversalChain 18 are un acumulator de 18 V, o lama de 20 cm cu lant Oregon si sistemul SDS, cu care intinzi lantul din mana, fara chei, exact ca la varianta cu cablu. Cantareste doar 2.7 kg, cea mai usoara drujba full-size din selectie, deci e ideala pentru toaletat pomi si taiat crengi la inaltime fara sa obosesti. Vine kit complet, cu acumulator de 2.5 Ah si incarcator, si e cotata cu 4.68 din 37 de pareri. Lama scurta de 20 cm si viteza mica a lantului, 4.5 m/s, o tin la crengi si lemn subtire, nu la busteni grosi. O iei cand vrei un fierastrau pe acumulator usor, de brand, cu tensionare fara scule, pentru munca de gradina si crengi, si conteaza confortul, nu taiatul de busteni mari.' },
+  { g: 'acu', id: 'DDVWRF3BM', badge: 'Cea mai multa lama', short: 'Herrgut 16 inch', putere: '1800 W', lama: '16" (40 cm)', alim: 'Acumulator, 2x6000 mAh',
+    specs: ['1800 W, motor fara perii', 'lama 16 inch, taiere pana la 40 cm', 'viteza lant 15 m/s, 55 de dinti', '2 baterii mari de 6000 mAh, fast charging'],
+    pros: ['Cea mai lunga lama pe acumulator, 16 inch, busteni grosi', 'Doua baterii mari de 6000 mAh, autonomie serioasa', 'Motor fara perii si viteza lant de 15 m/s', 'Vibratii foarte mici, 2.8 m/s²'],
+    cons: ['Mai grea, cu lama de 16 inch cere ambele maini', 'Brand mai putin consacrat decat Einhell sau Bosch'],
+    verdict: 'Drujba pe acumulator cu cea mai multa lama din selectie, pentru cine vrea sa taie busteni grosi fara cablu si fara benzina. Herrgut de 16 inch are un motor fara perii de 1800 W, o lama de 40 cm cu care ataci lemn de pana la 40 cm grosime si o viteza a lantului de 15 m/s, la nivelul drujbelor puternice. Cele doua baterii de 6000 mAh, cele mai mari din selectie, ii dau autonomie pentru sesiuni serioase de taiat lemn de foc, iar vibratiile de doar 2.8 m/s² o fac surprinzator de comoda pentru dimensiunea ei. Cu 40 de pareri si nota 4.72 e bine cotata. Fiind mai mare, cere ambele maini si atentie sporita, iar brandul e mai putin consacrat decat Einhell sau Bosch. O iei cand vrei sa tai busteni grosi pe acumulator, cu lama lunga si baterii mari, si nu ai priza aproape de locul de lucru.' },
+  { g: 'acu', id: 'D8HV7PMBM', badge: 'Cea mai buna pe acumulator', short: 'Einhell GE-LC 36/35', putere: '36 V (2x18 V)', lama: '35 cm', alim: 'Acumulator 36 V',
+    specs: ['36 V (2x18 V Power X-Change)', 'lama 35 cm, viteza lant 15 m/s', 'kit: 2 acumulatori 4.0 Ah + incarcator', 'nota 4.89 din 90 de pareri'],
+    pros: ['Nota excelenta, 4.89 din 90 de pareri', 'Putere de 36 V si lama de 35 cm, ca o drujba cu cablu', 'Viteza lant mare, 15 m/s', 'Kit complet, 2 acumulatori de 4.0 Ah inclusi'],
+    cons: ['Cel mai scump model din selectie', 'Mai grea, 4.1 kg, cu doi acumulatori la bord'],
+    verdict: 'Cea mai buna drujba pe acumulator din selectie, pentru cine vrea putere de model cu cablu, dar fara cablu. Einhell GE-LC 36/35 foloseste doi acumulatori de 18 V pentru 36 V in total, tot pe sistemul Power X-Change, si o lama de 35 cm cu o viteza a lantului de 15 m/s, deci taie lemn de foc gros la fel ca o drujba de retea, dar oriunde in curte sau in gradina. Vine kit complet, cu doi acumulatori de 4.0 Ah si incarcator, si a strans o nota exceptionala, 4.89 din 90 de pareri, cea mai apreciata drujba pe acumulator de aici. E cel mai scump model din articol si cantareste 4.1 kg cu bateriile la bord, dar oferi in schimb putere si autonomie reale. O iei cand vrei cea mai capabila drujba pe acumulator, cu lama de 35 cm si putere de retea, si pretuiesti libertatea de a taia lemn oriunde, fara priza si fara benzina.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MINI = PICKS.filter(x => x.g === 'mini');
+const CABLU = PICKS.filter(x => x.g === 'cablu');
+const ACU = PICKS.filter(x => x.g === 'acu');
+
+const hero = '/images/articles/fierastrau-electric-pentru-lemne.webp';
+const figMini = '/imagini/articole/fierastrau-mini.webp';
+const figCablu = '/imagini/articole/fierastrau-cablu.webp';
+const figAcu = '/imagini/articole/fierastrau-acumulator.webp';
+const published = '2026-07-19T11:04:34+03:00';
+
+const faq = [
+  { question: 'Ce fierastrau electric imi trebuie ca sa tai lemne de foc?', answer: 'Depinde de grosimea lemnului si de unde lucrezi. Pentru busteni grosi de foc, la un punct fix langa priza, o drujba cu cablu de 1800-1900 W cu lama de 35-40 cm, ca Einhell GC-EC 1935 sau Makita, e alegerea care taie mult si repede, cu autonomie nelimitata. Daca vrei sa lucrezi oriunde in curte, fara cablu, o drujba pe acumulator de 36 V cu lama de 35 cm, ca Einhell GE-LC 36/35, taie la fel de gros dar te lasa liber. Pentru crengi, pomi fructiferi si lemn subtire, un mini fierastrau de 6-12 inch, ca Folixs sau Herrgut, e usor, ieftin si suficient.' },
+  { question: 'Ce lungime de lama sa aleg?', answer: 'Regula simpla: lama trebuie sa fie cu cel putin 5 cm mai lunga decat grosimea lemnului pe care il tai, ca sa treci dintr-o singura miscare. O lama de 4-8 inch (10-20 cm) e pentru crengi si lemn subtire; una de 25-30 cm e buna pentru lemn mediu de foc; iar 35-40 cm ataca busteni grosi, ca o drujba clasica. Lama mai lunga cere un motor mai puternic, pentru ca frecarea creste, asa ca nu are sens sa iei o lama mare pe un motor mic. Pentru taiat lemne de foc de grosime obisnuita in curte, o lama de 35 cm e alegerea universala.' },
+  { question: 'Fierastrau electric cu cablu sau pe acumulator?', answer: 'Cel cu cablu iti da putere multa si autonomie nelimitata la cel mai bun pret, dar te tine legat de o priza, deci e ideal pentru taiat lemn de foc la un punct fix in curte. Cel pe acumulator te lasa sa lucrezi oriunde, prin gradina, la toaletat pomi sau departe de casa, si a ajuns sa taie serios pe modelele de 36 V, dar costa mai mult si are autonomie limitata de baterie. Daca tai mult lemn langa priza, alege cablul; daca vrei libertate de miscare si lucrezi in locuri diferite, alege acumulatorul, ideal pe un sistem de baterii pe care il folosesti si la alte scule.' },
+  { question: 'Un mini fierastrau pe acumulator taie lemne de foc?', answer: 'Taie lemn subtire si mediu, nu busteni grosi. Un mini de 4-6 inch, ca Kardett sau Herrgut 6 inch, e pentru crengi, pomi fructiferi si lemnisor de aprins focul, nu pentru trunchiuri. Modelele mai mari, de 8-12 inch, ca Folixs sau Herrgut 12 inch, trec de crengi si taie si bucati de lemn de foc de pana la 25-30 cm, deci se descurca la lemn subtire spre mediu. Pentru busteni grosi de foc ai nevoie de o drujba adevarata, cu lama de 35-40 cm, fie cu cablu, fie pe acumulator de 36 V. Mini fierastraiele castiga la greutate mica, pret si usurinta de manevrare cu o mana.' },
+  { question: 'Ce e reculul si cum ma feresc de el?', answer: 'Reculul e saltul brusc al lamei inapoi spre tine, cea mai frecventa cauza de accidente la fierastraie cu lant, si apare mai ales cand varful lamei atinge lemnul. Te feresti tinand aparatul ferm cu ambele maini, taind cu partea de jos a lamei, nu cu varful, si evitand sa infigi varful in lemn. Multe modele au si franare de lant, un mecanism care opreste lantul aproape instant daca apare reculul, plus lant si lama cu risc redus de recul. Poarta mereu ochelari si manusi, iar la drujbele mari si casti si incaltaminte solida. La cele cu cablu, tine cablul mereu in spate, departe de lama.' },
+  { question: 'De ce trebuie ulei la lantul fierastraului?', answer: 'Lantul se roteste cu viteza mare pe lama si, fara ungere, se supraincalzeste, se toceste repede si poate chiar gripa pe lama. De aceea, aproape toate fierastraiele cu lant, si cele mari, si multe mini, au un rezervor de ulei si un sistem de ungere automata care unge lantul in timpul lucrului. Verifica nivelul de ulei inainte de fiecare sesiune si completeaza cu ulei special pentru lant, nu cu orice ulei. Un lant bine uns taie mai usor, mai curat, se incalzeste mai putin si tine mult mai mult. E cea mai simpla si mai importanta intretinere la un fierastrau cu lant.' },
+  { question: 'Cat de puternic trebuie sa fie fierastraul?', answer: 'La cele cu cablu, puterea se masoara in wati: 1800-1900 W, ca la modelele din selectie, e putere de drujba adevarata, buna pentru lemn de foc gros. La cele pe acumulator conteaza tensiunea: 18 V e pentru crengi si lemn mediu, iar 36 V se apropie de puterea unei drujbe cu cablu si taie busteni grosi. La mini fierastraie, un motor fara perii de 1000-1200 W, ca la Folixs sau Herrgut, e mai eficient si mai durabil decat unul cu perii de 550 W. Ideea de baza: cu cat lemnul e mai gros, cu atat ai nevoie de mai multa putere, iar puterea mare cere si o lama pe masura.' },
+  { question: 'Cat costa un fierastrau electric bun pentru lemne?', answer: 'Depinde de tip. Un mini fierastrau pe acumulator pentru crengi si lemn subtire porneste de la circa 160 de lei, ca Kardett de 4 inch, si urca spre 300-450 de lei la modelele mari de 8-12 inch, ca Folixs sau Herrgut. O drujba cu cablu pentru lemn de foc gros costa in general 220-540 de lei, de la Procraft sau Heinner pana la Bosch, iar variantele profesionale Makita trec de 900 de lei. Drujbele pe acumulator full-size pornesc de la circa 580 de lei, ca Einhell 18 V cu kit, si ajung la peste 1000 de lei la modelul de 36 V. Cel mai bun raport il gasesti alegand tipul potrivit grosimii lemnului, nu neaparat cel mai scump.' },
+];
+
+const images = [hero, figMini, figCablu, figAcu, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Fierastrau electric pentru lemne - CentroCasa"
-  description="Ah, lemnul! E o poveste veche pe la noi, fie ca vorbim de focul din soba iarna, fie ca vrem sa ne facem un mic proiect in curte. Dar cand vine vorba de taiat, mai ales daca ai de-a face cu lemne groase sau vrei sa faci treaba repede, un fierastrau electric pentru lemne devine un aliat de nadejde. M-am tot jucat eu cu diverse modele si azi vreau sa va spun cum stau lucrurile, ca sa nu dati cu capul in zid ca mine la inceput."
-  image="/images/articles/fierastrau-electric-pentru-lemne.webp"
+  title="Cel mai bun fierastrau electric pentru taiat lemne in 2026: cu cablu, pe acumulator si mini"
+  description="Care e cel mai bun fierastrau electric pentru taiat lemne in 2026: drujbe cu cablu de 1800-1900 W de la Einhell, Bosch si Makita, drujbe pe acumulator de 18-36 V si mini fierastraie de la Folixs si Herrgut, comparate pe putere, lungime lama si alimentare. Plus cum alegi, cu cablu vs acumulator si siguranta la recul."
+  image={hero}
   type="article"
-  publishedTime="2026-02-04T17:12:07.775Z"
-  modifiedTime="2026-02-04T17:12:07.775Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cel mai bun fierastrau electric pentru taiat lemne' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Fierastrau electric pentru lemne</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cel mai bun fierastrau electric pentru taiat lemne</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">4 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Fierastrau electric pentru lemne</h1>
-    </header>
+    <h1>Cel mai bun fierastrau electric pentru taiat lemne</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    
+    <img class="rd-hero" src={hero} alt="Cel mai bun fierastrau electric pentru taiat lemne: drujbe cu cablu, pe acumulator si mini fierastraie" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-un-fierastrau-electric-pentru-lemne-si-pentru-cine-e-potrivit">
-        <h2>De ce ai nevoie de un fierastrau electric pentru lemne si pentru cine e potrivit</h2>
-        <p>Stiti cum e, vine iarna, sau poate vreti sa va modernizati curtea, si apare nevoia de lemn. Fie ca e vorba de lemne pentru foc, pe care le taiati la dimensiunea potrivita pentru soba sau semineu, fie ca vreti sa construiti ceva din lemn, un fierastrau electric face toata treaba mult mai usoara. Eu am ajuns sa inteleg asta dupa ce am incercat sa tai bucati mari de lemne cu un fierastrau manual.</p>
-        <p>Mi-am dat seama ca pierd timp si imi obosesc bratele inutil. Un fierastrau <a href="/boiler-electric-pentru-baie/" class="interlink">electric pentru</a> lemne e o unealta care economiseste timp si efort, asta e clar.</p><p>Si pentru cine e potrivit? Pai, sincer sa fiu, pentru oricine are de-a face cu taiatul lemnului. Daca locuiti la casa si aveti un foc de lemne, e aproape indispensabil. Nu mai stai sa transpiri la fiecare bucata.</p>
-        <p>Dar nu doar asta. Daca va place sa va mesteriti prin curte, sa faceti garduri, bancute sau chiar casute pentru pasari, un fierastrau electric va face procesul de debitare mult mai rapid si mai precis. Chiar si pentru cei care nu au experienta multa cu unelte, modelele mai simple sunt destul de intuitive.</p><p>Am vazut oameni care se gandesc ca un fierastrau electric e prea complicat sau prea puternic pentru ei. Eu zic ca nu e asa. Exista modele pentru toate nivelurile de experienta. De la cele mai usoare, potrivite pentru crengi mai subtiri sau bucati mici de lemn, pana la cele mai robuste, capabile sa taie trunchiuri groase. E ca si cum ai alege o masina: poti lua una mica pentru oras sau una mai mare pentru drumuri lungi. Totul depinde de ce ai nevoie.</p><p>Un alt motiv pentru care am inceput sa folosesc mai mult un fierastrau electric e siguranta. Cand taii cu mana, riscul de accidente e mai mare, mai ales daca esti obosit. Un fierastrau electric, folosit corect, cu toate protectiile la locul lor, poate fi chiar mai sigur. Am avut si eu momente cand am fost neatent, dar sistemele de siguranta de pe uneltele moderne te ajuta mult.</p><p>Inainte sa va spun ce am incercat eu, vreau sa subliniez ca e important sa stii ce vrei sa faci cu el. Taiati lemne pentru foc? Construiti ceva? Aveti nevoie sa ajungeti in locuri mai greu accesibile? Raspunsurile la aceste intrebari va vor ajuta sa alegeti tipul potrivit de fierastrau electric. Nu va grabiti. E ca si cum ai alege un prieten: trebuie sa fie potrivit pentru tine si pentru ce aveti de facut impreuna.</p><p>Pe scurt, un fierastrau <a href="/convector-electric-pentru-incalzire/" class="interlink">electric pentru</a> lemne e o unealta multifunctionala, utila atat in gospodarie, pentru pregatirea lemnelor de foc, cat si pentru pasionatii de bricolaj. Este potrivit pentru o gama larga de utilizatori, de la cei incepatori, pana la mesteri experimentati, atata timp cat aleg modelul potrivit nevoilor lor. Nu va lasati intimidati de aspectul lor, multe sunt proiectate pentru a fi usor de folosit.</p>
-      </section>
-
-      <section id="top-recomandari-fierastraie-electrice-pentru-lemne-pe-care-le-am-incercat">
-        <h2>Top recomandari: Fierastraie electrice pentru lemne pe care le-am incercat</h2>
-        <p>Bun, hai sa trecem la lucruri serioase. Dupa ce am testat cateva modele, am ajuns la cateva preferate. Nu zic ca sunt singurele bune de pe piata, dar mie mi s-au parut cele mai fiabile si mai potrivite pentru buzunarul romanului. Am tinut cont de raportul calitate-pret si de cat de usor se folosesc.</p><p>Prima pe lista mea e <strong>Bosch UniversalChain 18V-20 (solo)</strong>. Asta e o drujba pe acumulator, mai micuta, dar surprinzator de capabila. Eu am folosit-o mai mult pentru crengi mai groase sau cand am avut de taiat cateva bucati de <a href="/pergola-din-lemn-pentru-terasa/" class="interlink">lemn pentru</a> foc, nu pentru o cantitate mare.</p>
-        <p>Avantajul mare e ca nu stai cu cablul dupa tine si e destul de usoara. Pretul ei, fara acumulator si incarcator, e undeva pe la <strong>450 RON</strong>. Daca ai deja acumulatori Bosch de 18V, e o afacere buna.</p>
-        <p>Dezavantajul e autonomia, depinde mult de acumulatorul pe care il folosesti.</p><p>Apoi, am testat si <strong>Makita UC002GZ01</strong>. Asta e pe acumulator de 40V MAX XGT, deci mult mai puternica. E mai scumpa, undeva pe la <strong>1200 RON</strong> (solo, fara acumulator). E o unealta serioasa, taie lemnul ala gros fara sa clipeasca. Am taiat cu ea si lemne pentru foc, dar si cateva bucati mai mari pentru un proiect de <a href="/motosapa-electrica-pentru-gradina-mica/">gradina</a>. Se simte ca e construita sa reziste. Partea proasta e pretul, daca nu ai deja acumulatori XGT, te ajunge la un cost considerabil.</p><p>Nu puteam sa omit nici modelele pe fir. Aici mi-a placut destul de mult <strong>Einhell GC-EC 2245</strong>. E un model mai accesibil, cam pe la <strong>400 RON</strong>. E mai grea decat cele pe acumulator, normal, si trebuie sa fii atent la cablu, dar are o putere destul de buna pentru pretul ei. Am folosit-o cand am avut de taiat o cantitate mai mare de lemn pentru foc, si s-a descurcat bine. E o optiune buna pentru cei cu un buget mai restrans, dar care vor o unealta mai robusta.</p><p>Am mai dat o sansa si unui model de la <strong>Stihl, MSE 141 C-BQ</strong>. E pe fir, dar e mai compacta si mai usor de manevrat. Pretul e undeva in jur de <strong>750 RON</strong>. Ce mi-a placut la ea e precizia. Poti taia foarte fin cu ea. E ideala daca vrei sa faci finisaje sau sa tai bucati mai mici, unde conteaza exactitatea. Pentru lemne foarte groase, s-ar putea sa nu fie cea mai rapida.</p><p>Ce am invatat eu din toate astea? Ca nu exista unealta perfecta pentru toata lumea. Dar exista unealta perfecta pentru tine, in functie de ce ai de facut si de cat vrei sa investesti. Si nu uita, preturile astea sunt aproximative si pot varia in functie de magazin si de oferte.</p>
-      </section>
-
-      <section id="cum-alegi-corect-un-fierastrau-electric-pentru-lemne-criterii-si-specificatii">
-        <h2>Cum alegi corect un fierastrau electric pentru lemne: Criterii si specificatii</h2>
-        <p>Alegerea unui fierastrau electric <a href="/drujba-pe-benzina-pentru-lemne/" class="interlink">pentru lemne</a> nu e chiar o stiinta nucleara, dar e bine sa stii la ce sa te uiti. Eu am facut greseala la inceput sa iau ceva doar pentru ca era ieftin si am ajuns sa ma enervez pe el. Deci, hai sa vedem ce conteaza.</p><p>In primul rand, te gandesti la <strong>tipul de alimentare</strong>. Ai de ales intre cele pe acumulator si cele pe fir. Cele pe acumulator iti ofera libertate de miscare, ceea ce e grozav daca ai o curte mare sau lucrezi in locuri fara priza. Dar trebuie sa tii cont de autonomia acumulatorului si, uneori, de puterea lui. Cele pe fir sunt, de obicei, mai puternice si mai ieftine, dar te limiteaza cablul. Eu am ambele si le folosesc in functie de situatie.</p><p>Apoi, vine <strong>puterea motorului</strong>. Asta se masoara in watti (W) la cele pe fir si in volti (V) la cele pe acumulator. Cu cat e mai mare puterea, cu atat fierastraul va taia mai usor si mai repede prin lemn. Pentru lemne de foc obisnuite, un motor de 1500-2000W sau un acumulator de 18-20V e suficient. Daca ai de taiat lemne foarte groase sau lemn tare, cauta ceva mai puternic.</p><p><strong>Lungimea lamei (sinei)</strong> e si ea importanta. Se masoara in centimetri (cm) sau inci (inch). O lama mai lunga taie bucati de lemn mai groase dintr-o singura miscare. Pentru uz casnic, o lama de 30-40 cm e, de obicei, suficienta. Daca ai de taiat trunchiuri mari, ai nevoie de o lama mai lunga, dar si de un motor mai puternic care sa o poata invarti.</p><p><strong>Greutatea si echilibrul</strong> uneltei conteaza enorm, mai ales daca o folosesti mult timp. Un fierastrau prea greu te va obosi repede. Eu prefer uneltele care se simt echilibrate in mana, pentru ca le poti controla mai bine. Si asta contribuie la siguranta.</p><p>Nu uita de <strong>sistemul de intindere a lantului</strong>. Unele modele au o rotiță pe care o invarti, altele au o cheie. Cel cu rotiță e mult mai comod, pentru ca poti regla intinderea rapida, fara unelte. Si asta e ceva ce apreciezi cand esti la treaba.</p><p><strong>Sistemul de ungere a lantului</strong> trebuie sa fie automat. Asta inseamna ca fierastraul isi baga singur ulei pe lant, cat e nevoie. Daca trebuie sa faci asta manual, e un pas in plus si o bataie de cap.</p><p>Si ultimul, dar nu cel din urma, <strong>brandul si recenziile</strong>. Eu am incredere in brandurile consacrate, cum ar fi Bosch, Makita, Stihl, Einhell. Dar si celelalte branduri pot avea modele bune. Citeste recenzii de la alti utilizatori. Vezi ce spun oamenii care au cumparat si au folosit deja produsul. Asta te poate scuti de multe dezamagiri.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-sinceritatea-mea-despre-fierastraiele-electrice">
-        <h2>Avantaje si dezavantaje: Sinceritatea mea despre fierastraiele electrice</h2>
-        <p>Nicio unealta nu e perfecta, si fierastraiele electrice pentru lemne nu fac exceptie. Am avut si momente de bucurie, si momente in care mi-as fi dorit sa fie altfel. Hai sa va zic cum vad eu lucrurile, fara ocolisuri.</p><p><strong>Avantaje</strong></p><p>Cel mai mare avantaj e, fara discutie, <strong>viteza si eficienta</strong>. Ce taiai cu un fierastrau manual intr-o ora, cu cel electric poti face in 10 minute. Asta inseamna mai mult timp pentru alte activitati, fie ele de relaxare sau de bricolaj.</p><p>Apoi, <strong>usurinta in utilizare</strong>. Modelele moderne sunt gandite sa fie cat mai simple. Nu trebuie sa fii un profesionist ca sa le folosesti. Multe au sisteme de siguranta care te protejeaza, iar intinderea lantului e adesea foarte simpla.</p><p><strong>Mai putin efort fizic</strong>. Asta e un punct mare pentru mine, mai ales pe masura ce anii trec. Nu mai transpiri atat si nu-ti mai amorțesc bratele dupa jumatate de ora de taiat.</p><p><strong>Precizie</strong>. Daca ai nevoie sa tai lemnul la o dimensiune exacta, un fierastrau electric te ajuta mult mai mult decat unul manual. Poti obtine taieri curate si drepte.</p><p><strong>Versatilitate</strong>. Cum am mai zis, nu doar pentru lemne de foc. Pot fi folosite pentru proiecte de <a href="/sistem-de-irigare-automata-pentru-gradina/">gradina</a>, pentru a curata copacii sau chiar pentru a taia materiale lemnoase mai moi.</p><p><strong>Dezavantaje</strong></p><p>Primul dezavantaj, mai ales la modelele pe acumulator, e <strong>pretul</strong>. Un fierastrau electric bun, mai ales unul pe acumulator, poate fi o investitie. Si daca nu ai deja acumulatori, costul total poate creste considerabil.</p><p><strong>Autonomia bateriei</strong>. La modelele pe acumulator, trebuie sa fii atent la cat timp poti lucra pana cand trebuie sa o pui la incarcat. Daca ai de taiat mult, s-ar putea sa ai nevoie de baterii de schimb sau sa-ti planifici pauze.</p><p><strong>Necesitatea unei surse de curent</strong>. La cele pe fir, te limiteaza cablul. Trebuie sa fii atent sa nu-l tai, sa ai o priza in apropiere. Poate fi incomod in anumite situatii.</p><p><strong>Intretinerea</strong>. Nu e complicata, dar exista. Trebuie sa cureti fierastraul, sa verifici nivelul de ulei pentru lant, sa intinzi lantul. Sunt lucruri care trebuie facute ca unealta sa functioneze bine.</p><p><strong>Zgomotul</strong>. Sunt, in general, destul de zgomotoase. Daca ai vecini mai sensibili, s-ar putea sa ai nevoie sa tii cont si de asta.</p><p><strong>Siguranta</strong>. Desi au sisteme de siguranta, raman unelte puternice. Daca nu esti atent, poti suferi accidente. E esential sa citesti manualul si sa respecti instructiunile de siguranta.</p>
-      </section>
-
-      <section id="sfaturi-practice-trucuri-din-experienta-si-greseli-de-evitat">
-        <h2>Sfaturi practice: Trucuri din experienta si greseli de evitat</h2>
-        <p>Am invatat multe din greseli, asa ca vreau sa va scutec si pe voi de unele. Sunt cateva chestii mici, dar care fac diferenta cand vine vorba de folosit un fierastrau electric pentru lemne.</p><p><strong>Prima regula de aur: Citeste manualul!</strong> Nu rada, chiar am vazut oameni care sar peste asta. Fiecare model are specificul lui. Acolo gasesti informatii esentiale despre cum sa-l folosesti, cum sa-l intretii si, cel mai important, cum sa te protejezi.</p><p><strong>Verifica intotdeauna starea lantului</strong>. Un lant prost intins sau tocit face taierea mult mai greoaie si chiar periculoasa. Eu am patit sa ma chinui cu un lant prea slabit si aproape ca mi-a sarit de pe sina. E mai bine sa-l intinzi corect inainte de fiecare utilizare mai serioasa.</p><p><strong>Foloseste ulei de calitate pentru lant</strong>. Nu folosi ulei de motor sau altceva. Ai nevoie de un ulei special pentru drujbe, care sa lubrifieze bine si sa reziste la temperaturi ridicate. Asta prelungeste viata lantului si a sinei.</p><p><strong>Nu forta fierastraul</strong>. Lasa unealta sa-si faca treaba. Daca simti ca se chinuie, inseamna ca ai nevoie de un fierastrau mai puternic, de un lant mai ascutit sau de o lama mai potrivita. Fortarea poate duce la supraincalzire si la deteriorarea motorului.</p><p><strong>Curata fierastraul dupa fiecare utilizare</strong>. Nu lasa rumegusul sa se adune. Curata sinele, filtrul de aer (daca are) si zonele de ventilatie. Un fierastrau curat functioneaza mai bine si tine mai mult.</p><p><strong>Poarta echipament de protectie</strong>! Asta nu e optional. Ochelari de protectie, manusi rezistente, o pereche de casti antifonice si, daca tai lemne groase, o pereche de cizme cu bombeu metalic. Nu te juca cu asta.</p><p><strong>Atentie la recul (kickback)</strong>. Asta se intampla cand varful lamei atinge ceva solid sau cand lama se blocheaza in lemn. Fierastraul sare brusc in sus. Nu tine niciodata fierastraul cu ambele maini aproape de varful lamei cand tai. Incearca sa tai dintr-o miscare fluida.</p><p><strong>Depoziteaza fierastraul corect</strong>. Daca e pe acumulator, scoate bateria. Daca e pe fir, strange cablul frumos. Pune-l intr-un loc uscat, ferit de umezeala.</p><p><strong>Nu taia in linii drepte perfecte, daca nu e nevoie</strong>. Uneori, o taietura mai relaxata, cu o usoara miscare de du-te-vino, poate fi mai eficienta si mai putin obositoare.</p><p><strong>Nu uita de pauze!</strong> Mai ales daca ai mult de taiat. Oboseala duce la neatentie, iar neatentia poate fi periculoasa.</p>
-      </section>
-
-      <section id="parerea-mea-finala-pentru-cine-recomand-un-fierastrau-electric-pentru-lemne">
-        <h2>Parerea mea finala: Pentru cine recomand un fierastrau electric pentru lemne</h2>
-        <p>Dupa atata vorba despre fierastraie electrice pentru lemne, cred ca e momentul sa spun si eu care e parerea mea cea mai sincera. Pentru mine, a devenit o unealta esentiala in casa. Daca locuiesti la casa si ai nevoie sa tai lemne, fie pentru foc, fie pentru diverse proiecte, un fierastrau electric nu mai e un lux, ci o necesitate. Te scapa de mult efort si de mult timp pierdut.</p><p>Recomand un fierastrau electric pe fir, cum e <strong>Einhell GC-EC 2245</strong> (cam 400 RON), oricui are un buget mai restrans, dar are nevoie de o unealta mai robusta pentru cantitati mai mari de lemn. E o investitie buna pe termen lung, daca nu te deranjeaza cablul.</p><p>Pentru cei care vor libertate de miscare si nu au de taiat zilnic cantitati uriase, un model pe acumulator mai mic, gen <strong>Bosch UniversalChain 18V-20</strong> (cam 450 RON solo), e perfect. E usor de manevrat, nu ai grija cablului si e suficient pentru treburile casnice obisnuite.</p><p>Daca te gandesti sa investesti mai mult si vrei o unealta care sa te tina ani buni si sa faca fata si treburilor mai serioase, atunci merita sa te uiti la modelele pe acumulator mai puternice, ca <strong>Makita UC002GZ01</strong> (cam 1200 RON solo). E o investitie, da, dar calitatea se simte.</p><p>In general, recomand un fierastrau electric pentru lemne oricui: familiei care se incalzeste cu lemne si vrea sa-si pregateasca singura combustibilul, pasionatilor de bricolaj care vor sa-si construiasca singuri mici obiecte de mobilier sau decoratiuni pentru <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a>, si chiar si celor care au nevoie sa mai curete din cand in cand copacii din curte.</p><p>Ce e important de retinut e sa alegi modelul potrivit nevoilor tale. Nu cumpara cel mai scump fierastrau daca il folosesti o data pe luna sa tai cateva crengi. Dar nici pe cel mai ieftin, daca ai de taiat un munte de lemne. Asculta-ti nevoile, bugetul si, daca poti, testeaza-l inainte. Cred ca un fierastrau electric de calitate, folosit corect, iti va face viata mult mai usoara si iti va permite sa te bucuri mai mult de casa si gradina ta.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce tip de fierastrau electric e mai bun: cu acumulator sau cu fir?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde de nevoile tale. Cele cu acumulator ofera libertate de miscare si sunt ideale pentru gradini mari sau locuri fara acces la curent. Cele cu fir sunt, de obicei, mai puternice si mai ieftine, dar te limiteaza cablul. Pentru uz casnic, ambele pot fi bune, dar cele pe acumulator sunt mai comode.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna "solo" la pretul unui fierastrau electric pe acumulator?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                "Solo" inseamna ca produsul vine fara acumulator si incarcator. Acestea trebuie achizitionate separat, ceea ce poate fi avantajos daca deja detii acumulatori compatibili de la alte unelte ale aceluiasi brand.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie sa ascut lantul unui fierastrau electric?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Frecventa depinde de cat de mult si de ce fel de lemn tai. In general, e bine sa verifici ascutimea lantului dupa ce ai taiat aproximativ 10-15 metri cubi de lemn. Daca taierea devine mai greoaie sau daca fierastraul incepe sa scoata rumegus fin in loc de span, e semn ca trebuie ascutit.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi un fierastrau electric pentru lemne pentru a taia alte materiale?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Fierastraiele electrice pentru lemne sunt proiectate specific pentru lemn. Taierea altor materiale, cum ar fi metalul sau plasticul, cu un astfel de fierastrau poate fi periculoasa, ineficienta si poate deteriora unealta. Foloseste intotdeauna unealta potrivita pentru fiecare material.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce echipament de protectie este obligatoriu cand folosesc un fierastrau electric?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Este esential sa porti ochelari de protectie pentru a-ti proteja ochii de rumegus, manusi rezistente pentru o priza mai buna si protectie a mainilor, si casti antifonice pentru a-ti proteja auzul de zgomotul puternic. Daca tai lemne groase, cizmele de protectie sunt recomandate.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum intretin corect un fierastrau electric pentru lemne?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Curata fierastraul dupa fiecare utilizare, indepartand rumegusul. Verifica si mentine nivelul corect de ulei pentru ungerea lantului, intinde lantul la tensiunea potrivita si asigura-te ca este ascutit. Depoziteaza unealta intr-un loc uscat, ferit de umezeala si, daca e pe acumulator, scoate bateria.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru taiat lemne de foc groase la un punct fix, cea mai buna alegere e o drujba cu cablu de <strong>1900 W</strong>, iar aici <strong>Einhell GC-EC 1935</strong> e si cea mai vanduta, si cea mai puternica. Daca vrei sa lucrezi oriunde in curte, fara cablu, <strong>Einhell GE-LC 36/35</strong> taie la fel de gros pe acumulator. Iar pentru crengi si lemn subtire, mini fierastraiele <strong>Folixs</strong> si <strong>Herrgut</strong> sunt usoare, ieftine si suficiente.</p>
+      <p>La un fierastrau electric pentru lemne conteaza trei lucruri: <strong>tipul de alimentare</strong> (cablu, acumulator sau mini pe baterie), <strong>lungimea lamei</strong> potrivita cu grosimea lemnului si <strong>puterea</strong> motorului. Mai jos gasesti direct recomandarile, grupate pe cele trei tipuri, iar sub ele un ghid despre cum alegi, cablu vs acumulator si cum lucrezi in siguranta.</p>
+      <p>Am pornit de la fierastraiele electrice in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe putere, lungime de lama, viteza a lantului si tip de alimentare, si le-am impartit in drujbe cu cablu, drujbe pe acumulator si mini fierastraie, ca sa gasesti repede tipul potrivit pentru ce ai tu de taiat. Pentru crengi si gard viu, vezi si <a href="/tocator-de-crengi-pentru-curte/">tocatoarele de crengi</a> si <a href="/foarfeca-electrica-pentru-gard-viu/">foarfecile de gard viu</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#mini">Mini fierastraie pe acumulator</a></li>
+        <li><a href="#cablu">Drujbe electrice cu cablu</a></li>
+        <li><a href="#acu">Drujbe pe acumulator full-size</a></li>
+        <li><a href="#pentru-ce">Pentru ce folosesti un fierastrau electric</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#cablu-acumulator">Cu cablu, pe acumulator sau mini</a></li>
+        <li><a href="#siguranta">Siguranta si reculul</a></li>
+        <li><a href="#folosire">Cum il folosesti si il intretii</a></li>
+        <li><a href="#greseli">Greseli de evitat</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Putere</th><th>Lama</th><th>Alimentare</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.putere || '—'}</td>
+              <td>{x.lama}</td>
+              <td>{x.alim}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mini">Mini fierastraie pe acumulator</h2>
+    <p>Usoare, portabile si ieftine, cu lame de 4-12 inch: le tii cu o mana si sunt ideale pentru crengi, pomi fructiferi si lemn subtire de foc. Aici e si cel mai vandut, si cel mai bine notat fierastrau din tot articolul.</p>
+    <div class="rd-grid">
+      {MINI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMini} alt="Mini fierastraie pe acumulator: Folixs, Herrgut, Kardett" width="1200" height="675" loading="lazy" />
+
+    <h2 id="cablu">Drujbe electrice cu cablu</h2>
+    <p>De 1800-1900 W si lame de 35-40 cm: putere multa, autonomie nelimitata si cel mai bun pret pe watt. Te tin legat de o priza, deci sunt facute pentru taiat lemn de foc gros la un punct fix in curte.</p>
+    <div class="rd-grid">
+      {CABLU.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figCablu} alt="Drujbe electrice cu cablu: Einhell, Heinner, Procraft, Bosch, Makita" width="1200" height="675" loading="lazy" />
+
+    <h2 id="acu">Drujbe pe acumulator full-size</h2>
+    <p>Aceeasi forma ca drujbele clasice, dar fara cablu: te lasa sa lucrezi oriunde, iar modelele de 36 V taie busteni grosi la fel ca cele de retea. Multe vin kit complet, cu acumulator si incarcator incluse.</p>
+    <div class="rd-grid">
+      {ACU.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcu} alt="Drujbe pe acumulator full-size: Einhell, Bosch, Herrgut" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-fierastrau-electric').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate fierastraiele electrice la oferta</strong>
+        <span>Reducerile din acest moment la fierastraie cu lant electrice, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="pentru-ce">Pentru ce folosesti un fierastrau electric</h2>
+    <p>Un fierastrau electric cu lant, fie ca il numesti drujba sau mini fierastrau, are un rol clar: <strong>taie lemnul rapid</strong> cu ajutorul lantului cu dinti care se roteste pe lama. Fata de fierastraul cu mana sau de topor, iti scuteste ore de munca grea si iti da bucati uniforme, gata de pus pe foc.</p>
+    <p>Cel mai des il folosesti pentru <strong>taiat lemne de foc</strong>, la debitat busteni si crengi groase pentru soba sau semineu, dar si la <strong>toaletatul pomilor</strong> primavara, la curatat livada de uscaturi, la taiat vita de vie sau la mici proiecte de curte. Un mini fierastrau se descurca la crengi si lemn subtire, o drujba cu cablu sau pe acumulator ataca si busteni grosi. Fata de un fierastrau pe benzina, cel electric e mai usor, mult mai silentios, porneste instant de la buton si nu are miros de combustibil, tocmai de aceea a devenit alegerea de baza pentru majoritatea gospodariilor.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua fierastraie electrice:</p>
+    <ul>
+      <li><strong>Lungimea lamei:</strong> alege o lama cu cel putin 5 cm mai lunga decat grosimea lemnului. 4-8 inch (10-20 cm) pentru crengi, 25-30 cm pentru lemn mediu, 35-40 cm pentru busteni grosi.</li>
+      <li><strong>Puterea:</strong> la cele cu cablu, 1800-1900 W inseamna putere de drujba adevarata; la acumulator, 18 V e pentru crengi, iar 36 V se apropie de puterea celor cu cablu. Lama mai lunga cere motor mai puternic.</li>
+      <li><strong>Viteza lantului:</strong> in general 10-15 m/s. Mai mare inseamna taiere mai rapida si mai curata, mai ales in lemn tare.</li>
+      <li><strong>Ungerea lantului:</strong> cauta rezervor de ulei si ungere automata. Fara ulei, lantul se supraincalzeste si se toceste repede.</li>
+      <li><strong>Greutatea:</strong> mini fierastraiele au 1-3 kg si le tii cu o mana; drujbele ajung la 4-4.5 kg si cer ambele maini. Conteaza cand lucrezi mult sau deasupra capului.</li>
+      <li><strong>Siguranta:</strong> franarea de lant, lantul cu risc redus de recul si un maner ergonomic fac diferenta la un aparat care se invarte cu viteza mare.</li>
+    </ul>
+
+    <h2 id="cablu-acumulator">Cu cablu, pe acumulator sau mini</h2>
+    <p>Cele trei tipuri din selectie rezolva nevoi diferite, iar alegerea potrivita depinde de <strong>ce tai si de unde lucrezi</strong>.</p>
+    <p><strong>Drujba cu cablu</strong> e regele raportului putere-pret. Iti da 1800-1900 W si autonomie nelimitata, deci tai lemn de foc gros ore in sir fara pauza, la cel mai mic pret. Singura conditie e sa ai o priza aproape sau un prelungitor de exterior, pentru ca esti legat de sursa de curent. E alegerea ideala daca debitezi lemn la un punct fix in curte, langa magazie sau langa casa.</p>
+    <p><strong>Drujba pe acumulator</strong> iti da libertate: lucrezi oriunde, prin gradina, in livada, departe de casa, fara sa cauti priza. Modelele de 18 V sunt usoare si bune pentru crengi si lemn mediu, iar cele de 36 V, ca Einhell GE-LC 36/35, taie busteni grosi aproape ca o drujba cu cablu. Costa mai mult si autonomia e limitata de baterie, dar daca prinzi un sistem de acumulatori pe care il folosesti si la alte scule, investitia se justifica.</p>
+    <p><strong>Mini fierastraul</strong> e cel mai usor si mai ieftin. Il tii cu o mana, ajungi usor printre crengi si il folosesti pentru toaletat pomi, curatat livada si taiat lemn subtire. Nu inlocuieste o drujba la busteni grosi, dar pentru munca marunta de gradina e exact ce trebuie, iar modelele mari de 8-12 inch se descurca si la lemn de foc subtire spre mediu.</p>
+
+    <h2 id="siguranta">Siguranta si reculul</h2>
+    <p>Un fierastrau cu lant e o unealta puternica, iar cel mai mare risc se numeste <strong>recul</strong>: saltul brusc al lamei inapoi spre tine, care apare mai ales cand varful lamei atinge lemnul. E cea mai frecventa cauza de accidente, dar il eviti usor daca stii cum.</p>
+    <p>Tine mereu aparatul <strong>ferm, cu ambele maini</strong> la drujbe, si taie cu partea de jos a lamei, nu cu varful. Nu infige varful lamei in lemn si nu tine aparatul mai sus de umeri. Multe modele au <strong>franare de lant</strong>, un mecanism care opreste lantul aproape instant daca apare reculul, plus lant si lama concepute sa reduca riscul. Poarta intotdeauna <strong>ochelari de protectie si manusi</strong>, iar la drujbele mari adauga casti antifonice, pentru ca trec de 100 dB, si incaltaminte solida. La cele cu cablu, tine cablul mereu in spate, departe de lama, ca sa nu il tai din greseala.</p>
+
+    <h2 id="folosire">Cum il folosesti si il intretii</h2>
+    <p>Inainte de fiecare sesiune, verifica <strong>nivelul de ulei</strong> pentru lant si completeaza cu ulei special de lant, nu cu orice ulei; un lant bine uns taie usor, se incalzeste putin si tine mult mai mult. Verifica si <strong>tensiunea lantului</strong>: trebuie sa fie intins, dar sa il poti misca cu mana pe lama. La modelele cu sistem SDS, ca Bosch, il tensionezi din mana, fara scule.</p>
+    <p>La taiere, sprijina lemnul bine, ca sa nu se miste, si lasa lantul sa lucreze fara sa fortezi aparatul in lemn; daca simti ca se chinuie, mai bine faci taietura in doua reprize. Dupa folosire, <strong>curata lantul si lama</strong> de rumegus si de rasina, sterge aparatul si depoziteaza-l uscat. Ascute sau schimba lantul cand nu mai musca in lemn, pentru ca un lant tocit forteaza motorul si taie prost. Intretinerea unui fierastrau electric e mult mai simpla decat a unuia pe benzina: nu are motor termic, ulei de motor, bujii sau carburator de curatat.</p>
+
+    <h2 id="greseli">Greseli de evitat</h2>
+    <p>Cateva greseli frecvente strica rezultatul, uzeaza aparatul sau te pun in pericol. Le eviti usor daca le stii dinainte:</p>
+    <ul>
+      <li><strong>Iei o lama prea scurta pentru lemnul tau:</strong> daca busteanul e mai gros decat lama, tai in mai multe reprize si obosesti aparatul. Alege lama cu cel putin 5 cm peste grosimea lemnului.</li>
+      <li><strong>Cumperi un mini fierastrau pentru busteni grosi:</strong> un model de 4-6 inch e pentru crengi, nu pentru trunchiuri. Pentru lemn de foc gros iti trebuie o drujba de 35-40 cm.</li>
+      <li><strong>Lucrezi fara ulei la lant:</strong> lantul se supraincalzeste, se toceste si poate gripa pe lama. Verifica uleiul de fiecare data.</li>
+      <li><strong>Tai cu varful lamei:</strong> asa apare reculul. Taie cu partea de jos a lamei si tine varful departe de lemn.</li>
+      <li><strong>Nu porti protectie:</strong> ochelarii si manusile sunt minimul, iar la drujbe mari, castile si incaltamintea solida. Un lant cu viteza mare nu iarta.</li>
+      <li><strong>Ignori tensiunea si ascutirea lantului:</strong> un lant slabit sare de pe lama, iar unul tocit forteaza motorul. Verifica-le periodic si ascute sau schimba lantul la nevoie.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tip, lungimea lamei si brand:</p>
+    <p><strong>Mini fierastraie pe acumulator:</strong> de la circa 160 de lei pentru un model de 4 inch, ca Kardett, si pana la 300-450 de lei pentru cele mari de 8-12 inch, ca Folixs sau Herrgut, cu motor fara perii si doua baterii.</p>
+    <p><strong>Drujbe cu cablu:</strong> in general 220-540 de lei, de la Procraft si Heinner pana la Bosch UniversalChain, cu putere de 1800-1900 W si lama de 35 cm. Variantele profesionale, ca Makita, trec de 900 de lei.</p>
+    <p><strong>Drujbe pe acumulator full-size:</strong> de la circa 580 de lei pentru un model de 18 V cu kit, ca Einhell GE-LC 18 Li, si pana la peste 1000 de lei pentru cel de 36 V, cu doi acumulatori inclusi.</p>
+    <p>Pe langa pret, gandeste-te la <strong>ce tai cel mai des</strong>: pentru crengi si lemn subtire, un mini fierastrau ieftin e cea mai buna alegere; pentru lemn de foc gros langa priza, o drujba cu cablu iti da cea mai multa putere pe leu; iar daca vrei libertate fata de cablu, drujba pe acumulator merita banii in plus. Cel mai bun raport il gasesti alegand tipul potrivit nevoii, nu neaparat cel mai scump model.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
         <p class="author-role">Expert Gradinarit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="fierastrau-electric-pentru-lemne"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="fierastrau-electric-pentru-lemne"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="fierastrau-electric-pentru-lemne" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="fierastrau-electric-pentru-lemne" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

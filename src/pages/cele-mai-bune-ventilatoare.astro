@@ -1,0 +1,325 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['ventilator'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. De podea, cu picior ---
+  { g: 'podea', id: 'DCFKRMBBM', rol: 'Cel mai vandut', short: 'Star-Light FTBB-60W', tip: 'De podea', putere: '60 W', elice: '40 cm', trepte: '3',
+    specs: ['938 de pareri, de departe cele mai multe din selectie', 'elice de 40 cm si 60 W, cel mai puternic de aici', 'inaltime reglabila pana la 127 cm', 'telecomanda, oscilatie si temporizator'],
+    pros: ['De departe cel mai cumparat ventilator din articol, 938 de pareri', 'Cea mai mare putere si cel mai mare diametru din selectie', 'Are tot ce trebuie: telecomanda, oscilatie, timer, inaltime reglabila', 'Pret sub 280 de lei pentru dotarile astea'],
+    cons: ['Doar 3 trepte de viteza, control mai grosier', 'Nota 4.55, buna dar nu cea mai mare din selectie'],
+    verdict: 'Cu 938 de pareri, Star-Light FTBB-60W are de trei ori mai multe decat urmatorul din articol si e clar alegerea implicita a pietei. Motivul se vede in fisa: 60 de wati si elice de 40 de centimetri, adica cel mai mult aer mutat din toata selectia, plus telecomanda, oscilatie, temporizator si inaltime reglabila pana la 127 de centimetri, toate sub 280 de lei. E ventilatorul clasic de living sau dormitor mare, din cele care se aud, dar care chiar misca aerul dintr-un capat in altul al camerei. Cele 3 trepte de viteza sunt putine fata de cele 9 ale lui Heinner, deci reglezi mai grosier, iar nota de 4.55 e mai modesta decat la modelele scumpe. Il iei cand vrei cel mai mult aer pentru cei mai putini bani si camera e destul de mare cat sa conteze.' },
+  { g: 'podea', id: 'DCFRVDBBM', rol: 'Cel mai ieftin de podea', short: 'Zass ZF 1605', tip: 'De podea', putere: '45 W', elice: '40.6 cm', trepte: '3',
+    specs: ['elice de 40.6 cm, cea mai mare din selectie', '45 W la circa 130 de lei', 'inaltime reglabila intre 98 si 130 cm', 'doar oscilatie, fara telecomanda'],
+    pros: ['Cel mai ieftin ventilator de podea adevarat din articol', 'Elice de 40.6 cm, cea mai mare diagonala de aici', 'Inaltime reglabila pana la 130 cm', '45 W, putere reala pentru o camera'],
+    cons: ['Fara telecomanda si fara temporizator', 'Nota 4.08, cea mai slaba din selectie'],
+    verdict: 'Zass ZF 1605 e varianta fara fasoane: elice de 40.6 centimetri, cea mai mare din tot articolul, 45 de wati si inaltime reglabila pana la 130 de centimetri, la circa 130 de lei. Ca sa ajunga acolo, producatorul a taiat exact lucrurile de confort: nu are telecomanda, nu are temporizator, il pornesti si il opresti de la buton. Pe partea de aer mutat nu e cu nimic mai prejos decat modele de doua ori mai scumpe, pentru ca diametrul si puterea sunt cele care conteaza. Nota de 4.08 din 66 de pareri e cea mai modesta din selectie si merita sa citesti recenziile inainte. Il iei cand vrei aer mult la buget minim si nu te deranjeaza sa te ridici ca sa schimbi treapta.' },
+  { g: 'podea', id: 'D9NZ43MBM', rol: 'Cel mai silentios pe treapta mica', short: 'Xiaomi Mi Smart 1C', tip: 'De podea', putere: '38 W', elice: '14 inch', trepte: '3',
+    specs: ['26.6 dB pe treapta mica, cel mai silentios de podea', 'control din aplicatie si prin asistent vocal', '38 W, inaltime reglabila pana la 100 cm', '63 dB pe treapta maxima'],
+    pros: ['26.6 dB pe treapta mica, se poate lasa pornit noaptea', 'Smart: aplicatie, programare, control vocal', 'Xiaomi, ecosistem cunoscut si suport bun', 'Inaltime reglabila'],
+    cons: ['63 dB pe treapta maxima, se aude clar', 'Doar 3 trepte, saritura intre ele e mare'],
+    verdict: 'Xiaomi Mi Smart 1C e singurul ventilator de podea din selectie care declara zgomotul pe fiecare treapta, si cifrele explica de ce merita: 26.6 decibeli pe treapta mica, adica sub o soapta, si 63 pe maxim. Practic ai doua aparate intr-unul: noaptea il lasi pe treapta mica langa pat si nu il auzi, iar ziua il dai la maxim si misca aer cat un ventilator obisnuit. Partea smart nu e decorativa aici, pentru ca il programezi sa porneasca inainte sa ajungi acasa sau sa se opreasca dupa ce adormi, fara sa te ridici. Saritura intre cele 3 trepte e insa mare, iar pe maxim chiar se aude. Il iei cand vrei un singur ventilator si pentru zi, si pentru noapte, si folosesti deja aplicatii pentru casa.' },
+  { g: 'podea', id: 'DWX1G0MBM', rol: 'Cel mai fin control', short: 'Heinner HMSF-9BK', tip: 'De podea', putere: '19 W', elice: '-', trepte: '9',
+    specs: ['9 trepte de viteza, cele mai multe din selectie', 'doar 19 W, consum foarte mic', 'functie de memorie, retine setarile', 'telecomanda si temporizator'],
+    pros: ['9 trepte de viteza, cel mai fin control din articol', 'Doar 19 W, consuma cat un bec LED', 'Nota 4.79, printre cele mai bune de aici', 'Functie de memorie: retine treapta la repornire'],
+    cons: ['52 dB declarat, nu e cel mai silentios', 'Fisa nu precizeaza diametrul elicei'],
+    verdict: 'Diferenta dintre 3 trepte si 9 trepte se simte mai mult decat pare. Cu trei, esti mereu intre prea putin si prea mult; cu noua, gasesti exact punctul in care aerul ajunge la tine fara sa te bata. HMSF-9BK e singurul din selectie care ofera asta, si o face la 19 wati, adica un consum de bec LED, cu functie de memorie care retine treapta la care l-ai lasat, un detaliu mic pe care il apreciezi zilnic. Nota de 4.79 din 67 de pareri e printre cele mai bune din articol. Cei 52 de decibeli declarati nu il fac un model de liniste, iar fisa nu spune diametrul elicei, deci nu pot compara direct aerul mutat cu Star-Light. Il iei cand te deranjeaza ventilatoarele care bat prea tare si vrei sa reglezi fin.' },
+  { g: 'podea', id: 'D0FLP0MBM', rol: 'Cel mai scump din selectie', short: 'Xiaomi BHR4828GL', tip: 'De podea', putere: '15 W', elice: '35.5 cm', trepte: '4',
+    specs: ['30.2 dB si doar 15 W', 'Wi-Fi, control complet din aplicatie', 'recomandat pentru camere de pana la 14 m²', '1210 lei, cel mai scump din articol'],
+    pros: ['30.2 dB, foarte silentios', 'Cel mai mic consum din selectie la un ventilator de podea, 15 W', 'Wi-Fi si inaltime reglabila', 'Nota 4.78'],
+    cons: ['1210 lei pentru o acoperire declarata de doar 14 m²', 'Costa de patru ori cat Star-Light, care misca mai mult aer'],
+    verdict: 'BHR4828GL e cel mai scump aparat din articol si cel mai greu de justificat pe cifre. Are calitati reale: 30.2 decibeli, 15 wati, Wi-Fi complet si constructie Xiaomi. Dar fisa declara o acoperire de 14 metri patrati, adica o camera obisnuita, la 1210 lei, in timp ce Star-Light acopera vizibil mai mult cu elice de 40 de centimetri si 60 de wati, la 275 de lei. Practic platesti de patru ori mai mult pentru liniste, consum mic si integrare in aplicatie, nu pentru aer mutat. Intr-un dormitor mic in care aparatul merge toata noaptea, argumentul sta in picioare. In orice alta situatie, nu. Il iei doar daca linistea si consumul conteaza mai mult decat orice altceva, si ai bugetul.' },
+  // --- B. De turn ---
+  { g: 'turn', id: 'D8X1G0MBM', rol: 'Cel mai bun turn accesibil', short: 'Heinner HMTF-D3BK', tip: 'Turn', putere: '45 W', elice: '-', trepte: '3',
+    specs: ['45 W, cea mai mare putere din grupul de turn', 'control touch si telecomanda', 'temporizator si oscilatie', 'sub 300 de lei'],
+    pros: ['Cel mai ieftin ventilator de turn din selectie', '45 W, cea mai mare putere dintre turnuri', 'Control touch plus telecomanda', 'Nota 4.62 din 84 de pareri, cele mai multe din grup'],
+    cons: ['Doar 3 trepte de viteza', 'Fisa nu declara nivelul de zgomot'],
+    verdict: 'Ventilatoarele de turn se cumpara pentru forma, nu pentru performanta: ocupa un patrat de 25 pe 25 de centimetri pe podea si nu au elice expusa, ceea ce conteaza intr-o casa cu copii sau animale. HMTF-D3BK e cel mai accesibil din grup si totodata cel mai puternic dintre turnuri, cu 45 de wati, plus control touch pe aparat si telecomanda. Cele 84 de pareri cu nota 4.62 sunt cele mai multe din grupul de turn, deci e si cel mai verificat. Are doar 3 trepte, iar Heinner nu declara zgomotul, ceea ce la un turn conteaza, pentru ca forma inalta si ingusta tinde sa fluiere pe treptele mari. Il iei cand vrei un turn si nu vrei sa treci de 300 de lei.' },
+  { g: 'turn', id: 'DZ83KWMBM', rol: 'Cele mai multe trepte', short: 'Trisa Comfort Breeze', tip: 'Turn', putere: '28 W', elice: '-', trepte: '8',
+    specs: ['8 trepte de viteza', '114 cm inaltime, aer distribuit pe verticala', '28 W, consum mic pentru un turn', 'telecomanda si functii smart'],
+    pros: ['8 trepte, control fin pentru un turn', '114 cm inaltime, aerul ajunge si la nivelul capului', 'Doar 28 W', 'Brand elvetian, constructie ingrijita'],
+    cons: ['55 dB declarat, se aude', 'Nota 4.47, cea mai modesta din grupul de turn'],
+    verdict: 'Comfort Breeze e turnul pentru cine vrea sa regleze, nu doar sa porneasca. Cele 8 trepte de viteza sunt aproape triplu fata de restul turnurilor din selectie si iti dau exact fluxul dorit, iar inaltimea de 114 centimetri inseamna ca aerul ajunge la nivelul pieptului si al capului cand stai in picioare sau pe canapea, nu doar la glezne. Consuma 28 de wati, mai putin decat Heinner, iar Trisa e un brand elvetian cu finisaje peste medie. Reversul e ca declara 55 de decibeli, deci nu e un aparat de dormit langa el, iar nota de 4.47 din 57 de pareri e cea mai modesta din grupul de turn. Il iei cand stai mult in aceeasi camera si vrei sa ajustezi des intensitatea.' },
+  { g: 'turn', id: 'D52VS9BBM', rol: 'Cel mai compact', short: 'Rowenta Eole Compact', tip: 'Turn', putere: '30 W', elice: '-', trepte: '3',
+    specs: ['doar 39.3 cm inaltime, incape pe birou sau noptiera', '45 dB pe treapta mica', 'afisaj LED si temporizator', 'Rowenta, brand consacrat'],
+    pros: ['39.3 cm, cel mai mic turn din selectie, intra pe o noptiera', '45 dB pe treapta mica, acceptabil noaptea', 'Rowenta, brand cu service la noi', 'Afisaj LED, temporizator si oscilatie'],
+    cons: ['Nota 4.25, cea mai slaba din grupul de turn', '60 dB pe treapta maxima'],
+    verdict: 'Eole Compact rezolva problema turnurilor obisnuite: sunt inalte si trebuie sa stea pe podea. La 39.3 centimetri, asta incape pe o noptiera, pe birou sau pe un raft, deci aerul ajunge direct la tine in loc sa fie trimis de la nivelul podelei. Cei 45 de decibeli pe treapta mica il fac utilizabil noaptea, iar Rowenta inseamna service si piese la noi, ceea ce la un aparat cu motor conteaza in timp. Are afisaj LED, temporizator si oscilatie. Nota de 4.25 din 56 de pareri e insa cea mai slaba dintre turnuri, iar pe maxim urca la 60 de decibeli, adica devine zgomotos. Il iei cand nu ai loc pe podea si vrei aerul aproape de tine.' },
+  // --- C. De birou si portabile ---
+  { g: 'birou', id: 'D3JWCLYBM', rol: 'Cea mai buna nota din articol', short: 'Freezy Air AeroCool Pro', tip: 'De birou', putere: '6 W', elice: '15 cm', trepte: '4',
+    specs: ['nota 4.91, cea mai mare din selectie', 'functioneaza pe acumulator, fara cablu', '25 dB, practic inaudibil', 'elice de 15 cm, cea mai mare din grup'],
+    pros: ['Cea mai buna nota din tot articolul, 4.91 din 271 de pareri', 'Merge pe acumulator, il muti oriunde fara priza', '25 dB, nu il auzi', 'Elice de 15 cm, mai mult aer decat restul modelelor de birou'],
+    cons: ['6 W, misca aer doar in jurul tau', '200 de lei pentru un ventilator de birou e in partea de sus'],
+    verdict: 'Nota de 4.91 din 271 de pareri e cea mai mare din tot articolul, iar la un aparat simplu ca acesta cifra e credibila: face un singur lucru si il face bine. AeroCool Pro merge pe acumulator, deci il pui pe birou, il duci in bucatarie sau pe balcon fara sa cauti priza, are elice de 15 centimetri, mai mare decat restul modelelor de birou de aici, si declara 25 de decibeli, adica practic nu il auzi. Cei 6 wati inseamna insa ca misca aer in jurul tau, la un metru, nu in camera, si asta e important de inteles inainte de cumparare. La 200 de lei e in partea de sus a segmentului de birou. Il iei cand stai mult la masa sau la birou si vrei aer pe tine, nu in camera.' },
+  { g: 'birou', id: 'DDX9QWMBM', rol: 'Cu iluminare inclusa', short: 'Ideas4Comfort camera', tip: 'De birou', putere: '8 W', elice: '14 cm', trepte: '4',
+    specs: ['8 W, cel mai puternic din grupul de birou', 'are si lampa, functioneaza ca veioza', 'inaltime reglabila, afisaj LED', 'recomandat pentru camere de pana la 10 m²'],
+    pros: ['Cel mai puternic din grupul de birou, 8 W', 'Are iluminare inclusa, tine loc si de veioza', 'Inaltime reglabila si afisaj LED', '205 de pareri cu nota 4.78'],
+    cons: ['10 m² acoperiti, doar pentru spatii mici', 'Combinatia ventilator plus lampa nu excelezaza la niciuna'],
+    verdict: 'Ideas4Comfort e ventilatorul de birou care incearca sa fie si altceva, iar aici combinatia are logica: pe o noptiera vrei si aer, si o lumina slaba, si ocupa un singur loc si o singura priza. Are 8 wati, cel mai mult din grupul de birou, elice de 14 centimetri, inaltime reglabila si afisaj LED, cu 205 pareri si nota 4.78. Producatorul declara o acoperire de 10 metri patrati, ceea ce e realist pentru un aparat de dimensiunea asta si te avertizeaza sa nu il cumperi pentru living. Ca la orice produs care face doua lucruri, nu il face pe niciunul mai bine decat un aparat dedicat. Il iei pentru noptiera sau pentru un birou mic, cand vrei si lumina.' },
+  { g: 'birou', id: 'DL2W5N2BM', rol: 'Cel mai silentios din articol', short: 'Ideas4Comfort birou', tip: 'De birou', putere: '5.5 W', elice: '10 cm', trepte: '4',
+    specs: ['20 dB, cel mai silentios din tot articolul', 'alimentare USB, merge din laptop sau priza de telefon', '5.5 W, consum neglijabil', 'iluminare si inaltime reglabila'],
+    pros: ['20 dB, cel mai silentios aparat din tot articolul', 'Alimentare USB, il bagi in laptop', 'Consum neglijabil, 5.5 W', 'Are si iluminare'],
+    cons: ['Elice de 10 cm, cel mai mic flux de aer', 'Alimentarea USB limiteaza puterea'],
+    verdict: 'Douazeci de decibeli inseamna, practic, un aparat pe care nu il auzi decat daca iti lipesti urechea de el, si e cea mai mica valoare din tot articolul. Alimentarea prin USB il face potrivit exact pentru situatia in care il vrei: langa laptop, la birou, intr-un spatiu unde orice zgomot deranjeaza, alimentat direct din calculator sau dintr-un incarcator de telefon. Cei 5.5 wati si elicea de 10 centimetri limiteaza insa fluxul la un cerc mic in jurul tau, si asta e compromisul: alegi linistea si renunti la aer. Are si iluminare, si inaltime reglabila, cu 205 pareri si nota 4.78. Il iei pentru birou, in spatii in care zgomotul conteaza mai mult decat racoarea.' },
+  { g: 'birou', id: 'D249XJYBM', rol: 'Cel mai ieftin din articol', short: 'Aiyando 4 in 1', tip: 'De birou', putere: '-', elice: '-', trepte: '5',
+    specs: ['sub 50 de lei, cel mai ieftin din selectie', '5 trepte de viteza', 'se foloseste pe birou, in mana sau la gat', '93 de pareri cu nota 4.51'],
+    pros: ['Cel mai mic pret din tot articolul, sub 50 de lei', '5 trepte de viteza, neasteptat de multe la pretul asta', 'Portabil: birou, mana sau prins la gat', 'Util in deplasare sau pe caldura, afara'],
+    cons: ['Fisa nu declara nici puterea, nici diametrul', 'Nu inlocuieste un ventilator adevarat in casa'],
+    verdict: 'La sub 50 de lei nu se poate cere mult, iar Aiyando 4 in 1 nici nu promite mult: e un ventilator mic pe care il pui pe birou, il tii in mana sau il prinzi la gat, cu 5 trepte de viteza, ceea ce e neasteptat de mult la pretul asta. Cele 93 de pareri cu nota 4.51 vin de la oameni care stiu ce au cumparat. Fisa nu declara nici puterea, nici diametrul elicei, deci nu il pot compara pe cifre cu restul, iar asta spune ceva in sine. Nu il cumperi ca sa racoresti o camera, ci ca sa ai aer pe tine intr-un tren, la un festival, in bucatarie langa aragaz sau la birou. Il iei ca accesoriu de vara, nu ca aparat pentru casa.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const PODEA = PICKS.filter(x => x.g === 'podea');
+const TURN = PICKS.filter(x => x.g === 'turn');
+const BIROU = PICKS.filter(x => x.g === 'birou');
+
+const hero = '/imagini/articole/cele-mai-bune-ventilatoare.webp';
+const figPodea = '/imagini/articole/ventilator-podea.webp';
+const figTurn = '/imagini/articole/ventilator-turn.webp';
+const figBirou = '/imagini/articole/ventilator-birou.webp';
+const published = '2026-07-20T17:22:10+03:00';
+
+const faq = [
+  { question: 'Ventilatorul raceste camera?', answer: 'Nu, si asta e cea mai raspandita neintelegere despre ventilatoare. Un ventilator nu scade temperatura aerului, ci doar il misca. Senzatia de racoare vine din faptul ca aerul in miscare accelereaza evaporarea transpiratiei de pe piele, iar evaporarea consuma caldura din corp. Efectul se simte ca 2-4 grade in minus, dar termometrul din camera arata aceeasi valoare. Consecinta practica e importanta: un ventilator lasat pornit intr-o camera goala nu face absolut nimic, doar consuma curent. Il pornesti cand esti in camera si il indrepti spre tine sau spre zona in care stai, nu il lasi sa mearga toata ziua ca sa gasesti racoare cand te intorci.' },
+  { question: 'Ventilator sau aer conditionat?', answer: 'Sunt complementare, nu alternative, iar cifrele de consum arata de ce. Ventilatoarele din aceasta selectie consuma intre 5.5 si 60 de wati, in timp ce un aparat de aer conditionat obisnuit trage undeva la 700-1000 de wati, adica de peste zece ori mai mult. Aerul conditionat chiar raceste aerul si scade umiditatea, ventilatorul doar il misca. Combinatia e insa cea mai eficienta: Departamentul american al Energiei recomanda ca, atunci cand folosesti si un ventilator, sa urci termostatul aparatului de aer conditionat cu aproximativ 2 grade, pentru ca senzatia ramane aceeasi. Economia rezultata e de 10-12 la suta din costul de racire, iar ventilatorul adauga o fractiune neglijabila la consum.' },
+  { question: 'De podea, de turn sau de birou?', answer: 'Alegerea tine de spatiu si de distanta la care stai. Ventilatorul de podea, cu elice de 35-40 de centimetri si 40-60 de wati, e singurul care misca aerul intr-o camera intreaga si e alegerea pentru living sau dormitor mare. Turnul misca mai putin aer la aceeasi putere, dar ocupa un patrat mic pe podea si nu are elice expusa, ceea ce conteaza cu copii sau animale in casa. Modelele de birou, cu 5-8 wati si elice de 10-15 centimetri, nu racoresc o camera si nici nu incearca: fac un curent de aer in jurul tau, la un metru distanta, si sunt potrivite la masa de lucru. Daca vrei sa racoresti o incapere, singura optiune reala din cele trei e cea de podea.' },
+  { question: 'Cati decibeli inseamna silentios?', answer: 'Reperele practice: sub 30 de decibeli inseamna ca nu il auzi decat daca esti atent, intre 30 si 45 il auzi dar poti dormi, iar peste 50 devine deranjant intr-o camera linistita. In selectia de aici, cel mai silentios e modelul de birou Ideas4Comfort cu 20 de decibeli, urmat de Freezy Air cu 25 si de Xiaomi Mi Smart 1C cu 26.6 pe treapta mica. La celalalt capat, acelasi Xiaomi urca la 63 de decibeli pe treapta maxima, iar Rowenta la 60. De retinut ca aproape toti producatorii declara valoarea pe treapta cea mai mica, unde aparatul e cel mai silentios, deci cifra de pe cutie e cea mai favorabila, nu media.' },
+  { question: 'Cat consuma un ventilator?', answer: 'Foarte putin, si asta e principalul lui argument. Modelele din selectie merg de la 5.5 wati la un ventilator de birou pana la 60 de wati la cel mai puternic model de podea. Ca reper, 60 de wati inseamna cat un bec incandescent vechi, iar 19 wati, cat are modelul Heinner cu 9 trepte, inseamna cat un bec LED. La opt ore de functionare zilnica, un ventilator de 60 de wati consuma 0.48 kWh pe zi, adica sub 15 kWh pe luna. Un aparat de aer conditionat consuma atat in cateva zile. De aceea, chiar daca ai aer conditionat, merita sa folosesti si ventilatorul: costul lui e neglijabil, iar efectul combinat iti permite sa setezi aerul conditionat mai sus.' },
+  { question: 'Unde il asez in camera?', answer: 'Regula de baza e sa il indrepti spre tine, nu spre mijlocul camerei, pentru ca efectul de racoare exista doar acolo unde aerul atinge pielea. Daca vrei totusi sa schimbi aerul din incapere, exista un truc care functioneaza: asezi ventilatorul in dreptul unei ferestre deschise, orientat spre exterior, seara, cand afara s-a racit. Astfel scoti aerul cald acumulat in casa si tragi aer mai rece prin celelalte ferestre, iar asta chiar scade temperatura, spre deosebire de utilizarea obisnuita. Oscilatia e utila cand sunteti mai multi in camera, pentru ca imparte fluxul, dar daca stai singur intr-un loc fix o poti opri: aerul constant pe o directie racoreste mai bine decat unul intermitent.' },
+  { question: 'Ventilatorul e bun pentru alergii sau praf?', answer: 'Aici raspunsul e nuantat si merita stiut inainte. Un ventilator nu filtreaza nimic, doar misca aerul, iar prin asta ridica praful si polenul depuse pe suprafete si le pune in circulatie. Pentru cineva cu alergii sau astm, un ventilator indreptat direct spre fata poate inrautati simptomele, mai ales daca nu ai aspirat de curand. Solutiile sunt simple: pastreaza aparatul curat, sterge paletele periodic, pentru ca praful se depune pe ele si e reimprastiat, si nu il indrepta direct spre fata noaptea. Daca problema principala e calitatea aerului, nu caldura, un purificator cu filtru face ce ventilatorul nu poate.' },
+  { question: 'Cat costa un ventilator bun?', answer: 'Selectia acopera de la 49 la 1210 lei si se imparte clar pe tipuri. Modelele de birou si portabile stau intre 49 si 200 de lei, cu Aiyando 4 in 1 la capatul de jos si Freezy Air AeroCool Pro la cel de sus, iar la pretul asta cumperi aer in jurul tau, nu in camera. Ventilatoarele de podea adevarate pornesc de la circa 130 de lei cu Zass ZF 1605 si urca la 360 cu Xiaomi Mi Smart 1C, iar zona cea mai buna ca raport e in jur de 275 de lei, unde Star-Light FTBB-60W ofera cea mai mare putere si cel mai mare diametru din articol. Turnurile costa intre 300 si 529 de lei, iar diferenta fata de un model de podea o platesti pe forma si pe siguranta, nu pe aer mutat.' },
+];
+
+const images = [hero, figPodea, figTurn, figBirou, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune ventilatoare in ${SEO_YEAR}: de podea, de turn sau de birou`}
+  description="12 ventilatoare comparate pe putere, diametru si zgomot, de la 49 la 1210 lei. Plus de ce un ventilator nu raceste camera si cum il combini cu AC-ul."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Alina Munteanu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Incalzire si Climatizare', url: '/incalzire-climatizare/' }, { name: 'Cele mai bune ventilatoare' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/incalzire-climatizare/">Incalzire si Climatizare</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune ventilatoare</span>
+    </nav>
+
+    <h1>Cele mai bune ventilatoare pentru casa si birou</h1>
+    <p class="rd-byline">de <a href="/autori/alina-munteanu/">Alina Munteanu</a>, Specialist Incalzire si Climatizare · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune ventilatoare: modele de podea, de turn si de birou" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Cel mai cumparat ventilator din selectie e <strong>Star-Light FTBB-60W</strong>, cu 938 de pareri, elice de 40 cm si telecomanda, la sub 280 de lei. Daca vrei sa il lasi pornit noaptea, <strong>Xiaomi Mi Smart 1C</strong> coboara la 26.6 dB pe treapta mica, iar pentru control fin, <strong>Heinner HMSF-9BK</strong> are 9 trepte la doar 19 W. Cea mai buna nota din articol, 4.91, o are <strong>Freezy Air AeroCool Pro</strong>, un model de birou pe acumulator.</p>
+      <p>Inainte de orice comparatie, un lucru care schimba felul in care folosesti aparatul: <strong>un ventilator nu raceste aerul</strong>. Il misca, iar racoarea vine din evaporarea transpiratiei de pe piele. De aceea unul lasat pornit intr-o camera goala nu face nimic, iar unul indreptat spre tine face mult. Alegerea se reduce apoi la <strong>tip</strong>: de podea pentru o camera intreaga, de turn cand nu ai loc, de birou pentru aer in jurul tau.</p>
+      <p>Daca problema ta e caldura din tot apartamentul, nu doar din camera in care stai, vezi si <a href="/cele-mai-bune-aparate-de-aer-conditionat/">aparatele de aer conditionat</a>. Cele doua se folosesc cel mai bine impreuna, iar mai jos explic exact cum.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#podea">De podea, pentru o camera intreaga</a></li>
+        <li><a href="#turn">De turn, cand nu ai loc</a></li>
+        <li><a href="#birou">De birou si portabile</a></li>
+        <li><a href="#nu-raceste">De ce un ventilator nu raceste camera</a></li>
+        <li><a href="#cu-ac">Ventilator si aer conditionat impreuna</a></li>
+        <li><a href="#dormitor">Cel mai bun ventilator pentru dormitor</a></li>
+        <li><a href="#camera-mare">Cel mai bun ventilator pentru camera mare</a></li>
+        <li><a href="#ieftin">Cel mai ieftin ventilator care merita</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#greseli">Greseli la folosire</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Putere</th><th>Elice</th><th>Trepte</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.putere}</td>
+              <td>{x.elice}</td>
+              <td>{x.trepte}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="podea">De podea, pentru o camera intreaga</h2>
+    <p>Singurul tip care misca aerul dintr-un capat in altul al unei camere. Elice de 35-40 cm si 15-60 W, pe picior reglabil in inaltime. Daca vrei sa se simta ceva la trei metri de aparat, aici cauti.</p>
+    {PODEA.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPodea} alt="Ventilatoare de podea: Star-Light, Zass si Xiaomi Mi Smart" width="1600" height="900" loading="lazy" />
+
+    <h2 id="turn">De turn, cand nu ai loc</h2>
+    <p>Misca mai putin aer decat un model de podea la aceeasi putere, dar ocupa un patrat mic si nu are elice expusa. Diferenta reala nu e de performanta, ci de spatiu si de siguranta cu copii sau animale in casa.</p>
+    {TURN.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figTurn} alt="Ventilatoare de turn: Heinner, Trisa si Rowenta Eole Compact" width="1600" height="900" loading="lazy" />
+
+    <h2 id="birou">De birou si portabile</h2>
+    <p>Intre 5.5 si 8 W, cu elice de 10-15 cm. Nu racoresc o camera si nu incearca: fac un curent de aer in jurul tau, la un metru. Pentru masa de lucru, noptiera sau deplasare.</p>
+    {BIROU.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figBirou} alt="Ventilatoare de birou si portabile: Freezy Air, Ideas4Comfort si Aiyando" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-ventilator').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate ventilatoarele la oferta</strong>
+        <span>Reducerile din acest moment, pe toate tipurile, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="nu-raceste">De ce un ventilator nu raceste camera</h2>
+    <p>Merita insistat, pentru ca de aici vin aproape toate nemultumirile legate de ventilatoare.</p>
+    <p>Un ventilator nu are niciun mecanism prin care sa scada temperatura aerului. Nu are compresor, nu are agent de racire, nu schimba caldura cu exteriorul. Are un motor si o elice, iar tot ce face e sa <strong>mute aerul dintr-un loc in altul</strong>. Un termometru pus in camera arata aceeasi valoare cu ventilatorul pornit sau oprit. Ba chiar, tehnic, motorul adauga o cantitate mica de caldura.</p>
+    <p>Atunci de ce simti racoare? Pentru ca aerul in miscare accelereaza <strong>evaporarea transpiratiei de pe piele</strong>, iar evaporarea consuma caldura din corp. Efectul e echivalentul a 2-4 grade in minus ca senzatie, fara nicio schimbare reala in camera.</p>
+    <p>Din asta decurg cateva consecinte practice, si sunt exact opusul a ce fac multi:</p>
+    <ul>
+      <li><strong>Un ventilator pornit intr-o camera goala nu face nimic.</strong> Nu racoreste camera pentru cand te intorci, doar consuma curent. Il pornesti cand intri.</li>
+      <li><strong>Trebuie sa te atinga aerul.</strong> Indreptat spre mijlocul camerei, efectul e aproape zero. Indreptat spre tine, e maxim.</li>
+      <li><strong>Oscilatia scade efectul asupra ta.</strong> E utila cand sunteti mai multi, dar daca stai singur intr-un loc fix, un flux constant racoreste mai bine.</li>
+      <li><strong>Cu cat e mai umed aerul, cu atat merge mai prost.</strong> Transpiratia se evapora mai greu, deci senzatia de racoare scade. In zilele inabusitoare, ventilatorul dezamageste tocmai cand ai nevoie de el.</li>
+    </ul>
+    <p>Exista si o utilizare in care un ventilator chiar scade temperatura din casa: <strong>asezat in dreptul unei ferestre deschise, orientat spre exterior</strong>, seara, dupa ce afara s-a racit. Asa scoti aerul cald acumulat peste zi si tragi aer mai rece prin celelalte ferestre. Aici nu mai vorbim de senzatie, ci de schimb real de aer.</p>
+
+    <h2 id="cu-ac">Ventilator si aer conditionat impreuna</h2>
+    <p>Intrebarea corecta nu e care dintre ele, ci cum se folosesc impreuna, iar raspunsul e sustinut de cifre.</p>
+    <p>Ventilatoarele din selectie consuma intre <strong>5.5 si 60 de wati</strong>. Un aparat de aer conditimat obisnuit trage 700-1000 de wati, deci de peste zece ori mai mult. Aerul conditionat chiar raceste aerul si ii scade umiditatea; ventilatorul doar il misca.</p>
+    <p>Combinatia e cea mai eficienta pentru ca rezolva o slabiciune a aerului conditionat: acesta raceste camera uniform, dar ca sa te simti bine trebuie sa coboare temperatura intregii incaperi. Cu un ventilator care iti trimite aer direct, senzatia de confort apare la o temperatura mai mare a camerei.</p>
+    <p>Recomandarea Departamentului american al Energiei e concreta: cand folosesti si un ventilator, <strong>urca termostatul aparatului de aer conditionat cu aproximativ 2 grade</strong>. Confortul ramane acelasi, iar economia e de <strong>10-12 la suta</strong> din costul de racire. Ventilatorul adauga la consum o fractiune neglijabila, sub 5 la suta din cat trage aerul conditionat.</p>
+    <p>Pentru un apartament, asta inseamna un ventilator in camera in care stai si aerul conditionat setat cu doua grade mai sus decat ai fi tentat. Daca inca alegi aparatul de aer conditionat, vezi si <a href="/aer-conditionat-pentru-apartament-mic/">ce se potriveste unui apartament mic</a>.</p>
+
+    <h2 id="dormitor">Cel mai bun ventilator pentru dormitor</h2>
+    <p>Criteriul aici nu e puterea, ci zgomotul, pentru ca un aparat pe care il opresti la culcare nu ajuta la nimic tocmai in orele in care ai nevoie de el.</p>
+    <p>Dintre modelele de podea, <strong>Xiaomi Mi Smart 1C</strong> e singurul care coboara la 26.6 decibeli pe treapta mica, sub nivelul unei soapte, si il poti programa din aplicatie sa se opreasca dupa ce adormi. <strong>Xiaomi BHR4828GL</strong> declara 30.2 decibeli, tot in zona buna, dar costa de trei ori mai mult.</p>
+    <p>Daca dormitorul e mic si aparatul poate sta pe noptiera, <strong>Rowenta Eole Compact</strong> are 39.3 centimetri inaltime si 45 de decibeli pe treapta mica, iar aerul ajunge direct la tine in loc sa fie trimis de la podea.</p>
+    <p>Un avertisment care nu apare pe cutii: aerul suflat direct in fata toata noaptea usuca mucoasele si poate da gat uscat sau nas infundat dimineata. Orienteaza fluxul spre picioare sau spre perete, ca aerul sa circule fara sa te bata direct.</p>
+
+    <h2 id="camera-mare">Cel mai bun ventilator pentru camera mare</h2>
+    <p>Pentru un living sau un dormitor de peste 20 de metri patrati, doua cifre decid: <strong>diametrul elicei</strong> si <strong>puterea</strong>. Restul sunt detalii de confort.</p>
+    <p><strong>Star-Light FTBB-60W</strong> e alegerea clara, cu elice de 40 de centimetri si 60 de wati, cele mai mari valori din articol, la sub 280 de lei. <strong>Zass ZF 1605</strong> are chiar o elice putin mai mare, 40.6 centimetri, si 45 de wati, la circa 130 de lei, dar renunta la telecomanda si temporizator.</p>
+    <p>Ce sa nu iei pentru o camera mare: modelele de birou, oricat de bine notate ar fi, si turnurile, care la aceeasi putere misca mai putin aer din cauza formei. Iar <strong>Xiaomi BHR4828GL</strong>, desi costa 1210 lei, declara acoperire pentru doar 14 metri patrati, deci nu e un aparat pentru spatii mari, in ciuda pretului.</p>
+
+    <h2 id="ieftin">Cel mai ieftin ventilator care merita</h2>
+    <p>Depinde de ce astepti, si aici merita facuta distinctia clar.</p>
+    <p>Daca vrei sa racoresti o camera, pragul real e <strong>Zass ZF 1605</strong>, la circa 130 de lei: elice de 40.6 centimetri si 45 de wati, adica performanta de ventilator adevarat, fara telecomanda si fara timer. Sub pretul asta nu mai gasesti aparate de podea cu putere reala.</p>
+    <p>Daca vrei doar aer pe tine, la birou sau in deplasare, <strong>Aiyando 4 in 1</strong> costa sub 50 de lei si are 5 trepte de viteza. Nu inlocuieste un ventilator de camera si nici nu pretinde asta.</p>
+    <p>Greseala frecventa e sa cumperi un model de birou de 150-200 de lei asteptand sa racoreasca dormitorul. Cu 6-8 wati, nu se intampla. Pentru aceeasi suma iei un ventilator de podea care chiar face treaba.</p>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la ventilatoarele in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat cate un singur model din fiecare linie de produs, pentru ca multe apar in mai multe variante de culoare care ar fi umplut lista degeaba.</p>
+    <p><strong>Nu am grupat dupa campul "Tip ventilator" de pe eMAG</strong>, pentru ca acesta e nesigur: pune mini-ventilatoare de birou de 5 wati si 10 centimetri in aceeasi categorie cu aparatele de podea de 60 de wati. Am grupat dupa <strong>putere si diametrul elicei</strong>, care sunt masurabile si spun ce face aparatul in realitate.</p>
+    <p><strong>O precizare despre pareri.</strong> Categoria asta e foarte fragmentata: exista sute de modele si un singur produs din selectie trece de 300 de pareri. Brandurile serioase, Xiaomi, Rowenta, Trisa, Heinner, au intre 56 si 84 de pareri, in timp ce gadgeturile ieftine de birou aduna 200-270. Daca as fi ordonat articolul dupa popularitate, primele locuri ar fi fost ocupate de ventilatoare de birou de 6 wati, ceea ce ar fi indus in eroare pe cineva care cauta sa racoreasca o camera. De aceea am grupat pe tip si am comparat in interiorul fiecarui grup.</p>
+    <p>La un ventilator, spre deosebire de un dezumidificator sau o masina de spalat, numarul de pareri conteaza mai putin: e un aparat simplu, cu motor si elice, iar decizia tine de tip, putere si zgomot, nu de fiabilitate pe termen lung. Aceste date le avem complete din fisele produselor.</p>
+    <p>Nu testam aparatele in laborator si nu pretindem asta. Comparam specificatiile reale, notele si volumul parerilor, si le raportam la ce spun sursele tehnice despre modul in care racoreste, de fapt, un ventilator.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Patru lucruri, in ordinea in care conteaza:</p>
+    <ul>
+      <li><strong>Tipul.</strong> Decide inainte de orice altceva: de podea daca vrei sa racoresti o camera, de turn daca nu ai loc sau ai copii, de birou daca vrei aer doar in jurul tau. Un model gresit ca tip nu se compenseaza cu nimic.</li>
+      <li><strong>Diametrul elicei si puterea.</strong> Astea determina cat aer misca. 35-40 cm si 40-60 W inseamna o camera intreaga; 10-15 cm si 5-8 W inseamna un metru in jurul tau.</li>
+      <li><strong>Zgomotul.</strong> Sub 30 dB nu il auzi, intre 30 si 45 poti dormi, peste 50 deranjeaza. Atentie: producatorii declara de obicei valoarea pe treapta cea mai mica.</li>
+      <li><strong>Numarul de trepte.</strong> Cu 3 trepte esti mereu intre prea putin si prea mult. Cu 8-9, ca la Heinner sau Trisa, gasesti punctul exact. Conteaza mai mult decat pare la un aparat pe care il folosesti zilnic luni intregi.</li>
+    </ul>
+    <p>Telecomanda si temporizatorul par accesorii pana cand aparatul e la trei metri de pat si trebuie sa te ridici ca sa il opresti. Oscilatia e utila cand sunteti mai multi in camera si mai putin utila cand stai singur intr-un loc fix.</p>
+
+    <h2 id="greseli">Greseli la folosire</h2>
+    <ul>
+      <li><strong>Lasat pornit in camera goala.</strong> Nu racoreste incaperea pentru mai tarziu. Consuma degeaba.</li>
+      <li><strong>Indreptat spre mijlocul camerei.</strong> Efectul apare doar unde aerul atinge pielea. Orienteaza-l spre tine.</li>
+      <li><strong>Pornit cu ferestrele inchise ziua, pe canicula.</strong> Daca aerul din casa e mai cald decat cel de afara, plimbi aer cald. Seara, cu fereastra deschisa si aparatul orientat spre exterior, chiar racoresti.</li>
+      <li><strong>Paletele nesterse.</strong> Praful depus pe elice e reimprastiat in camera si scade fluxul. Sterge-le la cateva saptamani.</li>
+      <li><strong>Suflat direct in fata toata noaptea.</strong> Usuca mucoasele si poate da gat uscat sau nas infundat dimineata.</li>
+      <li><strong>Cumparat un model de birou pentru o camera.</strong> Cu 6 wati nu se intampla nimic la trei metri, oricat de bine ar fi notat aparatul.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 49 la 1210 lei, iar impartirea urmeaza tipurile.</p>
+    <p><strong>Sub 200 de lei</strong> stau modelele de birou si portabile: Aiyando 4 in 1 la 49 de lei, Ideas4Comfort intre 150 si 170, Freezy Air AeroCool Pro la 200. Aici cumperi aer in jurul tau, nu in camera. Tot in zona asta intra si <strong>Zass ZF 1605</strong> la circa 130 de lei, singurul ventilator de podea adevarat sub 200.</p>
+    <p><strong>Intre 275 si 360 de lei</strong> e zona cu cel mai bun raport din articol: Star-Light FTBB-60W la 275, cu cea mai mare putere si cel mai mare diametru, Heinner HMSF-9BK la 349 cu 9 trepte, Xiaomi Mi Smart 1C la 360 cu 26.6 dB si control din aplicatie. Tot aici, Heinner HMTF-D3BK la 300 daca vrei un turn.</p>
+    <p><strong>Peste 500 de lei</strong> ajungi la turnurile Trisa si Rowenta si la Xiaomi BHR4828GL. Aici nu mai platesti aer mutat, ci forma, brand, liniste si integrare smart. Xiaomi la 1210 lei declara acoperire pentru 14 metri patrati, cat un model de patru ori mai ieftin.</p>
+    <p>Observatia de buget: in categoria asta, pretul si aerul mutat se desincronizeaza rapid dupa 300 de lei. Cel mai puternic aparat din articol costa 275 de lei, iar cel mai scump, 1210, misca mai putin aer. Diferenta se duce in zgomot, consum si aplicatie, care pot conta, dar sunt altceva decat racoare. Daca ai nevoie de racire reala pentru tot apartamentul, vezi si <a href="/cele-mai-bune-dezumidificatoare/">dezumidificatoarele</a>, pentru ca vara disconfortul vine deseori din umiditate, nu din temperatura.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">AM</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/alina-munteanu/" class="author-name-link">Alina Munteanu</a></p>
+        <p class="author-role">Specialist Incalzire si Climatizare</p>
+        <p class="author-bio">Alina scrie despre incalzire si climatizare. Calculeaza puterea necesara pe suprafata si compara consumul real, nu doar pretul de pe raft.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-ventilatoare" currentCategory="incalzire-climatizare" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-ventilatoare" currentCategory="incalzire-climatizare" articles={relatedArticles} />
+  </article>
+</Layout>

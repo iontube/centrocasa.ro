@@ -30,7 +30,7 @@ const PICKS = [
     specs: ['aspirare 2200 Pa', 'navigatie de baza, fara laser', 'mop simplu', 'autonomie 120 min'],
     pros: ['Cel mai mic pret din top', 'Compact, intra usor sub mobila', 'Control din aplicatie si comenzi vocale'],
     cons: ['Navigatie de baza, fara LiDAR, nu retine harta', 'Curata in tipare mai aleatorii, nu sistematic', 'Mopul e simplu, doar de intretinere'],
-    verdict: 'Cel mai ieftin mod de a avea un robot care aspira singur, cu compromisul asteptat la acest pret: navigatia. Nu are LiDAR, se orienteaza prin senzori si merge mai degraba in tipare aleatorii, deci nu isi retine harta si nu curata la fel de sistematic ca modelele cu laser. Aspirarea de 2200 Pa e onesta pentru un apartament mic, cu pardoseli dure. Il controlezi din aplicatie sau cu vocea. Il iei daca vrei sa incerci un robot fara sa investesti mult, pentru spatii mici, nu pentru case mari cu multe camere.' },
+    verdict: 'Cu cel mai mic pret din selectie, ai un robot care aspira singur, cu compromisul asteptat la acest pret: navigatia. Nu are LiDAR, se orienteaza prin senzori si merge mai degraba in tipare aleatorii, deci nu isi retine harta si nu curata la fel de sistematic ca modelele cu laser. Aspirarea de 2200 Pa e onesta pentru un apartament mic, cu pardoseli dure. Il controlezi din aplicatie sau cu vocea. Il iei daca vrei sa incerci un robot fara sa investesti mult, pentru spatii mici, nu pentru case mari cu multe camere.' },
   { id: 'D86RLFYBM', badge: 'Compact pentru spatii mici',
     specs: ['aspirare 2000 Pa', 'navigatie giroscopica', 'mop cu rezervor 90 ml', 'corp de 30 cm'],
     pros: ['Compact, doar 30 cm, intra sub mobila joasa', 'Simplu de folosit, cu aplicatie', 'Pret mic pentru un Xiaomi'],
@@ -55,7 +55,7 @@ const PICKS = [
     specs: ['aspirare pana la 12000 Pa', 'autonomie 225 min', 'navigatie laser, harta permanenta', 'mop detasabil, lavabil'],
     pros: ['Cea mai mare aspirare din top, 12000 Pa', 'Cea mai lunga autonomie, 225 min', 'Bun pentru par de animale', 'Laveta de mop se spala la masina'],
     cons: ['Cel mai scump din selectie', 'Fara statie de auto-golire', 'Rezervor de apa mic, 220 ml'],
-    verdict: 'Varful selectiei, gandit mai ales pentru case cu animale. Are cea mai mare aspirare, pana la 12000 Pa, care ridica parul de animale de pe covoare si din colturi, si cea mai lunga autonomie, 225 de minute, deci acopera si o casa mare dintr-o singura incarcare. Se orienteaza cu laser si isi pastreaza harta permanent in aplicatie. Mopul e detasabil, cu laveta din microfibra care se spala la masina. Nu are statie de auto-golire si rezervorul de apa e mic, deci mopul e mai mult de intretinere. Il iei daca ai animale, casa mare si vrei cea mai mare putere de aspirare.' },
+    verdict: 'Cel mai capabil din selectie, gandit mai ales pentru case cu animale. Are cea mai mare aspirare, pana la 12000 Pa, care ridica parul de animale de pe covoare si din colturi, si cea mai lunga autonomie, 225 de minute, deci acopera si o casa mare dintr-o singura incarcare. Se orienteaza cu laser si isi pastreaza harta permanent in aplicatie. Mopul e detasabil, cu laveta din microfibra care se spala la masina. Nu are statie de auto-golire si rezervorul de apa e mic, deci mopul e mai mult de intretinere. Il iei daca ai animale, casa mare si vrei cea mai mare putere de aspirare.' },
 ].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
 
 const site = 'https://centrocasa.ro';
@@ -105,7 +105,7 @@ const b64 = (s) => Buffer.from(s).toString('base64');
     <div class="rd-intro">
       <p>Cel mai bun aspirator robot pentru majoritatea oamenilor este <strong>Roborock S5 Max</strong>: are navigatie LiDAR precisa, curata sistematic si are cel mai bun istoric de pareri. Daca vrei acelasi tip de robot mai ieftin, <strong>Xiaomi S20</strong> iti da 5000 Pa si navigatie laser sub 1000 de lei. Daca vrei sa te atingi de robot cat mai rar, un model cu statie ca <strong>Xiaomi X20 Pro</strong> se goleste singur si isi spala mopul.</p>
       <p>Mai jos ai 7 aspiratoare robot comparate pe navigatie, putere de aspirare, mop, statie si parerile reale ale cumparatorilor, pentru bugete de la 400 la aproape 5000 de lei. Cel mai important criteriu nu e puterea, ci navigatia, si iti explicam de ce.</p>
-      <p>Am pornit de la cele mai vandute aspiratoare robot de pe eMAG, am verificat specificatiile reale ale fiecarui model, de la tipul de navigatie la statie si autonomie, si le-am comparat cu parerile a mii de cumparatori.</p>
+      <p>Am pornit de la cele mai vandute aspiratoare robot de pe eMAG, am verificat specificatiile reale ale fiecarui model, de la tipul de navigatie la statie si autonomie, si le-am comparat cu parerile a mii de cumparatori. Pentru curatenie completa, vezi si <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspiratoarele robot cu mop</a> si <a href="/robot-de-curatat-geamuri/">robotii de curatat geamuri</a>.</p>
     </div>
 
     <details class="rd-toc">
@@ -222,7 +222,7 @@ const b64 = (s) => Buffer.from(s).toString('base64');
       <li><strong>Saptamanal:</strong> scoate peria principala si periile laterale si curata parul si firele infasurate, spala filtrul si sterge senzorii si contactele de incarcare.</li>
       <li><strong>La cateva luni:</strong> inlocuieste filtrul si periile uzate, iar la modelele cu statie, schimba sacul de praf cand se umple.</li>
     </ul>
-    <p>Senzorii murdari sunt cea mai frecventa cauza pentru care un robot incepe sa se rataceasca sau sa cada de pe trepte. O stergere cu o laveta uscata rezolva de obicei problema.</p>
+    <p>Senzorii murdari sunt cea mai frecventa cauza pentru care un robot incepe sa se rataceasca sau sa cada de pe trepte. O stergere cu o laveta uscata rezolva de obicei problema. Pentru spalatul pardoselilor, vezi si <a href="/mop-cu-aburi-pentru-podele/">mopurile cu aburi</a>.</p>
 
     <div class="rd-offers" data-o={b64('oferte-aspiratoare-robot')} role="button" tabindex="0">
       <div class="rd-offers-txt">

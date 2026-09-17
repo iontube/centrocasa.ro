@@ -3,6 +3,16 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CookieBanner from '../components/CookieBanner.astro';
+import ScrollTop from '../components/ScrollTop.astro';
+import keywordsData from '../../keywords.json';
+import { slugify } from '../lib/articles.mjs';
+
+// Articolele vechi (legacy, produse fabricate de AI) primesc noindex,follow ca sa nu
+// traga in jos calitatea perceputa a domeniului si sa deblocheze crawl-ul paginilor reale.
+// Raman 200 + linkurile lor sunt urmarite (follow). Auto-detectat dupa slug, fara a edita cele 48 fisiere.
+const legacySlugs = new Set(keywordsData.completed.filter(a => a.legacy).map(a => a.slug || slugify(a.keyword)));
+const pageSlug = Astro.url.pathname.replace(/^\/+|\/+$/g, '');
+const isLegacyArticle = legacySlugs.has(pageSlug);
 
 interface Props {
   title: string;
@@ -15,6 +25,10 @@ interface Props {
   author?: string;
   faq?: Array<{ question: string; answer: string }>;
   breadcrumb?: Array<{ name: string; url?: string }>;
+  /** hero-ul articolului: se preincarca, fiind de obicei elementul LCP */
+  preloadImage?: string;
+  preloadSrcset?: string;
+  preloadSizes?: string;
 }
 
 const {
@@ -27,7 +41,10 @@ const {
   modifiedTime,
   author,
   faq,
-  breadcrumb
+  breadcrumb,
+  preloadImage,
+  preloadSrcset,
+  preloadSizes
 } = Astro.props;
 
 const siteUrl = 'https://centrocasa.ro';
@@ -41,7 +58,12 @@ const websiteSchema = {
   "name": "CentroCasa",
   "url": siteUrl,
   "description": "Sfaturi si recomandari pentru casa si gradina ta",
-  "publisher": { "@type": "Organization", "name": "CentroCasa", "url": siteUrl }
+  "publisher": {
+    "@type": "Organization",
+    "name": "CentroCasa",
+    "url": siteUrl,
+    "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo.png`, "width": 571, "height": 120 }
+  }
 };
 
 // Article schema — doar pe pagini article, din propsurile deja transmise de pagini
@@ -93,11 +115,38 @@ const faqSchema = faq && faq.length > 0 ? {
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
+  <!-- Google Consent Mode v2 — consimtamant implicit REFUZAT (EEA); se actualizeaza doar dupa acceptare -->
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('consent', 'default', {
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'granted',
+      'security_storage': 'granted',
+      'wait_for_update': 500
+    });
+    try {
+      if (localStorage.getItem('cookies-consent') === 'accepted') {
+        gtag('consent', 'update', {
+          'ad_storage': 'granted',
+          'ad_user_data': 'granted',
+          'ad_personalization': 'granted',
+          'analytics_storage': 'granted'
+        });
+      }
+    } catch (e) {}
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="robots" content={isLegacyArticle ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"}>
   <meta name="theme-color" content="#16a34a">
 
   <title>{title}</title>
+  {preloadImage && (
+    <link rel="preload" as="image" href={preloadImage} imagesrcset={preloadSrcset} imagesizes={preloadSizes} fetchpriority="high" />
+  )}
   <meta name="description" content={description}>
   <link rel="canonical" href={canonicalUrl}>
 
@@ -141,6 +190,7 @@ const faqSchema = faq && faq.length > 0 ? {
   </main>
   <Footer />
   <CookieBanner />
+  <ScrollTop />
   <script>
     document.addEventListener('click', (e) => {
       const el = e.target.closest('[data-o]');

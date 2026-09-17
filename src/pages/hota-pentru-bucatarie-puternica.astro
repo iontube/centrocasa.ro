@@ -1,299 +1,321 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Hota pentru bucatarie puternica",
-  excerpt: "Daca vrei o hota pentru bucatarie puternica, cel mai sigur pariu e una cu o capacitate de absorbtie de minim 600 m3/h, ideal cu motor eficient energetic si zgomot sub 65 dB. Modelele cu control tactil si filtre de carbon regenerabile sunt excelente, dar verifica si dimensiunea sa se potriveasca spatiului tau. Sincer, am vazut multe bucatarii pline de aburi si mirosuri din cauza horțurilor subdimensionate, asa ca nu te zgârci aici.",
-  image: "/images/articles/hota-pentru-bucatarie-puternica.webp",
-  category: "Electrocasnice Casa",
-  categorySlug: "electrocasnice-casa",
-  date: "2026-02-26T09:41:42.066Z",
-  modifiedDate: "2026-02-26T09:41:42.066Z",
-  author: "Cristian Popa",
-  authorRole: "Specialist Electrocasnice",
-  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
-};
-
-const faq = [
-  { question: "cat costa o hota pentru bucatarie puternica", answer: "O hota pentru bucatarie puternica cu o capacitate de absorbtie de minim 600 m3/h costa intre 700 lei si 1500 lei pentru modele decente, de buget mediu. Modelele premium, cu design special si zgomot redus, pot ajunge si la 3000-5000 lei sau chiar mai mult." },
-  { question: "care e diferenta intre hota cu evacuare si hota cu recirculare", answer: "Hota cu evacuare elimina aerul viciat (aburi, mirosuri, grasime) direct in exterior, prin tubulatura. Hota cu recirculare filtreaza aerul prin filtre de carbon si grasime, apoi il elibereaza inapoi in bucatarie. Cea cu evacuare e mai eficienta, dar necesita instalare exterioara." },
-  { question: "ce capacitate de absorbtie e necesara pentru o bucatarie mica", answer: "Pentru o bucatarie mica (pana la 15 m2), o hota pentru bucatarie puternica cu o capacitate de absorbtie de 300-450 m3/h este, in general, suficienta. Totusi, se recomanda sa alegi un model cu cel putin 500 m3/h pentru a asigura o buna ventilatie." },
-  { question: "cat de important e nivelul de zgomot la o hota", answer: "Nivelul de zgomot, masurat in decibeli (dB), e foarte important, mai ales pentru bucatariile deschise. O hota zgomotoasa poate fi deranjanta. Ideal e sa alegi un model sub 65 dB la viteza medie, iar cele sub 55 dB sunt considerate foarte silentioase." },
-  { question: "cat de des trebuie curatat filtrul de la hota", answer: "Filtrele de grasime metalice trebuie curatate saptamanal sau la doua saptamani, in functie de cat gatesti; pot fi bagate in masina de spalat vase. Filtrele de carbon, daca hota nu evacueaza in exterior, trebuie schimbate la 3-6 luni sau regenerate, conform instructiunilor producatorului." },
-  { question: "merita sa cumpar o hota pentru bucatarie puternica de firma cunoscuta", answer: "Da, merita adesea sa investesti intr-un brand cunoscut pentru o hota pentru bucatarie puternica, deoarece acestea ofera de obicei motoare mai fiabile, materiale de calitate superioara si servicii post-vanzare mai bune. Totusi, exista si branduri mai noi sau mai putin cunoscute care ofera performante similare la preturi mai bune." },
-  { question: "care e diferenta intre filtrele de hota metalice si cele de carbon", answer: "Filtrele metalice capteaza grasimea din aer si sunt de obicei lavabile. Filtrele de carbon (antimiros) capteaza mirosurile si vaporii si sunt necesare doar la hote cu recirculare; acestea trebuie inlocuite periodic. O hota performanta are ambele tipuri de filtre." },
-  { question: "unde gasesc piese de schimb pentru o hota", answer: "Piese de schimb precum filtrele de carbon, becurile sau chiar motoarele se pot gasi la magazinele mari de electrocasnice, pe site-urile producatorilor sau la service-urile autorizate. E bine sa ai la indemana modelul exact al hotei tale cand cauti piese." }
-];
-
-const toc = [
-  { title: "Ce inseamna o hota pentru bucatarie puternica si de ce ai nevoie de una", id: "ce-inseamna-o-hota-pentru-bucatarie-puternica-si-de-ce-ai-nevoie-de-una" },
-  { title: "Top recomandari: Hote puternice pentru orice buzunar", id: "top-recomandari-hote-puternice-pentru-orice-buzunar" },
-  { title: "Pe ce sa te uiti cand cauti o hota de bucatarie performanta", id: "pe-ce-sa-te-uiti-cand-cauti-o-hota-de-bucatarie-performanta" },
-  { title: "Hota telescopica vs. hota decorativa: ce sa alegi", id: "hota-telescopica-vs-hota-decorativa-ce-sa-alegi" },
-  { title: "Greseli de evitat la achizitia unei hote", id: "greseli-de-evitat-la-achizitia-unei-hote" },
-  { title: "Verdict pe buget: Hota pentru bucatarie puternica la orice pret", id: "verdict-pe-buget-hota-pentru-bucatarie-puternica-la-orice-pret" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['hota-puternica'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Incorporabile si telescopice ---
+  { g: 'incorp', id: 'D4M2SHYBM', badge: 'Cea mai accesibila', short: 'DeLux 900', tip: 'Incorporabila', debit: '900 m³/h', zgomot: '57 dB',
+    specs: ['incorporabila, se ascunde in mobilier', '900 m³/h, motor dublu turbo', 'filtru lavabil din aluminiu, iluminare LED', 'doar 57 dB, silentioasa'],
+    pros: ['Cea mai accesibila hota din selectie', 'Debit bun, 900 m³/h, motor dublu turbo', 'Silentioasa pentru putere, doar 57 dB', 'Filtru lavabil, se spala si se refoloseste'],
+    cons: ['Comanda mecanica, fara touch', 'Se vede putin sub mobilier'],
+    verdict: 'Cea mai accesibila hota din selectie si o alegere practica daca vrei una discreta, ascunsa in mobilier. DeLux se incorporeaza intr-un corp de bucatarie deasupra plitei, lasand la vedere doar partea de jos, si are un debit bun de 900 m³/h cu motor dublu turbo, suficient pentru gatitul unei familii, plus un filtru lavabil din aluminiu, pe care il speli si il refolosesti, si iluminare LED. La 57 dB e surprinzator de silentioasa pentru puterea ei, un plus intr-o bucatarie deschisa spre living. Comanda e mecanica, cu butoane, fara touch, iar aspectul e simplu, pentru ca oricum se ascunde. O iei cand vrei cea mai ieftina hota puternica si discreta, incorporata in mobilier, cu debit bun si mers silentios, si nu ai nevoie de comenzi touch sau de un design la vedere.' },
+  { g: 'incorp', id: 'DTH9CLBBM', badge: 'Telescopica, debit mare', short: 'Tornado telescopica', tip: 'Telescopica', debit: '1200 m³/h', zgomot: '69 dB',
+    specs: ['telescopica, se trage in fata cand gatesti', '1200 m³/h, debit mare', 'latime 60 cm, 3 trepte de putere', 'filtru de carbon inclus'],
+    pros: ['Debit mare, 1200 m³/h, pentru gatit intens', 'Telescopica, o tragi in fata doar cand gatesti', 'Se ascunde in mobilier cand nu o folosesti', 'Pret accesibil pentru puterea oferita'],
+    cons: ['Zgomotoasa la maxim, 69 dB', 'Comanda mecanica'],
+    verdict: 'O hota telescopica cu debit mare, pentru cine gateste intens dar vrea sa o ascunda cand nu o foloseste. Tornado Storm se monteaza in mobilier, iar partea din fata se trage in afara doar cand gatesti, marind suprafata de absorbtie, apoi o impingi la loc, discret. Are un debit mare de 1200 m³/h, printre cele mai mari din selectie, deci scoate repede fumul si mirosurile chiar si la un gatit intens, pe o latime de 60 cm si cu 3 trepte de putere, plus filtru de carbon inclus. Cu 18 pareri si nota 4.06 e o alegere corecta la banii ei. La putere maxima e zgomotoasa, 69 dB, iar comanda e mecanica. O iei cand vrei debit mare la un pret accesibil, intr-o hota telescopica pe care o tragi in fata doar la nevoie si o ascunzi in rest, si accepti zgomotul mai mare la maxim.' },
+  { g: 'incorp', id: 'DK4SLN3BM', badge: 'Cel mai mare debit', short: 'KB-Elements', tip: 'Incorporabila', debit: '1300 m³/h', zgomot: '',
+    specs: ['debit urias, 1300 m³/h', 'motor BLDC cu auto-curatare', 'comanda touch screen, iluminare LED', 'filtru cu carbune'],
+    pros: ['Cel mai mare debit din selectie, 1300 m³/h', 'Motor BLDC modern, cu auto-curatare', 'Comanda touch screen si iluminare LED', 'Nota mare, 4.71, pentru un model puternic'],
+    cons: ['Inca 14 pareri', 'Zgomot nedeclarat clar'],
+    verdict: 'Hota cu cel mai mare debit din selectie, pentru cine gateste mult si vrea putere maxima. KB-Elements are 1300 m³/h, cel mai mare debit de aici, deci scoate fumul, aburul si mirosurile aproape instant, ideala intr-o bucatarie deschisa sau pentru cine gateste des si intens. Motorul BLDC e modern, eficient si mai durabil decat cele clasice, si are o functie de auto-curatare care ii prelungeste viata, plus comanda touch screen si iluminare LED. Cu nota 4.71 din 14 pareri e bine cotata pentru un model asa de puternic. Are inca putine pareri si un nivel de zgomot nedeclarat clar, de asteptat mai ridicat la un debit asa mare. O iei cand vrei cea mai puternica hota din selectie, cu motor modern si auto-curatare, pentru un gatit intens, si pui puterea de absorbtie pe primul loc.' },
+  { g: 'incorp', id: 'D06C7LMBM', badge: 'Cea mai vanduta', short: 'Turbionaire Thea', tip: 'Incorporabila', debit: '800 m³/h', zgomot: '',
+    specs: ['de departe cea mai vanduta, 48 pareri', '800 m³/h, comanda touch cu WiFi', 'filtru lavabil din inox, iluminare LED', 'Turbionaire, brand specializat in hote'],
+    pros: ['De departe cea mai vanduta din selectie, 48 pareri', 'Comanda touch cu WiFi, control din telefon', 'Filtru lavabil din inox, durabil', 'Turbionaire, brand specializat in hote'],
+    cons: ['Debit de 800 m³/h, mediu pentru selectie', 'Pret spre mijlocul segmentului'],
+    verdict: 'Cea mai vanduta hota din tot articolul si o alegere echilibrata, de la un brand specializat. Turbionaire Thea TH50RCB se incorporeaza in mobilier, are un debit de 800 m³/h, suficient pentru gatitul obisnuit al unei familii, si o comanda touch cu WiFi, deci o controlezi si din telefon, o dotare moderna rara la acest pret. Filtrul lavabil din inox e durabil si se spala usor, iar iluminarea LED lumineaza bine plita. Cu 48 de pareri, cele mai multe din selectie, si nota 4.65, e clar preferata cumparatorilor, iar Turbionaire e un brand specializat in hote, cu experienta pe acest produs. Debitul de 800 m³/h e mediu pentru selectie, bun pentru o bucatarie normala, nu pentru gatit foarte intens. O iei cand vrei cea mai testata hota din selectie, cu comanda touch si WiFi, de la un brand specializat, pentru o bucatarie de familie.' },
+  // --- Decorative de perete ---
+  { g: 'decor', id: 'DNQ0PF3BM', badge: 'Cea mai accesibila decorativa', short: 'Heinner T-shape', tip: 'Decorativa', debit: '800 m³/h', zgomot: '57 dB',
+    specs: ['decorativa T-shape, montaj pe perete', '800 m³/h, 4 trepte de putere', 'comanda touch, iluminare LED, 57 dB', 'nota 4.8 din 10 pareri'],
+    pros: ['Cea mai accesibila hota decorativa din selectie', 'Design T-shape modern, la vedere pe perete', 'Comanda touch si iluminare LED', 'Silentioasa, doar 57 dB, nota mare, 4.8'],
+    cons: ['Inca 10 pareri', 'Debit de 800 m³/h, mediu'],
+    verdict: 'Cea mai accesibila hota decorativa din selectie si o alegere excelenta daca vrei una la vedere, fara sa dai multi bani. Heinner HDCH-MD60TIX are un design T-shape modern, cu un corp de inox si sticla care arata bine montat pe perete, deasupra plitei, si un debit de 800 m³/h cu 4 trepte de putere, potrivit pentru o bucatarie de familie. Comanda touch si iluminarea LED ii dau un aer modern, iar la 57 dB e silentioasa. Cu nota 4.8 din 10 pareri e foarte apreciata, un semn bun la un pret mic pentru o hota decorativa de brand. Are inca putine pareri, iar debitul de 800 m³/h e mediu, bun pentru gatit normal. O iei cand vrei o hota decorativa moderna, la vedere, cu comanda touch si mers silentios, la cel mai mic pret din grupul decorativ, de la un brand cunoscut.' },
+  { g: 'decor', id: 'DPRT4LBBM', badge: 'Tip cupola, clasica', short: 'Tornado cupola', tip: 'Cupola', debit: '750 m³/h', zgomot: '60 dB',
+    specs: ['hota tip cupola Violla, clasica', '750 m³/h, 1 motor turbo', 'latime 60 cm, 3 viteze, iluminare LED', 'filtru de carbon inclus'],
+    pros: ['Design clasic tip cupola, atemporal', 'Pret accesibil pentru o hota de perete', 'Trei viteze si iluminare LED', 'Filtru de carbon inclus'],
+    cons: ['Cel mai mic debit din selectie, 750 m³/h', 'Comanda mecanica'],
+    verdict: 'O hota clasica tip cupola, pentru cine prefera forma traditionala, evazata, in locul designelor moderne. Tornado Violla are forma de cupola, cu partea de jos larga care se ingusteaza spre tavan, un aspect atemporal care se potriveste in bucatarii clasice, si un debit de 750 m³/h cu un motor turbo, 3 viteze si iluminare LED. Filtrul de carbon vine inclus, util daca o folosesti in regim de recirculare. Cu 13 pareri si nota 4.62 e bine cotata la banii ei, la un pret accesibil pentru o hota de perete. Debitul de 750 m³/h e cel mai mic din selectie, bun pentru o bucatarie normala, nu pentru gatit foarte intens, iar comanda e mecanica. O iei cand vrei o hota de perete cu design clasic, tip cupola, la un pret accesibil, pentru o bucatarie traditionala, si nu ai nevoie de cel mai mare debit sau de comenzi touch.' },
+  { g: 'decor', id: 'DWT6LZYBM', badge: 'Lata, de 90 cm', short: 'Turbionaire 90 cm', tip: 'Decorativa', debit: '800 m³/h', zgomot: '52 dB',
+    specs: ['decorativa lata, de 90 cm', '800 m³/h, comanda electronica', 'coboara la 52 dB pe treapta mica', 'Turbionaire, brand specializat'],
+    pros: ['Lata, 90 cm, acopera si plite mari', 'Foarte silentioasa pe treapta mica, 52 dB', 'A doua cea mai testata, 30 de pareri', 'Turbionaire, brand specializat in hote'],
+    cons: ['Zgomotoasa la maxim, 68 dB', 'Necesita o plita si un spatiu mai late'],
+    verdict: 'O hota decorativa lata, de 90 cm, pentru bucatarii cu plite mari sau spatii generoase. Turbionaire THC90WPS are 90 cm latime, mai mult decat standardul de 60, deci acopera si o plita cu 5 arzatoare sau o zona de gatit mai larga, un avantaj real intr-o bucatarie mare. Are un debit de 800 m³/h si o comanda electronica, iar pe treapta mica coboara la doar 52 dB, foarte silentioasa, chiar daca la maxim urca la 68 dB. Cu 30 de pareri, a doua cea mai testata din selectie, si nota 4.57, e o alegere de incredere, iar Turbionaire e specializat in hote. Are nevoie de o plita si un spatiu mai late ca sa se justifice. O iei cand ai o bucatarie mare, cu plita lata, si vrei o hota decorativa de 90 cm, silentioasa la putere mica, de la un brand specializat.' },
+  { g: 'decor', id: 'D2K6LZYBM', badge: 'Cea mai silentioasa', short: 'Turbionaire TEV', tip: 'Decorativa', debit: '800 m³/h', zgomot: '43 dB',
+    specs: ['cea mai silentioasa din selectie, 43 dB', '800 m³/h, comanda touch', 'iluminare LED, filtru lavabil', 'nota 4.84, cea mai buna din selectie'],
+    pros: ['Cea mai silentioasa din selectie, doar 43 dB', 'Cea mai buna nota din articol, 4.84', 'Comanda touch si iluminare LED', 'Turbionaire, brand specializat in hote'],
+    cons: ['Pret premium', 'Debit de 800 m³/h, mediu'],
+    verdict: 'Cea mai silentioasa si cea mai bine notata hota din tot articolul, pentru cine pretuieste linistea. Turbionaire TEV60WB coboara la doar 43 dB pe treapta mica, cel mai mic nivel din selectie, deci abia o auzi cand gatesti, un avantaj urias intr-o bucatarie deschisa spre living, unde o hota zgomotoasa strica atmosfera. Are 800 m³/h, comanda touch si iluminare LED, plus filtru lavabil, si o nota de 4.84 din 19 pareri, cea mai mare din articol, semn de multumire reala. E o hota premium, cu un pret pe masura, iar debitul de 800 m³/h e mediu, bun pentru gatit obisnuit. O iei cand vrei cea mai silentioasa si mai bine cotata hota din selectie, cu comanda touch, pentru o bucatarie deschisa unde linistea conteaza, si esti dispus la un pret premium.' },
+  // --- De insula, smart si premium ---
+  { g: 'spec', id: 'D76C7LMBM', badge: 'Pentru insula', short: 'Turbionaire insula', tip: 'De insula', debit: '800 m³/h', zgomot: '',
+    specs: ['hota de insula, se monteaza in tavan', '800 m³/h, motor brushless durabil', 'pentru plite in mijlocul bucatariei', 'filtru lavabil din inox'],
+    pros: ['Facuta special pentru plite pe insula', 'Se monteaza suspendata din tavan', 'Motor brushless, eficient si durabil', 'Turbionaire, brand specializat'],
+    cons: ['Nota 3.86 din 7 pareri, verifica recenziile', 'Montaj in tavan, mai complicat'],
+    verdict: 'Hota de ales daca ai plita in mijlocul bucatariei, pe o insula. Turbionaire DOT35IB e o hota de insula, care se monteaza suspendata din tavan, deasupra unei plite asezate central, nu langa perete, o situatie tot mai frecventa in bucatariile moderne open-space. Are un debit de 800 m³/h, un motor brushless eficient si durabil, si un filtru lavabil din inox. Fiind vizibila din toate partile, are un design ingrijit, gandit sa fie o piesa centrala. Cu 7 pareri si nota 3.86 e cotata mai modest, asa ca citeste atent recenziile inainte, iar montajul in tavan e mai complicat si cere de obicei un specialist. O iei cand ai plita pe o insula, in mijlocul bucatariei, si ai nevoie de o hota suspendata din tavan, de la un brand specializat, si esti dispus la un montaj mai pretentios.' },
+  { g: 'spec', id: 'D9ZPL83BM', badge: 'Smart, cu control vocal', short: 'Florida smart', tip: 'Smart', debit: '1200 m³/h', zgomot: '60 dB',
+    specs: ['hota inteligenta, control vocal si prin gesturi', '1200 m³/h, debit mare', 'comanda touch, iluminare LED', 'nota maxima, 5 din 5'],
+    pros: ['Control vocal si prin gesturi, foarte moderna', 'Debit mare, 1200 m³/h', 'Nota maxima, 5 din 5', 'Comanda touch si iluminare LED'],
+    cons: ['Inca 5 pareri', 'Pret ridicat'],
+    verdict: 'Cea mai moderna hota din selectie, pentru cine vrea tehnologie de ultima ora in bucatarie. Florida S9005 e o hota inteligenta cu control vocal si prin gesturi, deci o pornesti, o opresti sau ii schimbi puterea fara sa o atingi, cu mainile ocupate sau murdare de la gatit, un lux practic real. Are un debit mare de 1200 m³/h, printre cele mai mari din selectie, plus comanda touch si iluminare LED. Cu nota maxima, 5 din 5, chiar daca din doar 5 pareri, primii cumparatori sunt incantati, iar pretul ridicat se justifica prin dotarile smart. O iei cand vrei cea mai moderna hota din selectie, cu control vocal si prin gesturi si debit mare, pentru o bucatarie de ultima generatie, si esti dispus sa platesti pentru tehnologia inteligenta, acceptand ca are inca putine pareri.' },
+  { g: 'spec', id: 'DWV138BBM', badge: 'Touch Free, debit mare', short: 'Tornado Touch Free', tip: 'Incorporabila', debit: '1200 m³/h', zgomot: '67 dB',
+    specs: ['comanda Touch Free, fara atingere', '1200 m³/h, latime 60 cm', '4 viteze, comanda touch cu WiFi', 'filtru lavabil din aluminiu'],
+    pros: ['Comanda Touch Free, o controlezi fara sa o atingi', 'Debit mare, 1200 m³/h, 4 viteze', 'Comanda touch cu WiFi, control din telefon', 'Filtru lavabil, se spala si se refoloseste'],
+    cons: ['Zgomotoasa la maxim, 67 dB', 'Inca 7 pareri'],
+    verdict: 'O hota moderna cu debit mare si comanda fara atingere, pentru cine vrea tehnologie la un pret mai bun decat cele smart de top. Tornado Modul are functia Touch Free, cu care o controlezi fara sa o atingi, practic cand ai mainile ocupate, plus comanda touch cu WiFi, deci o reglezi si din telefon. Are un debit mare de 1200 m³/h pe o latime de 60 cm, cu 4 viteze, deci scoate repede fumul si mirosurile la un gatit intens, si un filtru lavabil din aluminiu. Cu 7 pareri si nota 4.57 e bine cotata, chiar daca inca putin testata. La maxim e zgomotoasa, 67 dB, de asteptat la debitul ei. O iei cand vrei o hota cu debit mare, comanda fara atingere si WiFi, la un pret mai accesibil decat hotele smart premium, si accepti zgomotul mai mare la putere maxima.' },
+  { g: 'spec', id: 'DLMRR3BBM', badge: 'Premium, top de gama', short: 'Falmec premium', tip: 'Incorporabila', debit: '800 m³/h', zgomot: '53 dB',
+    specs: ['top de gama, brand italian Falmec', 'grup incorporabil de calitate premium', '800 m³/h, 4 trepte, 53 dB', 'nota maxima, 5 din 5'],
+    pros: ['Falmec, brand italian premium de hote', 'Constructie si finisaje de top', 'Silentioasa pentru putere, 53 dB', 'Nota maxima, 5 din 5'],
+    cons: ['De departe cea mai scumpa din selectie', 'Inca 5 pareri'],
+    verdict: 'Cea mai rafinata din selectie, pentru cine vrea o hota premium, italiana, si nu se uita la pret. Falmec GRUPPOINC50 e un grup incorporabil de la Falmec, un brand italian recunoscut pentru hote de calitate, cu o constructie si finisaje de top, gandite sa dureze si sa functioneze impecabil ani la rand. Are un debit de 800 m³/h, 4 trepte de putere si un nivel de zgomot de doar 53 dB, silentioasa pentru puterea ei. Cu nota maxima, 5 din 5, chiar daca din 5 pareri, cei care au cumparat-o sunt foarte multumiti. E de departe cea mai scumpa din selectie, o investitie serioasa, justificata doar daca pui pret pe brand si pe calitatea premium. O iei cand vrei o hota top de gama, de la un brand italian de prestigiu, cu finisaje si constructie premium, si bugetul nu e o problema.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const INCORP = PICKS.filter(x => x.g === 'incorp');
+const DECOR = PICKS.filter(x => x.g === 'decor');
+const SPEC = PICKS.filter(x => x.g === 'spec');
+
+const hero = '/images/articles/hota-pentru-bucatarie-puternica.webp';
+const figIncorp = '/imagini/articole/hota-incorporabile.webp';
+const figDecor = '/imagini/articole/hota-decorative.webp';
+const figSpec = '/imagini/articole/hota-speciale.webp';
+const published = '2026-07-19T14:35:22+03:00';
+
+const faq = [
+  { question: 'Ce debit de aer imi trebuie la o hota?', answer: 'Debitul, masurat in metri cubi pe ora, arata cat aer scoate hota, deci cat de repede curata fumul, aburul si mirosurile. Pentru o bucatarie obisnuita, un debit de 400-500 m³/h e minimul rezonabil, iar pentru gatit intens sau o bucatarie deschisa spre living, unde mirosurile ajung usor in restul casei, cauta 600 m³/h sau mai mult. Modelele din selectie, toate puternice, merg de la 750 pana la 1300 m³/h, deci acopera si nevoile cele mai mari. O regula practica: debitul ideal e de circa 10 ori volumul bucatariei pe ora. Cu cat gatesti mai des si mai intens, cu atat un debit mai mare merita.' },
+  { question: 'Hota cu evacuare sau cu recirculare?', answer: 'Sunt cele doua moduri de functionare. Cu evacuare, hota scoate aerul cu fum si mirosuri afara, printr-un tub, si e cea mai eficienta varianta, pentru ca elimina complet aerul viciat; cere insa o iesire spre exterior. Cu recirculare, hota trece aerul printr-un filtru de carbon, care retine mirosurile, si il reda curatat in camera, fara tub spre afara, utila cand nu ai unde sa scoti evacuarea, dar mai putin eficienta si cu filtre de carbon care trebuie schimbate periodic. Multe hote, inclusiv din selectie, functioneaza in ambele moduri. Daca poti face evacuare spre exterior, e alegerea mai buna; daca nu, recircularea cu filtru de carbon e o solutie decenta.' },
+  { question: 'Ce latime de hota sa aleg?', answer: 'Regula de baza e simpla: hota trebuie sa fie cel putin la fel de lata ca plita, ideal chiar putin mai lata, ca sa prinda tot fumul si aburul care se ridica. Cea mai comuna latime e de 60 cm, potrivita pentru o plita standard cu 4 arzatoare, si majoritatea modelelor din selectie au aceasta dimensiune. Daca ai o plita mai mare, cu 5 arzatoare sau o zona de gatit lata, alege o hota de 90 cm, ca modelul Turbionaire din selectie, care acopera mai mult. O hota mai ingusta decat plita lasa fumul sa scape pe laturi, oricat de mare i-ar fi debitul, asa ca masoara plita inainte de a alege.' },
+  { question: 'Cat de zgomotoasa e o hota puternica?', answer: 'Hotele produc in general intre 50 si 70 dB, iar cele sub 60 dB sunt considerate silentioase. E important de stiut ca zgomotul creste cu puterea: pe treapta mica o hota poate fi foarte linistita, iar la maxim devine zgomotoasa. Modelele din selectie variaza mult: cele mai silentioase, ca Turbionaire TEV, coboara la 43 dB pe treapta mica, in timp ce altele, cu debit foarte mare, ajung la 67-69 dB la maxim. Daca ai o bucatarie deschisa spre living, unde zgomotul deranjeaza, alege o hota silentioasa, sub 60 dB pe treptele obisnuite, si foloseste puterea maxima doar cand chiar e nevoie, la un gatit intens.' },
+  { question: 'Ce tipuri de hota exista?', answer: 'Sunt cateva tipuri principale, dupa cum se monteaza. Hota incorporabila se ascunde intr-un corp de mobilier deasupra plitei, discreta, iar cea telescopica are o parte care se trage in fata doar cand gatesti. Hota decorativa se monteaza la vedere pe perete si e o piesa de design in sine, cu forme moderne sau clasice, ca tipul cupola. Hota de insula se suspenda din tavan, pentru plitele asezate in mijlocul bucatariei, nu langa perete. Alege in functie de amenajare: incorporabila daca vrei ceva discret, decorativa daca vrei un aspect la vedere, si de insula daca ai plita pe o insula centrala. Latimea si debitul se aleg apoi in functie de plita si de cat gatesti.' },
+  { question: 'Cum intretin filtrele unei hote?', answer: 'Hota are doua tipuri de filtre, care cer o intretinere diferita. Filtrul de grasime, de obicei din aluminiu, retine grasimea din aburi si trebuie curatat regulat, la cateva saptamani: cele lavabile, ca la majoritatea modelelor din selectie, se spala usor cu apa calda si detergent sau chiar in masina de spalat vase, apoi se pun la loc. Filtrul de carbon, folosit doar in regim de recirculare, retine mirosurile si nu se spala, ci se inlocuieste periodic, in general la cateva luni, conform indicatiilor producatorului. Un filtru de grasime infundat reduce mult puterea de absorbtie si forteaza motorul, iar unul de carbon epuizat nu mai retine mirosurile, deci intretinerea lor conteaza pentru performanta.' },
+  { question: 'Ce comenzi si iluminare are o hota moderna?', answer: 'Comenzile variaza de la simple butoane mecanice, la modelele accesibile, la panouri touch, tot mai raspandite, unde reglezi puterea si lumina cu o atingere. Modelele avansate din selectie adauga si mai mult: comanda cu WiFi, ca sa controlezi hota din telefon, functia Touch Free, cu care o pornesti fara sa o atingi, utila cand ai mainile murdare de la gatit, sau chiar control vocal si prin gesturi, ca la modelul Florida. Iluminarea e aproape mereu LED, eficienta si durabila, si lumineaza plita in timp ce gatesti, un plus practic real. Cand alegi, gandeste-te ce dotari folosesti cu adevarat: pentru mainile ocupate la gatit, comenzile fara atingere sunt foarte utile.' },
+  { question: 'Cat costa o hota de bucatarie puternica?', answer: 'In selectie, hotele accesibile pornesc de la circa 640 de lei pentru un model incorporabil sau decorativ, ca DeLux sau Heinner, si merg pana spre 800 de lei pentru cele telescopice cu debit mare. Segmentul echilibrat, cu Turbionaire sau KB-Elements, se aseaza intre circa 1150 si 1700 de lei si aduce comenzi touch, WiFi si debite mari. Modelele premium, de insula, smart cu control vocal sau de la branduri de top, trec de 1800 de lei si urca mult, pana spre 10.000 de lei la o hota italiana Falmec. Cel mai bun raport il gasesti alegand tipul, debitul si latimea potrivite bucatariei tale, nu neaparat cel mai scump model.' },
+];
+
+const images = [hero, figIncorp, figDecor, figSpec, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Hota pentru bucatarie puternica - CentroCasa"
-  description="Daca vrei o hota pentru bucatarie puternica, cel mai sigur pariu e una cu o capacitate de absorbtie de minim 600 m3/h, ideal cu motor eficient energetic si zgomot sub 65 dB. Modelele cu control tactil si filtre de carbon regenerabile sunt excelente, dar verifica si dimensiunea sa se potriveasca spatiului tau. Sincer, am vazut multe bucatarii pline de aburi si mirosuri din cauza horțurilor subdimensionate, asa ca nu te zgârci aici."
-  image="/images/articles/hota-pentru-bucatarie-puternica.webp"
+  title="Cele mai bune hote de bucatarie puternice in 2026: incorporabile, decorative si de insula"
+  description="Care sunt cele mai bune hote de bucatarie puternice in 2026: modele incorporabile si telescopice de la DeLux, Tornado si KB-Elements, decorative de perete de la Heinner si Turbionaire, si hote de insula, smart si premium, comparate pe debit, tip si zgomot. Plus cum alegi debitul, latimea si evacuare vs recirculare."
+  image={hero}
   type="article"
-  publishedTime="2026-02-26T09:41:42.066Z"
-  modifiedTime="2026-02-26T09:41:42.066Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Cristian Popa"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune hote de bucatarie puternice' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/electrocasnice-casa/">Electrocasnice Casa</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Hota pentru bucatarie puternica</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune hote de bucatarie puternice</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/electrocasnice-casa/" class="article-category">Electrocasnice Casa</a>
-        <span class="article-date">26 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Hota pentru bucatarie puternica</h1>
-    </header>
+    <h1>Cele mai bune hote de bucatarie puternice</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/hota-pentru-bucatarie-puternica.webp" alt="Hota pentru bucatarie puternica" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune hote de bucatarie puternice: incorporabile, decorative si de insula" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="ce-inseamna-o-hota-pentru-bucatarie-puternica-si-de-ce-ai-nevoie-de-una">
-        <h2>Ce inseamna o hota pentru bucatarie puternica si de ce ai nevoie de una</h2>
-        <p>Hai sa fim directi: o <strong>hota <a href="/plita-cu-inductie-pentru-bucatarie/" class="interlink">pentru bucatarie</a> puternica</strong> nu e un lux, e o necesitate, mai ales daca gatesti des sau ai o bucatarie deschisa. Ce inseamna "puternica"? Simplu: capacitatea de absorbtie. Asta se masoara in metri cubi pe ora (m3/h).</p>
-        <p>Daca ai o plita standard de 4 ochiuri, ai nevoie de cel putin 600 m3/h. Daca gatesti mult, prajesti, afumi sau ai o <a href="/plita-cu-inductie-pentru-bucatarie/">bucatarie</a> mai mare, mergi spre 700-800 m3/h sau chiar mai mult. Un prieten si-a luat o hota "draguta" de 300 m3/h si dupa o saptamana se plangea ca-i miroase a ciorba in toata casa.</p>
-        <p>Na, asta e.</p>
-        <p>O <strong>hota pentru bucatarie puternica</strong> face mai mult decat sa elimine mirosurile. Ea preia vaporii de apa, grasimea din aer si alte particule, prevenind depunerea lor pe mobila, pereti si electrocasnice. Asta inseamna o bucatarie mai curata, mai igienica si un aer mult mai placut. Gandeste-te la ea ca la un plaman al bucatariei tale. Si un plaman bun nu se sufoca de la prima oala de ciorba.</p>
-        <p>Pe langa performanta, conteaza si cum arata. Azi gasesti modele de la cele clasice, telescopice, pana la cele de designer, incastrate sau pe insula. Materialele sunt si ele importante: otel inoxidabil, sticla securizata, aluminiu. Alege ceva ce se potriveste stilului bucatariei tale, dar nu uita ca functionalitatea vine pe primul loc. Am vazut o hota super eleganta, dar care abia tragea aer. Arata bine, dar nu-si facea treaba.</p>
-        <p>Important e sa nu te lasi pacalit de designul glossy sau de brand. Am testat personal un model de la un brand mai putin cunoscut, dar care batea la cur mai multe modele scumpe de la nume mari. Cauta specificatiile tehnice, citeste review-uri de la oameni reali, nu de la agenti de vanzari. Si cel mai important, ia in calcul dimensiunea bucatariei tale. O hota prea mica intr-o bucatarie mare e ca un <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspirator</a> mic intr-un stadion. Nu face fata.</p>
-      </section>
-
-      <section id="top-recomandari-hote-puternice-pentru-orice-buzunar">
-        <h2>Top recomandari: Hote puternice pentru orice buzunar</h2>
-        <p>Bun, hai sa trecem la fapte. Am ales cateva modele care mi s-au parut solide, fiecare cu plusurile si minusurile ei. Nu sunt toate noi, unele le-am vazut in actiune la prieteni sau chiar le-am testat pe perioade scurte. Stiu, nu-i ca si cum le-as fi tinut in teste un an, dar am o oarecare experienta.</p>
-        <ul><li><strong>Model 1: Elica ELIBLOC9</strong> - Pret estimat: 900 - 1200 lei. Asta e o hota telescopica, clasica, dar cu o putere decenta, cam 600-700 m3/h. E buna pentru bucatarii medii. <strong>Avantaje:</strong> Pret bun, usor de instalat, design discret, filtre lavabile. <strong>Dezavantaje:</strong> Poate fi un pic zgomotoasa la viteza maxima, controlul nu e cel mai modern, dar isi face treaba.</li><li><strong>Model 2: Bosch Serie 6 DWK67IM60</strong> - Pret estimat: 2000 - 2500 lei. Asta e o hota decorativa, de perete, cu un aspect modern, din inox si sticla. Putere in jur de 700-750 m3/h. Arata super bine si e destul de silentioasa. <strong>Avantaje:</strong> Design premium, motor eficient, iluminare LED buna, filtre de grasime metalice, usor de curatat. <strong>Dezavantaje:</strong> Pretul e mai piperat, iar daca gatesti intensiv, s-ar putea sa vrei ceva si mai puternic.</li><li><strong>Model 3: Falmec NRS GRIP+ 90</strong> - Pret estimat: 4500 - 5500 lei. Ok, asta e pentru cei care vor maximul. E o hota de perete, cu tehnologie NRS (Noise Reduction System), adica e super silentioasa chiar si la puteri mari (peste 800 m3/h). <strong>Avantaje:</strong> Putere enorma, zgomot minim, materiale de calitate superioara, control tactil, filtre de carbon regenerabile. <strong>Dezavantaje:</strong> Pretul e pe masura, clar nu e pentru oricine.</li><li><strong>Model 4: Whirlpool AKR 749/WH</strong> - Pret estimat: 700 - 900 lei. Asta e o optiune buna daca bugetul e mic, dar vrei totusi ceva decent. E o hota simpla, de sub dulap, cu o putere de aproximativ 550-600 m3/h. <strong>Avantaje:</strong> Foarte accesibila, usoara, ideala pentru bucatarii mici sau ca solutie temporara. <strong>Dezavantaje:</strong> Zgomotul poate fi deranjant, finisajele nu sunt de top, iar capacitatea e la limita pentru bucatarii mai solicitante.</li></ul>
-        <p>Fiecare dintre ele e o <strong>hota pentru bucatarie puternica</strong> in felul ei, dar cu prioritati diferite. Daca vrei sa-ti zic sincer, am avut un model similar cu Elica ELIBLOC9 si a tinut ani buni fara probleme majore, doar filtrele le-am schimbat. Bosch-ul ala arata spectaculos, am vazut unul la un prieten si am ramas impresionat de cum integra fluxul de aer cu designul.</p>
-      </section>
-
-      <section id="pe-ce-sa-te-uiti-cand-cauti-o-hota-de-bucatarie-performanta">
-        <h2>Pe ce sa te uiti cand cauti o hota de bucatarie performanta</h2>
-        <p>Alegerea unei <strong>hota <a href="/robot-de-bucatarie-multifunctional/" class="interlink">de bucatarie</a> performanta</strong> nu e chiar asa simpla cum pare. Sunt cateva chestii la care trebuie sa te uiti atent ca sa nu dai cu banul pe ceva ce nu te ajuta. Uite care-i treaba:</p>
-        <h3>Capacitatea de absorbtie (m3/h)</h3>
-        <p>Am tot zis de asta, dar e important. Regula de aur: volumul bucatariei in metri cubi, inmultit cu 10 (sau 12, daca gatesti mult). Sa zicem ca ai o bucatarie de 3m x 4m x 2.5m = 30 m3. Ai nevoie de cel putin 30 x 10 = 300 m3/h. Dar asta e minimul. Eu recomand sa iei ceva cu 20-30% mai mult, ca sa nu alerge hota la maxim tot timpul, ceea ce duce la zgomot si uzura.</p>
-        <h3>Tipul hotei</h3>
-        <p>Astea sunt principalele:</p>
-        <ul><li><strong>Telescopice:</strong> se ascund in dulap, ies doar cand ai nevoie. Economisesc spatiu, dar puterea e uneori limitata.</li><li><strong>De perete:</strong> cele mai comune, atarna direct pe perete. Multe modele puternice sunt din aceasta categorie.</li><li><strong>Incastrate (sub dulap):</strong> cele mai simple si adesea cele mai ieftine.</li><li><strong>Pe insula:</strong> pentru bucatariile cu insula centrala. Sunt de designer, dar si scumpe.</li></ul>
-        <p>Alege in functie de spatiul tau si de cum vrei sa arate bucataria. Daca ai dulapuri deasupra plitei, una telescopica sau incastrata e logica. Daca vrei sa fie piesa centrala, una decorativa de perete sau pe insula.</p>
-        <h3>Nivelul de zgomot (dB)</h3>
-        <p>Asta conteaza enorm, mai ales daca locuiesti la bloc sau ai bucataria deschisa spre living. O hota puternica poate fi si zgomotoasa. Cauta modele sub 65 dB la viteza medie. Cele sub 55 dB sunt considerate foarte silentioase, dar de obicei sunt si mai scumpe. Am stat intr-o bucatarie cu o hota care la viteza 2 facea cat un avion la decolare. Nu-i placut deloc.</p>
-        <h3>Filtrele</h3>
-        <p>Astea sunt de doua feluri:</p>
-        <ul><li><strong>Filtre de grasime (metalice sau sintetice):</strong> se curata, cele metalice sunt mai durabile si pot fi bagate in masina de <a href="/masina-de-spalat-vase-incorporabila/" class="interlink">spalat vase</a>.</li><li><strong>Filtre de carbon (antimiros):</strong> esentiale daca hota nu e cu evacuare in exterior, ci recircula aerul. Cele bune sunt regenerabile (le pui la cuptor sau le cureti) si trebuie schimbate o data la 6 luni-1 an.</li></ul>
-        <p>Daca hota ta nu are evacuare, filtrele de carbon sunt critice. Altfel, toata grasimea si mirosul se intorc in camera. Verifica daca modelul ales vine cu filtre de carbon sau daca trebuie sa le cumperi separat.</p>
-        <h3>Controlul si iluminarea</h3>
-        <p>Butoanele clasice, touch control, telecomanda? Asta e mai mult o chestiune de preferinta si buget. Iluminarea LED e standard acum si e foarte utila. Verifica sa fie suficienta lumina pe plita.</p>
-      </section>
-
-      <section id="hota-telescopica-vs-hota-decorativa-ce-sa-alegi">
-        <h2>Hota telescopica vs. hota decorativa: ce sa alegi</h2>
-        <p>Hai sa comparam doua tipuri populare de <strong>hota pentru bucatarie puternica</strong>: cea telescopica si cea decorativa. Ambele pot fi puternice, dar se potrivesc unor bucatarii si unor nevoi diferite.</p>
-        <h3>Hota telescopica: Discreta si eficienta</h3>
-        <p><strong>Cum e:</strong> Se monteaza sub dulapul de deasupra plitei si se extinde (trage sertarul) doar cand ai nevoie de ea. Cand e retrasa, se vede doar o fanta subtire. Sunt ideale pentru bucatariile mici sau pentru cei care vor ca hota sa fie cat mai putin vizibila.</p>
-        <p><strong>Avantaje:</strong></p>
-        <ul><li>Economie de spatiu.</li><li>Design discret, se integreaza usor in mobilier.</li><li>Preturi mai accesibile, gasesti modele decente in jur de 600-1000 lei.</li></ul>
-        <p><strong>Dezavantaje:</strong></p>
-        <ul><li>Capacitatea de absorbtie e adesea mai mica decat la modelele decorative (maxim 600 m3/h la cele mai bune).</li><li>Filtrele pot fi mai greu de accesat si curatat.</li><li>Unele modele pot fi un pic zgomotoase la viteza maxima.</li></ul>
-        <h3>Hota decorativa (de perete): Putere si stil</h3>
-        <p><strong>Cum e:</strong> Asta e cea pe care o vezi adesea pe perete, deasupra plitei. Poate fi in forma de T, de L, cilindrica sau chiar dreptunghiulara. Sunt facute sa fie vizibile, ca o piesa de design. Aici gasesti cele mai puternice modele, cu capacitati de peste 700 m3/h.</p>
-        <p><strong>Avantaje:</strong></p>
-        <ul><li>Performanta superioara, ideala pentru bucatarii mari sau gatit intensiv.</li><li>Design variat, poate transforma bucataria.</li><li>Motoare mai performante, adesea mai silentioase pentru puterea lor.</li><li>Filtre mai usor de accesat.</li></ul>
-        <p><strong>Dezavantaje:</strong></p>
-        <ul><li>Pretul e, in general, mai ridicat (incepand de la 1200-1500 lei si urcand spre 5000+).</li><li>Ocupa mai mult spatiu vizual.</li><li>Necesita o instalare mai atenta.</li></ul>
-        <p><strong>Verdictul meu:</strong> Daca spatiul e o problema si gatesti normal, o hota telescopica <strong>hota pentru bucatarie puternica</strong> de 500-600 m3/h e suficienta. Daca vrei performanta maxima, zgomot minim si ai loc, mergi pe o hota decorativa. Am avut o telescopica vreo 3 ani, a fost ok, dar acum am trecut la una decorativa si diferenta e clara, mai ales la capitolul aer curat.</p>
-      </section>
-
-      <section id="greseli-de-evitat-la-achizitia-unei-hote">
-        <h2>Greseli de evitat la achizitia unei hote</h2>
-        <p>Am vazut multe greseli facute de oameni cand isi cumpara o <strong>hota pentru bucatarie puternica</strong>. Uite cateva din cele mai frecvente, ca sa nu patesti si tu la fel:</p>
-        <ul><li><strong>Alegerea unei hote subdimensionate:</strong> Asta e cea mai mare greseala. Te gandesti "lasa, ca merge si asta" si ajungi cu mirosuri si grasime peste tot. Calculeaza-ti volumul bucatariei si ia ceva cu cel putin 10-15% peste minimul necesar. Nu te juca cu asta.</li><li><strong>Ignorarea nivelului de zgomot:</strong> O hota puternica nu trebuie sa fie si un aspirator industrial. Daca stai intr-un <a href="/aer-conditionat-pentru-apartament-mic/" class="interlink">apartament mic</a> sau ai bucataria deschisa, zgomotul te va scoate din sarite. Verifica specificatiile si cauta modele sub 65 dB. Am stat la un prieten care avea o hota "super puternica" dar cand o pornea, nu puteai vorbi in bucatarie. Era degeaba.</li><li><strong>Neacordarea atentiei filtrelor de carbon (daca e recirculare):</strong> Daca nu ai posibilitatea de evacuare in exterior, filtrele de carbon sunt viata hotei tale. Daca nu le schimbi sau curati periodic, vei avea doar un ventilator care imprastie mirosuri. Unele modele vin cu filtre de carbon de unica folosinta, altele cu cele regenerabile. Verifica ce ai si cum le intretii.</li><li><strong>Alegerea bazata doar pe design:</strong> Arata bine, dar daca nu trage aerul cum trebuie, e ca un tablou scump pe perete. Frumos, dar inutil. Estetica e importanta, dar performanta vine pe primul loc. Am vazut o hota super eleganta, dar care abia misca aerul. Oamenii au cumparat-o pentru ca "se potrivea perfect". Puteau sa puna si un ventilator de birou, efectul era similar.</li><li><strong>Alegerea unei hote prea mici ca dimensiune:</strong> Hota trebuie sa acopere plita. Daca ai o plita de 60 cm, ia o hota de minim 60 cm, ideal 70-80 cm. Daca e mai mica, aburul si grasimea vor scapa pe langa.</li><li><strong>Nu se ia in calcul inaltimea de montaj:</strong> Daca hota e prea jos fata de plita, poate fi periculoasa (caldura) si prea eficienta (trage tot aerul de pe foc). Daca e prea sus, isi pierde din putere. Urmeaza recomandarile producatorului.</li></ul>
-        <p>Sfat de insider: Daca poti, alege o hota cu evacuare in exterior. E mult mai <a href="/cum-sa-cureti-eficient-casa/">eficient</a>a decat recircularea, chiar si cu filtre de carbon noi. Si nu te baza pe ce scrie pe cutie ca "putere maxima". Cauta review-uri reale si teste.</p>
-      </section>
-
-      <section id="verdict-pe-buget-hota-pentru-bucatarie-puternica-la-orice-pret">
-        <h2>Verdict pe buget: Hota pentru bucatarie puternica la orice pret</h2>
-        <p>Stiu, bugetul e mereu o problema. Dar, ca sa fiu sincer, o <strong>hota pentru bucatarie puternica</strong> e o investitie pe termen lung in sanatatea si curatenia casei tale. Hai sa vedem ce gasesti la diferite niveluri de pret:</p>
-        <h3>Buget mic (sub 700 lei)</h3>
-        <p>Aici vorbim de obicei de hote incastrate sau telescopice simple, cu putere in jur de 400-550 m3/h. Sunt bune pentru bucatarii mici, unde gatesti ocazional si nu ai probleme cu aburul/mirosurile puternice. Filtrele de carbon sunt de obicei de unica folosinta sau chiar lipsesc. Un exemplu ar fi Whirlpool AKR 749/WH sau modele similare de la Arctic, Electrolux (modele de baza). Nu te astepta la minuni, dar isi fac treaba la nivel basic.</p>
-        <h3>Buget mediu (700 - 1500 lei)</h3>
-        <p>Aici gasesti optiuni mult mai serioase. Poti lua o hota telescopica mai performanta (peste 600 m3/h), sau o hota decorativa de perete mai simpla. Multe modele au filtre de grasime metalice, lavabile, si unele vin cu filtre de carbon.</p>
-        <p>Controlul e adesea tactil. Aici incadrezi multe modele de la Elica, Teka, Beko, sau chiar modele mid-range de la Bosch sau Franke. O <strong>hota pentru bucatarie puternica</strong> din aceasta categorie e un raport calitate-pret excelent pentru majoritatea familiilor.</p>
-        <h3>Buget mare (peste 1500 lei)</h3>
-        <p>In acest segment, vorbim de hotele de top. Designuri premium, materiale de calitate (inox, sticla), putere mare (700-1000+ m3/h), zgomot foarte redus (sub 60 dB), motoare eficiente energetic, control inteligent, filtre de carbon performante, uneori chiar si cu functii smart. Aici gasesti modele de la Bosch (seriile superioare), Siemens, Franke, Falmec, Miele.</p>
-        <p>Sunt hotele care transforma bucataria si iti ofera o experienta de gatit mult mai placuta. Am vazut un model de la Falmec care era atat de silentios si puternic, incat parca tragea tot aerul din camera fara efort. Merita daca iti permiti.</p>
-        <p>Deci, pana la urma, alegerea depinde de nevoile tale specifice, de cat de mult gatesti si, bineinteles, de buget. Dar indiferent de suma, nu uita sa verifici capacitatea de absorbtie si nivelul de zgomot. Asta e, na, nu te poti juca cu aerul din casa ta.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa o hota pentru bucatarie puternica
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O hota pentru bucatarie puternica cu o capacitate de absorbtie de minim 600 m3/h costa intre 700 lei si 1500 lei pentru modele decente, de buget mediu. Modelele premium, cu design special si zgomot redus, pot ajunge si la 3000-5000 lei sau chiar mai mult.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre hota cu evacuare si hota cu recirculare
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Hota cu evacuare elimina aerul viciat (aburi, mirosuri, grasime) direct in exterior, prin tubulatura. Hota cu recirculare filtreaza aerul prin filtre de carbon si grasime, apoi il elibereaza inapoi in bucatarie. Cea cu evacuare e mai eficienta, dar necesita instalare exterioara.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce capacitate de absorbtie e necesara pentru o bucatarie mica
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru o bucatarie mica (pana la 15 m2), o hota pentru bucatarie puternica cu o capacitate de absorbtie de 300-450 m3/h este, in general, suficienta. Totusi, se recomanda sa alegi un model cu cel putin 500 m3/h pentru a asigura o buna ventilatie.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat de important e nivelul de zgomot la o hota
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nivelul de zgomot, masurat in decibeli (dB), e foarte important, mai ales pentru bucatariile deschise. O hota zgomotoasa poate fi deranjanta. Ideal e sa alegi un model sub 65 dB la viteza medie, iar cele sub 55 dB sunt considerate foarte silentioase.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat de des trebuie curatat filtrul de la hota
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Filtrele de grasime metalice trebuie curatate saptamanal sau la doua saptamani, in functie de cat gatesti; pot fi bagate in masina de spalat vase. Filtrele de carbon, daca hota nu evacueaza in exterior, trebuie schimbate la 3-6 luni sau regenerate, conform instructiunilor producatorului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar o hota pentru bucatarie puternica de firma cunoscuta
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita adesea sa investesti intr-un brand cunoscut pentru o hota pentru bucatarie puternica, deoarece acestea ofera de obicei motoare mai fiabile, materiale de calitate superioara si servicii post-vanzare mai bune. Totusi, exista si branduri mai noi sau mai putin cunoscute care ofera performante similare la preturi mai bune.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre filtrele de hota metalice si cele de carbon
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Filtrele metalice capteaza grasimea din aer si sunt de obicei lavabile. Filtrele de carbon (antimiros) capteaza mirosurile si vaporii si sunt necesare doar la hote cu recirculare; acestea trebuie inlocuite periodic. O hota performanta are ambele tipuri de filtre.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc piese de schimb pentru o hota
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Piese de schimb precum filtrele de carbon, becurile sau chiar motoarele se pot gasi la magazinele mari de electrocasnice, pe site-urile producatorilor sau la service-urile autorizate. E bine sa ai la indemana modelul exact al hotei tale cand cauti piese.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cea mai vanduta hota puternica din selectie e <strong>Turbionaire Thea</strong>, cu comanda touch si WiFi, iar cel mai mare debit, de 1300 m³/h, il are <strong>KB-Elements</strong>. Cea mai silentioasa si mai bine notata e <strong>Turbionaire TEV</strong>, cu doar 43 dB, iar cea mai moderna, <strong>Florida smart</strong>, se comanda vocal si prin gesturi.</p>
+      <p>La o hota puternica, ce conteaza cel mai mult e <strong>debitul de aer</strong>, in metri cubi pe ora, dar si <strong>latimea</strong> potrivita cu plita, <strong>zgomotul</strong>, mai ales intr-o bucatarie deschisa, si <strong>tipul</strong> de montaj. Mai jos gasesti direct recomandarile, grupate pe tipuri, iar sub ele un ghid despre cum alegi si diferenta dintre evacuare si recirculare.</p>
+      <p>Am pornit de la hotele de bucatarie in stoc pe eMAG, toate cu debit mare, de peste 750 m³/h, cu cele mai multe pareri, si le-am impartit in incorporabile si telescopice, decorative de perete, si hote speciale, de insula, smart si premium, ca sa gasesti repede modelul potrivit bucatariei tale. Sub hota, vezi <a href="/plita-cu-inductie-pentru-bucatarie/">plitele cu inductie</a>, iar pentru mobilier, <a href="/cele-mai-bune-seturi-de-mobila-de-bucatarie/">seturile de mobila de bucatarie</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#incorp">Incorporabile si telescopice</a></li>
+        <li><a href="#decor">Decorative de perete</a></li>
+        <li><a href="#spec">De insula, smart si premium</a></li>
+        <li><a href="#de-ce">De ce o hota puternica</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#evacuare">Evacuare sau recirculare</a></li>
+        <li><a href="#filtre">Filtre si intretinere</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Debit</th><th>Zgomot</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.tip}</td>
+              <td>{x.debit}</td>
+              <td>{x.zgomot || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="incorp">Incorporabile si telescopice</h2>
+    <p>Se ascund in mobilier, discrete, iar cele telescopice se trag in fata doar cand gatesti. Alegerea daca vrei o hota puternica, dar la vedere cat mai putin. Aici e si cea mai vanduta, si cea mai puternica din selectie.</p>
+    <div class="rd-grid">
+      {INCORP.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figIncorp} alt="Hote incorporabile si telescopice: Turbionaire, Tornado, KB-Elements, DeLux" width="1200" height="675" loading="lazy" />
+
+    <h2 id="decor">Decorative de perete</h2>
+    <p>Montate la vedere pe perete, sunt o piesa de design in sine, cu forme moderne, T-shape sau clasice, tip cupola. Pentru cine vrea ca hota sa arate bine, nu doar sa functioneze, deasupra plitei.</p>
+    <div class="rd-grid">
+      {DECOR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figDecor} alt="Hote decorative de perete: Heinner, Tornado cupola, Turbionaire" width="1200" height="675" loading="lazy" />
+
+    <h2 id="spec">De insula, smart si premium</h2>
+    <p>Pentru situatii speciale: hote suspendate din tavan pentru plite pe insula, modele smart cu control vocal si gesturi, si varfuri de gama de la branduri premium. Cand vrei ceva peste standardul obisnuit.</p>
+    <div class="rd-grid">
+      {SPEC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSpec} alt="Hote de insula, smart si premium: Turbionaire, Florida, Tornado, Falmec" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-hota').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate hotele puternice la oferta</strong>
+        <span>Reducerile din acest moment la hote de bucatarie cu debit mare, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o hota puternica</h2>
+    <p>Gatitul umple bucataria cu abur, fum si mirosuri, iar fara o hota buna acestea se aseaza pe mobilier, pe pereti si ajung in restul casei, mai ales intr-o bucatarie deschisa spre living. O hota puternica <strong>scoate rapid aerul viciat</strong>, tine bucataria curata si casa fara mirosuri persistente de mancare.</p>
+    <p>Diferenta o face <strong>debitul</strong>: o hota slaba se chinuie sa faca fata unui gatit intens, iar fumul scapa pe langa ea, in timp ce una puternica curata aerul in cateva secunde. Pe langa asta, o hota protejeaza mobilierul si peretii de grasimea din aburi, care altfel se depune si e greu de curatat, si imbunatateste calitatea aerului din casa. Modelele moderne aduc si iluminare LED pentru plita, comenzi comode si un design care completeaza bucataria. Pentru cine gateste des sau are o bucatarie deschisa, o hota puternica nu e un lux, ci o necesitate pentru confort si curatenie.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua hote:</p>
+    <ul>
+      <li><strong>Debitul de aer:</strong> cel mai important. 400-500 m³/h minim, 600 sau mai mult pentru gatit intens sau bucatarie deschisa. Modelele din selectie merg pana la 1300 m³/h.</li>
+      <li><strong>Latimea:</strong> cel putin cat plita. 60 cm pentru o plita standard, 90 cm pentru una mare cu 5 arzatoare.</li>
+      <li><strong>Zgomotul:</strong> sub 60 dB e silentios. Conteaza mult intr-o bucatarie deschisa; unele coboara la 43 dB pe treapta mica.</li>
+      <li><strong>Tipul:</strong> incorporabila sau telescopica pentru discretie, decorativa pentru un aspect la vedere, de insula pentru plite centrale.</li>
+      <li><strong>Filtrele:</strong> lavabile din aluminiu, pentru grasime, se spala si se refolosesc; de carbon, pentru recirculare, se inlocuiesc periodic.</li>
+      <li><strong>Comenzile:</strong> mecanice la modelele simple, touch, WiFi, Touch Free sau control vocal la cele avansate. Iluminarea LED e aproape standard.</li>
+    </ul>
+
+    <h2 id="evacuare">Evacuare sau recirculare</h2>
+    <p>E o decizie importanta, care depinde de bucataria ta. In regim de <strong>evacuare</strong>, hota trage aerul cu fum si mirosuri si il scoate afara printr-un tub, spre exterior. E cea mai eficienta varianta, pentru ca elimina complet aerul viciat, si e ideala daca ai unde sa scoti evacuarea, printr-un perete exterior sau un cos de ventilatie.</p>
+    <p>In regim de <strong>recirculare</strong>, hota trece aerul printr-un filtru de carbon, care retine mirosurile, si il reda curatat inapoi in camera, fara tub spre exterior. E solutia cand nu ai cum sa faci o evacuare afara, de exemplu la bloc, dar e mai putin eficienta decat evacuarea, iar filtrele de carbon trebuie inlocuite periodic, la cateva luni, ceea ce adauga un cost in timp. Vestea buna e ca majoritatea hotelor, inclusiv multe din selectie, functioneaza in ambele moduri, deci alegi in functie de posibilitatile din bucatarie. Pe scurt: daca poti face evacuare spre exterior, e clar mai bine; daca nu, recircularea cu filtru de carbon ramane o solutie decenta.</p>
+
+    <h2 id="filtre">Filtre si intretinere</h2>
+    <p>O hota isi pastreaza puterea de absorbtie doar daca filtrele sunt curate. <strong>Filtrul de grasime</strong>, de obicei din aluminiu, retine grasimea din aburi si se infunda in timp; cele lavabile, ca la majoritatea modelelor din selectie, se spala usor la cateva saptamani, cu apa calda si detergent sau chiar in masina de spalat vase, apoi se pun la loc uscate. Un filtru de grasime infundat reduce mult debitul si forteaza motorul, deci nu il neglija.</p>
+    <p><strong>Filtrul de carbon</strong>, folosit doar in regim de recirculare, retine mirosurile si nu se spala, ci se inlocuieste periodic, in general la cateva luni, conform indicatiilor producatorului; unul epuizat nu mai retine mirosurile. Pe langa filtre, sterge periodic corpul hotei de grasimea depusa, mai ales pe partile de inox, si curata zona din jurul iluminarii. Cu aceasta intretinere simpla, o hota isi pastreaza performanta si aspectul ani la rand, iar motorul e ferit de uzura prematura cauzata de filtrele infundate.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de tip, debit si dotari:</p>
+    <p><strong>Accesibile:</strong> de la circa 640 de lei pentru un model incorporabil sau decorativ, ca DeLux sau Heinner, si pana spre 800 de lei pentru cele telescopice cu debit mare, ca Tornado.</p>
+    <p><strong>Echilibrate:</strong> intre circa 1150 si 1700 de lei, cu Turbionaire sau KB-Elements, care aduc comenzi touch, WiFi, debite mari si finisaje mai bune.</p>
+    <p><strong>Premium si speciale:</strong> peste 1800 de lei pentru hote de insula, smart cu control vocal sau de la branduri de top, urcand mult, pana spre 10.000 de lei la o hota italiana Falmec.</p>
+    <p>Pe langa pret, alege dupa <strong>bucataria ta</strong>: tipul de montaj potrivit amenajarii, un debit pe masura cat de des si intens gatesti, si o latime cel putin cat plita. Cel mai bun raport il gasesti potrivind hota cu nevoia reala, nu cu cel mai mare pret sau cel mai mare debit de pe eticheta.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">CP</div>
       <div class="author-info">
-        <h4><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></h4>
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
         <p class="author-role">Specialist Electrocasnice</p>
-        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="hota-pentru-bucatarie-puternica"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="hota-pentru-bucatarie-puternica"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="hota-pentru-bucatarie-puternica" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="hota-pentru-bucatarie-puternica" currentCategory="electrocasnice-casa" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

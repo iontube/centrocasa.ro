@@ -1,0 +1,316 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['congelatoare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Compacte, sub blat (60-103 l) ---
+  { g: 'mic', id: 'DC92J4YBM', rol: 'Cel mai mic si mai ieftin', short: 'STARCREST 63 l', cap: '63 l', racire: 'Static', clasa: 'E', pret: '770 lei',
+    specs: ['63 litri, 3 sertare, inaltime 82.5 cm', 'latime de doar 45 cm, cel mai mic footprint', 'clasa E, 157 kWh pe an, 39 dB', 'dezghetare manuala, autonomie 8.5 ore fara curent'],
+    pros: ['Cel mai mic pret din articol pentru un congelator cu sertare', 'Incape sub un blat sau intr-un colt ingust, 45 cm latime', 'Consum mic in absolut, 157 kWh pe an', '35 de pareri, cel mai testat din grupa compacta'],
+    cons: ['63 litri se umplu repede daca congelezi pentru mai multi', 'Rafturi din plastic, nu din sticla', 'Il decongelezi manual o data pe an'],
+    verdict: 'Cand ai nevoie de un congelator care sa incapa undeva, nu de unul mare, aici te opresti. Cu 45 de centimetri latime si 82.5 inaltime, STARCREST SUF-63WH intra sub un blat de bucatarie, intr-o camara sau intr-un colt de hol unde un model normal de 55-60 cm nu are loc. Cei 63 de litri distribuiti in 3 sertare ajung pentru o persoana sau un cuplu care tine ceva carne, legume si inghetata, nu pentru cine congeleaza recolta din gradina. Consuma putin, 157 kWh pe an, si costa cel mai putin din tot articolul. Il iei ca prim congelator intr-o locuinta mica sau ca al doilea, de rezerva, stiind ca il decongelezi manual o data pe an.' },
+  { g: 'mic', id: 'D03BXKMBM', rol: 'Cel mai ingust, 48 cm', short: 'Candy 64 l', cap: '64 l', racire: 'Static', clasa: 'F', pret: '792 lei',
+    specs: ['64 litri, 3 sertare, inaltime 85 cm', 'latime 48 cm, adancime doar 50 cm', 'clasa F, 197 kWh pe an, 40 dB', '2 picioare reglabile, autonomie 9 ore'],
+    pros: ['Corp foarte compact, 48 x 50 cm, incape in spatii mici', 'Brand cunoscut, cu service si piese usor de gasit', 'Picioare reglabile pentru podele denivelate', 'Autonomie de 9 ore fara curent, buna pentru gabaritul lui'],
+    cons: ['Clasa F si 197 kWh, mai mult decat STARCREST de alaturi', 'Capacitate de inghet de doar 3 kg pe 24 de ore', 'Control mecanic simplu, fara display'],
+    verdict: 'Candy joaca aceeasi carte ca STARCREST, spatiul mic, dar aduce numele unui brand consacrat, cu retea de service si piese de schimb, ceva ce la aparatele no-name lipseste. Are o adancime de doar 50 de centimetri, printre cele mai mici din articol, asa ca nu iese in afara mobilierului de bucatarie. Pe partea de consum e mai slab decat STARCREST, clasa F si 197 kWh fata de 157, diferenta care pe termen lung se vede pe factura, chiar daca nu dramatic. Cei 64 de litri si 3 sertarele sunt pentru un necesar mic, aceeasi poveste ca la orice congelator compact. Il iei cand vrei un aparat mic de la un brand cunoscut si conteaza adancimea redusa.' },
+  { g: 'mic', id: 'DCD18SYBM', rol: 'Cel mai econom compact', short: 'Heinner HM91, 91 l', cap: '91 l', racire: 'Static', clasa: 'E', pret: '928 lei',
+    specs: ['91 litri, 4 sertare, inaltime 85 cm', 'clasa E cu doar 166 kWh pe an', 'agent de racire R600A, usi reversibile', 'control mecanic, se pune si negru sau argintiu'],
+    pros: ['166 kWh la 91 litri, cel mai bun consum-la-capacitate din grupa mica', 'Patru sertare, mai bine organizat decat cele cu 3', 'Usi reversibile, il pui pe stanga sau pe dreapta', 'Vine si in negru, la circa 800 de lei, cea mai ieftina varianta'],
+    cons: ['Peste 900 de lei la varianta alba', 'Control mecanic, fara afisaj de temperatura'],
+    verdict: 'Aici incepi sa ai spatiu real, 91 de litri in 4 sertare, cu cel mai bun raport intre consum si capacitate din grupa compacta: clasa E si doar 166 kWh pe an, mai putin decat unele modele de 63-64 de litri. Cele patru sertare, in loc de trei, inseamna ca separi mai usor carnea de legume si de inghetata, fara sa scormonesti. Usile reversibile sunt un detaliu care conteaza in bucatariile inguste, unde balamaua pe partea gresita blocheaza deschiderea. Un amanunt de buget: modelul apare in alb, negru si argintiu, la preturi usor diferite, iar varianta neagra e de obicei cea mai ieftina, in jur de 800 de lei. Il iei cand vrei un compact care sa tina cat mai mult din energie, nu doar sa fie mic.' },
+  { g: 'mic', id: 'DDPB7FYBM', rol: 'Trei sertare mari', short: 'Heinner V102, 103 l', cap: '103 l', racire: 'Static', clasa: 'E', pret: '918 lei',
+    specs: ['103 litri, 3 sertare, inaltime 83.8 cm', 'clasa E, 170 kWh pe an, R600A', 'capacitate de inghet 5.2 kg pe 24 de ore', 'usa reversibila, termostat ajustabil'],
+    pros: ['Cei mai multi litri din grupa compacta, 103', 'Trei sertare mai adanci, bune pentru pachete voluminoase', 'Capacitate de inghet mai mare, 5.2 kg pe zi', 'Ramane sub 84 cm inaltime, tot sub blat'],
+    cons: ['Trei sertare la 103 litri, deci compartimente mari, mai greu de ordonat', 'Pret apropiat de modele mai mari, de 160 de litri'],
+    verdict: 'Fata de HM91 de alaturi, V102 alege alta filosofie: mai multi litri, 103, dar impartiti in doar 3 sertare, deci compartimente mai putine si mai adanci. E diferenta dintre a organiza si a incapea. Daca tii pachete mari, o pulpa intreaga, pungi voluminoase de legume, sertarele adanci sunt un avantaj; daca vrei sa separi multe categorii mici, patru sertare mai mici, ca la HM91, sunt mai practice. Consumul ramane bun, clasa E si 170 kWh, iar capacitatea de inghet, 5.2 kg pe zi, e cea mai mare din grupa compacta. Inaltimea de 83.8 cm il tine tot sub blat. Il iei cand vrei maximul de volum intr-un corp inca mic, si nu te deranjeaza sertarele mari.' },
+  // --- B. Medii, statice, pentru familie (160-188 l) ---
+  { g: 'mediu', id: 'DKSFFYYBM', rol: 'Cel mai accesibil de 160 l', short: 'STARCREST 160 l', cap: '160 l', racire: 'Static', clasa: 'E', pret: '1350 lei',
+    specs: ['160 litri, 5 sertare, inaltime 142 cm', 'clasa E, 183 kWh pe an, 42 dB', 'dezghetare manuala, usi reversibile', 'termostat ajustabil, clasa climatica N/ST'],
+    pros: ['Cel mai mic pret pentru un congelator de 160 de litri', 'Cinci sertare, buna organizare pe categorii', 'Nota 5 din 5, chiar daca pe putine pareri', 'Clasa E si 183 kWh, decent pentru volumul lui'],
+    cons: ['Doar 15 pareri, mai putin verificat', 'Static, deci il decongelezi manual', 'Clasa climatica N/ST, nu il tii intr-un spatiu care coboara sub 16 grade'],
+    verdict: 'Cand faci saltul de la un compact la un congelator de familie, asta e pragul accesibil: 160 de litri si 5 sertare, sub 1400 de lei. Volumul e altul, aici incap cumparaturile pentru doua-trei saptamani, portii gatite in avans, legume congelate pentru iarna. Cele cinci sertare ajuta la ordine, ca sa nu ajungi sa cauti prin gramada. E static, deci intra in rutina anuala de decongelare, dar in schimb consuma mai putin si e mai silentios decat un No Frost de aceeasi marime. Nota perfecta vine pe doar 15 pareri, deci o iau ca semnal bun, nu ca certitudine. Il iei cand vrei volum de familie fara sa treci de 1400 de lei.' },
+  { g: 'mediu', id: 'DDL81NYBM', rol: 'Cel mai silentios', short: 'Arctic 168 l', cap: '168 l', racire: 'Static', clasa: 'E', pret: '1349 lei',
+    specs: ['168 litri, 6 sertare, inaltime 135.7 cm', 'clasa E, 190 kWh pe an, doar 37 dB', 'autonomie 14 ore fara curent, R600A', 'Fast Freeze XL Zone, clasa climatica SN-T'],
+    pros: ['37 dB, cel mai silentios congelator din tot articolul', 'Autonomie mare, 14 ore fara curent', 'Sase sertare la 168 litri, foarte bine compartimentat', 'Clasa climatica SN-T, tolereaza si spatii mai reci'],
+    cons: ['Static, cu decongelare manuala', 'Brand romanesc mai putin premium ca perceptie'],
+    verdict: 'Arctic pune pe masa exact argumentele care conteaza intr-un congelator care merge nonstop in casa. Primul e zgomotul: 37 de decibeli, cel mai mic din articol, adica il pui in bucatarie deschisa spre living si nu il auzi seara. Al doilea e autonomia de 14 ore fara curent, dubla fata de compactele mici, deci la o pana lunga mancarea rezista mai bine. Are 6 sertare la 168 de litri, printre cele mai bine impartite, plus o zona Fast Freeze pentru congelare rapida. Clasa climatica SN-T il face mai tolerant decat STARCREST daca il tii intr-o camara mai racoroasa. E static, il decongelezi manual, dar pentru banii astia e cel mai echilibrat din grupa. Il iei cand vrei liniste si siguranta, nu doar litri.' },
+  { g: 'mediu', id: 'DNPB7FYBM', rol: 'Cel mai incapator static', short: 'Heinner V188, 188 l', cap: '188 l', racire: 'Static', clasa: 'E', pret: '1398 lei',
+    specs: ['188 litri, 6 sertare, inaltime 145.5 cm', 'clasa E, 197 kWh pe an, R600A', 'capacitate de inghet 9.1 kg pe 24 de ore', 'control mecanic cu termostat ajustabil'],
+    pros: ['188 litri la sub 1400 de lei, cel mai mult volum static la pretul asta', 'Sase sertare incapatoare', 'Capacitate de inghet mare, 9.1 kg pe zi', 'Clasa E cu 197 kWh, corect pentru un aparat de 188 litri'],
+    cons: ['Static, deci decongelare manuala', 'Control mecanic simplu, fara afisaj', 'Varianta argintie sau clasa F costa 250-400 de lei in plus, degeaba'],
+    verdict: 'Daca vrei cei mai multi litri statici pentru cei mai putini bani, V188 e raspunsul: 188 de litri in 6 sertare, la sub 1400 de lei. Capacitatea de inghet de 9.1 kg pe 24 de ore il face potrivit pentru cine chiar congeleaza in serie, o transa mare de carne, legume din gradina, nu doar pastreaza. Un sfat concret la acest model: vine in trei variante, alba clasa E, argintie si una clasa F, iar cea alba clasa E e si cea mai ieftina, si cea mai eficienta. Nu platesti in plus pentru argintiu sau, mai rau, pentru o clasa energetica mai slaba. E static, cu rutina de decongelare anuala. Il iei cand vrei volum maxim la buget si nu ai nevoie de No Frost.' },
+  // --- C. Mari si No Frost (194-404 l) ---
+  { g: 'nofrost', id: 'DRCQ17MBM', rol: 'Cel mai accesibil No Frost', short: 'Heinner N194, 194 l', cap: '194 l', racire: 'Full No Frost', clasa: 'F', pret: '2299 lei',
+    specs: ['194 litri, 6 sertare, Full No Frost', 'clasa F, 273 kWh pe an, 41 dB', 'display, control electronic, super-congelare', 'alarma pentru usa lasata deschisa'],
+    pros: ['Cel mai ieftin mod de a intra in No Frost, fara decongelare manuala', 'Control electronic cu display, setezi temperatura exact', 'Alarma de usa deschisa, previne dezghetul accidental', 'Functie de super-congelare pentru transe mari'],
+    cons: ['Clasa F si 273 kWh, consuma mai mult decat un static de aceeasi marime', 'Mai zgomotos decat un static, prin ventilatie'],
+    verdict: 'Aici faci trecerea care schimba complet relatia cu congelatorul: No Frost, adica nu il mai decongelezi niciodata manual. Heinner N194 e cel mai accesibil mod de a ajunge acolo, la circa 2300 de lei pentru 194 de litri. Fata de un static, castigi scapi de rutina anuala de decongelare si de gheata acumulata pe pereti, plus un control electronic cu display si o alarma care te anunta daca usa a ramas deschisa, exact greseala care baga gheata inauntru la modelele vechi. Pretul acestui confort e consumul mai mare, clasa F si 273 kWh, plus un zgomot ceva mai prezent, pentru ca No Frost inseamna un ventilator care circula aerul. Il iei cand vrei sa termini cu decongelarea manuala, la cel mai mic buget posibil.' },
+  { g: 'nofrost', id: 'DM2VY9BBM', rol: 'No Frost convertibil', short: 'LDK 238 l', cap: '238 l', racire: 'No Frost', clasa: 'F', pret: '2000 lei',
+    specs: ['238 litri, 7 sertare, No Frost', 'clasa F, 288 kWh pe an, 42 dB', 'control touch digital, tratament antibacterian', 'convertibil: functioneaza si ca frigider'],
+    pros: ['238 litri No Frost sub 2000 de lei, foarte mult volum pe ban', 'Se transforma in frigider, daca ai nevoie de racire, nu congelare', 'Sapte sertare, cel mai bine compartimentat din grupa mare', '23 de pareri, cel mai verificat No Frost din selectie'],
+    cons: ['Clasa F si 288 kWh, cel mai mare consum din articol', 'Control touch mai sensibil, se poate atinge din greseala'],
+    verdict: 'LDK reuseste ceva rar: cel mai mult volum No Frost pentru cei mai putini bani, 238 de litri sub 2000 de lei, plus o flexibilitate pe care aproape nimeni din articol nu o are. Functia de conversie inseamna ca acelasi aparat poate lucra ca frigider, nu doar ca congelator, util daca peste un an nevoile se schimba sau daca il muti in alta camera. Cele 7 sertare il fac cel mai bine impartit din grupa mare, iar controlul touch si tratamentul antibacterian tin de partea moderna. Compromisul e consumul: clasa F si 288 kWh, cel mai ridicat din selectie, pretul volumului mare intr-un No Frost ieftin. Il iei cand vrei mult spatiu flexibil si accepti o factura ceva mai mare la curent.' },
+  { g: 'nofrost', id: 'D070HHYBM', rol: 'Total No Frost, 273 l', short: 'Tesla 273 l', cap: '273 l', racire: 'Total No Frost', clasa: 'E', pret: '2306 lei',
+    specs: ['273 litri, 8 sertare, Total No Frost', 'clasa E, 245 kWh pe an, 41 dB', 'super congelare si super racire, convertibil in frigider', 'clasa climatica larga SN-N-ST-T, touchscreen'],
+    pros: ['273 litri No Frost la clasa E, consum bun pentru volum', 'Se converteste in frigider, ca si LDK', 'Clasa climatica SN-N-ST-T, cea mai toleranta la amplasare', 'Opt sertare si control touchscreen'],
+    cons: ['Doar 11 pareri, mai putin verificat', 'Peste 2300 de lei'],
+    verdict: 'Tesla urca stacheta fata de LDK pe partea de eficienta: acelasi tip de aparat mare si convertibil, dar la clasa E si 245 kWh, cu circa 40 kWh mai putin pe an la un volum mai mare, 273 de litri. Diferenta vine din tehnologia Total No Frost si dintr-o izolare mai buna. Are toate atuurile pe care le astepti in gama asta, 8 sertare, super-congelare pentru transe mari, super-racire si posibilitatea de a-l folosi ca frigider. Un plus discret dar real: clasa climatica SN-N-ST-T, cea mai larga din articol, il face cel mai putin pretentios la locul unde il pui. Singura retinere e ca are doar 11 pareri, deci istoricul lui pe termen lung e inca subtire. Il iei cand vrei un No Frost mare, eficient si flexibil, si nu te sperie numarul mic de recenzii.' },
+  { g: 'nofrost', id: 'D3HGH1MBM', rol: 'Cel mai bine notat mare', short: 'Beko 286 l', cap: '286 l', racire: 'No Frost', clasa: 'E', pret: '2677 lei',
+    specs: ['286 litri bruti, 8 compartimente, No Frost', 'clasa E, 250 kWh pe an, 38 dB', 'compresor ProSmart Inverter', 'rafturi din sticla securizata, autonomie 9 ore'],
+    pros: ['Nota 4.92 pe 37 de pareri, cel mai bine cotat mare din articol', 'Compresor Inverter, mai silentios, mai durabil, mai econom', '38 dB desi e No Frost, aproape ca un static', 'Rafturi din sticla securizata, nu din plastic'],
+    cons: ['Adancime de 71 cm, iese in afara unui blat standard de 60', 'Peste 2600 de lei'],
+    verdict: 'Beko B3RFNE314W e alegerea de mijloc rezonabila in gama mare: nu cel mai ieftin, nu cel mai mare, dar cel mai bine notat, 4.92 pe 37 de pareri, ceea ce la un electrocasnic mare conteaza mai mult decat orice cifra din fisa. Cheia e compresorul ProSmart Inverter, care nu porneste si se opreste brusc, ci isi regleaza turatia, deci consuma mai putin, tine mai mult si face mai putin zgomot, doar 38 dB, remarcabil pentru un No Frost. Rafturile din sticla securizata sunt un semn de calitate fata de plasticul din modelele ieftine. Un detaliu practic de masurat inainte: are 71 cm adancime, deci iese in afara unui blat de bucatarie standard de 60. Il iei cand vrei un No Frost mare de la un brand serios, cu compresor bun si note reale in spate.' },
+  { g: 'nofrost', id: 'DB4WZ7MBM', rol: 'Cel mai mare si mai vandut', short: 'Beko 404 l', cap: '404 l', racire: 'No Frost', clasa: 'E', pret: '3175 lei',
+    specs: ['404 litri, 8 compartimente, No Frost', 'clasa E, 292 kWh pe an, 38 dB', 'autonomie 20 ore fara curent, capacitate inghet 20 kg pe 24h', 'display touchscreen, rafturi sticla securizata'],
+    pros: ['404 litri, cel mai mare volum din articol', 'Autonomie de 20 de ore fara curent, cea mai mare din selectie', 'Congeleaza 20 kg pe zi, ideal pentru transe mari', '97 de pareri, de departe cel mai cumparat din tot articolul'],
+    cons: ['Peste 3000 de lei si 191 cm inaltime', 'Adancime 76.8 cm si latime 70 cm, cere spatiu real'],
+    verdict: 'Cand chiar congelezi mult, jumatate de porc, recolta dintr-o gradina, cumparaturi en-gros, aici ajungi. Beko RFNE448E41XB e cel mai mare din articol, 404 litri, si nu intamplator si cel mai vandut, cu 97 de pareri, mai multe decat toate celelalte la un loc din grupa mare. Doua cifre il despart de rest: autonomia de 20 de ore fara curent, dubla fata de majoritatea, deci la o pana lunga mancarea e in siguranta, si capacitatea de inghet de 20 kg pe 24 de ore, care inseamna ca poti baga o transa mare fara sa dezghezi ce era deja inauntru. Fiind No Frost, nu il decongelezi niciodata, iar cei 38 dB il tin surprinzator de silentios pentru gabarit. Ai nevoie insa de loc: 191 cm inaltime, 70 latime, 77 adancime. Il iei cand volumul e prioritatea numarul unu si ai unde sa il pui.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MIC = PICKS.filter(x => x.g === 'mic');
+const MEDIU = PICKS.filter(x => x.g === 'mediu');
+const NOFROST = PICKS.filter(x => x.g === 'nofrost');
+
+const hero = '/imagini/articole/cele-mai-bune-congelatoare.webp';
+const figMic = '/imagini/articole/congelatoare-compacte.webp';
+const figMediu = '/imagini/articole/congelatoare-medii.webp';
+const figNofrost = '/imagini/articole/congelatoare-no-frost.webp';
+const published = '2026-07-22T17:12:03+03:00';
+
+const faq = [
+  { question: 'Congelator static sau No Frost?', answer: 'E prima decizie si depinde de cat de mult te deranjeaza decongelarea manuala. Un congelator static costa mai putin, consuma mai putin curent si e mai silentios, dar acumuleaza gheata pe pereti si trebuie decongelat manual o data sau de doua ori pe an. Un No Frost are un ventilator care circula aerul si impiedica formarea ghetii, deci nu il mai decongelezi niciodata, insa consuma cu aproximativ 40% mai mult, e ceva mai zgomotos si costa mai mult la cumparare. Regula simpla: daca il pui undeva la vedere si vrei zero intretinere, ia No Frost; daca vrei consum si pret mici si nu te deranjeaza o decongelare pe an, ia static.' },
+  { question: 'De cati litri am nevoie?', answer: 'Orientativ, socoteste in jur de 50-60 de litri de persoana daca folosesti congelatorul normal, plus un supliment daca gatesti in avans sau congelezi legume si carne in cantitate. Sub 100 de litri, un compact de 63-103 litri, e pentru o persoana, un cuplu sau ca al doilea congelator. Zona de 160-190 de litri acopera o familie obisnuita de 3-4 persoane. Peste 230-270 de litri intri in teritoriul celor care congeleaza serios: jumatate de porc, recolta din gradina, cumparaturi en-gros. Mai bine putin mai mare decat prea mic, pentru ca un congelator plin consuma mai eficient decat unul pe jumatate gol.' },
+  { question: 'Ce inseamna clasa E sau F la un congelator? E slab?', answer: 'Nu, si e o confuzie foarte raspandita. Din martie 2021, eticheta energetica a fost rescrisa de la A la G, iar clasele vechi A+, A++ si A+++ au disparut. Scara a fost inasprita intentionat, iar clasele A si B au fost lasate goale la inceput, pentru progresul viitor. Asta inseamna ca un aparat care ar fi fost A+ pe eticheta veche apare acum ca F pe cea noua. In practica, aproape toate congelatoarele de pe piata sunt azi E sau F, deci o clasa F nu e un semn de aparat prost. Ce conteaza cu adevarat e cifra reala de consum in kWh pe an, scrisa pe eticheta: compara acel numar intre modele de capacitate similara, nu litera in sine.' },
+  { question: 'Pot tine congelatorul in garaj sau pe balcon?', answer: 'Doar daca temperatura din acel spatiu nu coboara prea mult iarna, si aici intervine clasa climatica de pe eticheta. Un aparat de clasa SN e proiectat sa functioneze corect pana la 10 grade, N de la 16 grade, ST si T de la 18 grade in sus. Sub aceste praguri, uleiul din compresor devine vascos si termostatul poate crede ca e destul de frig si sa nu mai porneasca racirea, ceea ce paradoxal duce la dezghetarea mancarii. Deci un garaj sau un balcon inchis care scade sub 10 grade iarna nu e potrivit pentru majoritatea congelatoarelor obisnuite, decat cele marcate special pentru garaj. Daca il tii intr-o camara racoroasa care ramane peste 10-16 grade, verifica sa aiba cel putin clasa SN, cum e Arctic sau Beko din selectie.' },
+  { question: 'Ce este autonomia fara curent si de ce conteaza?', answer: 'E numarul de ore in care mancarea ramane congelata dupa o pana de curent, cu usa inchisa. In articol variaza de la circa 8 ore la compactele mici pana la 20 de ore la Beko de 404 litri. Regula, poate contraintuitiva, e ca un congelator mai mare si mai plin tine frigul mai mult, pentru ca masa inghetata din interior actioneaza ca un rezervor de frig. Daca stai intr-o zona cu pene dese sau lungi, autonomia mare devine un criteriu real, nu un moft: la 20 de ore treci peste aproape orice intrerupere fara sa pierzi mancarea. Sfatul valabil oricum: in timpul unei pene, nu deschide usa deloc.' },
+  { question: 'Ce face functia de congelare rapida sau Fast Freeze?', answer: 'Cand bagi o cantitate mare de alimente proaspete deodata, ele ridica temperatura din congelator si risca sa dezghete partial ce era deja inghetat. Functia de congelare rapida, numita si Fast Freeze sau super-congelare, coboara temperatura mult sub normal cu cateva ore inainte, ca noile alimente sa inghete repede si sa nu afecteze restul. O folosesti concret cand vii cu o transa mare de carne sau cu legume de congelat pentru iarna. Dupa ce totul a inghetat, aparatul revine singur la regimul normal, la modelele moderne, sau il readuci tu manual. Arctic, Heinner N194, Tesla si cele doua Beko din articol o au.' },
+  { question: 'Un congelator convertibil in frigider merita?', answer: 'Merita daca banuiesti ca nevoile ti se vor schimba. Modelele convertibile, ca LDK 238 l si Tesla 273 l din articol, pot lucra fie ca un congelator care duce pana la minus 18 grade, fie ca un frigider normal, printr-o simpla setare. E util in cateva situatii concrete: cumperi acum un al doilea congelator pentru iarna cu legume, dar vara ai nevoie mai degraba de spatiu de racire pentru bauturi si conserve; sau il muti intre camere cu roluri diferite. Daca stii sigur ca il vrei doar congelator pentru totdeauna, functia nu iti aduce nimic in plus si nu ai de ce sa platesti pentru ea. E o plasa de siguranta, nu o necesitate.' },
+  { question: 'Cum decongelez corect un congelator static?', answer: 'O data la sase-douasprezece luni, sau cand stratul de gheata pe pereti trece de 5 milimetri, pentru ca gheata groasa izoleaza si creste consumul. Muta intai mancarea intr-o lada frigorifica sau in alt congelator, scoate aparatul din priza si lasa usa deschisa. Nu razui gheata cu obiecte metalice, strici peretii; lasa-o sa se topeasca singura, eventual grabeste cu un vas de apa calda pus inauntru. Sterge apa, usuca bine interiorul, baga la loc in priza si asteapta sa ajunga la temperatura inainte de a repune alimentele. La un No Frost sari peste tot pasul asta, pentru ca nu se formeaza gheata; asta e, de fapt, principalul lui avantaj.' },
+];
+
+const images = [hero, figMic, figMediu, figNofrost, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune congelatoare in ${SEO_YEAR}: de la compacte la No Frost de 404 litri`}
+  description="12 congelatoare comparate pe capacitate, static vs No Frost si consum, de la 63 la 404 litri. Cand merita No Frost si de cati litri ai nevoie."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune congelatoare' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune congelatoare</span>
+    </nav>
+
+    <h1>Cele mai bune congelatoare</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune congelatoare verticale, de la modele compacte sub blat la No Frost de 404 litri" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>La un congelator separat, doua intrebari decid totul inainte de brand: <strong>cat de mare il vrei</strong> si <strong>daca esti dispus sa il decongelezi manual o data pe an</strong>. Restul sunt detalii. Cel mai cumparat din selectie, cu 97 de pareri, e <strong>Beko RFNE448E41XB</strong>, 404 litri No Frost, care nu se mai decongeleaza niciodata, dar cere spatiu si peste 3000 de lei. Pentru o familie cu buget mai strans, <strong>Arctic AC54210</strong> de 168 de litri, static, la 1349 de lei, e cel mai silentios din articol. Iar pentru o garsoniera sau ca al doilea congelator, <strong>STARCREST de 63 de litri</strong> incape aproape oriunde, sub 800 de lei.</p>
+      <p>Decizia dintre <strong>static si No Frost</strong> e cea care schimba cel mai mult experienta. Un static costa mai putin, consuma mai putin si e mai silentios, dar acumuleaza gheata si trebuie decongelat manual o data pe an. Un No Frost nu formeaza gheata deloc, deci scapi de decongelare, insa consuma cu circa 40% mai mult si costa mai mult. Nu e un model mai bun si unul mai slab, sunt doua compromisuri diferite.</p>
+      <p>Toate cele 12 modele de aici sunt <strong>congelatoare verticale cu sertare</strong>, tipul care se cauta cel mai des si care incape in casa. Le-am grupat dupa capacitate, de la compacte care intra sub blat pana la cele mari de peste 270 de litri, pentru ca marimea e primul filtru real. Daca vrei racire si congelare intr-un singur corp, nu un congelator dedicat, uita-te mai degraba la <a href="/frigider-side-by-side-pentru-familie/">frigiderele side by side</a>.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#mic">Compacte, sub blat (60-103 l)</a></li>
+        <li><a href="#mediu">Medii, pentru familie (160-188 l)</a></li>
+        <li><a href="#nofrost">Mari si No Frost (194-404 l)</a></li>
+        <li><a href="#static">Static sau No Frost: decizia principala</a></li>
+        <li><a href="#litri">De cati litri ai nevoie</a></li>
+        <li><a href="#clasa">Clasa energetica: de ce sunt aproape toate E sau F</a></li>
+        <li><a href="#climatica">Unde il pui: clasa climatica si garajul</a></li>
+        <li><a href="#functii">Autonomie, congelare rapida si alte functii</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Racire</th><th>Clasa</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.racire}</td>
+              <td>{x.clasa}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mic">Compacte, sub blat (60-103 l)</h2>
+    <p>Astea sunt congelatoarele pe care le iei cand spatiul conteaza mai mult decat volumul: inalte de 82-85 cm, incap sub un blat de bucatarie, intr-o camara sau intr-un colt. Sunt pentru o persoana, un cuplu sau ca al doilea congelator de rezerva, iar toate sunt statice, cu decongelare manuala o data pe an. Le-am asezat de la cel mai mic la cel mai incapator.</p>
+    {MIC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMic} alt="Congelatoare compacte sub blat, STARCREST 63 l, Candy 64 l si Heinner 103 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mediu">Medii, pentru familie (160-188 l)</h2>
+    <p>Aici incap cumparaturile pentru doua-trei saptamani, portiile gatite in avans si legumele congelate pentru iarna. Sunt congelatoare verticale de 135-146 cm inaltime, tot statice, dar cu 5-6 sertare pentru o organizare mai buna. E segmentul cel mai cautat de familiile de 3-4 persoane, iar diferenta intre ele o fac zgomotul, consumul si autonomia, nu doar litrii.</p>
+    {MEDIU.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMediu} alt="Congelatoare medii pentru familie, STARCREST 160 l, Arctic 168 l si Heinner 188 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="nofrost">Mari si No Frost (194-404 l)</h2>
+    <p>Peste 190 de litri intram in gama celor care chiar congeleaza mult, si aproape toate de aici sunt No Frost: nu le decongelezi niciodata, pentru ca gheata nu se mai formeaza. Castigi confort si volum, platesti prin consum mai mare si pret mai ridicat. Doua dintre ele, LDK si Tesla, se pot transforma si in frigidere, iar cel mai mare, Beko de 404 litri, e si cel mai vandut din tot articolul.</p>
+    {NOFROST.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figNofrost} alt="Congelatoare mari No Frost, LDK 238 l, Beko 286 l si Beko 404 l" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-congelatoare').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate congelatoarele la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="static">Static sau No Frost: decizia principala</h2>
+    <p>Inainte de litri, de brand si de pret, alege sistemul de racire, pentru ca de el depinde cat de mult te ocupi de congelator si cat platesti la curent. Sunt doua tehnologii, fiecare cu logica ei.</p>
+    <p>Un congelator <strong>static</strong> raceste prin peretii interiori, iar umezeala din aer se depune si ingheata pe ei. In timp se formeaza un strat de gheata pe care il indepartezi decongeland aparatul manual, o data sau de doua ori pe an. In schimb, un static <strong>costa mai putin, consuma mai putin curent si e mai silentios</strong>, pentru ca nu are ventilator. Toate compactele si mediile din articol sunt statice.</p>
+    <p>Un congelator <strong>No Frost</strong> are un ventilator care circula aer rece si usuca umezeala inainte sa inghete pe pereti. Rezultatul: <strong>nu se formeaza gheata si nu il decongelezi niciodata manual</strong>. Pretul acestui confort e concret: consuma cu aproximativ 40% mai mult curent, e putin mai zgomotos din cauza ventilatorului si costa mai mult la cumparare. Un efect secundar mai putin stiut e ca aerul care circula poate usca alimentele lasate neambalate, asa-numita arsura de congelator, deci la un No Frost ambalarea etansa conteaza si mai mult.</p>
+    <ul>
+      <li><strong>Ia static</strong> daca vrei consum si pret mici, il pui intr-o camara sau bucatarie si nu te deranjeaza o decongelare pe an. E cazul majoritatii oamenilor cu un congelator de familie sub 190 de litri.</li>
+      <li><strong>Ia No Frost</strong> daca vrei zero intretinere, il tii la vedere si esti dispus sa platesti mai mult, la cumparare si la curent. Are sens mai ales la volume mari, unde decongelarea manuala a sute de litri devine o corvoada.</li>
+    </ul>
+
+    <h2 id="litri">De cati litri ai nevoie</h2>
+    <p>Capacitatea e primul filtru practic, iar aici greseala frecventa e sa iei prea mic ca sa economisesti spatiu, apoi sa te trezesti ca il umpli in doua zile. Un reper orientativ e de 50-60 de litri de persoana pentru un consum normal, plus un supliment daca gatesti in avans sau congelezi din gradina.</p>
+    <ul>
+      <li><strong>Sub 100 de litri.</strong> Compactele de 63-103 litri, pentru o persoana, un cuplu sau ca al doilea congelator. Incap sub blat, dar se umplu repede daca esti mai mult de doi.</li>
+      <li><strong>160-190 de litri.</strong> Zona de familie, 3-4 persoane. Acopera cumparaturile pe doua-trei saptamani plus congelare ocazionala de sezon. Aici sta majoritatea alegerilor bune la raport.</li>
+      <li><strong>Peste 230 de litri.</strong> Pentru cine congeleaza serios: jumatate de porc, recolta din gradina, cumparaturi en-gros. De obicei No Frost, pentru ca decongelarea manuala a atator litri e o bataie de cap.</li>
+    </ul>
+    <p>Un detaliu contraintuitiv: un congelator <strong>plin consuma mai eficient</strong> decat unul pe jumatate gol, pentru ca masa inghetata mentine frigul si compresorul porneste mai rar. Deci, daca ezitezi intre doua marimi si ai unde sa il pui, alege-o pe cea mai mare, cu conditia sa o tii rezonabil de plina.</p>
+
+    <h2 id="clasa">Clasa energetica: de ce sunt aproape toate E sau F</h2>
+    <p>Daca te uiti peste tabel si vezi numai clase E si F, e normal, si nu inseamna ca sunt aparate slabe. Din martie 2021, eticheta energetica a fost rescrisa complet: <strong>scara merge acum de la A la G</strong>, iar vechile clase A+, A++ si A+++ au fost eliminate.</p>
+    <p>Noua scara a fost <strong>inasprita intentionat</strong>. Clasele A si B au fost lasate goale la lansare, ca sa existe loc pentru viitoarele generatii de aparate mai eficiente. Practic, un congelator care pe eticheta veche ar fi fost A+ apare acum ca F, iar unul de A++ ca E. De aceea aproape tot ce se vinde azi, inclusiv modele bune, sta in zona E-F.</p>
+    <p>Concluzia practica: <strong>nu te lua dupa litera, ci dupa cifra reala de consum in kWh pe an</strong>, scrisa pe eticheta. Compara acel numar intre modele de capacitate apropiata. In articol, de exemplu, un compact static bun consuma 157-170 kWh, un mediu static in jur de 183-197 kWh, iar cele mari No Frost intre 245 si 292 kWh, diferenta de tehnologie si de volum contand mult mai mult decat litera de pe eticheta.</p>
+
+    <h2 id="climatica">Unde il pui: clasa climatica si garajul</h2>
+    <p>Multi cumpara un al doilea congelator si il duc in garaj, pe balconul inchis sau in beci, exact spatiile unde iarna e frig. Aici apare un detaliu pe care majoritatea il ignora: <strong>clasa climatica</strong>, marcata pe eticheta cu litere ca SN, N, ST sau T. Ea spune intre ce temperaturi ambientale functioneaza corect aparatul.</p>
+    <ul>
+      <li><strong>SN</strong> (subnormal): de la 10 grade in sus.</li>
+      <li><strong>N</strong> (normal): de la 16 grade in sus.</li>
+      <li><strong>ST</strong> (subtropical): de la 18 grade in sus.</li>
+      <li><strong>T</strong> (tropical): de la 18 grade in sus, tolereaza caldura mare.</li>
+    </ul>
+    <p>Multe modele combina doua clase, de exemplu N-ST sau SN-T, adica acopera un interval mai larg. Problema apare la frig: daca temperatura din garaj coboara <strong>sub pragul minim al clasei</strong>, uleiul din compresor devine vascos, iar termostatul poate crede ca e deja destul de frig si sa nu mai porneasca racirea. Rezultatul paradoxal e ca mancarea se dezgheata intr-o incapere rece. Un garaj neincalzit care scade sub 10 grade iarna <strong>nu e potrivit</strong> pentru un congelator obisnuit, decat pentru modelele marcate special pentru garaj.</p>
+    <p>Daca vrei sa il tii intr-un spatiu mai racoros, dar care ramane peste 10-16 grade, alege macar clasa SN. Din selectie, Arctic AC54210, Beko si Tesla au clase climatice care coboara pana la 10 grade (SN-T sau mai larg), pe cand STARCREST, cu N/ST, cere un spatiu care nu scade sub 16 grade.</p>
+
+    <h2 id="functii">Autonomie, congelare rapida si alte functii</h2>
+    <p>Dincolo de capacitate si racire, cateva functii chiar conteaza in folosirea de zi cu zi, iar altele sunt marketing. Uite ce sa urmaresti.</p>
+    <p><strong>Autonomia fara curent</strong> e numarul de ore in care mancarea ramane inghetata dupa o pana, cu usa inchisa. In articol merge de la circa 8 ore la compacte pana la 20 de ore la Beko de 404 litri. Regula, poate surprinzatoare, e ca un aparat mai mare si mai plin tine frigul mai mult, pentru ca masa inghetata din interior e un rezervor de frig. Daca stai unde penele sunt dese sau lungi, autonomia mare e un criteriu real.</p>
+    <p><strong>Congelarea rapida</strong>, numita Fast Freeze sau super-congelare, coboara temperatura mult sub normal cu cateva ore inainte sa bagi o transa mare de alimente proaspete, ca ele sa inghete repede si sa nu dezghete ce era deja inauntru. E utila concret cand congelezi carne sau legume in cantitate; o au Arctic, Heinner N194, Tesla si cele doua Beko.</p>
+    <p><strong>Functia de conversie</strong> in frigider, la LDK si Tesla, transforma congelatorul in frigider printr-o setare. E o plasa de siguranta pentru cine banuieste ca nevoile se schimba, nu o necesitate. Iar <strong>alarma de usa deschisa</strong>, aparent un moft, previne exact greseala care baga gheata si strica mancarea: usa lasata intredeschisa neobservata.</p>
+    <p>In schimb, nu da atentie exagerata numarului de sertare in sine. Mai multe sertare inseamna organizare mai buna, dar compartimente mai mici; mai putine sertare inseamna spatii mari, bune pentru pachete voluminoase. E o preferinta de folosire, nu o masura de calitate.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Iei prea mic ca sa economisesti.</strong> Un congelator care se umple in doua zile te enerveaza zilnic. Mai bine putin mai mare, tinut plin, care si consuma mai eficient.</li>
+      <li><strong>Crezi ca o clasa F inseamna aparat prost.</strong> Dupa eticheta din 2021, F echivaleaza cu vechiul A+. Uita-te la kWh pe an, nu la litera.</li>
+      <li><strong>Il pui intr-un garaj rece fara sa verifici clasa climatica.</strong> Sub pragul minim, aparatul nu mai raceste corect si mancarea se dezgheata, oricat de frig e afara.</li>
+      <li><strong>Alegi No Frost automat, crezand ca e mereu mai bun.</strong> Consuma cu circa 40% mai mult si costa mai mult. Daca nu te deranjeaza o decongelare pe an, un static te scuteste de bani.</li>
+      <li><strong>Uiti sa masori adancimea.</strong> Modelele mari No Frost au 70-77 cm adancime si ies in afara unui blat standard de 60. Masoara locul inainte, nu dupa.</li>
+      <li><strong>Nu tii cont de sensul usii.</strong> Intr-un colt, o usa care se deschide pe partea gresita e enervanta. Cauta mentiunea usi reversibile, prezenta la majoritatea din selectie.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la congelatoarele in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca acelasi produs apare listat de mai multe ori, in culori diferite si cu coduri diferite, la acelasi pret. Heinner HM91, de pilda, e in alb, negru si argintiu cu aceleasi specificatii; l-am trecut o data si am mentionat ca varianta neagra e de obicei cea mai ieftina.</p>
+    <p>Am filtrat si o confuzie de categorie: sub aceeasi cautare apar <strong>masini de facut cuburi de gheata</strong>, care nu sunt congelatoare, ci aparate de bar. Le-am lasat deoparte. Toate cele 12 alese sunt congelatoare verticale cu sertare, tipul care se cauta cel mai des cand cineva scrie congelator.</p>
+    <p><strong>Le-am grupat dupa capacitate</strong>, pentru ca marimea e primul lucru care restrange alegerea, si am pus in fiecare grupa modelele reprezentative pe pret si pe functii. Am comparat specificatiile reale din fise, capacitate, consum in kWh, sistem de racire, clasa climatica, autonomie si capacitate de inghet, si am semnalat unde o clasa energetica mai slaba sau un pret mai mare nu aduc nimic in plus, ca la variantele colorate ale aceluiasi Heinner.</p>
+    <p>Nu testam congelatoarele in laborator si nu pretindem asta. Ne bazam pe date reale, pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare. Un congelator bun completeaza bucataria alaturi de electrocasnicele de zi cu zi, de la <a href="/cele-mai-bune-blendere/">un blender</a> la <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o friteuza cu aer cald</a>, iar daca ai nevoie de racire si congelare intr-un singur corp, alternativa e <a href="/frigider-side-by-side-pentru-familie/">un frigider side by side</a>.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 770 la 3175 de lei, iar pretul urmeaza destul de fidel doua lucruri: capacitatea si sistemul de racire.</p>
+    <p><strong>Sub 1000 de lei</strong> stau compactele statice de 63-103 litri: STARCREST 63 l, Candy 64 l si cele doua Heinner de 91 si 103 litri. Sunt pentru spatii mici sau ca al doilea congelator, cu decongelare manuala si consum mic.</p>
+    <p><strong>Intre 1300 si 1400 de lei</strong> e zona cu cel mai bun raport pentru o familie: modelele statice de 160-188 litri, STARCREST 160 l, Arctic 168 l si Heinner 188 l. Aici primesti volum real fara sa platesti pentru No Frost, iar Arctic adauga si cel mai mic zgomot din articol.</p>
+    <p><strong>Peste 2000 de lei</strong> intri in No Frost si volume mari. LDK de 238 litri e cel mai ieftin mod de a avea mult spatiu fara decongelare, in jur de 2000 de lei, iar de acolo urci spre Tesla de 273 litri, Beko de 286 cu compresor Inverter si Beko de 404 litri, cel mai mare si mai vandut, la 3175 de lei. Platesti pentru confortul de a nu decongela niciodata si pentru capacitatea de a congela transe mari.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-congelatoare" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-congelatoare" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

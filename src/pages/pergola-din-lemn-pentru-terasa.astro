@@ -1,255 +1,284 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Pergola din lemn pentru terasa",
-  excerpt: "Daca vrei o pergola din lemn pentru terasa, cea mai sigura alegere, daca bugetul permite si ai spatiu, este una bioclimatica. Modelele cu lamele reglabile din lemn stratificat de rasinoase sau esente tari, tratate corespunzator, iti ofera control total asupra luminii si protectie impotriva ploii, iar aspectul e de top. Nu te arunca la prima oferta ieftina, verifica tratamentul lemnului si calitatea imbinarilor.",
-  image: "/images/articles/pergola-din-lemn-pentru-terasa.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-02-20T13:17:40.932Z",
-  modifiedDate: "2026-02-20T13:17:40.932Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "cat costa o pergola din lemn pentru terasa?", answer: "Pretul unei pergole din lemn pentru terasa variaza enorm. Modelele simple, deschise, fara acoperis, pot incepe de la 1.000-2.000 lei. O pergola cu acoperis fix din policarbonat sau tabla te duce in jur de 3.000-7.000 lei, in timp ce o pergola bioclimatica din lemn stratificat, cu lamele reglabile, poate depasi 10.000-15.000 lei." },
-  { question: "care e diferenta intre o pergola din lemn si una din aluminiu?", answer: "Pergola din lemn ofera un aspect natural, cald si se integreaza usor in gradina, dar necesita intretinere periodica (lacuire, impregnare). Pergola din aluminiu este mult mai rezistenta la intemperii, nu ruginește si necesita intretinere minima, avand adesea un aspect modern, dar poate parea mai rece. Lemnul e mai usor de modificat, aluminiul e mai durabil." },
-  { question: "cat de rezistenta e o pergola din lemn la intemperii?", answer: "Rezistenta unei pergole din lemn la intemperii depinde crucial de calitatea lemnului si de tratamentul aplicat. Lemnul stratificat, tratat corespunzator prin imersie sau sub presiune, si protejat cu lacuri de exterior de calitate, poate rezista ani buni. Totusi, expunerea constanta la soare si ploaie va necesita intretinere anuala (re-lacuire, impregnare) pentru a preveni degradarea." },
-  { question: "ce tip de lemn e cel mai bun pentru o pergola pe terasa?", answer: "Lemnul stratificat (lipit) este adesea preferat pentru stabilitatea sa si rezistenta la deformari, fiind ideal pentru structuri mai mari. Lemnul masiv de esenta tare (stejar, tec) este de asemenea o optiune excelenta, oferind un aspect robust si o durabilitate sporita, insa este mai scump. Lemnul de rasinoase (brad, molid) este mai accesibil, dar necesita un tratament riguros pentru exterior." },
-  { question: "de ce se crapa lemnul la pergola?", answer: "Lemnul se crapa la pergola din cauza schimbarilor de umiditate si temperatura. Cand lemnul absoarbe apa, se extinde, iar cand se usuca, se contracta. Aceste cicluri repetate duc la tensiuni interne care cauzeaza fisuri. Lipsa unui tratament corespunzator de protectie impotriva umezelii si a razelor UV accelereaza acest proces." },
-  { question: "cum intretin o pergola din lemn?", answer: "Intretinerea unei pergole din lemn presupune curatarea periodica de praf, frunze si murdarie. O data pe an, sau la doi ani, in functie de expunerea la soare si ploaie, este recomandata reimpregnarea sau lacuirea cu produse specifice pentru lemn de exterior. Verifica periodic imbinarile si aspectul general al lemnului." },
-  { question: "unde gasesc pergole din lemn de calitate in Romania?", answer: "Poti gasi pergole din lemn de calitate la producatori specializati in constructii din lemn, ateliere de tâmplărie care realizează la comandă, sau la magazinele mari de bricolaj care oferă game premium. Este recomandat să cauți furnizori cu experiență și să ceri detalii despre proveniența lemnului și tratamentele aplicate." },
-  { question: "merita sa cumpar o pergola bioclimatica din lemn?", answer: "Da, merita daca bugetul iti permite si vrei flexibilitate maxima. O pergola bioclimatica din lemn, cu lamele reglabile, iti permite sa controlezi lumina si protectia impotriva ploii, oferind un confort sporit. Este o investitie pe termen lung, dar costul initial este mai ridicat comparativ cu o pergola simpla." }
-];
-
-const toc = [
-  { title: "Pergola din Lemn pentru Terasa: Ghidul Complet pentru O Alegere Inspirata", id: "pergola-din-lemn-pentru-terasa-ghidul-complet-pentru-o-alegere-inspirata" },
-  { title: "Top Recomandari: Pergole din Lemn cu Stil si Rezistenta", id: "top-recomandari-pergole-din-lemn-cu-stil-si-rezistenta" },
-  { title: "Cum Alegi Pergola din Lemn Potrivită pentru Terasa Ta: Criterii Esențiale", id: "cum-alegi-pergola-din-lemn-potrivita-pentru-terasa-ta-criterii-esentiale" },
-  { title: "Pergola din Lemn vs. Pergola din Aluminiu: Lupta pentru Terasa Ta", id: "pergola-din-lemn-vs-pergola-din-aluminiu-lupta-pentru-terasa-ta" },
-  { title: "Greseli Comune la Achizitia unei Pergole din Lemn și Sfaturi de Insider", id: "greseli-comune-la-achizitia-unei-pergole-din-lemn-si-sfaturi-de-insider" },
-  { title: "Verdict pe Buget: Cea Mai Bună Pergola din Lemn pentru Fiecare Buzunar", id: "verdict-pe-buget-cea-mai-buna-pergola-din-lemn-pentru-fiecare-buzunar" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['pergola-lemn'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Din lemn ---
+  { g: 'lemn', id: 'DHDL2M3BM', badge: 'Structura din lemn, 3x4 m', short: 'Foisor lemn 3x4', material: 'Lemn', dim: '3 x 4 m', acoperis: 'Fix',
+    specs: ['foisor-pergola din lemn rindeluit, 3x4 m', 'kit metalic de imbinare inclus', 'pentru terasa, gradina sau garaj', 'nota maxima, 5 din 5'],
+    pros: ['Structura reala din lemn rindeluit, aspect cald', 'Dimensiune generoasa, 3x4 m', 'Kit metalic de imbinare inclus, montaj mai simplu', 'Nota maxima, 5 din 5'],
+    cons: ['Doar 2 pareri deocamdata', 'Pret ridicat si montaj laborios'],
+    verdict: 'Cea mai apropiata de ideea clasica de pergola din lemn din selectie, o structura reala pentru terasa. Acest foisor-pergola de la buz e facut din lemn rindeluit, cu un kit metalic de imbinare inclus care usureaza montajul, si are 3x4 m, o suprafata generoasa care acopera o masa cu scaune sau un colt de relaxare. Lemnul aduce caldura si un aspect natural, elegant, pe care structurile metalice nu il au, si se integreaza frumos intr-o gradina sau pe o terasa amenajata cu lemn. A luat nota maxima, 5 din 5, chiar daca din doar 2 pareri, deci te bazezi si pe descriere. E o investitie serioasa, cu un pret ridicat si un montaj laborios, ca la orice structura mare din lemn. O iei cand vrei o pergola adevarata din lemn, cu aspect cald si suprafata mare, si esti dispus la efortul si costul unei structuri de durata.' },
+  { g: 'lemn', id: 'DZ2L2M3BM', badge: 'Lemn cu imbinari de fier', short: 'Pergola lemn 3x4', material: 'Lemn', dim: '3 x 4 m', acoperis: 'Fix',
+    specs: ['pergola din lemn rindeluit, 3x4 m', 'imbinari de fier pentru rezistenta', 'pentru gradina sau terasa', 'nota maxima, 5 din 5'],
+    pros: ['Lemn rindeluit cu imbinari de fier, robust', 'Dimensiune mare, 3x4 m', 'Aspect natural, cald, potrivit langa casa', 'Nota maxima, 5 din 5'],
+    cons: ['Doar 2 pareri deocamdata', 'Pret mare si montaj laborios'],
+    verdict: 'O alta structura reala din lemn, cu imbinari de fier pentru rezistenta, pentru cine vrea o pergola solida si durabila. Modelul de la buz e din lemn rindeluit, cu 3x4 m si imbinari metalice care ii dau rezistenta la vant si la timp, potrivit pentru o terasa sau un colt de gradina langa casa. Lemnul da caldura si un aspect natural pe care aluminiul si otelul nu il pot imita complet, iar dimensiunea mare acopera confortabil o masa cu scaune. Cu nota maxima, 5 din 5, din 2 pareri, e bine primita, chiar daca inca putin testata. Ca la orice structura mare din lemn, pretul e ridicat, montajul cere timp, iar lemnul are nevoie de tratament periodic impotriva umezelii. O iei cand vrei o pergola din lemn robusta, cu imbinari de fier, pentru un aspect natural durabil pe terasa, si accepti investitia si intretinerea specifice lemnului.' },
+  { g: 'lemn', id: 'DVTRQN3BM', badge: 'Decorativa, cea mai ieftina', short: 'Pergola pliabila', material: 'Lemn', dim: '1 x 2 m', acoperis: 'Deschis',
+    specs: ['pergola pliabila din lemn, 1x2 m', 'cu decor de frunze si flori', 'cea mai ieftina din selectie', 'pentru un accent verde pe terasa'],
+    pros: ['Cea mai ieftina din selectie', 'Din lemn real, pliabila si usor de montat', 'Decor de frunze si flori, aspect placut', 'Buna ca suport pentru plante cataratoare'],
+    cons: ['Mica, 1x2 m, decorativa, nu structura de umbra', 'Inca fara pareri'],
+    verdict: 'Cea mai accesibila piesa din selectie si o cale simpla de a aduce un accent din lemn pe terasa. Aceasta pergola pliabila din lemn are 1x2 m si vine cu un decor de frunze si flori, deci e mai degraba un panou decorativ, un spalier, decat o structura de umbra care sa acopere o masa. E ideala ca suport pentru plante cataratoare, langa un perete sau intr-un colt, unde creeaza un decor verde si un aer de gradina. Din lemn real si pliabila, se monteaza usor si costa foarte putin, motiv pentru care e o alegere buna daca vrei doar un accent, nu o pergola mare. Nu are inca pareri, fiind un produs nou. O iei cand vrei o piesa mica si ieftina din lemn, decorativa, pentru plante cataratoare sau un colt verde pe terasa, si nu cauti o structura mare de umbra.' },
+  // --- Alternative metalice si din aluminiu ---
+  { g: 'metal', id: 'DH6YPN2BM', badge: 'Cea mai accesibila', short: 'Metalica 3x3', material: 'Metal', dim: '3 x 3 m', acoperis: 'Fix inclinat',
+    specs: ['pergola metalica galvanizata, 3x3 m', 'acoperis inclinat din poliester UPF30+', 'ancorare inclusa', 'cea mai ieftina structura de umbra'],
+    pros: ['Cea mai ieftina structura de umbra din selectie', 'Cadru metalic galvanizat, rezistent la rugina', 'Acoperis din poliester cu protectie UPF30+', 'Ancorare inclusa, mai sigura pe vant'],
+    cons: ['Fara pareri deocamdata', 'Aspect mai putin cald decat lemnul'],
+    verdict: 'Cea mai accesibila structura de umbra din selectie, pentru cine vrea o pergola functionala fara sa dea multi bani. Acest model are un cadru metalic galvanizat, rezistent la rugina, 3x3 m si un acoperis inclinat din poliester cu protectie UPF30+, care apara de soare si de o ploaie usoara, plus ancorare inclusa, importanta ca sa nu o ia vantul. E o alternativa practica la pergola din lemn, mult mai ieftina si mai usor de montat, chiar daca nu are caldura si aspectul natural al lemnului. Fiind un produs nou, nu are inca pareri, deci te bazezi pe specificatii. O iei cand vrei cea mai ieftina cale de a avea umbra pe terasa, cu un cadru metalic rezistent si acoperis cu protectie UV, si nu conteaza ca nu e din lemn.' },
+  { g: 'metal', id: 'D223PN2BM', badge: 'Cu cortina impermeabila', short: 'Metalica cu cortina', material: 'Metal', dim: '3 x 3 m', acoperis: 'Fix + cortina',
+    specs: ['pergola metalica 3x3 m, crem', 'cu cortina impermeabila laterala', 'protectie de soare si ploaie oblica', 'aspect elegant, culoare neutra'],
+    pros: ['Vine cu cortina impermeabila laterala', 'Protectie in plus fata de soare piezis si ploaie', 'Culoare crem, neutra si eleganta', 'Cadru metalic, montaj accesibil'],
+    cons: ['Fara pareri deocamdata', 'Cortina cere prindere in plus'],
+    verdict: 'Pergola de ales daca vrei si o cortina laterala, pentru mai multa intimitate si protectie. Acest model metalic de 3x3 m, in nuanta crem eleganta, vine cu o cortina impermeabila care se prinde pe o latura, deci te aperi nu doar de soarele de sus, ci si de cel piezis, de dimineata sau seara, si de ploaia oblica, iar spatiul devine mai intim. E o alternativa accesibila la lemn, cu un aspect ingrijit datorita culorii neutre. Fiind un produs nou, nu are inca pareri, deci te bazezi pe descriere. Cortina aduce un plus de confort, dar cere prindere si ajustare in plus. O iei cand vrei o pergola metalica accesibila cu o cortina laterala pentru intimitate si protectie de soare piezis, intr-o culoare neutra care se asorteaza usor pe terasa.' },
+  { g: 'metal', id: 'D6DWZ73BM', badge: 'Cu lumini LED', short: 'Beliani cu LED', material: 'Otel', dim: '3.1 x 3.1 m', acoperis: 'Fix',
+    specs: ['pergola din otel Beliani, 310 x 310 cm', 'cu lumini LED integrate', 'nuanta maro, aspect cald', 'de la un brand cunoscut de mobilier'],
+    pros: ['Lumini LED integrate, atmosfera seara', 'Structura din otel, robusta', 'Nuanta maro, aspect mai cald', 'Beliani, brand cunoscut de mobilier'],
+    cons: ['Fara pareri deocamdata', 'Mai scumpa decat modelele metalice de baza'],
+    verdict: 'Pergola de ales daca vrei sa folosesti terasa si seara, cu lumina inclusa. Beliani Parga are o structura din otel de 310 x 310 cm, in nuanta maro care ii da un aspect mai cald decat metalul obisnuit, si vine cu lumini LED integrate, care creeaza o atmosfera placuta dupa lasarea intunericului, fara sa mai adaugi tu iluminat separat. Beliani e un brand cunoscut de mobilier si decoratiuni, un plus de incredere la finisaje si design. E din otel, deci robusta, si mai scumpa decat modelele metalice de baza, in schimbul luminilor si al aspectului mai ingrijit. Fiind noua, nu are inca pareri. O iei cand vrei o pergola care sa arate bine si seara, cu lumini LED integrate si un aspect cald, de la un brand de mobilier cunoscut, si esti dispus sa platesti ceva mai mult pentru aceste detalii.' },
+  { g: 'metal', id: 'DFFYPN2BM', badge: 'Acoperis retractabil', short: 'Aluminiu retractabila', material: 'Aluminiu', dim: '3 x 3 m', acoperis: 'Retractabil',
+    specs: ['pergola din aluminiu, 3x3 m', 'acoperis retractabil, il deschizi si il inchizi', 'protectie UV, gri inchis', 'aluminiu usor si rezistent la rugina'],
+    pros: ['Acoperis retractabil, alegi soare sau umbra', 'Aluminiu usor si rezistent la rugina', 'Protectie UV, culoare gri inchis moderna', 'Mai durabila decat cadrele metalice ieftine'],
+    cons: ['Fara pareri deocamdata', 'Mai scumpa decat modelele fixe'],
+    verdict: 'Pergola de ales daca vrei sa controlezi cat soare intra, cu un acoperis pe care il deschizi si il inchizi. Acest model din aluminiu de 3x3 m are un acoperis retractabil, deci il tragi la o parte cand vrei soare si il inchizi cand vrei umbra sau te fereste de o ploaie usoara, o flexibilitate reala fata de pergolele fixe. Aluminiul e usor, nu rugineste si rezista bine in timp, iar nuanta gri inchis, cu protectie UV, arata modern pe o terasa contemporana. E mai scumpa decat modelele metalice fixe, in schimbul mecanismului retractabil si al materialului mai bun. Fiind noua, nu are inca pareri. O iei cand vrei o pergola din aluminiu durabila, cu acoperis retractabil pe care il controlezi dupa vreme, si preferi un aspect modern, gri, in locul lemnului.' },
+  { g: 'metal', id: 'D3H3PN2BM', badge: 'Cu acoperis si 4 perdele', short: 'Cu 4 perdele', material: 'Metal', dim: '3 x 3 m', acoperis: 'Retractabil + perdele',
+    specs: ['pergola 3x3 m, acoperis retractabil', 'patru perdele laterale incluse', 'nuanta bej, aspect elegant', 'inchizi complet spatiul'],
+    pros: ['Patru perdele laterale, inchizi complet spatiul', 'Acoperis retractabil, controlezi soarele', 'Nuanta bej, eleganta si neutra', 'Cel mai complet model din alternative'],
+    cons: ['Fara pareri deocamdata', 'Perdelele cer prindere si intretinere'],
+    verdict: 'Cea mai completa dintre alternativele metalice, daca vrei sa inchizi complet spatiul. Acest model de 3x3 m are un acoperis retractabil, pe care il controlezi dupa soare, si vine cu patru perdele laterale, deci il transformi dintr-un simplu umbrar intr-un spatiu aproape inchis, protejat de vant, soare piezis si priviri, potrivit pentru mese sau relaxare in intimitate. Nuanta bej ii da un aspect elegant si neutru, usor de asortat. Combina astfel avantajele unei pergole cu cele ale unui pavilion cu pereti. Fiind noua, nu are inca pareri, iar perdelele cer prindere si intretinere in plus. O iei cand vrei cea mai completa alternativa metalica, cu acoperis retractabil si perdele pe toate laturile, pentru un spatiu de terasa inchis si intim, si nu insisti neaparat pe lemn.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const LEMN = PICKS.filter(x => x.g === 'lemn');
+const METAL = PICKS.filter(x => x.g === 'metal');
+
+const hero = '/images/articles/pergola-din-lemn-pentru-terasa.webp';
+const figLemn = '/imagini/articole/pergola-lemn.webp';
+const figMetal = '/imagini/articole/pergola-metal.webp';
+const published = '2026-07-19T13:33:14+03:00';
+
+const faq = [
+  { question: 'Se gasesc pergole din lemn gata facute?', answer: 'Mai greu decat ai crede. Spre deosebire de pergolele metalice si din aluminiu, care se vand la pachet, gata de montat, pergolele din lemn adevarate sunt rare in comert, pentru ca lemnul e greu, voluminos si scump de transportat. Multe pergole din lemn se fac la comanda de un tamplar sau se construiesc chiar de proprietar, dupa un plan. In selectie exista cateva structuri reale din lemn rindeluit, ca cele de la buz, dar majoritatea produsele gasite sunt metalice sau din aluminiu, unele cu finisaj efect lemn. Daca vrei neaparat lemn, cauta structurile din lemn masiv sau ia in calcul o constructie la comanda; daca vrei doar umbra pe terasa, o alternativa metalica e mai practica si mai ieftina.' },
+  { question: 'Pergola din lemn sau din metal si aluminiu?', answer: 'Lemnul arata cald si natural, se integreaza frumos intr-o gradina sau pe o terasa amenajata natural si da un farmec pe care metalul nu il are. In schimb, e mai scump, mai greu de montat si cere intretinere: tratament periodic impotriva umezelii si a insectelor. Metalul si aluminiul sunt mai ieftine, mai usor de montat, nu putrezesc si aproape nu cer intretinere; aluminiul in special nu rugineste si e foarte durabil. In plus, modelele metalice vin des cu acoperis retractabil, perdele sau lumini. Alege lemnul daca pui pret pe aspectul natural si esti dispus la efort si intretinere, si metalul sau aluminiul daca vrei ceva practic, durabil si accesibil.' },
+  { question: 'Cum intretin o pergola din lemn?', answer: 'Lemnul de exterior are nevoie de grija ca sa reziste in timp. Aplica un tratament de protectie, ulei, lac sau lazura de exterior, cel putin o data pe an, de obicei primavara, ca sa il aperi de umezeala, de razele UV si de insecte. Verifica periodic imbinarile si suruburile, mai ales dupa iarna, si strange-le sau inlocuieste piesele deteriorate. Nu lasa apa sa balteasca pe elementele orizontale si asigura-te ca stalpii nu stau direct in pamant umed, ci pe suporturi metalice, ca sa nu putrezeasca la baza. Cu aceasta intretinere, o pergola din lemn tine multi ani si isi pastreaza aspectul cald; neglijata, lemnul se degradeaza si se innegreste in cateva sezoane.' },
+  { question: 'Ce dimensiune de pergola imi trebuie?', answer: 'Depinde de ce vrei sa acoperi. Pentru o masa cu 4-6 scaune sau un colt de relaxare pe terasa, o pergola de 3x3 m e formatul cel mai comun si suficient, iar una de 3x4 m acopera un spatiu mai generos, cu canapele sau o masa mai lunga. Structurile mari din lemn, ca cele de 3x4 m din selectie, sunt potrivite pentru terase spatioase. Daca vrei doar un accent decorativ sau un suport pentru plante cataratoare, o piesa mica, ca pergola pliabila de 1x2 m, e de ajuns. Masoara locul de pe terasa inainte, tine cont de spatiul de trecere in jur si alege dimensiunea dupa mobilierul pe care vrei sa il adapostesti.' },
+  { question: 'La ce foloseste acoperisul retractabil?', answer: 'Un acoperis retractabil iti da control asupra cat soare intra sub pergola. Il tragi la o parte cand vrei lumina si caldura, de exemplu intr-o dimineata racoroasa de primavara, si il inchizi cand soarele devine prea puternic sau se anunta o ploaie usoara. E un avantaj real fata de acoperisul fix, care iti da mereu aceeasi umbra, indiferent de vreme sau de cheful tau. Modelele din aluminiu din selectie au acest mecanism, uneori combinat cu perdele laterale pentru protectie completa. E util mai ales pe o terasa pe care o folosesti mult, la ore diferite; daca vrei doar umbra constanta, un acoperis fix e mai simplu si mai ieftin.' },
+  { question: 'Cat costa o pergola pentru terasa?', answer: 'In selectie, alternativele metalice si din aluminiu, care sunt cele mai raspandite, pornesc de la circa 850 de lei pentru un model metalic simplu de 3x3 m si urca spre 2500 de lei pentru unul din aluminiu cu acoperis retractabil si perdele. Modelele cu lumini LED, ca Beliani, sunt in jur de 1650 de lei. Structurile reale din lemn, mai rare, sunt mai scumpe: cele de 3x4 m din lemn rindeluit trec de 5000 de lei, in schimbul aspectului natural si al durabilitatii. La capatul accesibil, o piesa decorativa mica din lemn costa in jur de 250 de lei. Cel mai bun raport il gasesti alegand intre aspectul natural al lemnului, cu costul si intretinerea aferente, si practicitatea unei structuri metalice sau din aluminiu.' },
+];
+
+const images = [hero, figLemn, figMetal, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Pergola din lemn pentru terasa - CentroCasa"
-  description="Daca vrei o pergola din lemn pentru terasa, cea mai sigura alegere, daca bugetul permite si ai spatiu, este una bioclimatica. Modelele cu lamele reglabile din lemn stratificat de rasinoase sau esente tari, tratate corespunzator, iti ofera control total asupra luminii si protectie impotriva ploii, iar aspectul e de top. Nu te arunca la prima oferta ieftina, verifica tratamentul lemnului si calitatea imbinarilor."
-  image="/images/articles/pergola-din-lemn-pentru-terasa.webp"
+  title="Cele mai bune pergole din lemn pentru terasa in 2026: din lemn si alternative metalice"
+  description="Care sunt cele mai bune pergole din lemn pentru terasa in 2026: structuri reale din lemn rindeluit si alternative metalice si din aluminiu, cu acoperis retractabil, perdele sau lumini LED, comparate pe material, dimensiune si acoperis. Plus lemn vs metal si cum intretii o pergola din lemn."
+  image={hero}
   type="article"
-  publishedTime="2026-02-20T13:17:40.932Z"
-  modifiedTime="2026-02-20T13:17:40.932Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune pergole din lemn pentru terasa' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/mobilier-gradina/">Mobilier Gradina</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Pergola din lemn pentru terasa</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune pergole din lemn pentru terasa</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
-        <span class="article-date">20 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Pergola din lemn pentru terasa</h1>
-    </header>
+    <h1>Cele mai bune pergole din lemn pentru terasa</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    
+    <img class="rd-hero" src={hero} alt="Cele mai bune pergole din lemn pentru terasa: structuri din lemn si alternative metalice" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="pergola-din-lemn-pentru-terasa-ghidul-complet-pentru-o-alegere-inspirata">
-        <h2>Pergola din Lemn pentru Terasa: Ghidul Complet pentru O Alegere Inspirata</h2>
-        <p>Am sa fiu direct: cand vine vorba de o <strong>pergola din lemn <a href="/gratar-pe-gaz-pentru-terasa/" class="interlink">pentru terasa</a></strong>, cele mai apreciate sunt cele care iti ofera flexibilitate. Ma refer la cele bioclimatice, cu lamele reglabile. De ce? Pentru ca poti sa le ajustezi in functie de soare, de vant, de ploaie.</p>
-        <p>Nu te trezesti cu soarele in ochi la pranz, nici nu te ploua pe cap cand incepe o ploaie scurtă. E o investitie, da, dar merita pe termen lung. Lemnul stratificat, de obicei brad sau molid tratat, sau chiar esente mai tari ca ipe sau tec, arata fantastic si se integreaza perfect in orice <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a>.</p><p>Uite care-i treaba: o <strong>pergola din lemn pentru terasa</strong> nu e doar un acoperis. E un spatiu de relaxare, un loc unde bei cafeaua dimineata fara sa te arzi la soare, unde iei cina seara fara grija ploii. Lemnul aduce caldura, naturalete. Dar atentie, lemnul cere si ingrijire. Nu te astepta sa stea ca noua ani de zile fara sa-i faci nimic. Tratamentul initial e crucial, dar si mentenanta anuala e importanta.</p><p>Am vazut multe pergole la prieteni, la clienti. Cele mai reusite sunt cele facute la comanda, cu atentie la detalii. Dar gasesti si modele prefabricate bune, daca stii ce sa cauti. Nu te uita doar la poza. Uita-te la grosimea lemnului, la tipul de imbinari, la tratamentul aplicat. Ăsta e secretul unei pergole care rezista si arata bine ani de zile. O <strong>pergola din lemn pentru terasa</strong> bine aleasa iti transforma complet spatiul exterior.</p><p>Daca vrei ceva mai simplu, o structura fixa cu policarbonat sau tabla acoperita poate fi o varianta. Dar, sincer, lemnul are un farmec aparte. Adauga valoare casei si gradinii tale. Si, daca ma intrebi pe mine, merita sa investesti putin mai mult pentru calitate. Na, asta e parerea mea.</p>
-      </section>
-
-      <section id="top-recomandari-pergole-din-lemn-cu-stil-si-rezistenta">
-        <h2>Top Recomandari: Pergole din Lemn cu Stil si Rezistenta</h2>
-        <p>Bon, hai sa vedem cateva optiuni concrete pentru o <strong>pergola din lemn pentru terasa</strong>. Am selectat cateva modele pe care le-am vazut la treaba sau despre care am auzit pareri bune, cu preturi orientative. Nu uita, preturile pot varia mult in functie de dimensiune, furnizor si complexitatea montajului.</p><h3>1. Pergola Bioclimatica cu Lamele Reglabile (Lemn Stratificat)</h3><p>Asta e varful de gama, daca vrei maximul de confort si flexibilitate. Lemnul stratificat e mai stabil decat cel masiv, mai rezistent la deformari. Lamelele se rotesc 0-90 de grade. Poti sa le inchizi complet ca sa te protejeze de ploaie sau sa le deschizi ca sa lasi soarele sa intre.</p><ul><li><strong>Pret estimativ:</strong> 5.000 - 15.000+ EUR, in functie de dimensiune si complexitate.</li><li><strong>Avantaje:</strong> Control total asupra luminii si vremii, design modern, rezistenta buna la intemperii daca lemnul e tratat corespunzator.</li><li><strong>Dezavantaje:</strong> Pretul e piperat. Necesita un montaj profesionist. Lemnul, chiar si stratificat, necesita intretinere periodica (lacuire/impregnare).</li></ul><h3>2. Pergola Fixa cu Acoperis Din Lemn si Policarbonat</h3><p>Asta e o varianta mai accesibila, buna daca vrei umbra si protectie la ploaie, dar nu neaparat flexibilitatea lamelelor. Structura e din lemn masiv sau stratificat, iar acoperisul e de obicei din policarbonat, care lasa lumina sa treaca. E o solutie rapida si eficienta.</p><ul><li><strong>Pret estimativ:</strong> 2.000 - 7.000 LEI, pentru dimensiuni medii.</li><li><strong>Avantaje:</strong> Pret mai mic decat cea bioclimatica, montaj relativ usor, ofera umbra constanta si protectie la ploaie.</li><li><strong>Dezavantaje:</strong> Nu poti ajusta nivelul de lumina sau ventilatie. Policarbonatul se poate zgaria in timp sau se poate ingalbeni daca nu e de calitate superioara.</li></ul><h3>3. Pergola Deschisă cu Stâlpi și Traverse (Lemn Masiv Tratate)</h3><p>Asta e mai mult o structura decorativa, un cadru din lemn care delimiteaza spatiul terasei si poate sustine plante agatoare. Nu ofera protectie reala la soare sau ploaie, dar creeaza o atmosfera deosebita. E o <strong>pergola din lemn pentru terasa</strong> mai mult de design.</p><ul><li><strong>Pret estimativ:</strong> 1.000 - 4.000 LEI, depinde mult de lemn si finisaje.</li><li><strong>Avantaje:</strong> Foarte accesibila, usor de integrat in orice stil de gradina, perfecta pentru plante agatoare (vita de vie, iedera).</li><li><strong>Dezavantaje:</strong> Nu ofera protectie la intemperii. Nu e o <strong>pergola din lemn pentru terasa</strong> in sensul clasic de acoperis.</li></ul><h3>4. Pergola cu Acoperis Mobil (Tensionat)</h3><p>Aici vorbim de o structura de lemn cu un prelata textila speciala, care se poate retracta. E un compromis bun intre o structura fixa si o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela</a>. Oferta protectie decenta la soare si ploaie, dar nu e la fel de robusta ca o structura solida.</p><ul><li><strong>Pret estimativ:</strong> 3.000 - 9.000 LEI.</li><li><strong>Avantaje:</strong> Flexibila, poate fi retractata cand nu e nevoie, ofera un aspect modern.</li><li><strong>Dezavantaje:</strong> Prelata necesita curatare periodica si poate fi afectata de vant puternic. Durabilitate mai mica decat o structura rigida.</li></ul><p>Am testat personal o pergola cu lamele reglabile timp de 2 veri si a fost o minune. In plus, am montat o pergola deschisa la un prieten, mai mult ca element de decor, si a prins viata terasa lui instant. Asta e, fiecare are rolul ei.</p>
-      </section>
-
-      <section id="cum-alegi-pergola-din-lemn-potrivita-pentru-terasa-ta-criterii-esentiale">
-        <h2>Cum Alegi Pergola din Lemn Potrivită pentru Terasa Ta: Criterii Esențiale</h2>
-        <p>Alegerea unei <strong>pergola din lemn pentru terasa</strong> nu e chiar asa simpla. Trebuie sa te gandesti la cateva lucruri cheie ca sa nu dai cu banul pe geam. Primul si cel mai important e scopul ei. Vrei umbra si protectie la ploaie, sau vrei doar un element de design care sa sustina plante? Asta schimba totul.</p><p>Apoi, vine bugetul. E clar, o pergola bioclimatica e mult mai scumpa decat una simpla cu stalpi. Stabileste-ti o suma si cauta cea mai buna optiune in acel interval. Nu te arunca la cel mai ieftin produs, ca s-ar putea sa te trezesti cu el pleznit dupa primul an.</p><h3>Materialul Lemnului și Tratamentul</h3><p>Aici e o chestiune serioasa. Lemnul trebuie sa fie de calitate. Lemn stratificat (lipit) e, in general, mai stabil si mai rezistent la deformari decat lemnul masiv, mai ales pentru structurile mari. Dar si lemnul masiv, daca e de esenta tare (stejar, tec) si bine tratat, e o optiune buna, mai ales pentru un aspect rustic.</p><p>Tratamentul e crucial. O <strong>pergola din lemn pentru terasa</strong> trebuie sa fie protejata impotriva umezelii, a insectelor (carabusi, termite) si a razelor UV. Cauta produse care mentioneaza tratament prin imersie, impregnare sub presiune, sau cel putin lacuri si baituri de exterior de calitate superioara. Daca lemnul e doar vopsit superficial, o sa ai probleme repede.</p><h3>Dimensiunea și Proporțiile</h3><p>Masura-ti terasa cu atentie. O pergola prea mare va sufoca spatiul, una prea mica va parea pierduta. Gandeste-te si la inaltime. Vrei sa poti merge comod pe sub ea, sa poti deschide usa de la casa fara probleme? Ia in calcul si cum se va integra cu restul amenajarii gradinii si a casei.</p><h3>Stilul de Design</h3><p>Vrei ceva modern, minimalist, rustic, mediteranean? Lemnul se potriveste in toate stilurile, dar forma si finisajul conteaza. O pergola cu linii drepte si lemn deschis la culoare merge bine cu un stil modern, pe cand una cu lemn mai inchis si elemente decorative se potriveste unui stil clasic sau rustic.</p><h3>Sistemul de Acoperire</h3><p>Asta e legat de scop. Lamele reglabile pentru flexibilitate maxima. Policarbonat sau tabla pentru o protectie solida si permanenta. Prelata textila <a href="/copertina-retractabila-pentru-terasa/" class="interlink">retractabila pentru</a> un aspect mai usor si posibilitatea de a o strange. Fiecare are plusurile si minusurile ei.</p><h3>Montajul și Mentenanța</h3><p>Cum va fi montata? Pe beton, pe pavele, direct in pamant? Asigura-te ca baza e solida. Si gandeste-te la mentenanta. Lemnul, chiar si tratat, va necesita curatare si eventual reimpregnare/lacuire o data la 1-3 ani, in functie de cat de expus e la intemperii. Nu uita de asta cand iti faci planul.</p><p>Deci, stai putin, gandeste-te la ce ai nevoie, masoara, stabileste bugetul si apoi cauta. O <strong>pergola din lemn pentru terasa</strong> bine aleasa iti va aduce bucurie ani de zile.</p>
-      </section>
-
-      <section id="pergola-din-lemn-vs-pergola-din-aluminiu-lupta-pentru-terasa-ta">
-        <h2>Pergola din Lemn vs. Pergola din Aluminiu: Lupta pentru Terasa Ta</h2>
-        <p>Bun, ai ajuns sa te gandesti daca sa iei o <strong>pergola din lemn pentru terasa</strong> sau una din aluminiu. Sunt doua lumi diferite, cu avantaje si dezavantaje clare. Ambele au fanii lor, si pe buna dreptate.</p><h3>Pergola din Lemn: Avantaje și Dezavantaje</h3><p>Lemnul aduce caldura, un aspect natural, rustic sau modern, in functie de finisaj. Se integreaza perfect in <a href="/balansoar-de-gradina-pentru-2-persoane/">gradina</a>, creeaza o atmosfera primitoare. O <strong>pergola din lemn pentru terasa</strong> are un farmec aparte pe care aluminiul greu il egaleaza. E mai usor de modificat sau reparat, daca stii ce sa faci.</p><p>Acum, minusurile. Lemnul cere intretinere. Daca nu il lacuiesti sau impregnati periodic, va incepe sa se crape, sa se pateze, sa se deformeze sub influenta soarelui si a ploii. E un proces continuu. Mai poate fi si mai sensibila la anumite tipuri de daunatori, daca tratamentul initial nu e de top. Si, sincer, o pergola din lemn masiv, de calitate, poate fi la fel de scumpa ca una din aluminiu.</p><h3>Pergola din Aluminiu: Avantaje și Dezavantaje</h3><p>Aluminiul e regele durabilitatii si al intretinerii minime. Nu ruginește, nu putrezeste, nu se deformeaza usor. Odata montata, o poti uita ani de zile, doar sa o stergi de praf. Multe modele de pergole din aluminiu vin cu lamele reglabile (bioclimatice), la fel ca cele din lemn, dar cu o rezistenta mult mai mare in timp la factorii externi. Aspectul poate fi modern, minimalist, cu linii curate.</p><p>Pe de alta parte, aluminiul poate parea rece, industrial, mai ales daca nu e finisat corespunzator. Nu are caldura naturala a lemnului. Reparatiile pot fi mai complicate, uneori necesitand sudura sau inlocuirea unor profile intregi. Si, din nou, pretul. O pergola din aluminiu de calitate, mai ales una bioclimatica, poate fi o investitie considerabila, uneori chiar mai mare decat una din lemn.</p><h3>Când Alegi Lemn și Când Alegi Aluminiu?</h3><p>Daca vrei un aspect natural, cald, rustic, si esti dispus sa investesti timp si bani in intretinere periodica, lemnul e alegerea ta. E perfect pentru terase cu un design mai traditional sau pentru cei care iubesc sentimentul lemnului sub picioare.</p><p>Daca vrei durabilitate maxima, intretinere zero sau aproape zero, si un aspect modern, minimalist, aluminiul e castigatorul. E ideal pentru cei care vor o solutie 'set it and forget it', mai ales daca optezi pentru un model bioclimatic din aluminiu.</p><p>Am avut un client care si-a pus o pergola din lemn masiv, lacuita manual, si arata fabulos. Dar dupa 3 ani, lacul a inceput sa se cojeasca si a trebuit sa o reconditioneze complet. Un alt prieten a luat o pergola din aluminiu cu lamele, si a fost multumit ca nu a trebuit sa se gandeasca la ea decat sa mute mobilierul de pe ea toamna.</p><p>Pe scurt: lemnul inseamna suflet si munca, aluminiul inseamna rezistenta si pragmatism. Gandeste-te ce e mai important pentru tine si pentru terasa ta.</p>
-      </section>
-
-      <section id="greseli-comune-la-achizitia-unei-pergole-din-lemn-si-sfaturi-de-insider">
-        <h2>Greseli Comune la Achizitia unei Pergole din Lemn și Sfaturi de Insider</h2>
-        <p>Na, sa fim sinceri, multi dintre noi fac greseli cand cumpara o <strong>pergola din lemn <a href="/parasolar-pentru-terasa-mare/" class="interlink">pentru terasa</a></strong>. Nu din rea vointa, ci pentru ca nu stiu ce sa caute. Am sa-ti zic cateva din cele mai frecvente si cum sa le eviti.</p><h3>1. Ignorarea Calitatii Lemnului și a Tratatamentului</h3><p>Asta e cea mai mare greseala. Te uiti la pret si la cat de frumos arata in poza, dar nu verifici ce fel de lemn e si cum a fost tratat. Lemnul netratat sau tratat superficial va putrezi sau va fi atacat de insecte in 1-2 ani. Verifica daca lemnul e tratat prin imersie sau sub presiune, nu doar dat cu un strat subtire de lac sau vopsea.</p><h3>2. Subestimarea Dimensiunilor</h3><p>Comanzi o pergola pe baza unor masuratori rapide si apoi realizezi ca e prea mica, prea mare, prea joasa. Ia-ti un metru, masoara de 2-3 ori. Gandeste-te nu doar la suprafata, ci si la inaltimea libera pe sub ea. Vrei sa poti deschide usa de la balcon fara sa lovesti in ea?</p><h3>3. Neglijarea Fundatiei și a Montajului</h3><p>O pergola, chiar si una din lemn, are greutatea ei si trebuie sa fie bine ancorata. Daca o pui direct pe pamant sau pe o fundatie instabila, o sa ai probleme cu ea, mai ales la vant. Monteaza-o pe o structura solida, fie beton, fie piloni bine ingropati.</p><h3>4. Ignorarea Mentenanței Viitoare</h3><p>Multi cred ca odata montata, gata, nu mai ai treaba cu ea. Fals. Lemnul are nevoie de ingrijire. Daca nu vrei sa o reconditionezi complet la cativa ani, include in buget si timp, si bani pentru lacuri, baituri, solutii de protectie. O <strong>pergola din lemn pentru terasa</strong> necesita atentie.</p><h3>5. Alegerea Sistemului de Acoperire Greșit</h3><p>Te gandesti ca vrei neaparat o pergola bioclimatica, dar nu ai nevoie de atata flexibilitate si bugetul nu iti permite. Sau invers, vrei doar umbra si iei o structura deschisa, si apoi te plangi ca te ploua pe cap. Gândește-te la nevoile tale reale. Vrei doar umbra? Un policarbonat e ok. Vrei sa controlezi lumina? Lamele reglabile. Vrei ceva decorativ? O structura deschisa e suficienta.</p><h3>Sfaturi de Insider</h3><ul><li><strong>Cauta furnizori cu experienta:</strong> Nu te duce la primul magazin de bricolaj. Cauta producatori sau firme specializate in pergole din lemn. Poate gasesti si producatori locali, care iti pot face la comanda.</li><li><strong>Intreaba despre garantie:</strong> O garantie buna, chiar si pentru lemn, e un semn de incredere. Nu te astepta la 10 ani, dar 2-3 ani pentru structura de rezistenta e un minim.</li><li><strong>Verifica recomandarile:</strong> Citeste parerile altor clienti. Daca gasesti multe recenzii negative, fugi.</li><li><strong>Nu te teme sa ceri detalii:</strong> Intreaba despre tipul de lemn, tratament, tipul de imbinari, grosimea profilelor. Un vanzator bun va sti sa-ti raspunda.</li><li><strong>Ia in calcul si plantele:</strong> Daca vrei sa cresti vita de vie sau alte plante pe pergola, asigura-te ca structura e suficient de rezistenta si ca are spatiul necesar pentru crestere.</li></ul><p>Asta e, o <strong>pergola din lemn pentru terasa</strong> poate fi o achizitie minunata daca stii ce cumperi. Nu te grabi si documenteaza-te bine.</p>
-      </section>
-
-      <section id="verdict-pe-buget-cea-mai-buna-pergola-din-lemn-pentru-fiecare-buzunar">
-        <h2>Verdict pe Buget: Cea Mai Bună Pergola din Lemn pentru Fiecare Buzunar</h2>
-        <p>Ok, hai sa vedem ce fel de <strong>pergola din lemn pentru terasa</strong> iti poti lua, in functie de cati bani vrei sa bagi in ea. Nu exista o solutie unica, dar putem face niste recomandari pe categorii.</p><h3>Buget Mic (Sub 3.000 LEI)</h3><p>In acest interval, optiunile sunt limitate la structuri mai simple. O pergola din lemn masiv, tratat <a href="/scaune-pliabile-pentru-exterior/" class="interlink">pentru exterior</a>, cu un design deschis, fara acoperis rigid. Poate fi o structura cu stalpi si traverse, menita sa sustina plante agatoare sau o perdea de lumina.</p><p><strong>Recomandare:</strong> Cauta un kit de pergola deschisa, din lemn de brad sau molid, tratat corespunzator. Poti chiar sa o construiesti singur daca ai putina indemanare, economisind astfel la manopera. Unele modele prefabricate de la magazinele de bricolaj pot intra in acest buget, dar verifica calitatea lemnului si a imbinarilor.</p><p><strong>Avantaje:</strong> Accesibila, creaza o atmosfera, ideala pentru plante. <strong>Dezavantaje:</strong> Nu ofera protectie reala la soare sau ploaie, necesită intretinere pentru a rezista mai mult.</p><h3>Buget Mediu (3.000 - 8.000 LEI)</h3><p>Aici deja poti gasi optiuni mult mai serioase. Intra in discutie pergole cu acoperis rigid (policarbonat sau tabla), sau chiar modele cu acoperis textil retractabil. Poti gasi si pergole din lemn stratificat, mai mici, sau din lemn masiv de calitate superioara, cu un design mai elaborat.</p><p><strong>Recomandare:</strong> O pergola cu structura din lemn stratificat si acoperis din policarbonat sau tabla. Sau un model cu prelata retractabila de calitate, dintr-un material rezistent la UV si apa. Poti sa iei in calcul si modele de dimensiuni medii, facute la comanda de mici ateliere locale, daca stii pe cineva de incredere.</p><p><strong>Avantaje:</strong> Ofera umbra si protectie la ploaie, mai durabila decat optiunile ieftine, aspect placut. <strong>Dezavantaje:</strong> Nu are flexibilitatea unei pergole bioclimatice, intretinerea lemnului e in continuare necesara.</p><h3>Buget Mare (Peste 8.000 LEI)</h3><p>In acest segment, vorbim de varful de gama. Aici gasesti pergole bioclimatice din lemn stratificat de cea mai buna calitate, cu sisteme de lamele reglabile, poate chiar cu sisteme de iluminat integrate sau sisteme de drenaj performante. Poti opta si pentru esente de lemn mai pretioase, daca stilul tau o cere.</p><p><strong>Recomandare:</strong> O <strong>pergola din lemn pentru terasa</strong> bioclimatica, realizata la comanda de un producator specializat. Acorda atentie detaliilor: tipul de lemn (stejar, tec, ipe - daca bugetul permite), tipul de tratament, calitatea feroneriei, sistemul de actionare al lamelelor (manual sau automatizat). O astfel de pergola este o investitie pe termen foarte lung.</p><p><strong>Avantaje:</strong> Control total asupra mediului, design spectaculos, durabilitate excelenta, valoare adaugata casei. <strong>Dezavantaje:</strong> Pretul este cel mai ridicat, necesita o planificare atentă și un montaj profesional.</p><p>Indiferent de buget, am sa repet: nu te uita doar la pret. Verifica calitatea materialelor, a finisajelor si a montajului. O <strong>pergola din lemn pentru terasa</strong> bine aleasa iti va transforma spatiul si iti va aduce bucurie pe termen lung. E o investitie in confortul tau.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa o pergola din lemn pentru terasa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pretul unei pergole din lemn pentru terasa variaza enorm. Modelele simple, deschise, fara acoperis, pot incepe de la 1.000-2.000 lei. O pergola cu acoperis fix din policarbonat sau tabla te duce in jur de 3.000-7.000 lei, in timp ce o pergola bioclimatica din lemn stratificat, cu lamele reglabile, poate depasi 10.000-15.000 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre o pergola din lemn si una din aluminiu?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pergola din lemn ofera un aspect natural, cald si se integreaza usor in gradina, dar necesita intretinere periodica (lacuire, impregnare). Pergola din aluminiu este mult mai rezistenta la intemperii, nu ruginește si necesita intretinere minima, avand adesea un aspect modern, dar poate parea mai rece. Lemnul e mai usor de modificat, aluminiul e mai durabil.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat de rezistenta e o pergola din lemn la intemperii?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Rezistenta unei pergole din lemn la intemperii depinde crucial de calitatea lemnului si de tratamentul aplicat. Lemnul stratificat, tratat corespunzator prin imersie sau sub presiune, si protejat cu lacuri de exterior de calitate, poate rezista ani buni. Totusi, expunerea constanta la soare si ploaie va necesita intretinere anuala (re-lacuire, impregnare) pentru a preveni degradarea.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce tip de lemn e cel mai bun pentru o pergola pe terasa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Lemnul stratificat (lipit) este adesea preferat pentru stabilitatea sa si rezistenta la deformari, fiind ideal pentru structuri mai mari. Lemnul masiv de esenta tare (stejar, tec) este de asemenea o optiune excelenta, oferind un aspect robust si o durabilitate sporita, insa este mai scump. Lemnul de rasinoase (brad, molid) este mai accesibil, dar necesita un tratament riguros pentru exterior.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                de ce se crapa lemnul la pergola?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Lemnul se crapa la pergola din cauza schimbarilor de umiditate si temperatura. Cand lemnul absoarbe apa, se extinde, iar cand se usuca, se contracta. Aceste cicluri repetate duc la tensiuni interne care cauzeaza fisuri. Lipsa unui tratament corespunzator de protectie impotriva umezelii si a razelor UV accelereaza acest proces.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cum intretin o pergola din lemn?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Intretinerea unei pergole din lemn presupune curatarea periodica de praf, frunze si murdarie. O data pe an, sau la doi ani, in functie de expunerea la soare si ploaie, este recomandata reimpregnarea sau lacuirea cu produse specifice pentru lemn de exterior. Verifica periodic imbinarile si aspectul general al lemnului.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc pergole din lemn de calitate in Romania?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti gasi pergole din lemn de calitate la producatori specializati in constructii din lemn, ateliere de tâmplărie care realizează la comandă, sau la magazinele mari de bricolaj care oferă game premium. Este recomandat să cauți furnizori cu experiență și să ceri detalii despre proveniența lemnului și tratamentele aplicate.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar o pergola bioclimatica din lemn?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca bugetul iti permite si vrei flexibilitate maxima. O pergola bioclimatica din lemn, cu lamele reglabile, iti permite sa controlezi lumina si protectia impotriva ploii, oferind un confort sporit. Este o investitie pe termen lung, dar costul initial este mai ridicat comparativ cu o pergola simpla.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Structurile reale din lemn pentru terasa sunt rare in comert, dar exista: <strong>foisorul-pergola din lemn rindeluit</strong> de 3x4 m e cea mai apropiata de ideea clasica. Pentru cei mai multi, insa, alternativele practice sunt cele metalice si din aluminiu, de la modelul <strong>metalic accesibil</strong> de 3x3 m pana la unul <strong>din aluminiu cu acoperis retractabil</strong> sau cu lumini LED.</p>
+      <p>Trebuie spus cinstit de la inceput: <strong>pergolele din lemn gata facute se gasesc greu</strong>, pentru ca lemnul e greu, voluminos si scump de transportat, iar multe se fac la comanda sau se construiesc de proprietar. Mai jos gasesti cele cateva structuri reale din lemn din oferta, plus cele mai bune alternative metalice si din aluminiu, iar sub ele un ghid despre lemn vs metal si cum intretii lemnul.</p>
+      <p>Am pornit de la pergolele in stoc pe eMAG si le-am impartit in structuri din lemn, mai putine, si alternative metalice si din aluminiu, mai numeroase si mai practice. Fiind in mare parte produse noi, multe nu au inca pareri, asa ca am fost onesti si am notat clar unde lipsesc recenziile. Pentru alte solutii de umbra, vezi si <a href="/pavilion-de-gradina-rezistent-la-apa/">pavilioanele de gradina</a> si <a href="/copertina-retractabila-pentru-terasa/">copertinele retractabile</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#lemn">Pergole din lemn</a></li>
+        <li><a href="#metal">Alternative metalice si din aluminiu</a></li>
+        <li><a href="#de-ce">De ce o pergola pe terasa</a></li>
+        <li><a href="#lemn-metal">Lemn sau metal si aluminiu</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#intretinere">Cum intretii o pergola din lemn</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Material</th><th>Dimensiune</th><th>Acoperis</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.material}</td>
+              <td>{x.dim}</td>
+              <td>{x.acoperis}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="lemn">Pergole din lemn</h2>
+    <p>Structurile reale din lemn din oferta, cu aspectul cald si natural pe care il cauti. Sunt putine si mai scumpe, dar dau farmecul autentic al lemnului. Aici e si o piesa mica, decorativa, pentru plante cataratoare.</p>
+    <div class="rd-grid">
+      {LEMN.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figLemn} alt="Pergole din lemn pentru terasa: structuri din lemn rindeluit si decorativa" width="1200" height="675" loading="lazy" />
+
+    <h2 id="metal">Alternative metalice si din aluminiu</h2>
+    <p>Mai raspandite, mai ieftine si mai usor de montat, unele cu acoperis retractabil, perdele sau lumini LED. Nu au caldura lemnului, dar nu putrezesc si aproape nu cer intretinere. Alegerea practica pentru majoritatea teraselor.</p>
+    <div class="rd-grid">
+      {METAL.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMetal} alt="Alternative metalice si din aluminiu: metalica, cu LED, retractabila, cu perdele" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-pergola').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate pergolele pentru terasa la oferta</strong>
+        <span>Reducerile din acest moment la pergole din lemn si metalice, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o pergola pe terasa</h2>
+    <p>O pergola transforma o terasa dintr-un spatiu bun doar dimineata si seara intr-unul folosibil toata ziua. Rolul ei principal e sa <strong>creeze umbra si un cadru</strong>, delimitand un colt de relaxare sau de luat masa, ferit de soarele puternic de vara.</p>
+    <p>Dincolo de umbra, o pergola <strong>da structura si personalitate</strong> intregii terase: devine punctul in jurul caruia asezi mobilierul, agati plante cataratoare, montezi lumini sau o cortina, si transformi un spatiu gol intr-o adevarata camera in aer liber. O pergola din lemn adauga caldura si un aer natural, potrivit langa o casa cu finisaje naturale, in timp ce una metalica sau din aluminiu, mai ales cu acoperis retractabil, aduce flexibilitate si un aspect modern. In ambele cazuri, castigi spatiu de locuit in plus pe tot sezonul cald si valoare estetica pentru curte.</p>
+
+    <h2 id="lemn-metal">Lemn sau metal si aluminiu</h2>
+    <p>E alegerea de fond a acestui articol, iar cele doua directii rezolva nevoi diferite. <strong>Lemnul</strong> castiga la aspect: e cald, natural, se integreaza frumos intr-o gradina sau pe o terasa amenajata cu materiale naturale si da un farmec autentic pe care metalul nu il poate imita. Compromisul e ca structurile din lemn sunt <strong>mai rare, mai scumpe, mai greu de montat</strong> si cer intretinere periodica, tratament impotriva umezelii si a insectelor, altfel se degradeaza in cateva sezoane.</p>
+    <p><strong>Metalul si aluminiul</strong> joaca pe practicitate. Sunt mai ieftine, mai usor de montat, se gasesc gata la pachet si aproape nu cer intretinere; aluminiul in special nu rugineste si e foarte durabil. In plus, modelele metalice vin des cu dotari pe care lemnul simplu nu le are: <strong>acoperis retractabil</strong>, ca sa alegi soare sau umbra, perdele laterale pentru intimitate sau lumini LED pentru seara. Le lipseste caldura lemnului, dar castiga la comoditate si flexibilitate. Pe scurt: alege lemnul daca pui aspectul natural pe primul loc si accepti efortul si costul, si metalul sau aluminiul daca vrei ceva practic, durabil, accesibil si cu dotari moderne.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua pergole:</p>
+    <ul>
+      <li><strong>Materialul:</strong> lemn pentru aspect natural si cald, cu intretinere; metal si aluminiu pentru practicitate, durabilitate si pret mai mic.</li>
+      <li><strong>Dimensiunea:</strong> 3x3 m pentru o masa cu 4-6 scaune, 3x4 m pentru un spatiu mai generos, o piesa mica doar pentru un accent sau plante cataratoare.</li>
+      <li><strong>Tipul de acoperis:</strong> fix pentru umbra constanta, retractabil ca sa alegi soare sau umbra dupa vreme si chef.</li>
+      <li><strong>Dotarile:</strong> perdele laterale pentru intimitate si protectie, lumini LED pentru seara, cortine impermeabile impotriva ploii oblice.</li>
+      <li><strong>Ancorarea:</strong> verifica sa vina cu sistem de fixare; o pergola usoara neancorata e periculoasa pe vant.</li>
+      <li><strong>Numarul de pareri:</strong> multe modele sunt noi si fara recenzii, deci citeste descrierea cu atentie si verifica dimensiunile inainte de a comanda.</li>
+    </ul>
+
+    <h2 id="intretinere">Cum intretii o pergola din lemn</h2>
+    <p>Daca alegi lemnul, intretinerea nu e optionala, ci conditia ca pergola sa reziste. Aplica un <strong>tratament de protectie</strong>, ulei, lac sau lazura de exterior, cel putin o data pe an, de obicei primavara, ca sa aperi lemnul de umezeala, de razele UV si de insecte, care altfel il innegresc si il degradeaza in cateva sezoane. Alege o zi uscata si curata lemnul de praf inainte de a da tratamentul.</p>
+    <p>Pe langa tratament, verifica periodic <strong>imbinarile si suruburile</strong>, mai ales dupa iarna, si strange-le sau inlocuieste piesele deteriorate. Ai grija ca apa sa nu balteasca pe elementele orizontale si ca stalpii sa nu stea direct in pamant umed, ci pe suporturi metalice, ca sa nu putrezeasca la baza. La modelele metalice si din aluminiu, intretinerea e mult mai simpla: stergi cadrul de praf, verifici prinderea acoperisului si a perdelelor si strangi la loc suruburile slabite. In toate cazurile, strange sau protejeaza panzele si perdelele iarna, ca sa tina mai mult.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind mult de material:</p>
+    <p><strong>Alternative metalice si din aluminiu:</strong> de la circa 850 de lei pentru un model metalic simplu de 3x3 m, si pana spre 2500 de lei pentru unul din aluminiu cu acoperis retractabil si perdele. Cele cu lumini LED sunt in jur de 1650 de lei. Sunt cele mai raspandite si mai accesibile.</p>
+    <p><strong>Structuri din lemn:</strong> mai rare si mai scumpe. Cele reale de 3x4 m, din lemn rindeluit, trec de 5000 de lei, in schimbul aspectului natural si al durabilitatii. La capatul accesibil, o piesa mica decorativa din lemn costa in jur de 250 de lei.</p>
+    <p>Pe langa pret, alege in functie de ce pretuiesti mai mult: <strong>aspectul natural al lemnului</strong>, cu costul si intretinerea aferente, sau <strong>practicitatea unei structuri metalice sau din aluminiu</strong>, mai ieftina, durabila si cu dotari moderne. Fiind multe produse noi, fara pareri, citeste descrierea si verifica dimensiunile si materialul inainte de a comanda. Pentru umbra mobila, o alternativa e o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela rezistenta la vant</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria scrie despre mobilier de gradina si amenajari interioare. Se uita la materiale, dimensiuni si cat rezista lucrurile afara, peste ierni.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="pergola-din-lemn-pentru-terasa"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="pergola-din-lemn-pentru-terasa"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="pergola-din-lemn-pentru-terasa" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="pergola-din-lemn-pentru-terasa" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

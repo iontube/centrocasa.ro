@@ -1,256 +1,320 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Tocator de crengi pentru curte",
-  excerpt: "Daca vrei un tocator de crengi pentru curte care sa te ajute rapid si eficient, iti recomand sa te uiti la modelele electrice cu cutite, mai ales daca ai crengi de pana la 4-5 cm grosime. Sunt mai silentioase, mai usor de manevrat si mai accesibile ca pret, perfecte pentru o curte de dimensiuni medii. Daca ai de tocat lemne mai groase si in cantitati mari, atunci un tocator pe benzina e solutia, dar pregateste-te pentru zgomot si un pret pe masura.",
-  image: "/images/articles/tocator-de-crengi-pentru-curte.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-02-19T13:17:41.857Z",
-  modifiedDate: "2026-02-19T13:17:41.857Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "cat costa un tocator de crengi pentru curte", answer: "Un tocator de crengi pentru curte electric de calitate, bun pentru uz casnic, costa intre 800 si 1500 lei. Modelele electrice mai simple pot fi gasite si sub 800 lei, dar sunt mai putin performante. Tocatoarele pe benzina incep de la aproximativ 1500-2000 lei si pot ajunge la peste 5000 lei pentru modele profesionale." },
-  { question: "care e diferenta intre tocatoare electrice si pe benzina", answer: "Principala diferenta este puterea si mobilitatea. Tocatoarele electrice sunt mai silentioase, mai usoare si mai ieftine, ideale pentru crengi de pana la 4-5 cm, dar necesita priza. Cele pe benzina sunt mai puternice, toaca diametre mai mari (5-8 cm+), sunt independente de priza, dar sunt mai zgomotoase, mai grele si mai scumpe." },
-  { question: "merita sa cumpar un tocator de crengi pentru curte?", answer: "Da, merita daca ai o curte cu multi pomi, arbusti sau gard viu pe care il tunzi regulat. Un tocator de crengi pentru curte te ajuta sa reduci volumul deseurilor lemnoase, transformandu-le in material pentru compost sau mulci, economisind timp si efort la transportul lor." },
-  { question: "ce tocator de crengi pentru curte e mai bun, electric sau pe benzina", answer: "Pentru majoritatea gradinilor de dimensiuni medii, un tocator electric de 2000-2500W este mai bun. Este mai usor de utilizat, mai silentios si mai accesibil. Daca ai de procesat cantitati mari de crengi groase si lemnoase, sau lucrezi pe teren fara acces la curent, atunci un model pe benzina este superior." },
-  { question: "ce diametru maxim poate toca un tocator de crengi electric", answer: "Majoritatea tocatoarelor electrice pentru uz casnic pot toca crengi cu diametrul maxim intre 3 si 4.5 cm. Modelele mai puternice pot ajunge la 5 cm, dar rareori depasesc aceasta valoare. Este important sa verifici specificatiile producatorului pentru fiecare model in parte." },
-  { question: "cum se intretine un tocator de crengi pentru curte", answer: "Intretinerea unui tocator de crengi pentru curte depinde de tipul motorizarii. La cele electrice, curata cutitele si interiorul dupa fiecare utilizare. La cele pe benzina, pe langa curatare, schimba uleiul regulat, verifica filtrul de aer si bujia. Asigura-te ca depozitezi aparatul intr-un loc uscat." },
-  { question: "unde gasesc piese de schimb pentru tocator de crengi", answer: "Piese de schimb precum cutite, curele sau filtre se gasesc de obicei la magazinele specializate in unelte de gradina, service-urile autorizate ale marcilor respective (ex: service Bosch, Stihl) sau online, pe site-uri mari de comert electronic care vand piese de schimb pentru unelte de gradina." },
-  { question: "cat dureaza sa tocesti crengile cu un tocator electric", answer: "Timpul necesar variaza mult in functie de cantitatea de crengi, diametrul lor si eficienta tocatorului. Pentru o curte de dimensiuni medii, cu crengi de pana la 4 cm, procesul poate dura intre 30 de minute si 2 ore. Modelele mai performante si cu un diametru de tocare mai mare vor finaliza lucrarea mai rapid." }
-];
-
-const toc = [
-  { title: "Cel mai bun tocator de crengi pentru curte: Recomandarea mea de prieten", id: "cel-mai-bun-tocator-de-crengi-pentru-curte-recomandarea-mea-de-prieten" },
-  { title: "Top 4 tocatoare de crengi pentru curte: Ce merita banii", id: "top-4-tocatoare-de-crengi-pentru-curte-ce-merita-banii" },
-  { title: "Cum sa alegi tocatorul de crengi pentru curte potrivit", id: "cum-sa-alegi-tocatorul-de-crengi-pentru-curte-potrivit" },
-  { title: "Electric vs. Benzina: Duel pe tocator de crengi pentru curte", id: "electric-vs-benzina-duel-pe-tocator-de-crengi-pentru-curte" },
-  { title: "Greseli de evitat cand cumperi si folosesti un tocator de crengi pentru curte", id: "greseli-de-evitat-cand-cumperi-si-folosesti-un-tocator-de-crengi-pentru-curte" },
-  { title: "Verdict pe buget: Ce tocator de crengi pentru curte cumperi?", id: "verdict-pe-buget-ce-tocator-de-crengi-pentru-curte-cumperi" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['tocator-crengi'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Accesibile, sub 800 lei ---
+  { g: 'acc', id: 'D1H2QXMBM', badge: 'Cel mai vandut accesibil', short: 'VONROC 2500W', putere: '2500 W', sistem: 'Cutite', alim: 'Retea',
+    specs: ['cel mai vandut accesibil, 38 pareri', '2500 W, 2 cutite din otel dur', 'cos colector de 45 l', 'nota 4.84, cea mai mare din grup'],
+    pros: ['Cel mai vandut din grupul accesibil, 38 de pareri', 'Nota excelenta, 4.84, rara la un tocator ieftin', 'Cos colector generos, 45 l', 'Doua cutite din otel dur, taiere fina'],
+    cons: ['Sistem cu cutite, mai zgomotos decat cel cu valt', 'Cutitele se uzeaza si cer ascutire in timp'],
+    verdict: 'Cel mai vandut si mai bine notat tocator din grupul accesibil, alegerea sigura daca vrei sa incepi sa maruntesti crengi fara sa dai multi bani. VONROC GS502AC are 2500 W si doua cutite din otel dur, care taie fin crengile uscate si resturile vegetale, plus un cos colector generos de 45 l, in care se aduna direct tocatura, gata de compost. Cu 38 de pareri si nota 4.84, cea mai mare din grup, e clar preferat de cumparatori la acest pret. Fiind un sistem cu cutite, e mai rapid pe crengi uscate, dar si mai zgomotos decat unul cu valt, iar cutitele se uzeaza in timp si cer ascutire sau inlocuire. Il iei cand vrei cel mai popular tocator accesibil, cu cutite si cos mare, pentru maruntit crengi uscate si resturi dintr-o gradina de casa, la cel mai bun raport pret-nota.' },
+  { g: 'acc', id: 'DD1MSMMBM', badge: 'Einhell, de brand', short: 'Einhell 2000W', putere: '2000 W', sistem: 'Cutite', alim: 'Retea',
+    specs: ['tocator Einhell GC-KS 2540, 2000 W', 'sistem cu cutite, 3800 rpm', 'de la un brand consacrat de unelte', 'nota 3.7 din 10 pareri'],
+    pros: ['Einhell, brand consacrat de scule si unelte de gradina', 'Sistem cu cutite, taiere fina', 'Pret accesibil pentru un tocator de brand', 'Bun pentru crengi subtiri si resturi'],
+    cons: ['Putere mai mica, 2000 W', 'Nota 3.7, medie, verifica recenziile'],
+    verdict: 'Tocatorul de ales daca vrei un brand consacrat la un pret accesibil. Einhell GC-KS 2540 are 2000 W si un sistem cu cutite care taie fin crengile subtiri si resturile vegetale, iar Einhell e un nume cunoscut in scule si unelte de gradina, cu piese si service usor de gasit, un plus de siguranta la un aparat pe care il folosesti sezonier. Puterea de 2000 W e mai mica decat la altele din selectie, deci il tii pentru crengi subtiri si material moale, nu pentru lemn gros. Cu 10 pareri si nota 3.7 e o alegere medie, asa ca merita sa citesti recenziile inainte de a comanda. Il iei cand vrei un tocator de la Einhell, cu cutite, pentru maruntit crengi subtiri si resturi din gradina, si pui pret pe brand si pe service la noi, chiar daca puterea e mai modesta.' },
+  { g: 'acc', id: 'D0NWHG3BM', badge: 'Cel mai puternic ieftin', short: 'Lehmann Timber', putere: '3000 W', sistem: 'Cutite', alim: 'Retea',
+    specs: ['3000 W, cea mai mare putere din grup', 'sistem cu 4 cutite, 4500 rpm', 'crengi de pana la 45 mm, cos 50 l', 'protectie la suprasarcina'],
+    pros: ['Cea mai mare putere din grupul accesibil, 3000 W', 'Patru cutite, taie crengi de pana la 45 mm', 'Cos colector mare, 50 l', 'Protectie la suprasarcina, mai sigur'],
+    cons: ['Doar 7 pareri deocamdata', 'Sistemul cu cutite e mai zgomotos'],
+    verdict: 'Cel mai puternic tocator din grupul accesibil, pentru cine vrea sa atace si crengi ceva mai groase la un pret mic. Lehmann Timber are 3000 W, cea mai mare putere de aici, un sistem cu patru cutite la 4500 rpm si o capacitate de taiere de pana la 45 mm, aproape de limita unui tocator electric, deci se descurca si cu crengile mai groase din livada. Cosul colector de 50 l e generos, iar protectia la suprasarcina il opreste daca il fortezi, un plus de siguranta. Cu 7 pareri si nota 4.43 e bine primit, chiar daca inca putin testat. Fiind cu cutite, e mai zgomotos decat un model cu valt. Il iei cand vrei cea mai multa putere si cel mai mare diametru de taiere din grupul accesibil, pentru crengi de pana la 45 mm si resturi din gradina, la un pret bun.' },
+  { g: 'acc', id: 'D57KN3MBM', badge: 'Nota mare, accesibil', short: 'Raider 2400W', putere: '2400 W', sistem: 'Cutite', alim: 'Retea',
+    specs: ['Raider RD-ESH01, 2400 W', 'sistem cu cutite, 4500 rpm', 'nota 4.75 din 4 pareri', 'compact, pentru gradina de casa'],
+    pros: ['Nota mare, 4.75, printre cele mai bune ieftine', 'Putere buna, 2400 W, si 4500 rpm', 'Raider, brand accesibil raspandit la noi', 'Compact, usor de manevrat si depozitat'],
+    cons: ['Doar 4 pareri deocamdata', 'Sistem cu cutite, mai zgomotos'],
+    verdict: 'O alegere accesibila bine notata, pentru cine vrea un tocator de gradina simplu si eficient. Raider RD-ESH01 are 2400 W si un sistem cu cutite la 4500 rpm, care marunteste crengile uscate si resturile vegetale, intr-un corp compact, usor de mutat si de depozitat intr-o gradina de casa. Cu nota 4.75 din 4 pareri e printre cele mai bine cotate din grupul accesibil, chiar daca numarul de recenzii e inca mic, deci te bazezi si pe specificatii. Raider e un brand accesibil, raspandit la noi, cu preturi bune. Fiind cu cutite, e mai rapid pe material uscat, dar si mai zgomotos decat un model cu valt. Il iei cand vrei un tocator accesibil, compact si bine notat, cu putere buna, pentru maruntit crengi si resturi dintr-o gradina de dimensiuni obisnuite.' },
+  // --- Echilibrate, 800-1500 lei ---
+  { g: 'ech', id: 'DXLZT8BBM', badge: 'Cel mai vandut din articol', short: 'Villager VC2500', putere: '2500 W', sistem: 'Cutite', alim: 'Retea',
+    specs: ['de departe cel mai vandut, 66 pareri', '2500 W, sistem cu cutite', 'cos colector de 40 l', 'Villager, brand cunoscut de gradinarit'],
+    pros: ['De departe cel mai vandut din tot articolul, 66 de pareri', 'Villager, brand cunoscut de utilaje de gradina', '2500 W, putere buna pentru gradina', 'Cos colector inclus, 40 l'],
+    cons: ['Sistem cu cutite, mai zgomotos', 'Nota 4.3, buna dar nu maxima'],
+    verdict: 'Cel mai vandut tocator din tot articolul si o alegere echilibrata de incredere, de la un brand cunoscut de gradinarit. Villager VC 2500 are 2500 W si un sistem cu cutite care marunteste eficient crengile uscate si resturile vegetale, plus un cos colector de 40 l pentru tocatura. Cu 66 de pareri, cele mai multe din selectie, si nota 4.3, e clar preferatul cumparatorilor la aceasta categorie, un semn bun de fiabilitate si multumire in timp. Villager e un nume familiar in utilajele de gradina, cu piese si service la noi. Fiind cu cutite, e mai rapid pe material uscat, dar si mai zgomotos decat un model cu valt. Il iei cand vrei cel mai testat si mai popular tocator din selectie, de la un brand de gradinarit cunoscut, cu putere buna si cos inclus, pentru o gradina de casa.' },
+  { g: 'ech', id: 'DHY097MBM', badge: 'Cu valt, silentios', short: 'Black & Decker', putere: '2800 W', sistem: 'Valt', alim: 'Retea',
+    specs: ['2800 W, sistem cu valt, mai silentios', 'trage singur crengile, autoalimentare', 'cos colector de 45 l', 'robust, 29 kg, pentru crengi verzi'],
+    pros: ['Sistem cu valt, silentios si cu autoalimentare', 'Ideal pentru crengi verzi si fibroase', '2800 W si cos de 45 l', 'Black & Decker, brand de incredere'],
+    cons: ['Greu, 29 kg', 'Tocatura mai grosiera decat la cutite'],
+    verdict: 'Alegerea echilibrata daca vrei un tocator silentios, cu valt, care trage singur crengile. Black & Decker BEGAS5800 are 2800 W si un sistem cu valt, o roata dintata care prinde si striveste crengile incet, in loc sa le taie cu cutite, deci e mult mai silentios, se autoalimenteaza fara sa impingi tu materialul si se descurca excelent cu crengile verzi si fibroase, unde cutitele se ineaca. Cosul de 45 l aduna tocatura, ceva mai grosiera decat cea de la cutite, dar perfecta pentru compost. Cu 24 de pareri si nota 4.5 e bine cotat, iar Black & Decker inseamna incredere si service. E greu, 29 kg, dar are roti pentru transport. Il iei cand vrei un tocator silentios, cu valt, care se autoalimenteaza si face fata crengilor verzi, si nu te deranjeaza greutatea in schimbul linistii si al comoditatii.' },
+  { g: 'ech', id: 'D54MM7BBM', badge: 'Cel mai bine notat', short: 'Bosch AXT Rapid', putere: '2200 W', sistem: 'Cutite', alim: 'Retea',
+    specs: ['Bosch AXT Rapid 2200, 2200 W', 'sistem rapid cu cutite, pentru crengi uscate', 'usor, 12 kg, compact', 'nota 4.86, cea mai buna din grup'],
+    pros: ['Cea mai buna nota din grupul echilibrat, 4.86', 'Sistem Rapid, taie repede crengile uscate', 'Usor, doar 12 kg, se muta lejer', 'Bosch, fiabilitate si service peste tot'],
+    cons: ['Putere ceva mai mica, 2200 W', 'Sistemul cu cutite, mai potrivit pe uscat decat pe verde'],
+    verdict: 'Cel mai bine notat tocator din grupul echilibrat si alegerea daca vrei un Bosch usor si eficient pe crengi uscate. AXT Rapid 2200 are 2200 W si sistemul Rapid cu cutite, gandit sa taie repede crengile uscate din tunsul de intretinere, si cantareste doar 12 kg, printre cele mai usoare din selectie, deci il muti si il depozitezi lejer. Cu nota 4.86 din 7 pareri e cel mai apreciat din grup, iar Bosch inseamna fiabilitate dovedita si service oriunde. Puterea de 2200 W e ceva mai mica pe hartie, iar sistemul cu cutite se descurca cel mai bine pe material uscat, nu pe crengi verzi si fibroase. Il iei cand vrei cel mai bine notat tocator echilibrat, usor si de brand, pentru maruntit rapid crengile uscate dintr-o gradina de casa, si nu ai de tocat mult material verde.' },
+  { g: 'ech', id: 'DBRZRLMBM', badge: 'Cel mai silentios', short: 'ParkSide silentios', putere: '2800 W', sistem: 'Valt', alim: 'Retea',
+    specs: ['tocator silentios PWH, 2800 W', 'sistem cu valt, crengi de pana la 45 mm', 'autoalimentare, functionare linistita', 'nota 4.8 din 5 pareri'],
+    pros: ['Sistem cu valt, dintre cele mai silentioase', 'Crengi de pana la 45 mm, putere de 2800 W', 'Autoalimentare, trage singur crengile', 'Nota mare, 4.8'],
+    cons: ['Doar 5 pareri deocamdata', 'Tocatura mai grosiera, ca la toate cele cu valt'],
+    verdict: 'Tocatorul de ales daca vrei cea mai multa liniste in timp ce lucrezi. ParkSide PWH e un model silentios cu 2800 W si sistem cu valt, care striveste crengile incet in loc sa le taie zgomotos, si acopera diametre de pana la 45 mm, aproape de maximul unui tocator electric. Valtul se autoalimenteaza, trage singur crengile din mana ta, deci nu trebuie sa le impingi, iar functionarea linistita il face potrivit pentru zone rezidentiale, unde nu vrei sa deranjezi vecinii. Cu nota 4.8 din 5 pareri e bine primit, chiar daca inca putin testat. Tocatura iese mai grosiera decat la cutite, dar e buna pentru compost. Il iei cand vrei cel mai silentios tocator din selectie, cu valt si autoalimentare, pentru crengi de pana la 45 mm, si pretuiesti linistea si comoditatea la lucru.' },
+  // --- Premium si benzina ---
+  { g: 'prem', id: 'D9TTJMBBM', badge: 'Premium, cel mai vandut', short: 'Makita UD2500', putere: '2500 W', sistem: 'Valt', alim: 'Retea',
+    specs: ['de departe cel mai vandut premium, 65 pareri', '2500 W, sistem cu valt silentios', 'cos colector urias, 67 l', 'robust, 37 kg, pentru uz intens'],
+    pros: ['De departe cel mai vandut premium, 65 de pareri', 'Sistem cu valt silentios, autoalimentare', 'Cel mai mare cos colector, 67 l', 'Makita, calitate profesionala si durabilitate'],
+    cons: ['Greu, 37 kg', 'Investitie mai mare'],
+    verdict: 'Cel mai vandut tocator premium din selectie si o alegere de durata, cu numele Makita in spate. UD2500 are 2500 W si un sistem cu valt silentios, care striveste crengile incet, se autoalimenteaza si se descurca la crengi verzi si fibroase, plus cel mai mare cos colector din selectie, 67 l, deci golesti mult mai rar. Cu 65 de pareri, aproape cele mai multe din articol, si nota 4.63, e clar apreciat, iar Makita inseamna calitate profesionala, gandita pentru uz intens si ani multi de folosire. E greu, 37 kg, dar are roti pentru transport, si e o investitie mai mare, justificata daca ai mult de tocat des. Il iei cand vrei cel mai vandut tocator premium, silentios, cu cos urias si durabilitate Makita, pentru o gradina mare sau uz frecvent, si esti dispus la o investitie pe masura.' },
+  { g: 'prem', id: 'DNYKFDMBM', badge: 'Ruris, foarte testat', short: 'Ruris ST100', putere: '2500 W', sistem: 'Cutite', alim: 'Retea',
+    specs: ['Ruris ST100, 2500 W', 'sistem cu cutite, 4500 rpm', 'cos colector de 40 l', 'foarte testat, 56 pareri'],
+    pros: ['Foarte testat, 56 de pareri', 'Ruris, brand de utilaje agricole cunoscut la noi', '2500 W si 4500 rpm, taiere eficienta', 'Cos colector inclus, 40 l'],
+    cons: ['Sistem cu cutite, mai zgomotos', 'Pret premium pentru specificatii de mijloc'],
+    verdict: 'Un tocator premium foarte testat, de la un brand de utilaje cunoscut la noi. Ruris ST100 are 2500 W si un sistem cu cutite la 4500 rpm, care marunteste eficient crengile uscate si resturile, plus un cos colector de 40 l. Cu 56 de pareri e unul dintre cele mai testate din selectie, un semn bun de incredere, iar Ruris e un nume familiar in utilaje agricole si de gradina in Romania, cu piese si service la noi. Nota de 4.3 e buna, chiar daca nu maxima. Fiind cu cutite, e mai zgomotos decat modelele cu valt, iar pretul e in zona premium pentru niste specificatii de mijloc, deci platesti si pentru brand. Il iei cand vrei un tocator de la Ruris, foarte testat si cu service la noi, cu cutite si cos inclus, pentru maruntit crengi uscate si resturi, si pui pret pe brandul cunoscut.' },
+  { g: 'prem', id: 'DZPBXGMBM', badge: 'Bosch cu valt silentios', short: 'Bosch AXT 25 D', putere: '2500 W', sistem: 'Valt', alim: 'Retea',
+    specs: ['Bosch AXT 25 D, 2500 W', 'sistem Drum-Cut cu valt, silentios', 'autoalimentare, pentru crengi verzi', 'nota 4.71 din 7 pareri'],
+    pros: ['Sistem Drum-Cut cu valt, foarte silentios', 'Autoalimentare, trage singur crengile', 'Ideal pentru crengi verzi si fibroase', 'Bosch, fiabilitate si service peste tot'],
+    cons: ['Doar 7 pareri deocamdata', 'Investitie premium'],
+    verdict: 'Varianta premium Bosch daca vrei un tocator silentios cu valt pentru crengi verzi. AXT 25 D are 2500 W si sistemul Drum-Cut, un valt care prinde si striveste crengile incet, deci e foarte silentios, se autoalimenteaza fara sa impingi materialul si se descurca excelent cu crengile verzi si fibroase, unde cutitele se blocheaza. Fata de AXT Rapid, cu cutite, acest model e gandit pentru cine tunde mult material proaspat si vrea liniste. Cu 7 pareri si nota 4.71 e bine cotat, iar Bosch inseamna fiabilitate si service oriunde. E o investitie premium, justificata daca ai des de tocat crengi verzi. Il iei cand vrei un Bosch silentios cu valt, pentru crengi verzi si fibroase, cu autoalimentare si liniste la lucru, si esti dispus la un pret premium.' },
+  { g: 'prem', id: 'DYNNNVYBM', badge: 'Pe benzina, fara priza', short: 'Raider benzina', putere: '212 cc, 4.1 kW', sistem: 'Cutite', alim: 'Benzina',
+    specs: ['motor pe benzina, 212 cc, 4.1 kW', 'crengi de pana la 50 mm, peste limita electricelor', 'lucrezi oriunde, fara priza', 'nota 4.75 din 4 pareri'],
+    pros: ['Pe benzina, lucrezi oriunde, fara priza', 'Crengi de pana la 50 mm, mai groase decat la electrice', 'Motor puternic, 212 cc, 4.1 kW', 'Nota mare, 4.75'],
+    cons: ['Mai zgomotos si cu intretinere de motor termic', 'Doar 4 pareri, pret ridicat'],
+    verdict: 'Tocatorul de ales daca ai de lucru departe de priza sau crengi mai groase decat duce un electric. Raider RD-GSH01 are un motor pe benzina de 212 cc si 4.1 kW si taie crengi de pana la 50 mm, peste limita obisnuita de 40-45 mm a tocatoarelor electrice, deci ataca si lemn mai gros din livada sau din curatarea unei gradini mari. Fiind pe benzina, il folosesti oriunde, fara cablu si fara priza, un avantaj real pe un teren intins. Cu nota 4.75 din 4 pareri e bine primit, chiar daca inca putin testat. In schimb, e mai zgomotos decat electricele, care oricum nu sunt silentioase, si cere intretinerea unui motor termic, ulei, bujie, filtru, plus un pret ridicat. Il iei cand ai o gradina mare, crengi groase de pana la 50 mm si lucrezi departe de priza, si accepti zgomotul si intretinerea unui motor pe benzina in schimbul puterii si al libertatii.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const ECH = PICKS.filter(x => x.g === 'ech');
+const PREM = PICKS.filter(x => x.g === 'prem');
+
+const hero = '/images/articles/tocator-de-crengi-pentru-curte.webp';
+const figAcc = '/imagini/articole/tocator-accesibile.webp';
+const figEch = '/imagini/articole/tocator-echilibrate.webp';
+const figPrem = '/imagini/articole/tocator-premium.webp';
+const published = '2026-07-19T13:15:18+03:00';
+
+const faq = [
+  { question: 'Tocator cu cutite sau cu valt, ce sa aleg?', answer: 'Depinde de ce toci. Sistemul cu cutite taie rapid si fin, si se descurca cel mai bine cu crengile uscate si tari rezultate din tunsul de intretinere; tocatura iese marunta, buna pentru compost rapid, dar aparatul e mai zgomotos si cutitele se uzeaza si cer ascutire. Sistemul cu valt, o roata dintata sau un cilindru care striveste crengile incet, e mult mai silentios, se autoalimenteaza, adica trage singur crengile, si e ideal pentru material verde, fibros si umed, unde cutitele se ineaca; tocatura e ceva mai grosiera. Pe scurt: cutite pentru crengi uscate si liniste mai putina, valt pentru crengi verzi, fibroase si mers silentios.' },
+  { question: 'Ce diametru maxim de crengi imi trebuie?', answer: 'Diametrul maxim arata cat de groase pot fi crengile pe care le baga aparatul. Tocatoarele electrice se descurca in general cu crengi de pana la 40-45 mm, iar cele bune ating exact aceasta limita, ca Lehmann sau ParkSide din selectie, cu 45 mm. Pentru majoritatea gradinilor de casa, unde toci crengi din tunderea pomilor si a gardului viu, 40-45 mm sunt mai mult decat suficienti. Daca ai crengi mai groase, din curatarea unei livezi mari sau a unui teren, un tocator pe benzina, ca Raider din selectie, ajunge la 50 mm sau mai mult. Nu forta niciodata o creanga mai groasa decat limita aparatului, pentru ca il blochezi sau il strici.' },
+  { question: 'Tocator electric sau pe benzina?', answer: 'Pentru o gradina de casa, tocatorul electric e alegerea mai buna: e mai usor, mult mai silentios, porneste instant de la buton, nu are miros de combustibil si cere intretinere minima. Se descurca la crengi de pana la 40-45 mm, suficient pentru intretinerea obisnuita, dar te tine legat de o priza sau de un prelungitor de exterior. Tocatorul pe benzina isi merita banii doar daca ai teren mare, crengi mai groase de 45 mm sau lucrezi departe de sursa de curent: are mai multa putere si libertate de miscare, dar e mai greu, mai zgomotos, mai scump si cere intretinerea unui motor termic. Pentru majoritatea curtilor, electricul e mai practic.' },
+  { question: 'La ce foloseste tocatura rezultata?', answer: 'Tocatura, adica maruntisul de crengi si resturi vegetale, e o resursa valoroasa in gradina, nu un gunoi. Cea mai frecventa utilizare e compostul: crengile maruntite se descompun mult mai repede decat intregi si imbogatesc pamantul. O poti folosi si ca mulci, un strat asezat la baza plantelor si a pomilor, care pastreaza umezeala in sol, tine buruienile la distanta si protejeaza radacinile de ger si de caldura. Tocatura mai grosiera, de la sistemele cu valt, e potrivita ca mulci pe alei sau sub arbusti, iar cea marunta, de la cutite, se composteaza mai repede. Practic, tocatorul iti transforma resturile de la tuns intr-un material util, in loc sa le arunci.' },
+  { question: 'Cat de zgomotos e un tocator de crengi?', answer: 'Tocatoarele electrice au un nivel de zgomot in general intre 85 si 100 dB, iar cele pe benzina pot depasi 110 dB. Diferenta cea mai mare o face sistemul: cele cu valt, care strivesc crengile incet, sunt considerabil mai silentioase, in jurul a 90 dB, in timp ce cele cu cutite, care taie rapid, sunt mai galagioase. Daca stai intr-o zona rezidentiala, cu vecini aproape, un model cu valt e mult mai potrivit si te fereste de reclamatii. Indiferent de model, poarta casti antifonice si ochelari de protectie cand lucrezi, pentru ca si un tocator electric produce un zgomot semnificativ si arunca aschii.' },
+  { question: 'Cum folosesc in siguranta un tocator de crengi?', answer: 'Poarta intotdeauna ochelari de protectie, manusi si casti antifonice, si haine stranse pe corp, fara snururi sau maneci largi care s-ar putea prinde. Introdu crengile cu grija, tinand mainile departe de gura de alimentare, si foloseste impingatorul din dotare pentru materialul scurt, niciodata mana. Nu baga crengi mai groase decat limita aparatului si nu forta materialul, mai ales la cutite; daca se blocheaza, opreste aparatul si scoate stecherul inainte de a interveni. Aseaza tocatorul pe o suprafata stabila si plana si tine copiii si animalele la distanta. Dupa folosire, curata gura de alimentare si cutitele sau valtul de resturi, cu aparatul oprit si deconectat.' },
+  { question: 'Cat costa un tocator de crengi bun?', answer: 'In selectie, tocatoarele electrice accesibile pornesc de la circa 610-650 de lei, ca Raider, Lehmann sau Einhell, si urca spre 780 de lei pentru cel mai vandut accesibil, VONROC. Segmentul echilibrat, cu Villager, Black & Decker, Bosch sau ParkSide, se aseaza intre circa 1170 si 1410 lei si aduce sisteme cu valt silentioase sau branduri premium. Modelele premium, ca Makita sau Bosch AXT 25 D, trec de 1500 si urca spre 1900 de lei, cu cosuri mari si durabilitate profesionala. Tocatoarele pe benzina, pentru crengi groase si teren mare, ajung la peste 3000 de lei. Cel mai bun raport il gasesti alegand sistemul, cutite sau valt, si puterea potrivite pentru ce toci.' },
+];
+
+const images = [hero, figAcc, figEch, figPrem, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Tocator de crengi pentru curte - CentroCasa"
-  description="Daca vrei un tocator de crengi pentru curte care sa te ajute rapid si eficient, iti recomand sa te uiti la modelele electrice cu cutite, mai ales daca ai crengi de pana la 4-5 cm grosime. Sunt mai silentioase, mai usor de manevrat si mai accesibile ca pret, perfecte pentru o curte de dimensiuni medii. Daca ai de tocat lemne mai groase si in cantitati mari, atunci un tocator pe benzina e solutia, dar pregateste-te pentru zgomot si un pret pe masura."
-  image="/images/articles/tocator-de-crengi-pentru-curte.webp"
+  title="Cel mai bun tocator de crengi pentru curte in 2026: accesibile, echilibrate si premium"
+  description="Care e cel mai bun tocator de crengi pentru curte in 2026: modele electrice accesibile de la VONROC si Lehmann, echilibrate cu valt de la Black & Decker si ParkSide, premium de la Makita si Bosch, si unul pe benzina de la Raider, comparate pe putere, sistem si alimentare. Plus cutite vs valt si ce diametru alegi."
+  image={hero}
   type="article"
-  publishedTime="2026-02-19T13:17:41.857Z"
-  modifiedTime="2026-02-19T13:17:41.857Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cel mai bun tocator de crengi pentru curte' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Tocator de crengi pentru curte</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cel mai bun tocator de crengi pentru curte</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">19 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Tocator de crengi pentru curte</h1>
-    </header>
+    <h1>Cel mai bun tocator de crengi pentru curte</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    
+    <img class="rd-hero" src={hero} alt="Cel mai bun tocator de crengi pentru curte: modele electrice cu cutite si cu valt, si pe benzina" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="cel-mai-bun-tocator-de-crengi-pentru-curte-recomandarea-mea-de-prieten">
-        <h2>Cel mai bun tocator de crengi pentru curte: Recomandarea mea de prieten</h2>
-        <p>Bon, uite care-i treaba cu <strong>tocatorul de crengi pentru curte</strong>. Daca ma intrebi pe mine, si vrei ceva bun fara sa dai faliment, mergi pe mana unui model <a href="/fierastrau-electric-pentru-lemne/">electric</a>, cu sistem de taiere prin cutite. Alea sunt cele mai practice pentru o curte normala. Nu te astepta sa toace lemne de stejar groase cat bratul, alea sunt pentru profesionisti sau pentru cei cu livezi imense. Dar pentru crengile de la pomi, gard viu, arbusti – alea pe care le strangi dupa o curatare – e perfect.</p><p>Am avut un model de la Bosch, acum vreo 3 ani, unul mai solidut, 2500W, si si-a facut treaba impecabil. Tocat crengi de pana la 4 cm fara probleme. Era si destul de silentios, comparativ cu ce am mai auzit pe la vecini cu alea pe <a href="/motocoasa-electrica-sau-pe-benzina/">benzina</a>. Si ca greutate, il puteai misca relativ usor prin curte. Partea buna e ca, daca se blocheaza, majoritatea au un buton de revers, deci nu trebuie sa desfaci juma de aparat.</p><p>Acum, daca ai de spart lemne mai mari, sau pur si simplu ai o gramada de material lemnos de prelucrat, atunci trebuie sa te uiti la cele pe benzina. Alea au putere mai mare, pot toca diametre mai groase, uneori pana la 7-8 cm, depinde de model. Dar sunt zgomotoase rau de tot, vibreaza, consuma benzina si ulei, si sunt mult mai grele. Plus ca intretinerea lor e mai complexa. Deci, pentru o curte de-a dreptul, nu pentru o exploatare forestiera, electricul e rege.</p><p>Ca pret, un electric bun te duce undeva pe la 800-1500 lei. Cele pe benzina, de la 1500 lei in sus, si pot ajunge si la 4000-5000 lei pentru modele profesionale. Ma rog, depinde ce vrei sa faci cu el, dar pentru uz casnic, un electric de 2000W+ e aur curat.</p>
-      </section>
-
-      <section id="top-4-tocatoare-de-crengi-pentru-curte-ce-merita-banii">
-        <h2>Top 4 tocatoare de crengi pentru curte: Ce merita banii</h2>
-        <p>Bun, hai sa vedem cateva optiuni concrete pentru un <strong>tocator de crengi <a href="/aspirator-de-frunze-pentru-curte/" class="interlink">pentru curte</a></strong>, ca sa nu zici ca vorbesc doar in general. Am ales modele care au un raport bun calitate-pret si sunt potrivite pentru uz casnic.</p><h3>1. Bosch AXT 25 TC (Electric)</h3><p>Asta e un fel de etalon pentru mine cand vine vorba de electrice. L-am vazut in actiune la un prieten si am ramas impresionat. Sistemul de taiere e cu turbina (de unde si TC-ul, cred), si toaca crengi de pana la 40 mm grosime. E destul de rapid, nu face asa mult zgomot, si are un sistem de autocuratare, ceea ce e super comod. E mai scump, undeva pe la 1400-1600 lei, dar isi merita fiecare banut daca vrei fiabilitate.</p><ul><li><strong>Avantaje:</strong> Foarte eficient la tocat, sistem de autocuratare, destul de silentios, manevrabil.</li><li><strong>Dezavantaje:</strong> Pretul e mai ridicat, nu toaca crengi foarte groase (max 4 cm).</li></ul><h3>2. Einhell GC-KS 2540 (Electric)</h3><p>Daca vrei ceva mai accesibil, Einhell e o optiune buna. Modelul asta e tot electric, cu cutite, si duce crengi pana la 40 mm. Nu e la fel de rapid sau de silentios ca Bosch-ul, dar isi face treaba. E mai usor, deci mai usor de mutat. L-am vazut si la un alt prieten, si a fost multumit pentru ce ofera la pretul lui, undeva pe la 800-1000 lei.</p><ul><li><strong>Avantaje:</strong> Pret bun, usor de manevrat, destul de puternic pentru diametrul specificat.</li><li><strong>Dezavantaje:</strong> Mai zgomotos decat modelele premium, sistemul de colectare (daca vine cu el) e mai simplu.</li></ul><h3>3. Makita UD2500 (Electric)</h3><p>Makita e un nume greu in scule, si tocatorul lor nu face exceptie. E un model robust, tot electric, cu cutite, bun pentru crengi de pana la 45 mm. Are un design mai solid, pare mai durabil. Pretul e undeva pe la 1200-1400 lei. Nu am apucat sa-l testez personal pe termen lung, dar din ce am vazut la un vecin, e o masina serioasa.</p><ul><li><strong>Avantaje:</strong> Constructie robusta, putere buna, toaca relativ gros.</li><li><strong>Dezavantaje:</strong> Mai greu decat alte modele electrice, pretul e pe partea mai ridicata.</li></ul><h3>4. Stihl GHE 135.0 (Benzina)</h3><p>Acum, daca ai nevoie neaparat de putere si nu te deranjeaza zgomotul si vibratiile, Stihl e o alegere sigura. Asta e deja alt nivel. E pe benzina, deci toaca crengi mult mai groase, pana la 50 mm, uneori chiar si mai mult, depinde cum sunt aruncate. E facut sa reziste, dar si pretul reflecta asta, sare de 2000 lei, ajungand si la 3000 lei in functie de motorizare.</p><ul><li><strong>Avantaje:</strong> Putere mare, toaca diametre mari, ideal pentru suprafete mari sau crengi lemnoase.</li><li><strong>Dezavantaje:</strong> Foarte zgomotos, greu, consuma benzina, intretinere mai complicata, pret ridicat.</li></ul><p>Astea sunt doar cateva exemple, piata e plina. Important e sa te gandesti la ce ai tu nevoie in curte, nu sa iei cel mai scump sau cel mai ieftin.</p>
-      </section>
-
-      <section id="cum-sa-alegi-tocatorul-de-crengi-pentru-curte-potrivit">
-        <h2>Cum sa alegi tocatorul de crengi pentru curte potrivit</h2>
-        <p>Alegerea unui <strong>tocator de crengi <a href="/hamac-cu-suport-pentru-curte/" class="interlink">pentru curte</a></strong> nu e chiar asa complicata daca stii ce sa urmaresti. Hai sa o luam pe puncte, ca sa fie clar.</p><h3>Tipul de motorizare: Electric vs. Benzina</h3><p>Asta e prima mare diferenta. <br><strong>Electric:</strong> Bun pentru crengi de pana la 4-5 cm, mai silentios, mai usor, mai ieftin, mai putina intretinere. Perfect pentru curti medii, fara pretentii de exploatare forestiera. Daca ai priza in curte, e ideal. Dezavantajul e puterea limitata si necesitatea cablului.</p><p><strong>Benzina:</strong> Putere mare, toaca si diametre mai groase (5-8 cm+), independent de priza. Ideal pentru suprafete mari, crengi lemnoase, sau daca vrei sa il folosesti departe de casa. Dezavantajele sunt zgomotul infernal, vibratiile, greutatea, consumul de combustibil si intretinerea mai complexa (ulei, filtre, bujie).</p><h3>Sistemul de taiere: Cutite vs. Turbine/Frezare</h3><p>Aici sunt doua mari familii:</p><p><strong>Cutite (lame):</strong> Cele mai comune la electrice. Taie crengile ca un foarfece. Sunt rapide, fac un material mai marunt, bun pentru compost. Daca dai de ceva mai tare, pot sare sau se pot bloca.</p><p><strong>Turbina/Frezare (roller):</strong> Mai intalnite la cele puternice, pe benzina, sau la modele electrice premium. Au un sistem de frezare care macina crengile. Materialul rezultat e mai grosier, dar pot lua si diametre mai mari, chiar si crengi uscate si lemnoase. Sunt mai lente, dar mai puternice.</p><h3>Diametrul maxim de tocare</h3><p>Asta e crucial. Uita-te la specificatii si gandeste-te la ce ai tu in curte. Daca ai doar crengi subtiri de la vie sau gard viu, un 2-3 cm e suficient. Daca ai pomi fructiferi pe care ii tunzi des, probabil ai nevoie de 4-5 cm. Daca ai multa vegetatie lemnoasa si groasa, atunci te uiti la 6-8 cm, dar probabil vei merge pe benzina.</p><p>Am patit sa iau unul care zicea ca toaca 4 cm, dar abia ducea 3 cm. Deci, lasa 1 cm marja de siguranta.</p><h3>Puterea motorului (W sau CP)</h3><p>La electrice, puterea se masoara in Watti (W). Cu cat mai multi, cu atat mai bine. Sub 1800W e cam slabut pentru ceva serios. 2000-2500W e un punct bun pentru uz casnic. La cele pe benzina, e in Caluti Putere (CP). Peste 5 CP e deja o masina serioasa.</p><h3>Greutatea si manevrabilitatea</h3><p>Daca ai o curte mare si trebuie sa il muti des, greutatea conteaza. Cele electrice sunt, in general, mai usoare. Uita-te si la rotile pe care le are. Unii au roti mari, pneumatice, care trec mai usor peste denivelari.</p><h3>Sistemul de colectare</h3><p>Unele vin cu un sac colector, altele nu. Materialul tocat cade pe jos, si apoi il aduni. E mai comod sa aiba un sac, sau un sertar, din care sa poti goli usor. Daca vrei sa il folosesti imediat ca mulci, atunci nu conteaza atat de mult.</p><p>Deci, stai putin, gandeste-te: cat de mari sunt crengile? cat de des il vei folosi? cat de mare e curtea? astea sunt intrebarile cheie.</p>
-      </section>
-
-      <section id="electric-vs-benzina-duel-pe-tocator-de-crengi-pentru-curte">
-        <h2>Electric vs. Benzina: Duel pe tocator de crengi pentru curte</h2>
-        <p>Hai sa facem lumina intre cele doua mari tabere cand vine vorba de un <strong>tocator de crengi pentru curte</strong>: electricele si cele pe benzina. Stai sa vezi, nu-i chiar asa complicat.</p><h3>Tocatoarele electrice: Avantaje si dezavantaje</h3><p><strong>Avantaje:</strong></p><ul><li><strong>Pret:</strong> Sunt semnificativ mai ieftine. Un model bun te scoate din buzunar cu 800-1500 lei.</li><li><strong>Zgomot:</strong> Mult mai silentioase. Poti lucra dimineata sau seara fara sa deranjezi tot cartierul.</li><li><strong>Greutate:</strong> Sunt mai usoare, deci mai usor de manevrat prin curte, de urcat pe scari (daca ai nevoie).</li><li><strong>Intretinere:</strong> Aproape zero. Nu trebuie sa te complici cu benzina, ulei, filtre. Doar cureti cutitele ocazional.</li><li><strong>Ecologie:</strong> Nu polueaza direct, depinde de sursa de curent.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Putere:</strong> Sunt limitate la diametre mai mici, de obicei pana la 4-5 cm maxim. Nu fac fata crengilor groase, lemnoase.</li><li><strong>Mobilitate:</strong> Ai nevoie de o priza in apropiere sau de un prelungitor lung, ceea ce poate fi incomod.</li><li><strong>Durabilitate pe termen lung:</strong> Unele modele mai ieftine pot ceda mai repede daca sunt suprasolicitate.</li></ul><h3>Tocatoarele pe benzina: Avantaje si dezavantaje</h3><p><strong>Avantaje:</strong></p><ul><li><strong>Putere:</strong> Aici e punctul lor forte. Pot toaca diametre mult mai mari, de la 5-6 cm pana la 8-10 cm, si fac fata si materialului mai uscat, mai lemnos.</li><li><strong>Mobilitate:</strong> Sunt independente de priza. Le poti folosi oriunde in curte sau pe teren.</li><li><strong>Productivitate:</strong> Datorita puterii, pot procesa cantitati mari de material intr-un timp scurt.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li><strong>Pret:</strong> Sunt mult mai scumpe, pornind de la 1500-2000 lei si ajungand la mii de lei pentru modele <a href="/set-unelte-de-gradinarit-profesionale/" class="interlink">profesionale</a>.</li><li><strong>Zgomot:</strong> Sunt extrem de zgomotoase. Teoretic, ar trebui sa porti protectie auditiva.</li><li><strong>Greutate:</strong> Sunt mult mai grele si mai greu de manevrat.</li><li><strong>Intretinere:</strong> Necesita intretinere regulata: schimb de ulei, curatare filtru aer, verificare bujie, amestec benzina-ulei (la motoarele in doi timpi).</li><li><strong>Poluare:</strong> Polueaza mai mult prin arderea combustibilului.</li></ul><p><strong>Verdictul meu?</strong> Daca ai o curte obisnuita, cu crengi de la pomi fructiferi, gard viu, si nu vrei sa faci o mica padure din ele, un <strong>tocator de crengi pentru curte</strong> electric, undeva la 2000-2500W, e cea mai buna investitie. Nu te complica cu benzina daca nu ai nevoie neaparat de puterea aia.</p>
-      </section>
-
-      <section id="greseli-de-evitat-cand-cumperi-si-folosesti-un-tocator-de-crengi-pentru-curte">
-        <h2>Greseli de evitat cand cumperi si folosesti un tocator de crengi pentru curte</h2>
-        <p>Na, ca am ajuns si la partea cu ce NU trebuie sa faci. Ca sa nu arzi banii pe fereastra sau sa te trezesti cu un aparat care sta degeaba in magazie.</p><h3>1. Sa iei cel mai ieftin model</h3><p>Stiu, tentatia e mare. Dar cele sub 500-600 lei, mai ales electrice, sunt de obicei foarte slabe. Nu toaca cum trebuie, se blocheaza des, si cel mai probabil o sa te enervezi si o sa-l arunci. Mai bine mai strangi niste bani si iei ceva decent, care sa te tina.</p><h3>2. Sa ignori diametrul maxim de tocare</h3><p>Asta am zis si mai sus, dar e asa important ca merită repetat. Daca scrie 4 cm, nu te astepta sa toace crengi de 5 cm. O sa-l strici. Gandeste-te la cea mai groasa creanga pe care o ai frecvent si ia un tocator cu o marja de siguranta de cel putin 1 cm.</p><h3>3. Sa nu citesti manualul</h3><p>Zic si eu, ca omul. Multi deschid cutia, baga in priza si dau drumul la treaba. Dar sunt chestii importante in manual: cum se intretine, cum se curata, ce sa faci daca se blocheaza, cum sa introduci crengile in siguranta. E bine sa stii.</p><h3>4. Sa bagi crengi cu pamant sau pietre</h3><p>Asta e siguranta de distrugere a cutitelor. Ai strans crengile de pe jos? Curata-le de pamant, pietricele, nisip. Altfel, o sa toceasca si alea, si o sa se toceasca si cutitele mult mai repede. Si zgomotul o sa fie de nedescris.</p><h3>5. Sa bagi prea multe crengi odata</h3><p>Mai ales la cele electrice, nu forta. Introdu crengile una cate una sau doua cate doua, in functie de cum cere aparatul. Daca bagi un manunchi deodata, o sa se blocheze imediat. Rabdare, ca nu alergi nicaieri.</p><h3>6. Sa nu cureti aparatul dupa folosire</h3><p>Dupa ce ai terminat, curata cutitele, gura de alimentare, sacul colector. Ramurile uscate pot ramane lipite, si la urmatoarea utilizare o sa fie mai greu. Si o sa previi rugina, mai ales pe cutite.</p><p>Si inca un pont: daca vrei sa faci compost din resturile tocate, amesteca crengile mai lemnoase cu cele mai verzi, umede. Asa fermenteaza mai bine.</p>
-      </section>
-
-      <section id="verdict-pe-buget-ce-tocator-de-crengi-pentru-curte-cumperi">
-        <h2>Verdict pe buget: Ce tocator de crengi pentru curte cumperi?</h2>
-        <p>Ok, hai sa vedem cum alegi un <strong>tocator de crengi pentru curte</strong> in functie de cati bani esti dispus sa investesti. Nu exista o solutie universala, dar asta te poate ghida.</p><h3>Buget mic (Sub 800 lei)</h3><p>In zona asta, te uiti strict la modele electrice, de obicei cu putere mai mica (1800-2000W). O sa gasesti marci mai putin cunoscute, sau modele de baza de la producatori mai mari. Sunt bune pentru crengi foarte subtiri, de pana in 3 cm.</p>
-        <p>Nu te astepta la minuni, nu vor toaca rapid si s-ar putea sa se blocheze daca le fortezi. Sunt ok daca ai de curatat doar cativa arbusti sau cateva crengi subtiri, o data pe an. O sa fie probabil si mai zgomotoase si mai greu de manevrat.</p>
-        <p>Cauta ceva cu pareri bune, chiar si in zona asta ieftina.</p><h3>Buget mediu (800 - 1500 lei)</h3><p>Aici incepe distractia. Poti lua un <strong>tocator de crengi pentru curte</strong> electric foarte bun, de la producatori de renume (Bosch, Makita, Einhell mai solid), cu putere de 2200-2500W. Acestea pot toca crengi de pana la 4-4.5 cm, sunt mai rapide, mai silentioase si mai fiabile. Multe vin cu sisteme de siguranta si functii suplimentare, cum ar fi autocuratarea sau sistemul de revers. Asta e zona ideala pentru majoritatea gradinilor. Investitia se vede in performanta si durabilitate.</p><h3>Buget mare (Peste 1500 lei)</h3><p>Daca bugetul iti permite, aici ai doua optiuni.</p><p><strong>1. Electric premium:</strong> Poti lua un model electric de top, cu putere foarte mare, sistem de taiere performant (gen turbina), si constructie robusta. Acestea pot duce crengi de 4.5-5 cm fara probleme si sunt facute sa reziste zeci de ani.</p><p><strong>2. Benzina entry-level/mediu:</strong> Sau te poti uita la modele <a href="/motocoasa-electrica-sau-pe-benzina/" class="interlink">pe benzina</a>, de la producatori ca Stihl, Husqvarna, sau marci cunoscute pentru motoare. Acestea o sa toace crengi de 5-7 cm, sunt independente de priza si pot lucra in conditii mai grele. Dar, cum am zis, pregateste-te pentru zgomot, vibratii si mai multa munca la intretinere.</p><p>Indiferent de buget, incearca sa te orientezi spre marci cunoscute, cu service in tara, daca se poate. E mai sigur pe termen lung.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat costa un tocator de crengi pentru curte
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un <strong>tocator de crengi pentru curte</strong> electric de calitate, bun pentru uz casnic, costa intre 800 si 1500 lei. Modelele electrice mai simple pot fi gasite si sub 800 lei, dar sunt mai putin performante. Tocatoarele pe benzina incep de la aproximativ 1500-2000 lei si pot ajunge la peste 5000 lei pentru modele profesionale.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                care e diferenta intre tocatoare electrice si pe benzina
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Principala diferenta este puterea si mobilitatea. Tocatoarele electrice sunt mai silentioase, mai usoare si mai ieftine, ideale pentru crengi de pana la 4-5 cm, dar necesita priza. Cele pe benzina sunt mai puternice, toaca diametre mai mari (5-8 cm+), sunt independente de priza, dar sunt mai zgomotoase, mai grele si mai scumpe.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                merita sa cumpar un tocator de crengi pentru curte?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca ai o curte cu multi pomi, arbusti sau gard viu pe care il tunzi regulat. Un <strong>tocator de crengi pentru curte</strong> te ajuta sa reduci volumul deseurilor lemnoase, transformandu-le in material pentru compost sau mulci, economisind timp si efort la transportul lor.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce tocator de crengi pentru curte e mai bun, electric sau pe benzina
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru majoritatea gradinilor de dimensiuni medii, un tocator electric de 2000-2500W este mai bun. Este mai usor de utilizat, mai silentios si mai accesibil. Daca ai de procesat cantitati mari de crengi groase si lemnoase, sau lucrezi pe teren fara acces la curent, atunci un model pe benzina este superior.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                ce diametru maxim poate toca un tocator de crengi electric
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea tocatoarelor electrice pentru uz casnic pot toca crengi cu diametrul maxim intre 3 si 4.5 cm. Modelele mai puternice pot ajunge la 5 cm, dar rareori depasesc aceasta valoare. Este important sa verifici specificatiile producatorului pentru fiecare model in parte.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cum se intretine un tocator de crengi pentru curte
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Intretinerea unui <strong>tocator de crengi pentru curte</strong> depinde de tipul motorizarii. La cele electrice, curata cutitele si interiorul dupa fiecare utilizare. La cele pe benzina, pe langa curatare, schimba uleiul regulat, verifica filtrul de aer si bujia. Asigura-te ca depozitezi aparatul intr-un loc uscat.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                unde gasesc piese de schimb pentru tocator de crengi
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Piese de schimb precum cutite, curele sau filtre se gasesc de obicei la magazinele specializate in unelte de gradina, service-urile autorizate ale marcilor respective (ex: service Bosch, Stihl) sau online, pe site-uri mari de comert electronic care vand piese de schimb pentru unelte de gradina.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                cat dureaza sa tocesti crengile cu un tocator electric
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Timpul necesar variaza mult in functie de cantitatea de crengi, diametrul lor si eficienta tocatorului. Pentru o curte de dimensiuni medii, cu crengi de pana la 4 cm, procesul poate dura intre 30 de minute si 2 ore. Modelele mai performante si cu un diametru de tocare mai mare vor finaliza lucrarea mai rapid.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cel mai vandut tocator din selectie e <strong>Villager VC 2500</strong>, iar la buget mic, <strong>VONROC 2500W</strong> are cea mai buna nota. Daca vrei liniste, modelele cu valt <strong>Black & Decker</strong> si <strong>ParkSide</strong> sunt silentioase si trag singure crengile, iar premium, <strong>Makita UD2500</strong> are cos urias si durabilitate profesionala.</p>
+      <p>La un tocator de crengi conteaza <strong>sistemul</strong> (cutite pentru crengi uscate si taiere fina, valt pentru crengi verzi si mers silentios), <strong>puterea</strong> si diametrul maxim de crengi, si <strong>alimentarea</strong>, la retea sau pe benzina. Mai jos gasesti direct recomandarile, pe trei segmente de pret, iar sub ele un ghid despre cum alegi si diferenta dintre cutite si valt.</p>
+      <p>Am pornit de la tocatoarele de crengi si resturi vegetale in stoc pe eMAG, cu cele mai multe pareri, am lasat deoparte suflantele si aspiratoarele de frunze, care nu sunt tocatoare de crengi, si le-am impartit in accesibile, echilibrate si premium, ca sa gasesti repede modelul potrivit gradinii tale. Crengile groase le tai intai cu un <a href="/fierastrau-electric-pentru-lemne/">fierastrau electric</a>, iar gardul viu il ingrijesti cu o <a href="/foarfeca-electrica-pentru-gard-viu/">foarfeca de gard viu</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Accesibile, sub 800 de lei</a></li>
+        <li><a href="#ech">Echilibrate, 800-1500 de lei</a></li>
+        <li><a href="#prem">Premium si pe benzina</a></li>
+        <li><a href="#de-ce">La ce foloseste un tocator</a></li>
+        <li><a href="#cutite-valt">Cutite sau valt</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#siguranta">Siguranta si intretinere</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Putere</th><th>Sistem</th><th>Alimentare</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.putere}</td>
+              <td>{x.sistem}</td>
+              <td>{x.alim}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Accesibile, sub 800 de lei</h2>
+    <p>Tocatoare electrice cu cutite, de 2000-3000 W, pentru maruntit crengi uscate si resturi dintr-o gradina de casa. Taie fin si rapid, la cel mai mic pret, si sunt saltul ideal daca vrei sa nu mai arzi sau cari resturile de la tuns.</p>
+    <div class="rd-grid">
+      {ACC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcc} alt="Tocatoare de crengi accesibile: VONROC, Einhell, Lehmann, Raider" width="1200" height="675" loading="lazy" />
+
+    <h2 id="ech">Echilibrate, 800-1500 de lei</h2>
+    <p>Zona cu cel mai bun raport pret-dotari: branduri mari, sisteme cu valt silentioase care se autoalimenteaza, cosuri colectoare si putere de 2200-2800 W. De aici alegi daca vrei liniste sau un brand de incredere.</p>
+    <div class="rd-grid">
+      {ECH.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figEch} alt="Tocatoare de crengi echilibrate: Villager, Black & Decker, Bosch, ParkSide" width="1200" height="675" loading="lazy" />
+
+    <h2 id="prem">Premium si pe benzina</h2>
+    <p>Cele mai bune la ce conteaza: sisteme cu valt silentioase, cosuri mari, durabilitate profesionala si, la benzina, putere pentru crengi groase, oriunde, fara priza. Pentru gradini mari sau uz frecvent.</p>
+    <div class="rd-grid">
+      {PREM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPrem} alt="Tocatoare de crengi premium si pe benzina: Makita, Ruris, Bosch, Raider" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-tocator').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate tocatoarele de crengi la oferta</strong>
+        <span>Reducerile din acest moment la tocatoare de crengi si resturi vegetale, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">La ce foloseste un tocator</h2>
+    <p>Dupa fiecare tuns de pomi, gard viu sau curatare de gradina, ramai cu gramezi de crengi si resturi vegetale, greu de carat, de depozitat sau de ars. Un tocator de crengi rezolva problema simplu: <strong>marunteste crengile intr-o tocatura</strong> de cateva ori mai mica in volum, usor de gestionat.</p>
+    <p>Dar tocatura nu e un gunoi, ci o <strong>resursa pentru gradina</strong>. O folosesti la compost, unde crengile maruntite se descompun mult mai repede decat intregi si imbogatesc pamantul, sau ca mulci, un strat asezat la baza plantelor si a pomilor care pastreaza umezeala, tine buruienile la distanta si protejeaza radacinile. Practic, un tocator iti transforma resturile de la tuns in ceva util, iti scuteste drumurile la groapa de gunoi si iti tine gradina curata si productiva. Pentru cine are pomi, arbusti sau gard viu, e o unealta care se plateste singura in timp.</p>
+
+    <h2 id="cutite-valt">Cutite sau valt</h2>
+    <p>E cea mai importanta alegere la un tocator, pentru ca sistemul de maruntire schimba complet cum lucrezi. Tocatoarele cu <strong>cutite</strong> folosesc lame rotative care taie crengile rapid si fin. Sunt eficiente pe <strong>crengi uscate si tari</strong>, cele rezultate din tunsul de intretinere, dau o tocatura marunta, buna pentru compost rapid, si sunt de obicei mai ieftine. In schimb, sunt mai zgomotoase, iar cutitele se uzeaza si cer ascutire sau inlocuire in timp.</p>
+    <p>Tocatoarele cu <strong>valt</strong>, o roata dintata sau un cilindru care prinde si striveste crengile incet, joaca alta carte. Sunt mult mai <strong>silentioase</strong>, in jurul a 90 dB, se <strong>autoalimenteaza</strong>, adica trag singure crengile din mana ta fara sa le impingi, si se descurca excelent cu <strong>crengile verzi, fibroase si umede</strong>, unde cutitele se ineaca. Consuma mai putina energie si au cuplu mai mare, ideale pentru material gros. Tocatura iese ceva mai grosiera, perfecta ca mulci. Pe scurt: alege cutite daca toci mai ales crengi uscate si vrei tocatura marunta la un pret mai mic, si valt daca toci material verde, vrei liniste si autoalimentare.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua tocatoare:</p>
+    <ul>
+      <li><strong>Sistemul:</strong> cutite pentru crengi uscate, taiere fina si pret mic; valt pentru crengi verzi, mers silentios si autoalimentare.</li>
+      <li><strong>Puterea:</strong> 2000-2500 W ajung pentru o gradina de casa; spre 2800-3000 W pentru crengi mai groase si uz mai intens.</li>
+      <li><strong>Diametrul maxim de crengi:</strong> electricele duc 40-45 mm, cele bune ating limita; pe benzina ajungi la 50 mm sau mai mult.</li>
+      <li><strong>Alimentarea:</strong> la retea pentru gradini de casa, silentios si usor; pe benzina pentru crengi groase si teren mare, fara priza.</li>
+      <li><strong>Cosul colector:</strong> un cos mare, 45-67 l, inseamna ca golesti mai rar. Utile si rotile pentru transport la modelele grele.</li>
+      <li><strong>Greutatea:</strong> cele cu valt sunt mai grele, 25-37 kg, dar au roti; cele cu cutite sunt mai usoare, in jur de 12 kg.</li>
+    </ul>
+
+    <h2 id="siguranta">Siguranta si intretinere</h2>
+    <p>Un tocator e o unealta puternica, cu lame sau valt care se rotesc cu forta, deci <strong>protectia e obligatorie</strong>: poarta ochelari, manusi si casti antifonice, si haine stranse pe corp, fara snururi care s-ar putea prinde. Introdu crengile cu grija, tinand mainile departe de gura de alimentare, si foloseste impingatorul din dotare pentru bucatile scurte, niciodata mana. Nu baga crengi mai groase decat limita aparatului si nu forta materialul; daca se blocheaza, opreste si scoate stecherul inainte de a interveni.</p>
+    <p>La intretinere, cel mai important e sa <strong>cureti gura de alimentare</strong> si sistemul de taiere de resturi dupa fiecare folosire, cu aparatul oprit si deconectat. La modelele cu cutite, verifica periodic ascutimea lamelor si ascute-le sau inlocuieste-le cand nu mai taie curat, pentru ca un cutit tocit forteaza motorul. Depoziteaza tocatorul intr-un loc uscat, la adapost. La cele pe benzina, adauga intretinerea motorului termic, ulei, bujie si filtru, conform manualului. Cu aceasta grija, un tocator te serveste multe sezoane, transformand fidel resturile in tocatura utila.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de sistem, putere si alimentare:</p>
+    <p><strong>Accesibile, sub 800 de lei:</strong> tocatoare electrice cu cutite, de la circa 610-650 de lei, ca Raider, Lehmann sau Einhell, si pana spre 780 de lei pentru cel mai vandut, VONROC. Bune pentru o gradina de casa.</p>
+    <p><strong>Echilibrate, 800-1500 de lei:</strong> Villager, Black & Decker, Bosch sau ParkSide, cu sisteme cu valt silentioase sau branduri premium. Cel mai bun raport pret-dotari.</p>
+    <p><strong>Premium si benzina:</strong> Makita si Bosch AXT 25 D trec de 1500, spre 1900 de lei, cu cosuri mari si durabilitate profesionala, iar tocatoarele pe benzina, pentru crengi groase si teren mare, ajung la peste 3000 de lei.</p>
+    <p>Pe langa pret, alege dupa <strong>ce toci</strong>: pentru crengi uscate si o gradina mica, un tocator accesibil cu cutite face treaba; pentru mult material verde si liniste, unul cu valt merita banii in plus; iar pentru crengi groase si teren mare, un model pe benzina. Cel mai bun raport il gasesti potrivind sistemul si puterea cu nevoia reala.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
-        <p class="author-role">Expert <a href="/motosapa-electrica-pentru-gradina-mica/">Gradina</a>rit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
+        <p class="author-role">Expert Gradinarit</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="tocator-de-crengi-pentru-curte"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="tocator-de-crengi-pentru-curte"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="tocator-de-crengi-pentru-curte" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="tocator-de-crengi-pentru-curte" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

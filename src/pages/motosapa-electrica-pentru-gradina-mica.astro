@@ -1,232 +1,317 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Motosapa electrica pentru gradina mica",
-  excerpt: "Salutare dragi prieteni ai gradinii! Azi vorbim despre o unealta care mi-a facut viata mai usoara: motosapa electrica pentru gradina mica. Daca ai o curte mai compacta si te gandesti cum sa-ti afanezi pamantul fara sa te rucaci, stai sa-ti povestesc ce am descoperit.",
-  image: "/images/articles/motosapa-electrica-pentru-gradina-mica.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-02-04T13:18:32.785Z",
-  modifiedDate: "2026-02-04T13:18:32.785Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "Cat de adanc sapa o motosapa electrica?", answer: "Majoritatea motosapelor electrice pentru gradini mici au o adancime de lucru intre 10 si 20 cm. Aceasta este suficienta pentru a afana solul pentru seminte, rasaduri sau gazon. Nu te astepta la adancimi mai mari, acestea sunt pentru utilaje mai puternice." },
-  { question: "Pot folosi motosapa electrica pe pamant batatorit?", answer: "Da, dar cu precautii. Pe pamant foarte batatorit, s-ar putea sa fie nevoie de mai multe treceri sau sa fie necesar sa afanezi putin manual inainte. Modelele cu motoare mai puternice (peste 1000W) se descurca mai bine in astfel de conditii." },
-  { question: "Ce lungime de cablu e ideala?", answer: "Depinde de gradina ta. Daca ai priza aproape, 5-10 metri sunt suficienti. Daca e mai departe, un prelungitor de 20-30 metri, special pentru exterior, e recomandat. Asigura-te ca e un cablu de calitate, rezistent la intemperii." },
-  { question: "Cat de des trebuie curatate cutitele?", answer: "Ideal, dupa fiecare utilizare. Daca pamantul e umed sau lipicios, curata-le chiar si in timpul lucrului, pentru a mentine eficienta si a preveni blocarea." },
-  { question: "Ce diferenta e intre motosapa electrica si motocultor?", answer: "Motosapa electrica e mai mica, mai usoara, mai silentioasa si mai usor de manevrat, potrivita pentru gradini mici. Motocultorul e mai mare, mai puternic (adesea pe benzina), si e folosit pentru suprafete mai mari, araturi mai adanci sau lucrari mai intensive." },
-  { question: "Ce garantie au de obicei aceste motosape?", answer: "Majoritatea producatorilor ofera o garantie de 2 ani pentru motosapele electrice. Verifica politica de garantie a magazinului si a producatorului pentru a sti la ce sa te astepti in caz de defectiuni." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de o motosapa electrica pentru gradina mica?", id: "de-ce-ai-nevoie-de-o-motosapa-electrica-pentru-gradina-mica" },
-  { title: "Top recomandari de motosape electrice pentru gradina ta", id: "top-recomandari-de-motosape-electrice-pentru-gradina-ta" },
-  { title: "Cum alegi corect motosapa electrica pentru gradina mica", id: "cum-alegi-corect-motosapa-electrica-pentru-gradina-mica" },
-  { title: "Avantaje si dezavantaje ale motosapei electrice", id: "avantaje-si-dezavantaje-ale-motosapei-electrice" },
-  { title: "Sfaturi practice din experienta mea cu motosapa electrica", id: "sfaturi-practice-din-experienta-mea-cu-motosapa-electrica" },
-  { title: "Parerea mea finala despre motosapa electrica", id: "parerea-mea-finala-despre-motosapa-electrica" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['motosapa-electrica'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Compacte, pentru gradina mica ---
+  { g: 'mic', id: 'D70B9HYBM', badge: 'Cea mai ieftina', short: 'Kanwod Grave', putere: '1050 W', adancime: '22 cm', greutate: '8.65 kg',
+    specs: ['1050 W, adancime de lucru 22 cm', 'usoara, 8.65 kg', 'cel mai mic pret din selectie', 'nota mare, 4.82 din 11 pareri'],
+    pros: ['Cel mai mic pret din toata selectia', 'Usoara, 8.65 kg, o manevrezi lejer', 'Nota mare, 4.82, din 11 pareri', 'Adancime buna de lucru, 22 cm'],
+    cons: ['Brand mai putin cunoscut', 'Putine pareri, 11'],
+    verdict: 'Cu cel mai mic pret afanezi pamantul intr-o gradina mica, cu un aparat surprinzator de bine cotat. Kanwod Grave are 1050 W si o adancime de lucru de 22 cm, suficienta pentru un strat de legume sau o gradina de casa, si cantareste doar 8.65 kg, deci o plimbi si o intorci usor pe capete de rand. E cel mai ieftin model din selectie, iar nota de 4.82 din 11 pareri arata ca primii cumparatori sunt multumiti. Vine de la un brand mai putin cunoscut si are inca putine recenzii, asa ca te bazezi mai mult pe specificatii si pe notele bune. O iei cand vrei cea mai accesibila motosapa electrica pentru o gradina mica, usoara si cu adancime buna, si nu conteaza brandul.' },
+  { g: 'mic', id: 'DT5PBPMBM', badge: 'Cea mai vanduta compacta', short: 'Könner KS 1000T E', putere: '1000 W', adancime: '22 cm', greutate: '8 kg',
+    specs: ['1000 W, 4 freze, adancime 22 cm', 'usoara, 8 kg', 'de la Könner&Söhnen, brand cunoscut', 'cea mai vanduta din grupul compact, 22 de pareri'],
+    pros: ['Cea mai vanduta motosapa compacta din selectie, 22 de pareri', 'Könner&Söhnen, brand apreciat pentru unelte', 'Nota buna, 4.68, si doar 8 kg', 'Patru freze, afaneaza bine solul'],
+    cons: ['Putere de 1000 W, medie pentru grupul compact', 'Latime de lucru mai mica'],
+    verdict: 'Cea mai vanduta motosapa compacta din selectie, de la un brand apreciat pentru unelte. Könner&Söhnen KS 1000T E are 1000 W, patru freze si o adancime de lucru de 22 cm, tot ce trebuie pentru afanarea unei gradini mici sau a unui solar, si cantareste doar 8 kg, deci e usor de manevrat de oricine. E cea mai vanduta din grupul compact, cu 22 de pareri si nota 4.68, semn ca lumea o cumpara si e multumita, iar Könner&Söhnen e un nume de incredere in uneltele de gradina. Puterea de 1000 W e medie pentru grup, potrivita pentru sol deja lucrat, nu pentru teren foarte tare. O iei cand vrei cea mai testata motosapa compacta, de la un brand serios, usoara si cu freze bune, pentru o gradina mica.' },
+  { g: 'mic', id: 'DDYVJJMBM', badge: 'Bun raport', short: 'Heinner VSE001', putere: '1000 W', adancime: '20 cm', greutate: '',
+    specs: ['1000 W, 380 rpm', 'adancime de lucru 20 cm', 'de la Heinner, brand cunoscut la noi', 'nota 4.37 din 19 pareri'],
+    pros: ['Heinner, brand cunoscut, cu service la noi', 'Pret bun pentru un 1000 W de brand', '19 pareri, una dintre cele mai cotate', 'Buna pentru gradina de casa'],
+    cons: ['Adancime ceva mai mica, 20 cm', 'Putere medie, 1000 W'],
+    verdict: 'Un bun raport pret-brand, pentru cine vrea o motosapa de la un nume cunoscut la noi. Heinner VSE001 are 1000 W la 380 de rotatii pe minut si o adancime de lucru de 20 cm, potrivita pentru o gradina de casa sau un strat de legume, la un pret accesibil pentru un aparat de brand. Heinner e cunoscut si are service in tara, un plus de siguranta fata de marcile generice, iar cu 19 pareri e una dintre cele mai cotate din grupul compact. Adancimea de 20 cm e ceva mai mica decat la altele, iar puterea de 1000 W e medie. O iei cand vrei o motosapa de la un brand cunoscut, cu service la noi, la un pret bun, pentru intretinerea unei gradini mici.' },
+  { g: 'mic', id: 'D3VWFJMBM', badge: 'Einhell, de brand', short: 'Einhell GC-RT 7530', putere: '750 W', adancime: '20 cm', greutate: '',
+    specs: ['750 W, adancime de lucru 20 cm', 'de la Einhell, brand de unelte', 'compacta, pentru suprafete mici', 'nota 4.8 din 5 pareri'],
+    pros: ['Einhell, brand consacrat de scule si unelte', 'Compacta si usoara, pentru gradini mici', 'Nota mare, 4.8', 'Ideala pentru straturi si solarii'],
+    cons: ['Putere mai mica, 750 W', 'Putine pareri, 5'],
+    verdict: 'Alegerea daca vrei o motosapa mica de la un brand de unelte consacrat. Einhell GC-RT 7530 are 750 W si o adancime de lucru de 20 cm, o putere potrivita pentru suprafete mici si sol deja lucrat, intr-un corp compact si usor de manevrat. Einhell e un nume cunoscut in scule si unelte de gradina, cu o gama larga si accesorii, un plus daca ai deja produse de la ei. A luat nota mare, 4.8, chiar daca din putine pareri, doar 5. Puterea de 750 W e printre cele mai mici din selectie, deci o iei pentru straturi, solarii si gradini mici, nu pentru teren tare sau suprafete mari. O alegi cand vrei brandul Einhell si o motosapa mica pentru o gradina de dimensiuni reduse.' },
+  { g: 'mic', id: 'D4L77NBBM', badge: 'Cea mai usoara', short: 'Texas EL-TEX 750', putere: '750 W', adancime: '22 cm', greutate: '7.4 kg',
+    specs: ['750 W, special pentru solarii si gradina', 'cea mai usoara, 7.4 kg', 'adancime de lucru 22 cm', 'nota maxima, 5 din 5'],
+    pros: ['Cea mai usoara din selectie, 7.4 kg', 'Gandita special pentru solarii si gradini mici', 'Nota maxima, 5 din 5', 'Adancime buna pentru dimensiunea ei, 22 cm'],
+    cons: ['Putere mica, 750 W', 'Putine pareri, 5'],
+    verdict: 'Cea mai usoara motosapa din selectie, facuta anume pentru solarii si gradini mici. Texas EL-TEX 750 cantareste doar 7.4 kg, deci o ridici si o manevrezi fara efort, chiar si prin spatiile stramte dintre straturi sau intr-un solar, si are 750 W cu o adancime de lucru de 22 cm, buna pentru dimensiunea ei. E gandita exact pentru acest tip de utilizare, iar nota maxima, 5 din 5, chiar daca din 5 pareri, e un semn bun. Puterea mica o limiteaza la sol deja lucrat si suprafete reduse, nu la teren tare. O iei cand ai un solar sau o gradina mica si vrei cea mai usoara si mai manevrabila motosapa, potrivita perfect pentru spatii stramte.' },
+  { g: 'mic', id: 'DMXBP3BBM', badge: 'Hecht, usoara', short: 'Hecht 738', putere: '1000 W', adancime: '', greutate: '7.7 kg',
+    specs: ['1000 W, latime de lucru 30 cm', 'usoara, 7.7 kg', 'de la Hecht, brand de unelte', 'nota 4.5 din 10 pareri'],
+    pros: ['Hecht, brand cunoscut de unelte de gradina', 'Usoara, 7.7 kg, si latime buna, 30 cm', 'Nota decenta, 4.5, din 10 pareri', 'Echilibru bun intre putere si greutate'],
+    cons: ['Brand mai putin raspandit', 'Adancime nedeclarata clar'],
+    verdict: 'O motosapa usoara si echilibrata de la un brand de unelte cunoscut. Hecht 738 are 1000 W si o latime de lucru de 30 cm, potrivita pentru gradini mici si medii, la o greutate de doar 7.7 kg, deci ramane usor de manevrat pe capete de rand si prin spatii stramte. Hecht e un nume cunoscut in uneltele de gradina, cu o gama larga, iar nota de 4.5 din 10 pareri e decenta. Puterea de 1000 W si latimea de 30 cm o fac un mijloc bun intre modelele foarte mici de 750 W si cele grele de 1500 W. O iei cand vrei o motosapa usoara, cu latime buna, de la un brand de unelte, pentru o gradina mica spre medie.' },
+  // --- Mai puternice, pentru gradini mai mari ---
+  { g: 'mare', id: 'D3BM8XYBM', badge: 'Cea mai vanduta', short: 'Steinhaus PRO-TIL1500', putere: '1500 W', adancime: '22 cm', greutate: '12.6 kg',
+    specs: ['1500 W, latime de lucru 45 cm', '6 cutite, adancime 22 cm', 'de departe cea mai vanduta, 32 de pareri', 'pentru suprafete mai mari'],
+    pros: ['De departe cea mai vanduta din selectie, 32 de pareri', 'Putere mare, 1500 W, si latime generoasa, 45 cm', 'Sase cutite, afaneaza in profunzime', 'Pret bun pentru puterea oferita'],
+    cons: ['Grea, 12.6 kg', 'Nota 4.06, mai modesta'],
+    verdict: 'Cea mai vanduta motosapa din toata selectia, pentru cine are o gradina mai mare. Steinhaus PRO-TIL1500 are 1500 W si o latime de lucru de 45 cm, deci acopera mai mult teren la fiecare trecere, cu sase cutite care afaneaza bine, la o adancime de 22 cm. E de departe cea mai vanduta, cu 32 de pareri, si are un pret bun pentru puterea oferita. In schimb, e grea, 12.6 kg, deci cere mai mult efort la manevrat si la intors, iar nota, 4.06, e ceva mai modesta decat la modelele compacte. O iei cand ai o gradina mai mare de afanat si vrei putere si latime la un pret bun, si nu te deranjeaza greutatea in plus.' },
+  { g: 'mare', id: 'DBYGWSMBM', badge: 'Könner, robusta', short: 'Könner KS 1500TE', putere: '1500 W', adancime: '22 cm', greutate: '12 kg',
+    specs: ['1500 W, adancime de lucru 22 cm', 'robusta, de la Könner&Söhnen', '12 kg', 'nota 4 din 15 pareri'],
+    pros: ['Könner&Söhnen, brand apreciat pentru unelte', 'Putere mare, 1500 W', 'Constructie robusta', 'Adancime buna, 22 cm'],
+    cons: ['Grea, 12 kg', 'Nota 4, mai modesta, si pret mai mare'],
+    verdict: 'Alternativa robusta de la Könner&Söhnen, pentru cine vrea putere si un brand de incredere. KS 1500TE are 1500 W si o adancime de lucru de 22 cm, cu o constructie solida specifica brandului, potrivita pentru gradini mai mari sau sol mai tare. Könner&Söhnen e apreciat pentru uneltele lui, un plus de siguranta la un aparat pe care il folosesti sezonier. Cantareste 12 kg, deci e mai grea si mai obositoare la manevrat decat modelele compacte, iar nota de 4 din 15 pareri e mai modesta, la un pret mai ridicat decat Steinhaus de aceeasi putere. O iei cand pui pret pe robustetea si brandul Könner&Söhnen si vrei o motosapa puternica pentru o gradina mai mare.' },
+  { g: 'mare', id: 'DJ03QZYBM', badge: 'Nota maxima', short: 'Evotools ET 1500', putere: '1500 W', adancime: '22 cm', greutate: '10 kg',
+    specs: ['1500 W, latime de lucru 40 cm', 'adancime 22 cm, 10 kg', 'nota maxima, 5 din 5', 'mai usoara decat alte modele de 1500 W'],
+    pros: ['Nota maxima, 5 din 5', 'Mai usoara, 10 kg, pentru un 1500 W', 'Latime buna, 40 cm', 'Putere mare la greutate mai mica'],
+    cons: ['Putine pareri, 5', 'Brand mai putin cunoscut'],
+    verdict: 'Alegerea daca vrei putere de 1500 W, dar mai putina greutate. Evotools ET 1500 are 1500 W si o latime de lucru de 40 cm, dar cantareste doar 10 kg, cu peste doua kilograme mai putin decat alte modele de aceeasi putere, ceea ce o face mai usor de manevrat fara sa pierzi din capacitate. Afaneaza la 22 cm adancime si a luat nota maxima, 5 din 5, chiar daca din putine pareri, 5. E un echilibru bun intre putere si greutate, potrivit pentru o gradina medie spre mare, fara efortul unui aparat de 12-13 kg. O iei cand vrei putere mare, latime buna si o greutate mai rezonabila, de la un brand mai nou dar bine notat de primii cumparatori.' },
+  { g: 'mare', id: 'DYKLN4MBM', badge: 'Cea mai lata', short: 'Texas El-tex 1800', putere: '1800 W', adancime: '', greutate: '',
+    specs: ['1800 W, latime de lucru 60 cm', 'cea mai lata din selectie', 'de la Texas, brand de unelte', 'pentru suprafete mari'],
+    pros: ['Cea mai lata din selectie, 60 cm, acopera mult teren', 'Putere mare, 1800 W', 'Texas, brand cunoscut de unelte de gradina', 'Nota maxima de la primii cumparatori'],
+    cons: ['Cea mai scumpa din selectie', 'Foarte putine pareri, 3'],
+    verdict: 'Cea mai lata si mai productiva motosapa din selectie, pentru suprafete mari. Texas El-tex 1800 are 1800 W si o latime de lucru de 60 cm, de departe cea mai mare de aici, deci afaneaza o fasie lata la fiecare trecere si termina mult mai repede o gradina intinsa. Texas e un brand cunoscut de unelte de gradina, iar nota maxima de la primii cumparatori e incurajatoare. E, insa, cea mai scumpa din selectie si are foarte putine pareri, doar 3, asa ca te bazezi pe specificatii. Latimea mare o face mai putin manevrabila prin spatii stramte. O iei cand ai o gradina mare de lucrat si vrei sa termini repede, cu cea mai lata motosapa electrica din selectie, si bugetul nu e principala grija.' },
+  { g: 'mare', id: 'D7L7GVMBM', badge: 'Cea mai puternica', short: 'Kraft&Dele KD5182', putere: '2200 W', adancime: '22 cm', greutate: '10 kg',
+    specs: ['2200 W, cea mai mare putere din selectie', 'adancime de lucru 22 cm', '10 kg', 'nota maxima, 5 din 5'],
+    pros: ['Cea mai mare putere din selectie, 2200 W', 'Face fata si solului mai tare', 'Doar 10 kg pentru puterea ei', 'Nota maxima, 5 din 5'],
+    cons: ['Putine pareri, 3', 'Consum mai mare la puterea asta'],
+    verdict: 'Cea mai puternica motosapa electrica din selectie, pentru sol mai tare si suprafete mari. Kraft&Dele KD5182 are 2200 W, de departe cea mai mare putere de aici, deci face fata mai bine terenului compact sau nelucrat de mult, unde motoarele mai mici se chinuie, si afaneaza la 22 cm adancime. Cantareste 10 kg, rezonabil pentru puterea ei, si a luat nota maxima, 5 din 5, din primele 3 pareri. Puterea mare inseamna si un consum pe masura, iar numarul de pareri e inca mic. O iei cand ai o gradina cu sol mai tare sau mai mare si vrei cea mai puternica motosapa electrica din selectie, care sa nu se opreasca in pamant greu.' },
+  { g: 'mare', id: 'D1QRKTMBM', badge: 'Accesibila, 1700 W', short: 'Electrocultor Powermat 1700', putere: '1700 W', adancime: '', greutate: '',
+    specs: ['electrocultor de 1700 W', 'latime de lucru 360 mm', 'pentru gradini medii', 'nota 4.17 din 6 pareri'],
+    pros: ['Putere mare, 1700 W, la un pret accesibil', 'Latime de lucru de 36 cm, buna pentru gradini medii', 'Raport bun putere-pret', 'Alternativa mai ieftina la modelele de brand'],
+    cons: ['Putine pareri, 6, nota 4.17', 'Brand generic'],
+    verdict: 'O optiune puternica la un pret accesibil, pentru o gradina medie. Electrocultorul Powermat are 1700 W si o latime de lucru de 36 cm, deci multa putere si o latime decenta la un pret sub cel al modelelor de brand de aceeasi clasa. E un mijloc bun intre motosapele compacte si cele foarte late si scumpe, potrivit pentru o gradina medie unde vrei sa afanezi in profunzime fara sa dai bani multi. Are inca putine pareri, 6, cu o nota de 4.17, si vine de la un brand generic. O iei cand vrei putere mare, 1700 W, si o latime buna la cel mai mic pret posibil, si nu conteaza brandul, ci raportul putere-pret.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MIC = PICKS.filter(x => x.g === 'mic');
+const MARE = PICKS.filter(x => x.g === 'mare');
+
+const hero = '/images/articles/motosapa-electrica-pentru-gradina-mica.webp';
+const figMic = '/imagini/articole/motosapa-compacte.webp';
+const figMare = '/imagini/articole/motosapa-puternice.webp';
+const published = '2026-07-18T21:37:21+03:00';
+
+const faq = [
+  { question: 'Ce putere de motosapa electrica imi trebuie pentru o gradina mica?', answer: 'Pentru o gradina mica sau un solar, o motosapa de 750-1500 W e mai mult decat suficienta. Modelele de 750-1000 W, ca Einhell, Texas sau Heinner din selectie, se descurca bine pe sol deja lucrat si pe suprafete reduse, iar cele spre 1500 W, ca Steinhaus sau Evotools, aduc un plus de putere daca ai o gradina ceva mai mare sau un sol mai tare. Puterea mai mare conteaza cel mai mult pe teren compact sau nelucrat de mult; pentru intretinerea unei gradini de casa, un motor de 1000 W face treaba fara probleme si e mai usor de manevrat.' },
+  { question: 'Ce latime si adancime de lucru sa aleg?', answer: 'Latimea de lucru arata cat de mult teren afanezi la o trecere si variaza in general intre 28 si 45 cm, iar la modelele mari ajunge la 60 cm. Pentru o gradina mica sau un solar, o latime de 28-36 cm e ideala, pentru ca te strecori usor printre straturi; pentru suprafete mari, o latime mai mare termina treaba mai repede, dar e mai greu de manevrat. Adancimea de lucru, in general 20-22 cm la modelele din selectie, spune cat de adanc rascoleste pamantul: 20 cm ajung pentru un strat de legume, iar mai mult inseamna afanare in profunzime, buna inainte de plantare.' },
+  { question: 'Motosapa electrica sau pe benzina, ce sa aleg?', answer: 'Pentru gradini mici si medii, motosapa electrica e alegerea mai buna: e mai usoara, mult mai silentioasa, porneste instant de la buton, nu are miros de combustibil si cere intretinere minima. E ideala pentru gradinari care ingrijesc suprafete mici, fara bataia de cap a unui motor termic. Motosapa pe benzina sau un motocultor cu motor termic isi arata rostul doar daca ai teren mare, sol foarte compact sau argilos, unde puterea si autonomia fara cablu conteaza. Pentru o gradina de casa sau un solar, insa, electrica e mai practica, mai curata si mai ieftina de intretinut.' },
+  { question: 'Cat de grea trebuie sa fie si conteaza greutatea?', answer: 'Conteaza mult, pentru ca o motosapa se manevreaza cu bratele si se intoarce des la capete de rand. Modelele compacte din selectie cantaresc intre 7 si 9 kg, ca Texas EL-TEX de 7.4 kg sau Könner de 8 kg, deci le ridici si le controlezi usor, ideal pentru gradini mici si pentru cine nu vrea efort. Cele puternice, de 1500 W in sus, ajung la 10-13 kg, ca Steinhaus de 12.6 kg, mai obositoare la manevrat, dar cu mai multa putere. Daca lucrezi o suprafata mica sau vrei ceva usor de manuit, alege un model sub 9 kg; daca ai teren mai mare si mai tare, accepti greutatea in plus pentru putere.' },
+  { question: 'Ce sunt frezele si cate imi trebuie?', answer: 'Frezele, numite si cutite, sunt discurile cu lame care se rotesc si rascolesc pamantul, inima motosapei. Numarul lor si latimea pe care o acopera influenteaza cat de bine si cat de lat afaneaza: mai multe freze inseamna o brazda mai lata si o afanare mai uniforma. Modelele din selectie vin cu configuratii diferite, de la patru freze, ca la Könner, pana la seturi cu mai multe cutite pe modelele late. Pentru o gradina mica, un set standard de freze e suficient; important e sa fie din otel rezistent si sa se poata inlocui la nevoie, ca sa nu ramai cu aparatul nefolosibil dupa cateva sezoane.' },
+  { question: 'Cum folosesc si intretin o motosapa electrica?', answer: 'Fiind electrica, cu cablu, lucreaza legata la priza sau la un prelungitor pentru exterior, asa ca ai grija sa tii cablul in spate, departe de freze, ca sa nu il prinzi. Treci cu ea uniform peste teren, la o adancime pe care o cresti treptat daca solul e tare, si nu o forta in pamant foarte compact, unde s-ar putea supraincalzi. Dupa folosire, curata frezele de pamant si radacini, sterge aparatul si depoziteaza-l uscat. Verifica periodic frezele si suruburile si strange-le daca s-au slabit. Intretinerea unei motosape electrice e minima fata de una pe benzina, tocmai pentru ca nu are motor termic, ulei sau bujii.' },
+  { question: 'Cat costa o motosapa electrica buna?', answer: 'In selectie, o motosapa compacta buna pentru o gradina mica porneste de la circa 300-490 de lei, cazul modelelor Kanwod, Hecht sau Texas, cu putere de 750-1050 W. Modelele mai puternice, de 1500 W, ca Steinhaus sau Evotools, sunt in general 500-730 de lei, iar cele foarte late sau puternice, ca Texas El-tex 1800 sau Kraft&Dele de 2200 W, trec de 750 si urca spre 1500 de lei. Pe langa pret, gandeste-te la marimea gradinii: pentru una mica, un model accesibil de 750-1000 W e cea mai buna alegere; puterea si latimea mari se justifica doar daca ai teren mare sau sol tare.' },
+];
+
+const images = [hero, figMic, figMare, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Motosapa electrica pentru gradina mica - CentroCasa"
-  description="Salutare dragi prieteni ai gradinii! Azi vorbim despre o unealta care mi-a facut viata mai usoara: motosapa electrica pentru gradina mica. Daca ai o curte mai compacta si te gandesti cum sa-ti afanezi pamantul fara sa te rucaci, stai sa-ti povestesc ce am descoperit."
-  image="/images/articles/motosapa-electrica-pentru-gradina-mica.webp"
+  title="Cea mai buna motosapa electrica pentru gradina mica in 2026: compacte si puternice"
+  description="Care e cea mai buna motosapa electrica pentru gradina mica in 2026: modele compacte si usoare de la Könner, Heinner, Einhell si Texas, si variante mai puternice de 1500-2200 W de la Steinhaus si Evotools, comparate pe putere, latime, adancime si greutate. Plus cum alegi si electric vs benzina."
+  image={hero}
   type="article"
-  publishedTime="2026-02-04T13:18:32.785Z"
-  modifiedTime="2026-02-04T13:18:32.785Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Cea mai buna motosapa electrica pentru gradina mica' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Motosapa electrica pentru gradina mica</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
+      <span>Cea mai buna motosapa electrica pentru gradina mica</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">4 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Motosapa electrica pentru gradina mica</h1>
-    </header>
+    <h1>Cea mai buna motosapa electrica pentru gradina mica</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/motosapa-electrica-pentru-gradina-mica.webp" alt="Motosapa electrica pentru gradina mica" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cea mai buna motosapa electrica pentru gradina mica: modele compacte si puternice" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-o-motosapa-electrica-pentru-gradina-mica">
-        <h2>De ce ai nevoie de o motosapa electrica pentru gradina mica?</h2>
-        <p>Stai si te gandesti de ce ai avea nevoie de o motosapa, mai ales daca gradina ta nu e cat un teren de fotbal? Ei bine, eu am patit-o. Aveam un petic de pamant, cam 50 de metri patrati, unde voiam sa pun niste legume si cateva flori. La inceput, am zis ca dau cu lopata si sapa, ca doar nu e mare lucru. Doamne, ce m-am inselat! Cu cat e pamantul mai compactat, mai ales dupa iarna sau daca l-ai lasat neglijat, cu atat devine mai greu de lucrat.</p><p>Pe langa lopata si sapa, am incercat si un motocultor mai vechi, imprumutat de la un vecin. Era un monstru! Greu de manevrat, zgomotos si pentru suprafata mea mica, era ca si cum ai folosi un tanc sa mergi la piata. Atunci mi-am zis ca trebuie sa existe o solutie mai potrivita. Si am gasit-o in motosapa <a href="/motocoasa-electrica-sau-pe-benzina/">electrica</a>. E o unealta pensata pentru suprafete mai mici, unde nu ai nevoie de putere enorma, dar iti trebuie ceva eficient si usor de folosit.</p><p>Pentru cine e potrivita? Daca ai o gradina de la 20 la 100-150 de metri patrati, in principiu. Sau daca ai zone mai mici, pe langa casa, unde vrei sa plantezi ceva, dar pamantul e batatorit. Nu e pentru cineva care are de arat hectare intregi. Acolo iti trebuie altceva, mai puternic, pe benzina probabil. Dar pentru rasaduri, pentru pregatirea solului pentru gazon nou, sau pur si simplu sa-ti afanezi pamantul pentru a-i da viata inapoi, motosapa electrica e un salvator.</p><p>Gandeste-te la ea ca la o unealta de precizie, nu ca la un buldozer. E ca si cum ai alege intre a taia un copac cu un topor masiv sau cu un <a href="/fierastrau-electric-pentru-lemne/">fierastrau electric</a> mai mic. Pentru o crenguta, fierastraul e perfect. Pentru suprafata mea mica, motosapa electrica a fost alegerea ideala. Nu mai pierd ore in sir incercand sa sparg pamantul inghetat sau tasat. In 20-30 de minute, am terminat cu toata zona.</p><p>Principalul avantaj e ca nu te chinui fizic. Nu mai transpiri ca la sala, nu-ti mai dor coatele si spatele. Porneste la buton, nu scoate fum, nu murdareste aerul atat de mult ca unul pe benzina. Si, daca ai curent in gradina, nu te basi cu prelungitoarele. Eu am avut noroc, am o priza langa magazie, deci e simplu. Daca nu, poate fi un mic inconvenient, dar pentru suprafete mici, un prelungitor de calitate te scoate din impas.</p><p>In concluzie, daca ai o gradina mica si vrei sa o lucrezi fara efort fizic exagerat, fara sa te complici cu motoare pe benzina si intretinere complexa, o motosapa electrica e fix ce iti trebuie. E o investitie mica, dar care iti aduce mare satisfactie si timp castigat.</p>
-      </section>
-
-      <section id="top-recomandari-de-motosape-electrice-pentru-gradina-ta">
-        <h2>Top recomandari de motosape electrice pentru gradina ta</h2>
-        <p>Dupa ce m-am documentat si am tot incercat diverse modele, am ajuns la cateva preferate. Nu sunt toate la fel, stii cum e, unele sunt mai solide, altele mai firave. Am incercat sa le aleg pe cele care mi s-au parut ca ofera un raport calitate-pret bun si sunt potrivite pentru gradinile de dimensiuni mici spre medii.</p><p><strong>1. Motosapa electrica Al-Ko MH 180-200 L</strong></p><p>Asta a fost una dintre primele pe care le-am luat in calcul. E destul de compacta, are o greutate acceptabila (cam 17 kg), ceea ce o face usor de manevrat. Motorul e de 180W, ceea ce nu pare mult, dar pentru pamantul meu, a facut treaba. Latimea de lucru e de 20 cm, ceea ce e perfect pentru mine, nu distrug prea mult din <a href="/cel-mai-bun-tractoras-pentru-tuns-gazonul/">gazonul</a> din jur. Pretul ei e undeva pe la <strong>700-800 RON</strong>, in functie de magazin si oferte.</p><ul><li><strong>Avantaje:</strong> Foarte manevrabila, usoara, pret accesibil, potrivita pentru spatii inguste.</li><li><strong>Dezavantaje:</strong> Puterea motorului e mai mica, deci pe pamant foarte batatorit s-ar putea sa o ia mai greu.</li></ul><p><strong>2. Motosapa electrica Micul Fermier GF-0201</strong></p><p>Micul Fermier e un brand destul de popular la noi, au multe unelte agricole. Modelul asta are un motor de 1400W, mult mai puternic decat primul. Latimea de lucru e de 40 cm, ceea ce inseamna ca acopera mai mult pamant dintr-o data. E mai grea, cam 25 kg, deci e un pic mai anevoioasa la manevrat, dar puterea compenseaza.</p><p>Am gasit-o la preturi in jur de <strong>900-1000 RON</strong>. Eu am testat-o la un prieten si mi-a placut cum lucreaza pamantul. E mai eficienta daca ai o suprafata un pic mai mare, sa zicem 80-100 mp.</p><ul><li><strong>Avantaje:</strong> Putere mare pentru o motosapa electrica, latime de lucru mai mare, eficienta pe suprafete mai extinse.</li><li><strong>Dezavantaje:</strong> Mai grea, poate fi mai dificil de manevrat in spatii foarte restranse, consumul de curent ar putea fi mai mare.</li></ul><p><strong>3. Motosapa electrica Hecht 700W</strong></p><p>Hecht e un alt producator pe care il apreciez. Modelul asta de 700W e un echilibru bun intre putere si manevrabilitate. Latimea de lucru e de 36 cm, deci acopera destul de bine. Greutatea e undeva la 15 kg, ceea ce e un punct forte. Pretul ei e in jur de <strong>600-700 RON</strong>. Am vazut ca e destul de robusta.</p><ul><li><strong>Avantaje:</strong> Bun echilibru intre putere, greutate si pret, destul de robusta.</li><li><strong>Dezavantaje:</strong> Latimea de lucru e medie, s-ar putea sa nu fie ideala pentru suprafete foarte mari.</li></ul><p><strong>4. Motosapa electrica Gardenia GEMS-1000</strong></p><p>Asta e o optiune mai serioasa, cu un motor de 1000W. Latimea de lucru e de 45 cm, deci chiar acopera bine. E un pic mai grea, cam 20 kg, dar puterea compenseaza. Pretul e un pic mai ridicat, cam <strong>1100-1200 RON</strong>, dar daca vrei ceva mai performant si mai durabil, merita.</p><ul><li><strong>Avantaje:</strong> Putere mare, latime de lucru generoasa, potrivita pentru suprafete mai mari de 100 mp.</li><li><strong>Dezavantaje:</strong> Mai grea, pretul e un pic mai ridicat decat la alte modele.</li></ul><p>Pe langa astea, mai sunt si alte branduri pe piata, cum ar fi Stihl (desi ei au mai mult pe benzina, dar am vazut si electrice), Bosch, sau producatori mai mici. Important e sa te uiti la specificatii si sa alegi ce se potriveste gradinii tale. Eu am incercat sa aduc o varietate pentru diferite nevoi.</p>
-      </section>
-
-      <section id="cum-alegi-corect-motosapa-electrica-pentru-gradina-mica">
-        <h2>Cum alegi corect motosapa electrica pentru gradina mica</h2>
-        <p>Acum, stiu ca am vorbit despre cateva modele, dar cum te decizi, de fapt? Nu e chiar atat de complicat, daca stii la ce sa te uiti. Pentru mine, cel mai important aspect a fost sa fie potrivita pentru suprafata mea. Nu vreau un monstru care sa-mi strice gazonul din jur sau sa fie greu de manevrat.</p><p><strong>Puterea motorului</strong> e un prim criteriu. Pentru o gradina mica, chiar si 500-700W pot fi suficienti, mai ales daca pamantul nu e foarte tasat. Daca terenul tau e mai dificil, mai compactat, atunci mergi pe ceva peste 1000W. Cum am zis, la Micul Fermier am vazut 1400W, ceea ce e destul de mult pentru o electrica.</p><p><strong>Latimea de lucru</strong> e urmatorul aspect. Asta iti spune cat de mult pamant lucrezi odata. Pentru mine, 20-30 cm e ideal. Daca ai o gradina un pic mai lunga si mai ingusta, o latime mai mica te ajuta sa manevrezi mai usor printre randuri sau pe langa gard. Pentru suprafete mai largi, o latime de 40-45 cm e mai eficienta.</p><p><strong>Greutatea</strong> e cruciala, mai ales daca nu esti o persoana foarte puternica sau daca ai de manevrat motosapa pe teren denivelat. Eu am incercat sa ma feresc de cele peste 25 kg, mi se par prea grele pentru mine. Sub 20 kg e ideal, parerea mea. Unelte mai usoare sunt mai usor de controlat si te obosesc mai putin.</p><p><strong>Adancimea de lucru</strong>. Asta se refera la cat de adanc intra cutitele in pamant. Majoritatea motosapelor electrice <a href="/sistem-de-irigare-automata-pentru-gradina/" class="interlink">pentru gradina</a> mica au o adancime de 10-20 cm. Asta e suficient pentru pregatirea solului pentru seminte sau rasaduri. Nu vrei sa sapi la 30 cm adancime cu o unealta electrica mica, oricum nu o sa faca fata.</p><p><strong>Tipul de cutite</strong>. Majoritatea vin cu cutite din otel, care sunt destul de rezistente. Unele modele au cutite detasabile, ceea ce e un avantaj daca se uzeaza sau se rup. Verifica daca sunt usor de inlocuit si daca se gasesc piese de schimb.</p><p><strong>Manerul si ergonomia</strong>. E important sa fie confortabil. Eu prefer manerele reglabile, poti sa le ajustezi la inaltimea ta. Si materialul din care sunt facute e important, sa nu alunece din mana, mai ales daca transpiri.</p><p><strong>Lungimea cablului de alimentare</strong>. Daca nu ai o priza chiar langa locul unde lucrezi, ai nevoie de un prelungitor. Unele motosape vin cu un cablu scurt, deci ar trebui sa iei unul separat. Eu am preferat sa am un prelungitor de exterior, rezistent la umezeala, ca sa nu ma stresez.</p><p>Nu uita sa te gandesti si la <strong>mentenanta</strong>. Motosapele electrice nu necesita multa intretinere. Curatarea cutitelor dupa fiecare utilizare si verificarea cablului sunt suficiente. E mult mai simplu decat la cele pe benzina.</p><p>Si, bineinteles, <strong>pretul</strong>. Stabilește-ți un buget. Am vazut modele de la 500 RON pana la 1200 RON. Daca ai o gradina mica si nu o folosesti zilnic, ceva mai ieftin ar putea fi suficient. Daca vrei ceva mai robust, care sa te tina ani de zile, investeste un pic mai mult.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ale-motosapei-electrice">
-        <h2>Avantaje si dezavantaje ale motosapei electrice</h2>
-        <p>Ca orice unealta, si motosapa electrica vine cu plusuri si minusuri. Sincer sa fiu, cand am inceput sa ma interesez, am avut un pic de retineri. Dar dupa ce am folosit-o, am realizat ca avantajele sunt destul de mari, mai ales <a href="/lampa-solara-pentru-gradina/" class="interlink">pentru gradina</a> mea mica.</p><p><strong>Avantaje:</strong></p><p>Cel mai mare avantaj, pentru mine, e <strong>usurinta in utilizare</strong>. Nu trebuie sa tragi de un sfoara, sa amesteci benzina cu ulei, sa cureti filtrul de aer. Apesi pe un buton si porneste. E atat de simplu. Asta inseamna mai putin efort si mai mult timp castigat.</p><p><strong>Zgomotul redus</strong> e un alt punct forte. Nu deranjezi vecinii, nu te trezesti cu urlete de la motor. Poti sa lucrezi si dimineata devreme sau seara, fara probleme.</p><p><strong>Nu polueaza</strong>. Nu scoate gaze nocive in aer, ceea ce e bine si pentru mediul inconjurator, si pentru sanatatea ta. Mai ales daca lucrezi in spatii inchise sau langa casa.</p><p><strong>Greutatea redusa</strong>, in general, fata de motocultoarele pe benzina. Asta le face mult mai manevrabile, mai ales in curtile cu obstacole, alei inguste sau zone cu pante.</p><p><strong>Costuri de intretinere scazute</strong>. Nu ai nevoie de ulei, filtre de aer, bujii. Tot ce trebuie sa faci e sa o cureti.</p><p><strong>Pretul mai accesibil</strong>, comparativ cu modelele pe benzina, pentru aceeasi putere (desi puterea e mai mica). Poti gasi o motosapa electrica decenta la un pret rezonabil.</p><p><strong>Dezavantaje:</strong></p><p>Principalul dezavantaj e <strong>dependenta de sursa de curent</strong>. Ai nevoie de o priza in apropiere sau de un prelungitor. Daca ai o gradina mare si departe de casa, sau nu ai acces la curent, o motosapa electrica nu e cea mai buna optiune.</p><p><strong>Puterea motorului</strong> este, in general, mai mica decat la cele pe benzina. Asta inseamna ca nu se descurca la fel de bine pe pamant foarte batatorit, cu radacini groase sau cu vegetatie densa. S-ar putea sa se blocheze sau sa necesite mai multe treceri.</p><p><strong>Durata de viata a bateriei (daca e pe acumulator) sau lungimea cablului</strong>. Daca e pe acumulator, trebuie sa tii cont de autonomia acestuia. Daca e cu fir, lungimea cablului poate fi o limitare. Eu am ales cu fir, pentru ca nu voiam sa ma stresez cu incarcatul bateriei.</p><p><strong>Durabilitatea pe termen lung</strong>, in comparatie cu modelele profesionale pe benzina, ar putea fi mai mica. Dar pentru o gradina mica, unde nu o folosesti zilnic, probabil o sa te tina ani buni.</p><p>Per total, cred ca pentru cine are o gradina mica, avantajele depasesc cu mult dezavantajele. E o unealta care face munca mai usoara si mai placuta.</p>
-      </section>
-
-      <section id="sfaturi-practice-din-experienta-mea-cu-motosapa-electrica">
-        <h2>Sfaturi practice din experienta mea cu motosapa electrica</h2>
-        <p>Dupa ce am pus mana pe prima mea motosapa electrica, am invatat destule lucruri din mers. Si, sincer, am si gresit pe alocuri. Asa ca m-am gandit sa-ti dau cateva ponturi, sa nu patesti si tu la fel.</p><p><strong>1. Pregateste terenul inainte.</strong> Nu te astepta ca motosapa sa taie prin buruieni inalte de 50 de cm sau prin crengi groase. Inainte sa o scoti la treaba, da o mana cu o coasa sau o trimer pentru a curata zona de vegetatia cea mai mare. Asa, motosapa va lucra mult mai eficient si nu se va bloca.</p><p><strong>2. Nu forta.</strong> Daca simti ca motosapa se chinuie, ca motorul se opreste sau ca se blocheaza cutitele, nu insista. Ridica putin motosapa, schimba directia sau incearca sa treci printr-un alt loc. Pamantul foarte batatorit sau plin de pietre poate fi o problema.</p><p><strong>3. Curata cutitele regulat.</strong> Dupa fiecare utilizare, sau chiar in timpul ei daca lucrezi pe un teren mai umed, curata cutitele de pamant, radacini si alte resturi. Un cutit curat lucreaza mai bine si prelungeste viata motorului.</p><p><strong>4. Inspecteaza cutitele.</strong> Verifica daca nu sunt indoite sau ciobite. Daca sunt prea uzate, e mai bine sa le schimbi. Si atentie la pietrele ascunse in pamant, pot deteriora cutitele.</p><p><strong>5. Foloseste echipament de protectie.</strong> Chiar daca e electrica, tot o unealta e. Poarta manusi, ochelari de protectie si incaltaminte rezistenta. Si, daca vrei sa fii extra precaut, o pereche de dopuri de urechi nu strica, desi zgomotul e mult mai mic decat la benzina.</p><p><strong>6. Nu lucra pe ploaie sau pe pamant ud.</strong> Umezeala excesiva poate fi periculoasa cu o unealta electrica. De asemenea, pamantul prea ud se lipeste de cutite si face treaba mult mai grea.</p><p><strong>7. Porneste si opreste corect.</strong> Asigura-te ca ai pus maneta de siguranta in pozitia corecta inainte de a porni motorul. Si cand termini, opreste-o imediat si scoate-o din priza.</p><p><strong>8. Stocheaza corect.</strong> Dupa ce ai curatat-o, depoziteaz-o intr-un loc uscat si ferit de intemperii. Eu o tin in magazie, pe raft.</p><p><strong>9. Atentie la cablu!</strong> Daca folosesti prelungitor, ai grija sa nu-l calci, sa nu-l tai sau sa nu-l prinzi intre cutite. E cel mai vulnerabil punct al sistemului.</p><p><strong>10. Nu te astepta la minuni.</strong> O motosapa <a href="/foarfeca-electrica-pentru-gard-viu/" class="interlink">electrica pentru</a> gradina mica nu e facuta sa arate pamantul de la zero, ca un tractor. E pentru a-l afana, a-l pregati pentru plantare, a-l face mai aerat. E o unealta de intretinere si pregatire, nu de transformare radicala.</p><p>Acestea sunt cateva din lucrurile pe care le-am invatat din experienta. Sper sa te ajute sa ai o experienta mai placuta si mai sigura cu motosapa ta.</p>
-      </section>
-
-      <section id="parerea-mea-finala-despre-motosapa-electrica">
-        <h2>Parerea mea finala despre motosapa electrica</h2>
-        <p>Dupa ce am trecut prin toate etapele – de la cumpărarea ei, la utilizare și la învățarea din greșeli – pot să spun cu mâna pe inimă că motosapa <a href="/fierastrau-electric-pentru-lemne/" class="interlink">electric</a>ă a fost o achiziție excelentă pentru mine. Am o grădină mică, cam cât o terasă mai generoasă, unde vreau să am legume proaspete și câteva flori pe lângă casă. Până acum, mă chinuiam cu lopata și hârlețul, iar rezultatele erau... obositoare, să zicem.</p><p>Acum, cu motosapa electrică, procesul de pregătire a solului a devenit o joacă. În 30-40 de minute, am gata zona unde vreau să pun roșiile sau salata. Nu mai transpir ca la efort fizic intens, nu mai am dureri de spate și, cel mai important, pamântul arată mult mai bine. E afânat, aerat, gata să primească semințele.</p><p>Pentru cine o recomand cu toată încrederea? Pentru toți cei care au o grădină mică, de la 20 la 100-150 de metri pătrați, și care nu vor să se complice cu întreținerea unui motor pe benzină. E perfectă pentru pensionari, pentru doamne, sau pentru oricine nu are forța necesară să lucreze cu unelte grele.</p><p>Dacă ai o suprafață mai mare, sau un teren foarte dur, cu pietre mari și rădăcini groase, atunci probabil că o motosapă pe benzină, mai puternică, ar fi o alegere mai bună. Dar pentru nevoile mele, motosapa electrică este ideală. E o unealtă de „întreținere” și „pregătire”, nu de „transformare radicală” a terenului.</p><p>Prețul este, de asemenea, un factor important. Am văzut modele decente începând de la 500-600 RON, iar cele mai performante ajung pe la 1100-1200 RON. Eu zic că o investiție de 700-900 RON îți poate aduce o unealtă destul de fiabilă și eficientă pentru câțiva ani buni.</p><p>Sfatul meu final: nu te teme să încerci o motosapă electrică dacă ai o grădină mică. Cred că o să te surprindă cât de mult îți poate ușura munca și cât de mult îți poate crește satisfacția de a lucra în propria grădină. E o investiție mică, dar cu un impact mare asupra timpului și confortului tău.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de adanc sapa o motosapa electrica?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea motosapelor electrice pentru gradini mici au o adancime de lucru intre 10 si 20 cm. Aceasta este suficienta pentru a afana solul pentru seminte, rasaduri sau gazon. Nu te astepta la adancimi mai mari, acestea sunt pentru utilaje mai puternice.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi motosapa electrica pe pamant batatorit?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, dar cu precautii. Pe pamant foarte batatorit, s-ar putea sa fie nevoie de mai multe treceri sau sa fie necesar sa afanezi putin manual inainte. Modelele cu motoare mai puternice (peste 1000W) se descurca mai bine in astfel de conditii.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce lungime de cablu e ideala?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde de gradina ta. Daca ai priza aproape, 5-10 metri sunt suficienti. Daca e mai departe, un prelungitor de 20-30 metri, special pentru exterior, e recomandat. Asigura-te ca e un cablu de calitate, rezistent la intemperii.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie curatate cutitele?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Ideal, dupa fiecare utilizare. Daca pamantul e umed sau lipicios, curata-le chiar si in timpul lucrului, pentru a mentine eficienta si a preveni blocarea.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce diferenta e intre motosapa electrica si motocultor?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Motosapa electrica e mai mica, mai usoara, mai silentioasa si mai usor de manevrat, potrivita pentru gradini mici. Motocultorul e mai mare, mai puternic (adesea pe benzina), si e folosit pentru suprafete mai mari, araturi mai adanci sau lucrari mai intensive.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce garantie au de obicei aceste motosape?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Majoritatea producatorilor ofera o garantie de 2 ani pentru motosapele electrice. Verifica politica de garantie a magazinului si a producatorului pentru a sti la ce sa te astepti in caz de defectiuni.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru o gradina mica, cea mai vanduta motosapa compacta e <strong>Könner KS 1000T E</strong>, usoara si de brand, iar cea mai ieftina, <strong>Kanwod Grave</strong>, are nota mare. Daca vrei cea mai usoara, pentru solar, <strong>Texas EL-TEX 750</strong> are doar 7.4 kg. Pentru o gradina mai mare, <strong>Steinhaus PRO-TIL1500</strong> e de departe cea mai vanduta, cu 1500 W si 45 cm latime.</p>
+      <p>La o motosapa electrica pentru gradina mica conteaza <strong>puterea</strong> potrivita cu marimea si duritatea solului, <strong>latimea si adancimea de lucru</strong>, si mai ales <strong>greutatea</strong>, pentru ca o manevrezi cu bratele. Mai jos gasesti direct recomandarile, impartite in compacte si mai puternice, iar dupa ele un ghid despre cum alegi.</p>
+      <p>Am pornit de la motosapele electrice in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe putere, latime, adancime si greutate, si le-am grupat in compacte, pentru gradini mici, si mai puternice, pentru suprafete mai mari. Dupa sapat, pentru ingrijirea gazonului vezi <a href="/scarificator-pentru-gazon/">scarificatoarele</a> si <a href="/sistem-de-irigare-automata-pentru-gradina/">sistemele de irigare automata</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#mic">Compacte, pentru gradina mica</a></li>
+        <li><a href="#mare">Mai puternice, pentru gradini mai mari</a></li>
+        <li><a href="#pentru-ce">Pentru ce folosesti o motosapa</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#electric-benzina">Electrica sau pe benzina</a></li>
+        <li><a href="#folosire">Cum o folosesti si o intretii</a></li>
+        <li><a href="#greseli">Greseli de evitat</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Putere</th><th>Adancime</th><th>Greutate</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.putere}</td>
+              <td>{x.adancime || '—'}</td>
+              <td>{x.greutate || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mic">Compacte, pentru gradina mica</h2>
+    <p>Usoare, sub 9 kg, cu putere de 750-1050 W: se manevreaza lejer prin straturi si solarii si sunt ideale pentru o gradina de casa. Aici e si cea mai ieftina, si cea mai usoara motosapa din selectie.</p>
+    <div class="rd-grid">
+      {MIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMic} alt="Motosape electrice compacte pentru gradina mica: Kanwod, Könner, Heinner, Texas" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mare">Mai puternice, pentru gradini mai mari</h2>
+    <p>De la 1500 la 2200 W si latimi de 40-60 cm: afaneaza mai mult teren la o trecere si fac fata solului mai tare, dar sunt mai grele. Pentru gradini medii spre mari sau pamant compact.</p>
+    <div class="rd-grid">
+      {MARE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMare} alt="Motosape electrice puternice: Steinhaus, Evotools, Texas, Kraft&Dele" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-motosapa-electrica').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate motosapele electrice la oferta</strong>
+        <span>Reducerile din acest moment la motosape electrice, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="pentru-ce">Pentru ce folosesti o motosapa</h2>
+    <p>O motosapa electrica are un rol simplu, dar care iti scuteste ore de munca grea cu sapa: <strong>afaneaza si marunteste pamantul</strong> cu ajutorul frezelor care se rotesc. E unealta de baza inainte de plantare, cand vrei un sol reavan, aerisit si usor de lucrat.</p>
+    <p>O folosesti mai ales la <strong>pregatirea gradinii de legume</strong> primavara, la afanarea straturilor, la incorporarea ingrasamantului sau a compostului in sol, si la intretinerea unui solar. Fata de sapatul manual, e mult mai rapida si mult mai putin obositoare, mai ales pe suprafetele mici si medii, unde o motosapa electrica isi arata cel mai bine avantajele: usoara, silentioasa si gata de lucru la o apasare de buton.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua motosape electrice:</p>
+    <ul>
+      <li><strong>Puterea:</strong> 750-1000 W ajung pentru o gradina mica si sol lucrat; spre 1500-2200 W pentru suprafete mai mari sau pamant tare. Mai multa putere inseamna si mai multa greutate.</li>
+      <li><strong>Latimea de lucru:</strong> 28-36 cm e ideala pentru gradini mici si solarii, unde te strecori printre straturi; 40-60 cm termina mai repede suprafetele mari.</li>
+      <li><strong>Adancimea de lucru:</strong> in general 20-22 cm. 20 cm ajung pentru un strat de legume, mai mult inseamna afanare in profunzime.</li>
+      <li><strong>Greutatea:</strong> conteaza mult, pentru ca o manevrezi cu bratele. Sub 9 kg e usor de manuit; peste 12 kg cere efort.</li>
+      <li><strong>Frezele:</strong> cauta freze din otel rezistent, care se pot inlocui la nevoie, ca sa nu ramai cu aparatul nefolosibil.</li>
+    </ul>
+
+    <h2 id="electric-benzina">Electrica sau pe benzina</h2>
+    <p>Pentru o gradina mica sau medie, <strong>motosapa electrica e alegerea mai buna</strong>, si de departe. E mai usoara, mult mai silentioasa, porneste instant de la buton, nu are miros de combustibil si cere o intretinere minima, fara ulei, bujii sau carburator. E solutia ideala pentru gradinarii care ingrijesc suprafete mici, eficient si curat.</p>
+    <p>O motosapa pe benzina sau un motocultor cu motor termic isi merita banii doar daca ai <strong>teren mare, sol foarte compact sau argilos</strong>, unde conteaza puterea bruta si libertatea de a lucra fara cablu, departe de priza. Pentru o gradina de casa sau un solar, insa, dezavantajele benzinei, zgomot, miros, intretinere, greutate, nu se justifica. Singura limita reala a electricei e cablul, care te tine legat de o priza si pe care trebuie sa il gestionezi cu grija in timpul lucrului.</p>
+
+    <h2 id="folosire">Cum o folosesti si o intretii</h2>
+    <p>Fiind electrica, motosapa lucreaza legata la priza sau la un prelungitor pentru exterior, asa ca cel mai important lucru la folosire e sa <strong>tii cablul in spate</strong>, departe de freze, ca sa nu il prinzi. Treci uniform peste teren si creste adancimea treptat daca solul e tare, fara sa fortezi aparatul in pamant foarte compact, unde s-ar putea supraincalzi; daca simti ca se chinuie, mai bine faci doua treceri mai putin adanci.</p>
+    <p>Intretinerea e minima, tocmai pentru ca nu are motor termic. Dupa fiecare folosire, <strong>curata frezele</strong> de pamant si radacini, ca sa nu se blocheze, sterge aparatul si depoziteaza-l uscat, la adapost. Verifica periodic frezele si suruburile si strange-le sau inlocuieste-le daca s-au uzat. Cu aceasta grija simpla, o motosapa electrica te serveste multe sezoane, fara bataia de cap a unui motor pe benzina.</p>
+
+    <h2 id="greseli">Greseli de evitat</h2>
+    <p>Cateva greseli frecvente strica rezultatul sau chiar aparatul. Le eviti usor daca le stii dinainte:</p>
+    <ul>
+      <li><strong>Cumperi prea multa putere pentru o gradina mica:</strong> un model greu de 1500-2200 W e inutil de obositor pe cateva straturi. Pentru o gradina mica, un 750-1000 W usor face treaba mai comod.</li>
+      <li><strong>Fortezi aparatul in sol foarte tare:</strong> daca solul e uscat si compact, motorul se chinuie si se poate supraincalzi. Uda usor terenul cu o zi inainte sau fa doua treceri mai putin adanci.</li>
+      <li><strong>Nu ai grija la cablu:</strong> la o motosapa electrica, cablul in fata frezelor e cel mai mare risc. Tine-l mereu in spate si foloseste un prelungitor de exterior potrivit.</li>
+      <li><strong>Sapi prea adanc dintr-o data:</strong> creste adancimea treptat, altfel obosesti si tu, si aparatul. Pe sol nelucrat, prima trecere se face mai la suprafata.</li>
+      <li><strong>Nu cureti frezele dupa folosire:</strong> pamantul si radacinile ramase se intaresc si blocheaza frezele. Curata-le de fiecare data.</li>
+      <li><strong>Ignori posibilitatea de a schimba frezele:</strong> alege un model cu freze din otel care se pot inlocui, ca sa nu arunci tot aparatul cand se uzeaza lamele.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de putere, latime si brand:</p>
+    <p><strong>Compacte, pentru gradina mica:</strong> de la circa 300-490 de lei pentru modele de 750-1050 W, ca Kanwod, Hecht, Texas sau Heinner, usoare si potrivite pentru straturi si solarii.</p>
+    <p><strong>Mai puternice, 1500 W:</strong> in general 500-730 de lei pentru Steinhaus, Evotools sau Könner, cu latime mai mare si putere pentru gradini medii.</p>
+    <p><strong>Foarte puternice sau late:</strong> peste 750 de lei, spre 1500, pentru modele ca Kraft&Dele de 2200 W sau Texas El-tex 1800 de 60 cm latime.</p>
+    <p>Pe langa pret, cantareste <strong>marimea gradinii</strong>: pentru una mica, un model accesibil de 750-1000 W e cea mai buna alegere si cel mai usor de manevrat; puterea si latimea mari se justifica doar daca ai teren mare sau sol tare, altfel platesti pentru capacitate pe care nu o folosesti.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
         <p class="author-role">Expert Gradinarit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="motosapa-electrica-pentru-gradina-mica"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="motosapa-electrica-pentru-gradina-mica"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="motosapa-electrica-pentru-gradina-mica" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="motosapa-electrica-pentru-gradina-mica" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

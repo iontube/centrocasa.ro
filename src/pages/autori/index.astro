@@ -1,9 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import keywordsData from '../../../keywords.json';
-import { slugify } from '../../lib/articles.mjs';
+import { slugify, visibleArticles } from '../../lib/articles.mjs';
 
-const authors = (keywordsData.authors || []).map(a => ({
+// Nu listam autorii care inca n-au niciun articol — pagina lor nici nu se genereaza.
+const _populated = new Set(visibleArticles(keywordsData.completed).map(a => a.categorySlug));
+const authors = (keywordsData.authors || [])
+  .filter(a => (a.categories || []).some(c => _populated.has(c)))
+  .map(a => ({
   ...a,
   slug: slugify(a.name),
   initials: a.name.split(' ').map(n => n[0]).join('')

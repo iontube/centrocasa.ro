@@ -1,0 +1,297 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['cuptoare-microunde-inco'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Accesibile, sub 900 lei ---
+  { g: 'accesibil', id: 'DBK6LVBBM', rol: 'Cel mai vandut accesibil', short: 'Heinner 25 l', cap: '25 l', putere: '900 W', ctrl: 'Touch', pret: '715 lei',
+    specs: ['25 litri, 900 W microunde plus grill de 1000 W', 'control touch cu afisaj si ceas', 'blocare acces copii si pornire intarziata', 'latime 59.5 cm, program Auto cook'],
+    pros: ['44 de pareri, cel mai verificat din grupa accesibila', '25 de litri, cel mai incapator la pretul asta', 'Are grill, pentru rumenit, nu doar incalzit', 'Control touch cu ceas si blocare copii'],
+    cons: ['Nota 4.07, buna, nu de varf', 'Brand mai putin premium ca perceptie'],
+    verdict: 'Heinner HMW-25BIGBK e cuptorul la care se opreste multa lume cand cauta un microunde incorporabil ieftin, dar complet, si cifrele explica de ce: 25 de litri, cea mai mare capacitate din grupa accesibila, plus grill, la 715 lei si cu 44 de pareri in spate. Cei 900 W incalzesc rapid, iar grillul de 1000 W adauga rumenirea, deci nu doar incalzesti, ci si gratinezi o bucata de pui sau topesti cascaval peste o pizza. Controlul touch, cu afisare ceas, blocare copii si pornire intarziata, e mai bogat decat te-ai astepta la pret. Nota, 4.07, e buna fara sa fie de top. Il iei cand vrei cel mai mult cuptor pentru cei mai putini bani, cu grill inclus.' },
+  { g: 'accesibil', id: 'DXLRY13BM', rol: 'Cel mai bine notat ieftin', short: 'Heinner 20 l', cap: '20 l', putere: '800 W', ctrl: 'Digital', pret: '600 lei',
+    specs: ['20 litri, 800 W microunde plus grill de 1000 W', 'control digital, incalzire rapida', 'temporizator si semnal sonor la final', 'latime 59.5 cm'],
+    pros: ['Nota 4.7, cea mai mare din grupa accesibila', 'Sub 600 de lei, printre cele mai ieftine', 'Are grill de 1000 W', 'Control digital, mai precis decat cel mecanic'],
+    cons: ['20 de litri, incape doar un vas mic-mediu', 'Doar 10 pareri'],
+    verdict: 'Heinner HMW-MDBI20GDBK e varianta si mai ieftina, sub 600 de lei, si totusi cea mai bine notata din grupa accesibila, cu 4.7. Are 20 de litri, mai putin decat modelul de 25, deci incape un vas mic spre mediu, potrivit pentru o persoana, un cuplu sau ca al doilea cuptor. Cei 800 W plus grillul de 1000 W acopera incalzitul si rumenitul, iar controlul digital regleaza timpul si puterea mai precis decat un buton mecanic, cu functie de incalzire rapida. Are doar 10 pareri, deci mai putin verificat, dar nota mare e un semnal bun. Il iei cand vrei cel mai ieftin microunde incorporabil bine cotat si nu ai nevoie de capacitate mare.' },
+  { g: 'accesibil', id: 'DSX833BBM', rol: 'Grill, compact', short: 'Hansa 20 l', cap: '20 l', putere: '700 W', ctrl: 'Butoane', pret: '795 lei',
+    specs: ['20 litri, 700 W microunde plus grill de 900 W', 'temporizator si blocare acces copii', 'adancime de doar 32 cm, cea mai mica', 'latime 59.5 cm'],
+    pros: ['36 de pareri, bine verificat pentru pret', 'Cea mai mica adancime, 32 cm, intra in nise inguste', 'Are grill si blocare copii', 'Brand cunoscut, cu service'],
+    cons: ['700 W, cea mai mica putere din articol', '20 de litri, capacitate mica'],
+    verdict: 'Hansa AMG20BFH e alegerea compacta din grupa accesibila, si are un atu practic pe care putini il observa: adancimea de doar 32 de centimetri, cea mai mica din articol, ceea ce il face sa incapa in nise mai inguste, unde alte modele mai adanci nu intra. Cu 20 de litri, un grill de 900 W si blocare pentru copii, acopera nevoile de baza, iar cele 36 de pareri il fac bine verificat pentru zona lui de pret. Punctul mai slab e puterea microundelor, 700 W, cea mai mica din selectie, deci incalzeste ceva mai lent decat cele de 800-900 W. Il iei cand nisa e ingusta si vrei un cuptor de la un brand cunoscut, cu grill.' },
+  { g: 'accesibil', id: 'DV4F9XYBM', rol: 'Singurul cu control mecanic', short: 'Beko 20 l', cap: '20 l', putere: '800 W', ctrl: 'Mecanic', pret: '870 lei',
+    specs: ['20 litri, 800 W, timer mecanic', 'doua butoane rotative, fara meniuri', 'blocare acces copii, decongelare, iluminare', 'latime 59.9 cm'],
+    pros: ['Control mecanic simplu, cu doua butoane, fara meniuri', '800 W, mai mult decat modelele de 700', 'Brand Beko, cu service extins', 'Blocare copii si functie de decongelare'],
+    cons: ['Fara grill, doar incalzire', 'Cel mai scump din grupa accesibila, fara sa aiba grill'],
+    verdict: 'Beko BMOB20202B e pentru cine prefera simplitatea unui control mecanic in locul meniurilor digitale: doua butoane rotative, unul de putere, unul de timp, si atat. Nu trebuie sa inveti nimic, il rasucesti si merge, ideal pentru cine vrea un cuptor fara batai de cap, inclusiv pentru varstnici. Are 800 W, decongelare, blocare copii si numele Beko in spate, cu service aproape. Doua lucruri de stiut inainte: nu are grill, deci doar incalzeste, nu rumeneste, si e cel mai scump din grupa accesibila fara sa aiba grillul pe care alte modele mai ieftine il ofera. Il iei cand vrei control mecanic simplu si nu ai nevoie de grill.' },
+  // --- B. Echilibrate, de brand (900-1400 lei) ---
+  { g: 'echilibrat', id: 'DX3D54MBM', rol: 'Cel mai vandut din articol', short: 'Samsung 22 l', cap: '22 l', putere: '850 W', ctrl: 'Touch', pret: '1000 lei',
+    specs: ['22 litri, 850 W, cu grill', 'control touch cu numeroase programe', 'Mod Eco, mentinere la cald, elimina mirosuri', 'latime 59.5 cm, adancime doar 32 cm'],
+    pros: ['83 de pareri, de departe cel mai vandut din articol', 'Adancime de doar 32 cm, intra in nise mai inguste', 'Mod Eco pentru consum redus in standby', 'Functie de eliminare a mirosurilor si mentinere la cald'],
+    cons: ['22 de litri, sub cele de 25', 'Pretul e la limita de sus a valorii pentru capacitate'],
+    verdict: 'Samsung MG22M8274AT e cel mai vandut cuptor din articol, cu 83 de pareri, si e un bun exemplu ca increderea multor cumparatori conteaza mai mult decat orice cifra izolata. Are 22 de litri, 850 W cu grill si un control touch bogat, cu Mod Eco care taie consumul in standby, mentinere la cald si chiar o functie de eliminare a mirosurilor din interior. Ca si Hansa, are o adancime mica, 32 de centimetri, deci intra in nise mai stranse. Capacitatea, 22 de litri, e sub cele de 25, iar pretul de 1000 de lei e la limita de sus pentru cat spatiu primesti. Il iei cand vrei siguranta celui mai popular model, de la un brand mare, si adancime mica.' },
+  { g: 'echilibrat', id: 'D642TJMBM', rol: 'Cea mai mare nota la 25 l', short: 'Beko 25 l', cap: '25 l', putere: '900 W', ctrl: 'Digital', pret: '1249 lei',
+    specs: ['25 litri, 900 W plus grill de 1000 W', 'program Auto cook', 'finisaj negru, latime 59.5 cm', 'adancime 40 cm'],
+    pros: ['Nota 4.54, cea mai mare dintre modelele de 25 l', '25 de litri plus grill de 1000 W', 'Brand Beko cu service extins', 'Finisaj negru, elegant'],
+    cons: ['Doar 13 pareri', 'Adancime de 40 cm, cere o nisa mai adanca'],
+    verdict: 'Beko BMGB25333BG imbina cele doua lucruri pe care le vrei la mijloc de gama: capacitate de 25 de litri si cea mai mare nota dintre modelele de aceasta marime, 4.54. Cei 900 W plus grillul de 1000 W il fac bun si la incalzit rapid, si la rumenit, iar finisajul negru arata elegant intr-o bucatarie moderna. E de la Beko, deci cu service aproape. Rezervele sunt numarul inca mic de pareri, 13, si adancimea de 40 de centimetri, care cere o nisa mai adanca decat modelele de 32 cm, deci masoara inainte. Il iei cand vrei 25 de litri bine notati, cu grill, de la un brand de incredere, si ai nisa potrivita.' },
+  { g: 'echilibrat', id: 'DNQCL7BBM', rol: 'Digital, finisaj inox', short: 'Heinner 23 l', cap: '23 l', putere: '800 W', ctrl: 'Digital', pret: '1255 lei',
+    specs: ['23 litri, 800 W plus grill de 1000 W', 'control digital, oprire automata', 'pornire intarziata, blocare copii', 'finisaj argintiu inox'],
+    pros: ['44 de pareri, bine verificat', 'Grill de 1000 W', 'Finisaj inox, se potriveste cu alte electrocasnice argintii', 'Control digital cu pornire intarziata'],
+    cons: ['Nota 3.98, cea mai mica din grupa', 'Mai inalt, 45.8 cm, verifica nisa'],
+    verdict: 'Heinner HMW-23BI e varianta cu finisaj inox din grupa echilibrata, potrivita daca ai deja electrocasnice argintii si vrei un set uniform. Are 23 de litri, 800 W plus un grill de 1000 W, control digital cu oprire automata, pornire intarziata si blocare pentru copii, plus 44 de pareri, printre cele mai multe din articol. Doua lucruri de cantarit: nota, 3.98, e cea mai mica din grupa, semn ca experientele sunt mai amestecate, si e mai inalt decat celelalte, 45.8 cm, deci verifica sa incapa in nisa pe verticala. Il iei cand vrei un finisaj inox, control digital si nu te descurajeaza nota medie.' },
+  { g: 'echilibrat', id: 'D3BM9V3BM', rol: 'Fara platou rotativ', short: 'Gorenje 23 l', cap: '23 l', putere: '800 W', ctrl: 'Digital', pret: '1413 lei',
+    specs: ['23 litri, 800 W, fara platou rotativ', 'tehnologie 360Stir, distribuie undele fara sa roteasca vasul', 'baza plana, incap vase mari sau dreptunghiulare', 'nota 5 pe primele pareri'],
+    pros: ['Fara platou rotativ, incap vase mari sau dreptunghiulare', 'Baza plana, mai usor de curatat', 'Distributie uniforma prin sistemul 360Stir', 'Brand cunoscut pentru electrocasnice de gatit'],
+    cons: ['Doar 4 pareri, putin verificat', 'Peste 1400 de lei'],
+    verdict: 'Gorenje BM235CLI iese din tipar prin ceva ce restul articolului nu are: nu foloseste platou rotativ. In loc sa invarta vasul, are tehnologia 360Stir, care distribuie microundele uniform printr-un element rotativ ascuns, lasand o baza plana in interior. Avantajul e concret: incap vase mari sau dreptunghiulare care nu ar avea loc sa se roteasca intr-un cuptor clasic, iar baza plana, fara inel si platou de sticla, se curata mult mai usor. Sunt 23 de litri, 800 W, control digital, de la un brand cunoscut pentru aparate de gatit. Are doar 4 pareri, deci merge luat pe specificatii. Il iei cand vrei sa scapi de platoul rotativ si sa poti folosi vase de orice forma.' },
+  // --- C. Premium (1700+ lei) ---
+  { g: 'premium', id: 'DMNDJFBBM', rol: 'Cel mai bine notat premium', short: 'Bosch AutoPilot 7', cap: '25 l', putere: '900 W', ctrl: 'Butoane', pret: '1699 lei',
+    specs: ['25 litri, 900 W, AutoPilot cu 7 programe automate', 'oprire automata si afisare ceas', 'butoane, constructie Bosch', 'latime 59.4 cm'],
+    pros: ['50 de pareri cu nota 4.5, cel mai bine cotat premium', 'AutoPilot cu 7 programe automate pentru feluri comune', '25 de litri, capacitate generoasa', 'Constructie si fiabilitate Bosch'],
+    cons: ['Peste 1600 de lei', 'Fara grill mentionat in dotarea de baza'],
+    verdict: 'Bosch BFL554MB0 e cuptorul premium cu cel mai bun echilibru intre pret, dotari si incredere: 25 de litri, 900 W, 50 de pareri si nota 4.5, cea mai buna combinatie din zona premium. Atuul lui e AutoPilot 7, un set de 7 programe automate care aleg singure puterea si timpul pentru feluri obisnuite, deci nu mai ghicesti cat sa dai la decongelat o bucata de carne sau la incalzit o portie. Constructia Bosch aduce fiabilitatea si finisajul asteptate de la brand. E peste 1600 de lei, adica dublu fata de un Heinner accesibil, si merita doar daca pui pret pe brand si pe programele automate. Il iei cand vrei un premium sigur, bine notat, fara sa platesti cat pentru varful de gama.' },
+  { g: 'premium', id: 'D5H9TQBBM', rol: 'Cele mai multe pareri premium', short: 'Electrolux 25 l', cap: '25 l', putere: '900 W', ctrl: 'Digital', pret: '1977 lei',
+    specs: ['25 litri, 900 W, cu grill', 'control cu timer si semnal la final', 'finisaj negru cu argintiu', 'adancime mare, 55 cm'],
+    pros: ['54 de pareri, cele mai multe din zona premium', '25 de litri plus grill', 'Finisaj negru cu argintiu, aspect premium', 'Brand Electrolux, cu service'],
+    cons: ['Adancime de 55 cm, cere o nisa foarte adanca', 'Aproape 2000 de lei'],
+    verdict: 'Electrolux LMS4253TMX e cel mai verificat cuptor din zona premium, cu 54 de pareri, mai multe decat orice alt model scump din articol. Ofera 25 de litri, 900 W cu grill si un finisaj negru cu argintiu care arata scump si se potriveste cu o bucatarie moderna. E o alegere solida pentru cine vrea un premium dovedit de multi cumparatori, nu unul cu doua-trei recenzii. Atentie insa la un detaliu de montaj: are o adancime de 55 de centimetri, mult peste modelele de 32-40 cm, deci ai nevoie de o nisa foarte adanca; masoara neaparat inainte de comanda. Il iei cand vrei un premium bine verificat de la Electrolux si ai nisa suficient de adanca.' },
+  { g: 'premium', id: 'D20JY6MBM', rol: 'Finisaj crem, cu grill', short: 'Electrolux crem', cap: '25 l', putere: '900 W', ctrl: 'Digital', pret: '2245 lei',
+    specs: ['25 litri, 900 W, cu grill', 'finisaj crem, pentru bucatarii clasice', 'control electronic', 'nota 5 pe primele pareri'],
+    pros: ['Finisaj crem, rar, pentru bucatarii clasice sau rustice', '25 de litri plus grill', 'Nota 5 pe primele pareri', 'Brand Electrolux'],
+    cons: ['Peste 2200 de lei', 'Doar 5 pareri', 'Culoarea crem se potriveste doar cu anumite bucatarii'],
+    verdict: 'Electrolux EMT25203OC e varianta de nisa a premium-ului, si diferenta principala fata de restul e culoarea: un finisaj crem, greu de gasit, care se potriveste in bucatariile clasice, rustice sau in cele cu mobilier crem si accente calde, unde negrul sau inoxul ar suna prost. Tehnic, e un cuptor solid de 25 de litri cu 900 W si grill, de la Electrolux, cu nota 5 pe primele pareri. Rezervele sunt pretul, peste 2200 de lei, numarul mic de recenzii si faptul ca finisajul crem e un avantaj doar daca se potriveste cu bucataria ta; altfel, modelele negre sau inox sunt mai versatile. Il iei cand ai o bucatarie in tonuri calde si vrei un cuptor care sa se integreze cromatic.' },
+  { g: 'premium', id: 'DDWTP3YBM', rol: 'Top premium, cu autocuratare', short: 'Bosch Seria 8', cap: '21 l', putere: '900 W', ctrl: 'Touch', pret: '3500 lei',
+    specs: ['21 litri, 900 W, functie de autocuratare', 'control touch, incalzire rapida', 'Seria 8, varful de gama Bosch', 'finisaj alb, latime 59.4 cm'],
+    pros: ['Autocuratare, unic in articol: curata singur interiorul', 'Varful de gama Bosch, Seria 8', 'Control touch si incalzire rapida', 'Finisaj alb, pentru bucatarii luminoase'],
+    cons: ['Cel mai scump din articol, peste 3500 de lei', 'Doar 21 de litri, cea mai mica capacitate premium', 'Doar 7 pareri'],
+    verdict: 'Bosch Seria 8 BFL7221W1 e varful de gama din articol, si aduce o functie pe care niciun alt model nu o are: autocuratarea, prin care cuptorul isi curata singur interiorul, fara sa freci tu peretii. E parte din Seria 8 a Bosch, cu control touch, incalzire rapida si un finisaj alb rar, pentru bucatarii luminoase. Aici platesti pentru varf: peste 3500 de lei, de cinci ori cat un accesibil bun, pentru un cuptor de doar 21 de litri, cea mai mica capacitate din zona premium, si cu doar 7 pareri. E o alegere de statement, pentru o bucatarie premium cap-coada, nu una de raport. Il iei doar cand vrei ce e mai bun de la Bosch si bugetul nu e o problema.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'accesibil');
+const ECH = PICKS.filter(x => x.g === 'echilibrat');
+const PREM = PICKS.filter(x => x.g === 'premium');
+
+const hero = '/imagini/articole/cele-mai-bune-cuptoare-cu-microunde-incorporabile.webp';
+const figAcc = '/imagini/articole/micro-inco-accesibile.webp';
+const figEch = '/imagini/articole/micro-inco-echilibrate.webp';
+const figPrem = '/imagini/articole/micro-inco-premium.webp';
+const published = '2026-07-22T19:18:29+03:00';
+
+const faq = [
+  { question: 'Ce inseamna cuptor cu microunde incorporabil?', answer: 'E un cuptor cu microunde proiectat sa fie montat ascuns intr-un corp de mobilier de bucatarie, intr-o nisa, un raft sau o coloana, in loc sa stea pe blat. Are o rama care se prinde de mobilier si un aspect care se integreaza cu fronturile, pentru un look unitar. Fata de un microunde de blat, elibereaza spatiul de lucru si arata mai curat, dar cere o nisa dedicata, cu dimensiuni potrivite si ventilatie, plus o instalare mai atenta. Latimea standard e de circa 59.5 cm, ca sa intre intr-o nisa de 60.' },
+  { question: 'De cati wati am nevoie la un cuptor cu microunde?', answer: 'Puterea microundelor determina cat de repede se incalzeste mancarea. Un minim rezonabil e 700-800 W; sub atat, incalzirea e vizibil mai lenta. Cele mai multe modele bune au 800-900 W, suficient pentru orice uz casnic, de la incalzit la decongelat si gatit. Peste asta, diferenta se simte putin. Atentie sa nu confunzi puterea microundelor cu cea a grillului: multe fise trec doua cifre, de exemplu 900 W microunde si 1000 W grill, iar cea care conteaza pentru incalzit e prima. In articol, puterile merg de la 700 la 900 W.' },
+  { question: 'Am nevoie de grill la microunde?', answer: 'Depinde ce gatesti. Un microunde simplu doar incalzeste si decongeleaza, prin unde. Unul cu grill are in plus un element de incalzire care rumeneste si crocaneste suprafata mancarii, deci poti gratina cascaval, rumeni o bucata de pui sau incalzi o pizza fara sa iasa moale. Multe modele au si o functie combi, care foloseste microundele si grillul in acelasi timp, pentru gatit mai rapid cu suprafata rumenita. Daca folosesti cuptorul doar pentru incalzit si decongelat, nu ai nevoie de grill; daca vrei sa si gatesti sau rumenesti, merita. Majoritatea modelelor din articol au grill.' },
+  { question: 'Control mecanic sau digital?', answer: 'Controlul mecanic, cu doua butoane rotative, unul de putere si unul de timp, e simplu si robust: il rasucesti si merge, fara meniuri de invatat, potrivit pentru cine vrea un aparat fara batai de cap. Controlul digital sau touch e mai precis, iti lasa sa setezi exact timpul si puterea, are afisaj, ceas, pornire intarziata si adesea programe automate care aleg singure setarile pentru feluri comune. Daca vrei simplitate maxima, ia mecanic, ca Beko din articol. Daca vrei precizie, programe si un aspect mai modern, ia digital. Majoritatea modelelor de azi sunt digitale sau touch.' },
+  { question: 'Ce e un microunde fara platou rotativ?', answer: 'La cuptoarele clasice, mancarea sta pe un platou de sticla care se roteste, ca sa se incalzeasca uniform pe toate partile. Unele modele moderne, ca Gorenje cu tehnologia 360Stir din articol, renunta la platou: au o baza plana si distribuie microundele uniform printr-un element rotativ ascuns, care imprastie undele in interior. Avantajele sunt doua. Intai, incap vase mari sau dreptunghiulare, care intr-un cuptor cu platou nu ar avea loc sa se roteasca. Apoi, baza plana, fara inel si platou de scos, se curata mult mai usor. E un plus real daca folosesti des vase mari sau vrei curatare simpla.' },
+  { question: 'Ce dimensiuni are nisa pentru un microunde incorporabil?', answer: 'Latimea e aproape mereu standard: aparatele au circa 59.5 cm, ca sa intre intr-o nisa de 60. Ce variaza mult, si ce trebuie verificat, e adancimea: in articol merge de la 32 cm la Hansa si Samsung pana la 55 cm la Electrolux. Un cuptor de 55 cm adancime nu incape intr-o nisa gandita pentru unul de 35, deci masoara adancimea nisei inainte de comanda. Verifica si inaltimea, care de obicei e in jur de 38-39 cm, dar poate urca la 45 la unele modele. Si lasa spatiu de ventilatie in jur, ca aparatul sa nu se supraincalzeasca.' },
+  { question: 'Cat spatiu are un microunde de 20 fata de 25 de litri?', answer: 'Diferenta se vede la ce vas incape. Un cuptor de 20 de litri e potrivit pentru o farfurie sau un vas mic spre mediu, bun pentru o persoana, un cuplu sau ca al doilea cuptor. Unul de 23-25 de litri incape un vas mai mare, o caserola pentru toata familia sau o farfurie plina fara sa atinga peretii, si e alegerea pentru uz zilnic pentru mai multi. Nu confunda insa capacitatea cu dimensiunile exterioare: toate au aceeasi latime de nisa, de 60 cm, diferenta de litri venind din adancimea si designul interior. Daca gatesti pentru mai multi, ia de la 23 de litri in sus.' },
+  { question: 'Merita autocuratarea la un microunde?', answer: 'E o functie rara si scumpa, prezenta doar la varful de gama, cum e Bosch Seria 8 din articol. Cuptorul isi curata singur interiorul, de obicei incalzind putina apa care desprinde grasimea si resturile, ca apoi sa stergi usor. E comod, dar sa fim cinstiti: un microunde se curata oricum usor, cu un bol de apa cu lamaie incalzit cateva minute, care face acelasi lucru gratis. Autocuratarea automata e un moft placut la un aparat premium, nu un motiv in sine sa platesti de doua-trei ori mai mult. O iei daca vine la pachet cu un cuptor pe care il vrei oricum pentru brand si finisaj, nu doar pentru ea.' },
+];
+
+const images = [hero, figAcc, figEch, figPrem, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune cuptoare cu microunde incorporabile in ${SEO_YEAR}: cum alegi puterea si dotarile`}
+  description="12 cuptoare cu microunde incorporabile comparate pe capacitate, putere, grill si control, de la 566 la 3900 de lei. Cat de multa putere si dotari iti trebuie."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune cuptoare cu microunde incorporabile' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune cuptoare cu microunde incorporabile</span>
+    </nav>
+
+    <h1>Cele mai bune cuptoare cu microunde incorporabile</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune cuptoare cu microunde incorporabile, de la modele accesibile la premium cu autocuratare" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Un cuptor cu microunde incorporabil se alege pe trei lucruri: sa incapa in nisa din mobilier, sa aiba destula putere si exact dotarile care iti trebuie, nici mai putine, nici in plus. Cel mai vandut din selectie, cu 83 de pareri, e <strong>Samsung MG22M8274AT</strong>, 22 de litri la 1000 de lei. Daca vrei cel mai bun raport, <strong>Heinner de 25 de litri</strong> cu grill costa 715 lei si are 44 de pareri. Iar la premium, <strong>Bosch BFL554</strong> cu AutoPilot, 50 de pareri si nota 4.5, e cel mai bine notat de peste 1600 de lei.</p>
+      <p>Odata bifata potrivirea in nisa, decizia se reduce la cateva lucruri simple: <strong>capacitatea</strong>, 20 pentru o persoana sau 25 de litri pentru o familie; <strong>puterea</strong>, de la 700 la 900 W; <strong>grillul</strong>, daca vrei sa si rumenesti, nu doar sa incalzesti; si <strong>tipul de control</strong>, mecanic simplu sau digital cu programe.</p>
+      <p>Le-am grupat pe trei praguri de pret: accesibile sub 900 de lei, echilibrate de brand intre 900 si 1400, si premium peste 1700, cu functii ca AutoPilot sau autocuratare. Toate sunt modele incorporabile; cele care stau pe blat, <strong>microundele de sine statatoare</strong>, sunt o categorie separata, cu articol propriu.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#accesibil">Accesibile, sub 900 lei</a></li>
+        <li><a href="#echilibrat">Echilibrate, de brand (900-1400 lei)</a></li>
+        <li><a href="#premium">Premium (1700+ lei)</a></li>
+        <li><a href="#nisa">Nisa si dimensiunile: masoara intai</a></li>
+        <li><a href="#putere">Puterea si grillul</a></li>
+        <li><a href="#control">Control mecanic sau digital</a></li>
+        <li><a href="#platou">Cu platou rotativ sau fara</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Putere</th><th>Control</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.putere}</td>
+              <td>{x.ctrl}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="accesibil">Accesibile, sub 900 lei</h2>
+    <p>Astea sunt cuptoarele pentru cine vrea un microunde incorporabil bun, fara sa treaca de 900 de lei. Au 20-25 de litri, iar cele mai multe si grill, deci nu doar incalzesc. Diferentele le fac capacitatea, puterea si tipul de control, asa ca le-am asezat de la cel mai vandut la cel mai simplu.</p>
+    {ACC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figAcc} alt="Cuptoare cu microunde incorporabile accesibile, Heinner 25 l, Hansa 20 l si Heinner 20 l" width="1600" height="900" loading="lazy" />
+
+    <h2 id="echilibrat">Echilibrate, de brand (900-1400 lei)</h2>
+    <p>Intre 900 si 1400 de lei intri la branduri consacrate si la cateva functii in plus. Aici sta cel mai vandut cuptor din articol, un finisaj inox, un model de 25 de litri bine notat si unul fara platou rotativ. E zona cu cel mai bun echilibru intre pret si incredere pentru majoritatea.</p>
+    {ECH.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figEch} alt="Cuptoare cu microunde incorporabile echilibrate, Samsung 22 l, Beko 25 l si Gorenje fara platou" width="1600" height="900" loading="lazy" />
+
+    <h2 id="premium">Premium (1700+ lei)</h2>
+    <p>Peste 1700 de lei ajungi la branduri premium si la functii pe care restul nu le au: programe automate AutoPilot, autocuratare, finisaje speciale. Sunt cuptoare bine construite, dar la unele merita cantarit daca platesti pentru dotari reale sau doar pentru nume si pentru varful de gama.</p>
+    {PREM.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPrem} alt="Cuptoare cu microunde incorporabile premium, Bosch AutoPilot 7, Electrolux si Bosch Seria 8" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-cuptoare-microunde-inco').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate cuptoarele incorporabile la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="nisa">Nisa si dimensiunile: masoara intai</h2>
+    <p>La un cuptor incorporabil, primul pas nu e sa alegi modelul, ci sa masori nisa din mobilier, pentru ca aparatul trebuie sa incapa exact. Latimea, adancimea, inaltimea, plus un spatiu de aerisire.</p>
+    <p><strong>Latimea</strong> e aproape mereu standard: aparatele au circa 59.5 cm, ca sa intre intr-o nisa de 60. Aici rareori sunt surprize.</p>
+    <p><strong>Adancimea</strong> e cea care variaza mult si pe care o rateaza multa lume. In articol merge de la 32 de centimetri, la Hansa si Samsung, pana la 55, la Electrolux. Un cuptor adanc de 55 cm nu incape intr-o nisa gandita pentru unul de 35, deci masoara adancimea disponibila si compara-o cu fisa. Daca ai o nisa ingusta pe adancime, cauta modelele de 32 cm.</p>
+    <p><strong>Inaltimea</strong> e de obicei in jur de 38-39 cm, dar poate urca la 45 la unele, ca Heinner de 23 de litri, deci verific-o si pe ea. Si lasa spatiu de <strong>ventilatie</strong> in jurul aparatului: un microunde incastrat elimina caldura si aburul, iar daca fantele sunt blocate, se supraincalzeste si se uzeaza mai repede.</p>
+
+    <h2 id="putere">Puterea si grillul</h2>
+    <p>Doua cifre apar pe fisa si e usor sa le confunzi: puterea microundelor si puterea grillului. Sunt lucruri diferite.</p>
+    <p><strong>Puterea microundelor</strong>, exprimata in wati, spune cat de repede se incalzeste mancarea. Un minim rezonabil e 700-800 W; sub atat, incalzirea e vizibil mai lenta. Cele mai multe modele bune au 800-900 W, suficient pentru orice uz casnic. In articol, doar Hansa coboara la 700 W, restul stau la 800-900.</p>
+    <p><strong>Grillul</strong> e un element de incalzire suplimentar, cu putere proprie, de obicei 900-1000 W, care rumeneste si crocaneste suprafata mancarii. Cu el gratinezi cascaval, rumenesti pui sau incalzesti o pizza fara sa iasa moale. Multe modele au si o functie combi, care foloseste microundele si grillul deodata, pentru gatit mai rapid cu suprafata rumenita.</p>
+    <p>Regula simpla: daca folosesti cuptorul doar ca sa incalzesti si sa decongelezi, 800 W fara grill ajung. Daca vrei sa si gatesti sau rumenesti, cauta unul cu grill, si sunt majoritatea din articol.</p>
+
+    <h2 id="control">Control mecanic sau digital</h2>
+    <p>Felul in care comanzi cuptorul tine mai mult de preferinta decat de performanta, dar conteaza in folosirea zilnica.</p>
+    <ul>
+      <li><strong>Mecanic.</strong> Doua butoane rotative, unul de putere, unul de timp. Il rasucesti si merge, fara meniuri de invatat. Robust si simplu, potrivit pentru cine vrea zero complicatii, inclusiv pentru varstnici. In articol, Beko e singurul asa.</li>
+      <li><strong>Digital sau touch.</strong> Afisaj, reglaj precis al timpului si puterii, ceas, pornire intarziata si adesea programe automate care aleg singure setarile pentru feluri comune. Mai multe posibilitati, aspect mai modern. Majoritatea modelelor de azi.</li>
+    </ul>
+    <p>Daca vrei simplitate maxima, ia mecanic. Daca vrei precizie, programe si un aspect care se potriveste cu o bucatarie moderna, ia digital sau touch.</p>
+
+    <h2 id="platou">Cu platou rotativ sau fara</h2>
+    <p>Aproape toate cuptoarele au un platou de sticla care se roteste, ca sa incalzeasca mancarea uniform pe toate partile. E sistemul clasic, ieftin si eficient, dar are doua limite: nu incap vase mari sau dreptunghiulare, care nu au loc sa se roteasca, si platoul plus inelul de sub el trebuie scoase si spalate.</p>
+    <p>Cateva modele moderne, ca Gorenje cu tehnologia 360Stir din articol, renunta la platou. Distribuie microundele uniform printr-un element rotativ ascuns si lasa o baza plana in interior. Asa incap vase de orice forma si marime, iar curatarea e mai simpla, fara platou de scos. E un avantaj real daca folosesti des vase mari sau vrei intretinere usoara, in schimbul unui pret ceva mai mare. Pentru uz obisnuit, platoul clasic e perfect suficient.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Nu masori adancimea nisei.</strong> Latimea e standard, dar adancimea variaza de la 32 la 55 cm. Un cuptor adanc nu incape intr-o nisa ingusta. Masoara inainte.</li>
+      <li><strong>Confunzi puterea grillului cu a microundelor.</strong> Cea care conteaza pentru incalzit e puterea microundelor, prima cifra. Un grill de 1000 W nu inseamna incalzire rapida daca microundele sunt de 700.</li>
+      <li><strong>Iei fara grill si apoi ai nevoie de el.</strong> Daca vrei sa rumenesti sau sa gratinezi, nu doar sa incalzesti, verifica sa aiba grill. Multe modele ieftine au deja.</li>
+      <li><strong>Alegi 20 de litri pentru o familie.</strong> Un vas mare pentru mai multe persoane cere 23-25 de litri. Cel de 20 e pentru o persoana sau un cuplu.</li>
+      <li><strong>Platesti premium doar pentru autocuratare.</strong> Un microunde se curata usor cu un bol de apa cu lamaie incalzit. Autocuratarea e un moft placut, nu un motiv sa dublezi bugetul.</li>
+      <li><strong>Uiti de ventilatie.</strong> Fantele blocate duc la supraincalzire. Respecta spatiul de aerisire indicat de producator.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la cuptoarele cu microunde incorporabile in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca acelasi cuptor apare adesea in mai multe finisaje, cu coduri diferite si acelasi pret.</p>
+    <p><strong>Le-am grupat pe praguri de pret</strong>, accesibile, echilibrate si premium, pentru ca la un microunde bugetul e primul filtru practic, iar sub fiecare prag am pus modele reprezentative pe capacitate, putere si dotari. Am comparat specificatiile reale din fise, capacitatea, puterea microundelor si a grillului, tipul de control, dimensiunile de montaj si functiile speciale, si am semnalat unde un pret mai mare aduce ceva concret, ca AutoPilot sau autocuratarea, si unde nu.</p>
+    <p>Am acoperit doar modelele <strong>incorporabile</strong>, gandite pentru nisa din mobilier; microundele de sine statatoare, care stau pe blat, sunt o categorie separata. Nu testam aparatele in laborator si nu pretindem asta: ne bazam pe pareri, specificatii de la producator si documentare. Un microunde incorporabil se aseaza firesc langa restul electrocasnicelor de bucatarie, de la <a href="/cele-mai-bune-friteuze-cu-aer-cald/">o friteuza cu aer cald</a> la <a href="/cele-mai-bune-espressoare-manuale/">un espressor</a>.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 566 la aproape 3900 de lei, iar pretul urmeaza brandul si dotarile mai mult decat capacitatea.</p>
+    <p><strong>Sub 900 de lei</strong> stau modelele accesibile de la Heinner, Hansa si Beko, de 20-25 de litri, multe cu grill. Fac exact ce trebuie, incalzesc, decongeleaza si rumenesc, la un pret mic. Pentru majoritatea, aici e zona in care alegi.</p>
+    <p><strong>Intre 900 si 1400 de lei</strong> intra brandurile consacrate, Samsung, Beko, Gorenje, cu finisaje mai bune, mai multe programe sau tehnologii ca cea fara platou rotativ. Platesti pentru incredere si cateva functii in plus.</p>
+    <p><strong>Peste 1700 de lei</strong> ajungi la premium, Bosch si Electrolux, cu AutoPilot, autocuratare sau finisaje speciale, pana la aproape 3900 de lei pentru varful de gama Bosch Seria 8. Merita doar daca pui pret pe brand, pe finisaj sau pe o functie anume; altfel, un accesibil bun cu grill face aceeasi treaba de baza la o cincime din pret.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-cuptoare-cu-microunde-incorporabile" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-cuptoare-cu-microunde-incorporabile" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

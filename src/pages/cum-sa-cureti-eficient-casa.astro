@@ -1,285 +1,327 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Cum sa cureti eficient casa",
-  excerpt: "Curatenia casei poate parea o corvoada, dar cu putina organizare si cu produsele potrivite, poate deveni o activitate mai usoara si chiar placuta. Acest ghid iti vine in ajutor sa intelegi cum sa abordezi curatenia eficient, astfel incat sa te bucuri de un camin curat si primitor.",
-  image: "/images/articles/cum-sa-cureti-eficient-casa.webp",
-  category: "Curatenie si Intretinere",
-  categorySlug: "curatenie-intretinere",
-  date: "2026-01-11T16:16:08.894Z",
-  modifiedDate: "2026-01-29T16:16:08.631Z",
-  author: "Elena Dragomir",
-  authorRole: "Consultant Amenajari",
-  authorBio: "Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget."
-};
-
-const faq = [
-  { question: "Cat de des ar trebui sa fac curatenie generala?", answer: "Depinde mult de stilul tau de viata, de numarul de persoane din casa si daca ai animale de companie. In general, o curatenie generala temeinica, care include si locurile mai greu accesibile, ar trebui facuta de 2-4 ori pe an, adica o data pe sezon. Insa, daca observi ca se acumuleaza mult praf sau murdarie, nu ezita sa o faci mai des. E mai usor sa mentii curatenia decat sa cureti mizerie adunata." },
-  { question: "Ce fac cu mirosurile neplacute din frigider?", answer: "Cel mai simplu si eficient mod este sa pui un bol mic cu bicarbonat de sodiu in frigider. Bicarbonatul absoarbe mirosurile. Schimba-l o data pe luna. De asemenea, asigura-te ca nu depozitezi alimente stricate si ca cureti frigiderul periodic cu o solutie de apa cu otet sau cu o solutie de curatat delicata." },
-  { question: "Sunt produsele de curatenie ecologice la fel de eficiente ca cele clasice?", answer: "In majoritatea cazurilor, da. Producatorii de produse ecologice au evoluat mult si formulele lor sunt acum foarte eficiente, reusind sa curete la fel de bine ca produsele conventionale, fara a folosi chimicale agresive. Unele pot fi chiar mai puternice in anumite situatii. Plus ca sunt mult mai prietenoase cu mediul si cu sanatatea ta." },
-  { question: "Cum pot curata petele de grasime de pe aragaz sau din hota?", answer: "Pentru petele de grasime proaspete, o solutie de apa calda cu putin detergent de vase concentrat ar trebui sa fie suficienta. Pentru grasime incrustata, cel mai bine functioneaza un degresant pe baza de citrice sau o pasta din bicarbonat de sodiu si otet. Lasa solutia sa actioneze cateva minute (sau chiar peste noapte pentru pete vechi), apoi curata cu o laveta umeda. Uneori, o racleta de plastic sau o perie cu peri tari pot ajuta." },
-  { question: "Ce e mai bun: aspirator cu sac sau fara sac?", answer: "Ambele au avantaje. Aspiratoarele cu sac sunt, in general, mai igienice la golire, deoarece praful ramane inchis in sac. Sunt potrivite pentru persoanele cu alergii. Aspiratoarele fara sac sunt mai economice pe termen lung, nefiind nevoie sa cumperi saci, insa golirea recipientului poate elibera praf in aer. Daca ai alergii, un aspirator cu sac si filtru HEPA ar fi ideal. Daca nu, ambele variante sunt bune, depinde de preferinte." },
-  { question: "Cum pot indeparta depunerile de calcar din baie?", answer: "Cel mai eficient si natural ingredient este otetul alb distilat. Pulverizeaza otet direct pe zonele afectate (robineti, cap de dus, cabina de dus) si lasa-l sa actioneze 15-30 de minute (sau mai mult pentru depuneri groase). Apoi freaca cu o perie sau o laveta aspra si clateste cu apa. Poti folosi si solutii dedicate anticalcar, dar verifica eticheta pentru a te asigura ca sunt potrivite pentru suprafetele tale." }
-];
-
-const toc = [
-  { title: "De ce e curatenia eficienta atat de importanta? Pentru cine e potrivita?", id: "de-ce-e-curatenia-eficienta-atat-de-importanta-pentru-cine-e-potrivita" },
-  { title: "Top Produse si Solutii Recomandate pentru o Curatenie Eficienta", id: "top-produse-si-solutii-recomandate-pentru-o-curatenie-eficienta" },
-  { title: "Cum Alegi Corect Produsele si Echipamentele de Curatenie?", id: "cum-alegi-corect-produsele-si-echipamentele-de-curatenie" },
-  { title: "Avantaje si Dezavantaje: Curatenia 'DIY' vs. Solutii Profesionale", id: "avantaje-si-dezavantaje-curatenia-diy-vs-solutii-profesionale" },
-  { title: "Sfaturi Practice si Trucuri Utile din Experienta Mea", id: "sfaturi-practice-si-trucuri-utile-din-experienta-mea" },
-  { title: "Parerea Mea Sinceră: Ce Contează Cel Mai Mult la o Curățenie Eficientă?", id: "parerea-mea-sincera-ce-conteaza-cel-mai-mult-la-o-curatenie-eficienta" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['curatenie-casa'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Aspirat: vertical fara fir ---
+  { g: 'aspirator', id: 'DB8RLFYBM', badge: 'Cel mai bun raport', short: 'Xiaomi G20 Lite', cat: 'Aspirator vertical', ideal: 'Praf zilnic, covoare',
+    specs: ['aspirator vertical fara fir', 'usor, se ia si se pune repede', 'baterie reincarcabila', 'Xiaomi, aplicatie si accesorii'],
+    pros: ['Cel mai bun raport din grupul de aspiratoare, foarte multe pareri', 'Fara fir, il iei si tunzi praful in cateva minute, fara sa cauti priza', 'Usor de manevrat pe scari, mobila si masina', 'Xiaomi, brand serios chiar la buget'],
+    cons: ['Autonomie limitata de baterie, ca la orice aspirator fara fir', 'Pe covoare groase, mai putina forta decat un Dyson'],
+    verdict: 'Cel mai bun punct de plecare pentru curatenia zilnica fara efort. Xiaomi G20 Lite e un aspirator vertical fara fir, deci il iei de pe suport, aspiri praful, firimiturile sau parul de animal in cateva minute si il pui la loc, fara sa scoti un aspirator greu si sa cauti priza. E usor si ajunge peste tot: scari, canapea, masina, colturi. Are foarte multe pareri, semn ca isi face treaba pentru clasa lui de pret, si vine de la Xiaomi, cu accesorii utile. Ca la orice model fara fir, autonomia bateriei e limitata, iar pe covoare groase nu are forta unui Dyson. Il iei cand vrei sa aspiri des si repede, fara sa fie o corvoada.' },
+  { g: 'aspirator', id: 'D7DLN03BM', badge: 'Cel mai dotat', short: 'SeveShop P11 Pro', cat: 'Aspirator vertical', ideal: 'Casa mare, 4 in 1',
+    specs: ['aspirator vertical 4 in 1', 'nota cea mai mare din grup', 'accesorii pentru toata casa', 'fara fir'],
+    pros: ['Nota cea mai mare din grupul de aspiratoare, aproape maxim', '4 in 1, cu accesorii pentru podele, mobila si colturi', 'Fara fir, autonomie buna pentru o casa intreaga', 'Raport bun intre dotari si pret'],
+    cons: ['Brand mai putin cunoscut ca Xiaomi sau Dyson', 'Statia si accesoriile cer un loc de depozitare'],
+    verdict: 'Alegerea daca vrei un aspirator fara fir bine dotat, cu care aspiri toata casa dintr-o incarcare. SeveShop P11 Pro e un model 4 in 1, cu mai multe accesorii care il transforma din aspirator de podea in aspirator de mobila, colturi sau masina, si are nota cea mai mare din grup, semn de multumire de la cumparatori. E fara fir, cu autonomie buna, deci nu te opresti la jumatate. Brandul nu e la fel de cunoscut ca Xiaomi sau Dyson, iar accesoriile cer un loc de pastrat. Il iei cand vrei un aspirator vertical complet, cu care sa faci toata casa, la un pret mai bun decat premium-urile.' },
+  { g: 'aspirator', id: 'D6KWLDYBM', badge: 'Premium, referinta', short: 'Dyson V8 Absolute', cat: 'Aspirator vertical', ideal: 'Par de animale, premium',
+    specs: ['Dyson V8 Absolute, 425 W', 'cea mai mare putere din grup', 'filtrare buna, bun pentru alergii', 'referinta in aspiratoare fara fir'],
+    pros: ['Dyson, referinta in aspiratoarele fara fir', 'Cea mai mare putere din grup, 425 W, ridica de pe covoare si par de animal', 'Filtrare buna, util pentru cei alergici', 'Constructie si fiabilitate premium'],
+    cons: ['Cel mai scump din grup, aproape 1900 de lei', 'Autonomie limitata la putere maxima'],
+    verdict: 'Alegerea daca vrei ce e mai bun si ai animale sau covoare groase. Dyson V8 Absolute e referinta in aspiratoarele verticale fara fir, cu 425 W, cea mai mare putere din grup, care ridica praful adanc din covoare si parul de animal mult mai bine decat modelele accesibile. Are o filtrare buna, un plus real pentru cei alergici, si constructia si fiabilitatea pentru care e cunoscut brandul. E cel mai scump din grup, iar la putere maxima autonomia scade, ca la orice fara fir. Il iei cand vrei performanta de top, ai animale in casa sau vrei un aspirator care sa tina ani buni.' },
+  // --- Spalat pardoseala: mop cu aburi ---
+  { g: 'mop', id: 'DNBVS9BBM', badge: 'Cel mai vandut mop', short: 'Rowenta Steam Power', cat: 'Mop cu aburi', ideal: 'Gresie, parchet etans',
+    specs: ['mop cu aburi, 1200 W', 'spala si dezinfecteaza cu abur', 'fara detergenti', 'Rowenta, cel mai vandut din grup'],
+    pros: ['Cel mai vandut mop cu aburi din grup, multe pareri', 'Spala si dezinfecteaza cu abur fierbinte, fara chimicale', 'Rowenta, brand cunoscut, cu service la noi', 'Buna pe gresie, faianta si parchet etansat'],
+    cons: ['La suprafete delicate, ca parchetul, foloseste abur mai putin', 'Cablu, deci depinzi de priza'],
+    verdict: 'Cel mai popular mod de a spala si dezinfecta pardoseala fara detergenti. Rowenta Steam Power e un mop cu aburi de 1200 W care scoate abur fierbinte, ce curata si igienizeaza podeaua, ridicand pana la aproape toate bacteriile, fara nicio substanta chimica. E cel mai vandut din grup, cu multe pareri, si vine de la Rowenta, un brand cunoscut cu service la noi. Merge bine pe gresie si faianta la putere mare si pe parchet etansat sau laminat la abur mai putin, ca sa nu le strici. Fiind cu cablu, depinzi de priza. Il iei cand vrei sa speli podelele mai rar cu galeata si mai des, rapid, cu abur.' },
+  { g: 'mop', id: 'DB4N72MBM', badge: 'Buget', short: 'Black+Decker FSM13', cat: 'Mop cu aburi', ideal: 'Apartament mic',
+    specs: ['mop cu aburi, 1300 W', 'compact, usor', 'Black+Decker, brand cunoscut', 'pret accesibil'],
+    pros: ['Cel mai ieftin mop cu aburi din grup', 'Black+Decker, brand cunoscut si de incredere', '1300 W, se incalzeste repede', 'Usor si compact, bun pentru un apartament'],
+    cons: ['Rezervor mic, il reumpli mai des la o casa mare', 'Dotari mai putine decat modelele scumpe'],
+    verdict: 'Intrarea in curatenia cu aburi la cel mai mic pret, de la un brand de incredere. Black+Decker FSM13 e un mop cu aburi de 1300 W care se incalzeste repede si spala si dezinfecteaza podeaua fara detergenti, exact ca modelele scumpe, dar la un pret mult mai mic. E usor si compact, potrivit pentru un apartament sau o casa mica, unde nu ai suprafete uriase. Rezervorul e mai mic, deci il reumpli mai des la o casa mare, si are mai putine accesorii decat modelele premium. Il iei cand vrei sa incerci mopul cu aburi ieftin, de la un brand cunoscut, pentru un spatiu nu foarte mare.' },
+  { g: 'mop', id: 'DTLDZTYBM', badge: 'Brand de referinta', short: 'Karcher SC 2 Upright', cat: 'Mop cu aburi', ideal: 'Folosire deasa',
+    specs: ['mop cu aburi Karcher, 1600 W', 'cea mai mare putere din grup', 'Karcher, specialist in curatare cu abur', 'pentru folosire deasa'],
+    pros: ['Karcher, cel mai cunoscut brand de curatare cu abur', '1600 W, cea mai mare putere din grup', 'Constructie solida, pentru folosire deasa', 'Abur puternic, curata rosturile si murdaria incrustata'],
+    cons: ['Mai scump decat modelele de buget', 'Cablu, ca la majoritatea mopurilor cu aburi'],
+    verdict: 'Alegerea daca vrei brandul de referinta in curatarea cu aburi si folosesti mopul des. Karcher SC 2 Upright are 1600 W, cea mai mare putere din grup, deci produce un abur puternic ce desprinde murdaria incrustata si curata rosturile mai bine decat modelele slabe. Karcher e specialistul in aparate cu abur, cu o constructie solida gandita pentru folosire intensa si de durata. E mai scump decat mopurile de buget si, ca majoritatea, are cablu. Il iei cand vrei calitate si putere de la un brand consacrat, pentru o casa in care speli podelele des si vrei un aparat care rezista.' },
+  // --- Curatat in profunzime: aparat cu aburi multifunctional ---
+  { g: 'aparat', id: 'DPS6622BM', badge: 'Cel mai bine notat', short: 'SeveShop SC-06', cat: 'Aparat cu aburi', ideal: 'Rosturi, bai, bucatarie',
+    specs: ['aparat de curatat cu aburi, 1200 W', 'multe accesorii incluse', 'nota aproape maxima', 'pentru rosturi, bai, bucatarie'],
+    pros: ['Nota aproape maxima, multe pareri', 'Multe accesorii, ajunge in colturi, rosturi si pe robineti', 'Igienizeaza cu abur, fara chimicale, in profunzime', 'Bun pentru bucatarie, baie si suprafete grase'],
+    cons: ['Nu inlocuieste mopul de podea, e pentru detalii', 'Rezervor mic, timp de lucru mai scurt'],
+    verdict: 'Un aparat de curatat cu aburi de mana pentru curatenia in profunzime, acolo unde un mop nu ajunge. SeveShop SC-06 vine cu multe accesorii, cu care igienizezi rosturile de la gresie, robinetii, aragazul, cuptorul, gratarul hotei, dusul si orice suprafata grasa, cu abur fierbinte, fara detergenti. Are nota aproape maxima si multe pareri. Nu inlocuieste mopul de podea, e complementar, pentru detalii si zone greu de curatat, iar rezervorul mic inseamna un timp de lucru mai scurt intre reumpleri. Il iei cand vrei sa igienizezi bucataria, baia si colturile in profunzime, cu abur, nu cu chimicale.' },
+  { g: 'aparat', id: 'DN7L18YBM', badge: 'Putere mare, buget', short: 'Folixs 2500W', cat: 'Aparat cu aburi', ideal: 'Putere mare, ieftin',
+    specs: ['aparat de curatat cu aburi, 2500 W', 'presiune mare a aburului', 'pret accesibil', 'accesorii incluse'],
+    pros: ['Putere mare, 2500 W, abur cu presiune buna', 'Pret accesibil pentru cata putere ofera', 'Accesorii pentru mai multe suprafete', 'Igienizeaza fara chimicale'],
+    cons: ['Brand mai putin cunoscut, verifica service-ul', 'Puterea mare cere atentie pe suprafetele delicate'],
+    verdict: 'Alegerea daca vrei abur puternic la un pret mic. Folixs are 2500 W, printre cele mai puternice din grup, deci produce un abur cu presiune buna care desprinde murdaria incrustata, grasimea si calcarul mai repede, cu accesorii pentru mai multe suprafete si igienizare fara chimicale. E accesibil pentru cata putere ofera. Brandul e mai putin cunoscut, deci verifica din timp piesele si service-ul, iar puterea mare cere atentie pe suprafetele delicate, ca sa nu le afectezi. Il iei cand vrei un aparat cu aburi puternic pentru curatenie in profunzime, fara sa dai bani multi.' },
+  // --- Solutii si consumabile ---
+  { g: 'solutie', id: 'DRK86BBBM', badge: 'Universal, ieftin', short: 'Mr. Proper universal', cat: 'Solutie universala', ideal: 'Pardoseala, suprafete',
+    specs: ['detergent universal 1 litru', 'pentru pardoseala si suprafete', 'clasic, foarte cautat', 'randament mare, se dilueaza'],
+    pros: ['Clasic, foarte cautat, cu multe pareri', 'Universal, pentru pardoseala si majoritatea suprafetelor', 'Randament mare, se dilueaza in apa', 'Pret foarte mic'],
+    cons: ['Nu e specializat pe pete grele sau dezinfectie', 'Aroma puternica pentru unii'],
+    verdict: 'Detergentul universal de baza pe care il ai mereu in dulap. Mr. Proper e un clasic, cu care speli pardoseala si majoritatea suprafetelor lavabile: gresie, faianta, blaturi, usi. Se dilueaza in apa, deci un litru tine mult, la un pret foarte mic. Nu e specializat pe pete grele sau pe dezinfectie, unde ai nevoie de o pasta abraziva sau un dezinfectant dedicat, iar aroma e puternica pentru unii. Ideea unei curatenii eficiente e sa nu folosesti un singur produs la tot, ci cel potrivit pe fiecare suprafata; asta e piesa de baza, universala. Il iei ca detergent general, de zi cu zi.' },
+  { g: 'solutie', id: 'D6ZWRWMBM', badge: 'Pete grele', short: 'The Pink Stuff', cat: 'Pasta abraziva', ideal: 'Aragaz, cada, pete',
+    specs: ['pasta de curatare universala', 'pentru pete grele si murdarie arsa', 'usor abraziva', 'foarte populara'],
+    pros: ['Excelenta pe pete grele: aragaz, cuptor, cada, chiuveta', 'Usor abraziva, freaca ce solutiile lichide nu scot', 'Foarte populara, cu rezultate vizibile', 'Un borcan tine mult'],
+    cons: ['Fiind abraziva, testeaza intai pe suprafete delicate', 'Cere putin efort de frecare'],
+    verdict: 'Arma pentru petele pe care detergentii lichizi nu le scot. The Pink Stuff e o pasta usor abraziva, foarte populara, cu care freci si scoti murdaria arsa de pe aragaz si cuptor, calcarul si petele de pe cada, chiuveta, gresie sau chiar oale. Face treaba unde un spray obisnuit nu ajunge, cu rezultate vizibile, iar un borcan tine mult. Fiind abraziva, testeaz-o intai pe o zona ascunsa la suprafetele delicate sau lucioase, ca sa nu le zgarie, si cere putin efort de frecare. O iei ca solutie de rezerva pentru petele grele, pe langa detergentul universal.' },
+  { g: 'solutie', id: 'DKC6S7BBM', badge: 'Dezinfectie', short: 'Dettol multifunctional', cat: 'Dezinfectant', ideal: 'Bai, bucatarie',
+    specs: ['dezinfectant multifunctional spray', '500 ml, pentru suprafete', 'elimina bacteriile', 'nota mare'],
+    pros: ['Dezinfecteaza, nu doar curata, elimina bacteriile', 'Spray, il aplici direct pe suprafata', 'Ideal pentru bucatarie si baie, zonele cu germeni', 'Nota mare de la cumparatori'],
+    cons: ['Lasa-l sa actioneze cateva minute inainte sa stergi', 'Pentru dezinfectie, nu pentru pete grele'],
+    verdict: 'Piesa care lipseste dintr-o curatenie doar cu detergent: dezinfectia. Dettol e un spray dezinfectant multifunctional care nu doar curata, ci elimina bacteriile de pe suprafete, motiv pentru care il folosesti mai ales in bucatarie, pe blaturi si langa chiuveta, si in baie. Trucul e sa il pulverizezi si sa il lasi sa actioneze cateva minute inainte sa stergi, ca sa isi faca efectul, nu sa il stergi imediat. Are nota mare de la cumparatori. Nu e pentru pete grele arse, unde ai nevoie de o pasta abraziva. Il iei ca dezinfectant dedicat pentru zonele cu germeni, pe langa detergentul general.' },
+  { g: 'solutie', id: 'D9NCYHMBM', badge: 'Praf rapid', short: 'Swiffer mop uscat/umed', cat: 'Mop uscat/umed', ideal: 'Praf rapid, zilnic',
+    specs: ['trusa mop uscat si umed', 'lavete de unica folosinta', 'cel mai vandut din grup', 'praf si podele intre curatenii'],
+    pros: ['Cel mai vandut din grup, sute de pareri', 'Prinde praful si parul rapid, fara galeata', 'Lavete uscate pentru praf, umede pentru podea', 'Perfect pentru o trecere rapida zilnica'],
+    cons: ['Lavetele sunt de unica folosinta, cost recurent', 'Nu inlocuieste o spalare adevarata a podelei'],
+    verdict: 'Solutia pentru curatenia rapida de zi cu zi, intre curateniile mari. Trusa Swiffer are un mop cu lavete uscate, care prind praful, firele si parul de animal ca un magnet, si lavete umede, pentru o trecere rapida peste podea, fara galeata si fara sa scoti mopul cu aburi. E cel mai vandut din grup, cu sute de pareri, tocmai pentru ca e comod pentru o trecere de doua minute. Lavetele sunt de unica folosinta, deci ai un cost recurent cu rezervele, si nu inlocuiesc o spalare adevarata a podelei. O iei pentru intretinerea zilnica rapida, ca sa nu apuce praful sa se adune intre curateniile generale.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ASPIRATOR = PICKS.filter(x => x.g === 'aspirator');
+const MOP = PICKS.filter(x => x.g === 'mop');
+const APARAT = PICKS.filter(x => x.g === 'aparat');
+const SOLUTIE = PICKS.filter(x => x.g === 'solutie');
+
+const site = 'https://centrocasa.ro';
+const hero = '/images/articles/cum-sa-cureti-eficient-casa.webp';
+const figAspirator = '/imagini/articole/curat-aspiratoare.webp';
+const figMop = '/imagini/articole/curat-mopuri.webp';
+const figSolutii = '/imagini/articole/curat-solutii.webp';
+const published = '2026-07-18T14:49:06+03:00';
+
+const faq = [
+  { question: 'In ce ordine fac curatenie ca sa fie eficient?', answer: 'De sus in jos si dinspre interiorul camerei spre iesire. Sterge intai praful de pe rafturi, mobila, corpuri de iluminat si suprafetele inalte, apoi curata suprafetele de mijloc, si abia la final aspira si spala podeaua, ca murdaria care cade sa ajunga pe ce nu ai curatat inca, nu pe zonele deja facute. Lucreaza pe o camera pe rand, cu toate uneltele la indemana, nu sari haotic dintr-o sarcina in alta. Asa nu refaci munca si termini mai repede.' },
+  { question: 'Ce unelte imi economisesc cel mai mult timp?', answer: 'Trei fac cea mai mare diferenta. Un aspirator vertical fara fir, pe care il iei si il pui in cateva secunde, deci aspiri des si repede. Un mop cu aburi, care spala si dezinfecteaza podeaua fara galeata si fara detergenti. Si, daca vrei complet fara maini, un aspirator robot care lucreaza singur cat esti plecat. Peste ele, cateva solutii potrivite pe suprafete si un mop rapid tip Swiffer pentru praful zilnic. Cu aceste unelte, o curatenie care lua ore se scurteaza mult.' },
+  { question: 'Mopul cu aburi e sigur pe orice podea?', answer: 'Pe suprafetele dure si etansate, da: gresie, faianta, linoleum si parchet laminat sau tratat. Pe gresie si faianta poti folosi abur mai mult, pentru murdaria incrustata; pe parchet si laminat, foloseste un nivel de abur mai mic, ca sa nu patrunda umezeala si caldura in imbinari si sa nu le deterioreze. Evita lemnul neetansat, netratat, care absoarbe apa. Marele avantaj e ca aburul fierbinte curata si dezinfecteaza in acelasi timp, eliminand aproape toti germenii, fara nicio substanta chimica.' },
+  { question: 'Trebuie sa folosesc un singur detergent la tot?', answer: 'Nu, si aici e cheia curateniei eficiente. Un detergent universal e bun pentru pardoseala si suprafetele obisnuite, dar pentru pete grele arse ai nevoie de o pasta abraziva, iar pentru dezinfectie, mai ales in bucatarie si baie, de un dezinfectant dedicat. Folosind produsul potrivit pe fiecare tip de murdarie, cureti mai repede si cu mai putin efort decat fortand un singur produs peste tot. Trei-patru solutii bine alese acopera aproape orice in casa.' },
+  { question: 'Cat de des ar trebui sa fac curatenie?', answer: 'Cel mai eficient e sa imparti curatenia in doua. O rutina scurta zilnica sau la doua zile, de 10-15 minute: o trecere rapida cu aspiratorul fara fir sau cu un mop de praf, sters blaturile si baia. Si o curatenie generala, mai rara, saptamanala sau la doua saptamani: spalat podelele cu aburi, curatat in profunzime bucataria si baia, sters praful peste tot. Rutina scurta impiedica murdaria sa se adune, iar generala nu mai devine o corvoada de ore intregi.' },
+  { question: 'Merita un dezinfectant sau ajunge detergentul obisnuit?', answer: 'Un detergent curata, adica indeparteaza murdaria vizibila, dar nu neaparat omoara bacteriile. Un dezinfectant, in schimb, elimina germenii, motiv pentru care merita mai ales in zonele cu risc: blaturile din bucatarie unde tai carne, langa chiuveta, in baie si pe manerele atinse des. Nu ai nevoie sa dezinfectezi tot, tot timpul, dar in aceste zone si mai ales cand e cineva bolnav in casa, face diferenta. Lasa-l sa actioneze cateva minute ca sa isi faca efectul.' },
+  { question: 'Cum curat eficient si afara, terasa si pavajul?', answer: 'Pentru curatenia de afara, un mop sau un aspirator obisnuit nu ajuta; acolo ai nevoie de un aparat de spalat cu presiune, care desprinde murdaria de pe pavaj, terasa, gard, fatada si mobila de gradina cu un jet de apa sub presiune. E cea mai rapida cale de a curata suprafetele mari exterioare, iar cateva accesorii, ca o perie de pavaj, o fac si mai usoara. Pentru detalii si recomandari, vezi articolul nostru dedicat aparatelor de spalat cu presiune.' },
+  { question: 'Aspiratorul fara fir sau cel robot?', answer: 'Se completeaza, nu se exclud. Aspiratorul vertical fara fir e pentru cand vrei sa aspiri tu, rapid si punctual, o zona anume: firimituri sub masa, par pe canapea, scarile, masina. Aspiratorul robot lucreaza singur, dupa program, cat esti la serviciu, si mentine podeaua curata fara sa fii tu prezent. Ideal ai amandoua: robotul face intretinerea zilnica a podelelor, iar verticalul intervine acolo unde robotul nu ajunge. Daca alegi unul singur, ia verticalul pentru control si robotul pentru comoditate.' },
+];
+
+const images = [hero, figAspirator, figMop, figSolutii, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
 ---
 
 <Layout
-  title="Cum sa cureti eficient casa - CentroCasa"
-  description="Curatenia casei poate parea o corvoada, dar cu putina organizare si cu produsele potrivite, poate deveni o activitate mai usoara si chiar placuta. Acest ghid iti vine in ajutor sa intelegi cum sa abordezi curatenia eficient, astfel incat sa te bucuri de un camin curat si primitor."
-  image="/images/articles/cum-sa-cureti-eficient-casa.webp"
+  title="Cum sa cureti eficient casa in 2026: sistemul si uneltele care economisesc timp"
+  description="Cum sa cureti eficient casa: ordinea corecta, rutina zilnica si generala, plus uneltele care economisesc cel mai mult timp, aspirator fara fir, mop cu aburi, aparat cu aburi si solutiile potrivite pe fiecare suprafata."
+  image={hero}
   type="article"
-  publishedTime="2026-01-11T16:16:08.894Z"
-  modifiedTime="2026-01-29T16:16:08.631Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Elena Dragomir"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cum sa cureti eficient casa' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a>
-      <span class="breadcrumb-separator">/</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
       <span>Cum sa cureti eficient casa</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/curatenie-intretinere/" class="article-category">Curatenie si Intretinere</a>
-        <span class="article-date">24 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Cum sa cureti eficient casa</h1>
-    </header>
+    <h1>Cum sa cureti eficient casa</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/cum-sa-cureti-eficient-casa.webp" alt="Cum sa cureti eficient casa" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cum sa cureti eficient casa: sistem si unelte care economisesc timp" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-e-curatenia-eficienta-atat-de-importanta-pentru-cine-e-potrivita">
-        <h2>De ce e curatenia eficienta atat de importanta? Pentru cine e potrivita?</h2>
-        <p>Salutare! Ca jurnalist cu ceva ani de experienta in spate, am vazut o multime de produse si metode de curatenie. Si stii ce am invatat? Ca o casa curata nu e doar despre estetica, e despre sanatate, despre bunastare si despre un spatiu in care te simti cu adevarat relaxat. Gandeste-te: cat de bine te simti cand intri intr-o camera proaspat <a href="/robot-de-curatat-geamuri/">curatat</a>a, unde totul e la locul lui si aerul e proaspat? Exact.</p>
-        <p>Curatenia eficienta nu e un lux, e o necesitate. Si nu, nu e doar pentru cei obsedati de ordine. E pentru oricine isi doreste sa traiasca intr-un mediu sanatos, mai ales daca ai copii mici, animale de companie sau daca suferi de alergii. Praful, bacteriile si alergenii se pot acumula rapid, iar o curatenie superficiala nu face decat sa mute problema. Vorbim aici despre a elimina sursele de probleme, nu doar despre a le ascunde.</p>
-        <p>Poate ca ti se pare ca nu ai timp, ca e prea complicat sau ca produsele de curatenie sunt prea scumpe. Eu zic ca e o chestiune de prioritati si de a alege solutiile potrivite pentru tine. Nu trebuie sa devii un expert in chimie, dar cateva cunostinte de baza te pot ajuta enorm.</p>
-        <p>Si vesti bune: curatenia eficienta poate fi si economica, daca stii ce sa alegi si cum sa folosesti produsele. Vom vorbi despre asta pe parcurs. Deci, daca vrei sa ai o casa mai placuta, mai sanatoasa si sa petreci mai putin timp cu eforturi inutile, esti in locul potrivit.</p>
-        <p>Indiferent daca stai la apartament sau la casa, daca esti singur sau cu o familie mare, principiile raman aceleasi. E vorba despre a face alegeri informate si a-ti organiza munca inteligent.</p>
-      </section>
-
-      <section id="top-produse-si-solutii-recomandate-pentru-o-curatenie-eficienta">
-        <h2>Top Produse si Solutii Recomandate pentru o Curatenie Eficienta</h2>
-        <p>Am testat o gramada de produse de-a lungul timpului, de la cele mai ieftine la cele mai 'de firma', si am ajuns la cateva concluzii. Nu intotdeauna cel mai scump e si cel mai bun, dar nici cel mai ieftin nu e intotdeauna o afacere buna pe termen lung. Iata cateva categorii si produse care mi s-au parut esentiale pentru o curatenie de succes:</p>
-        <p>1.  <strong>Aspiratorul:</strong> Asta e regele curateniei, fara discutie. Am testat aspiratoare cu sac, fara sac, cu filtrare HEPA, cu diverse accesorii. Pentru o curatenie eficienta, mai ales daca ai par de animale sau alergii, un <a href="/aspirator-cu-spalare-pentru-covoare/" class="interlink">aspirator cu</a> filtrare HEPA e sfant.</p>
-        <p>Elimina particulele fine de praf si alergenii din aer, ceea ce face o diferenta uriasa. Mi-a placut mult seria <strong>Philips PowerPro Expert</strong> (preturi intre 800-1500 RON, in functie de model) pentru puterea de aspiratie si sistemul de filtrare. Daca bugetul e mai restrans, <strong>Vortex VORTEX-VC1801</strong> (aproximativ 300-400 RON) face o treaba buna pentru apartamente si sarcini uzuale.</p>
-        <p>2.  <strong>Solutii de Curatat Multifunctionale:</strong> Nu ai nevoie de un dulap plin de sticle. O solutie buna, ecologica pe cat posibil, poate face minuni.  Am fost impresionat de <strong>Ecover Multi-Surface Cleaner</strong> (in jur de 30-40 RON) – curata bine si lasa un miros placut, natural.  Pentru pete mai dificile, un <strong>degresant pe baza de citrice</strong> (preturi variind intre 20-50 RON) e excelent, mai ales in bucatarie.</p>
-        <p>3.  <strong>Lavete din Microfibra:</strong> Astea sunt 'armele secrete'. Sunt mult mai bune decat cele vechi din bumbac. Absorb mult mai bine, nu lasa scame si pot fi folosite pe aproape orice suprafata. Am recomandat des seturile de la <strong>Vileda</strong> sau <strong>Kaufland (marca proprie)</strong>, care sunt accesibile (15-30 RON pentru un set de 3-5 bucati) si isi fac treaba.  Recomand sa ai lavete separate <a href="/plita-cu-inductie-pentru-bucatarie/" class="interlink">pentru bucatarie</a>, baie si suprafete generale.</p>
-        <p>4.  <strong><a href="/solutie-pentru-curatarea-geamurilor/" class="interlink">Solutie pentru</a> Geamuri:</strong> Nimic nu strica aspectul unei case curate mai tare ca geamurile murdare. Am incercat diverse solutii, dar clasicul <strong>solutie pe baza de otet si apa</strong> (costuri minime, acasa) sau un <strong>spray dedicat de la W5 (Lidl)</strong> sau <strong>Frosch</strong> (in jur de 15-25 RON) fac minuni.  Important e sa folosesti o <strong>racleta de geamuri</strong> buna (20-50 RON) si sa stergi intr-o directie pentru a evita urmele.</p>
-        <p>5.  <strong>Otet Alb Distilat:</strong> Asta e un produs 'minune' din batrani, si pe buna dreptate. E ieftin, natural si extrem de eficient pentru igienizare, indepartarea calcarului si chiar pentru a elimina mirosurile neplacute. Il poti folosi diluat in apa <a href="/mop-cu-aburi-pentru-podele/" class="interlink">pentru podele</a>, bai, bucatarie sau chiar in masina de spalat. Un litru de otet costa sub 10 RON.</p>
-        <p>Acestea sunt bazele. Bineinteles, in functie de nevoile specifice (parchet, gresie speciala, inox, etc.), vei avea nevoie si de solutii dedicate, dar cu lista asta poti acoperi 80% din nevoile tale de curatenie.</p>
-      </section>
-
-      <section id="cum-alegi-corect-produsele-si-echipamentele-de-curatenie">
-        <h2>Cum Alegi Corect Produsele si Echipamentele de Curatenie?</h2>
-        <p>Alegerea produselor potrivite poate fi o adevarata provocare, mai ales acum cand pe piata sunt atatea optiuni. Din experienta mea, nu te lasa purtat de reclame stralucitoare sau de promisiuni exagerate. Uite ce sfaturi ti-as da:</p>
-        <p><strong>Citeste eticheta:</strong> Asta pare evident, dar multi sar peste acest pas. Uita-te la ingrediente. Daca vezi o lista lunga de chimicale pe care nici nu le poti pronunta, poate nu e cea mai buna alegere, mai ales daca ai copii sau animale. Cauta produse cu ingrediente cat mai naturale, biodegradabile. Pentru mine, asta e un criteriu important.</p>
-        <p><strong>Multifunctionale vs. Dedicate:</strong> Nu cumpara un produs pentru fiecare minune. Investeste in cateva solutii versatile care pot fi folosite pe mai multe suprafete. Un bun degresant, un curatator pentru geamuri si o solutie dezinfectanta generala iti pot fi suficiente. Totusi, pentru anumite zone, cum ar fi baia (calcar, mucegai) sau bucataria (grasime incrustata), s-ar putea sa ai nevoie de solutii mai specifice. Dar si aici, cauta produse cu formule mai blande.</p>
-        <p><strong>Filtrarea HEPA la Aspirator:</strong> Daca ai probleme cu alergiile sau astmul, sau pur si simplu vrei un aer mai curat in casa, un aspirator cu filtru HEPA este esential. Aceste filtre capteaza particule microscopice pe care alte aspiratoare le lasa sa circule in aer. Nu te uita doar la puterea de aspiratie, ci si la calitatea filtrarii.</p>
-        <p><strong>Calitatea Lavetelor:</strong> Nu subestima puterea unei lavete bune. Cele din microfibra de calitate nu zgaraie, absorb mult mai bine si sunt mai igienice. Cand alegi, uita-te la densitatea materialului. Cele mai dense sunt, de obicei, mai rezistente si mai eficiente. Nu te zgarci la asta, o laveta buna te tine mult timp.</p>
-        <p><strong>Produse Ecologice vs. Convenționale:</strong> Multe produse ecologice sunt la fel de eficiente ca cele convenționale, doar ca sunt mai prietenoase cu mediul si cu sanatatea ta. De multe ori, pretul e similar sau doar putin mai ridicat. Eu personal prefer sa investesc in ele, mai ales pentru produsele pe care le folosesc zilnic.</p>
-        <p><strong>Recenzii și Recomandări:</strong> Nu uita sa citesti parerile altor utilizatori. Forumurile, grupurile de social media sau chiar site-urile magazinelor pot fi o sursa valoroasa de informatii. Am testat si eu multe produse bazandu-ma pe recomandari, si de cele mai multe ori a fost o decizie buna.</p>
-        <p><strong>Costul pe termen lung:</strong> Uneori, un produs mai scump la inceput, dar mai concentrat sau mai eficient, poate fi mai economic pe termen lung decat unul ieftin pe care trebuie sa-l folosesti in cantitati mai mari sau pe care trebuie sa-l inlocuiesti des.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-curatenia-diy-vs-solutii-profesionale">
-        <h2>Avantaje si Dezavantaje: Curatenia 'DIY' vs. Solutii Profesionale</h2>
-        <p>Hai sa fim sinceri, uneori ne gandim sa apelam la firme de curatenie, mai ales cand avem de facut o curatenie generala sau cand timpul e foarte limitat. Dar sa analizam putin avantajele si dezavantajele ambelor abordari. Eu, personal, am incercat ambele variante si am ajuns la niste concluzii.</p>
-        <p><strong>Curatenia 'DIY' (Do It Yourself) - adica sa o faci singur/a:</strong></p>
-        <p><strong>Avantaje:</strong></p>
-        <p><strong>Cost Redus:</strong> Acesta e probabil cel mai mare avantaj. Investesti in produse (care, cum am zis, pot fi si ieftine si eficiente) si in timpul tau. Nu ai costuri suplimentare pentru manopera.</p>
-        <p><strong>Control Total:</strong> Tu decizi ce produse folosesti, unde acorzi mai multa atentie si cand faci curatenie. Daca ai anumite sensibilitati la anumite substante, esti sigur ca nu le vei intalni.</p>
-        <p><strong>Satisfactia Personala:</strong> E o satisfactie aparte cand vezi rezultatele muncii tale. Te simti mai conectat cu spatiul tau.</p>
-        <p><strong>Flexibilitate:</strong> Poti face curatenie oricand ai un moment liber, fara sa depinzi de programul altcuiva.</p>
-        <p><strong>Dezavantaje:</strong></p>
-        <p><strong>Consum de Timp si Energie:</strong> Asta e clar. O curatenie profunda dureaza ore intregi si poate fi epuizanta fizic.</p>
-        <p><strong>Echipament Specific:</strong> Pentru anumite sarcini (curatat mocheta, geamuri la inaltime, etc.) s-ar putea sa ai nevoie de echipamente pe care nu le detii si pe care nu vrei sa le cumperi pentru o singura utilizare.</p>
-        <p><strong>Lipsa Expertizei:</strong> Uneori, nu stim cum sa abordam anumite pete sau murdarii incrustate, si putem chiar deteriora suprafetele incercand solutii gresite.</p>
-        <p><strong>Solutii Profesionale de Curatenie:</strong></p>
-        <p><strong>Avantaje:</strong></p>
-        <p><strong>Economie de Timp si Efort:</strong> Acesta e principalul atu. Tu te relaxezi, ei fac toata treaba.</p>
-        <p><strong>Echipament si Produse Specializate:</strong> Firmele de curatenie au acces la echipamente profesionale (aspiratoare industriale, masini de curatat covoare, etc.) si la solutii puternice, specifice pentru diverse tipuri de murdarie.</p>
-        <p><strong>Expertiza:</strong> Personalul este, de obicei, instruit sa abordeze diverse situatii si sa obtina cele mai bune rezultate fara a deteriora suprafetele.</p>
-        <p><strong>Rezultate Impecabile:</strong> Adesea, rezultatele sunt vizibile si de lunga durata, mai ales in cazul curateniilor generale.</p>
-        <p><strong>Dezavantaje:</strong></p>
-        <p><strong>Cost Ridicat:</strong> Acesta este principalul obstacol. Serviciile profesionale pot fi destul de scumpe, mai ales daca le folosesti frecvent. Un serviciu de curatenie generala pentru un apartament de 2 camere poate costa intre 300-600 RON, in functie de locatie si firma.</p>
-        <p><strong>Lipsa Controlului Direct:</strong> Desi poti da indicatii, nu ai acelasi nivel de control ca atunci cand faci tu curatenie. S-ar putea ca anumite detalii sa nu fie facute exact cum iti doresti.</p>
-        <p><strong>Programare:</strong> Trebuie sa te integrezi in programul lor, ceea ce poate fi uneori dificil.</p>
-        <p><strong>Preocupari legate de Produse:</strong> Daca esti sensibil la anumite chimicale, ar fi bine sa discuti in prealabil ce produse vor folosi.</p>
-      </section>
-
-      <section id="sfaturi-practice-si-trucuri-utile-din-experienta-mea">
-        <h2>Sfaturi Practice si Trucuri Utile din Experienta Mea</h2>
-        <p>Am adunat de-a lungul anilor tot felul de mici secrete care fac curatenia mai usoara si mai rapida. Nu sunt chestii complicate, ba chiar din contra, sunt lucruri pe care le poti aplica imediat.</p>
-        <p><strong>Curata pe Masura ce Murdaresti:</strong> Asta pare evident, dar e cel mai eficient sfat. Ai varsat ceva pe jos? Sterge imediat. Ai gatit si s-a murdarit chiuveta? Clateste-o. Daca lasi murdaria sa se usuce si sa se intareasca, va fi mult mai greu de curatat ulterior. E ca si cum ai avea grija de casa zi de zi, in loc sa faci o 'operatiune' uriasa o data pe luna.</p>
-        <p><strong>Pune Muzica sau un Podcast:</strong> Serios, asta schimba total experienta. Fa-ti un playlist cu muzica preferata sau asculta un podcast interesant in timp ce faci curatenie. Te vei misca mai repede si nici nu vei simti cum trece timpul.</p>
-        <p><strong>Foloseste Otet si Bicarbonat de Sodiu:</strong> Cum am mai zis, astea sunt 'super-eroii' curateniei. Pentru a indeparta mirosurile din frigider, pune un bol cu bicarbonat de sodiu. Pentru a curata cuptorul, fa o pasta din bicarbonat si apa, las-o sa actioneze peste noapte si apoi sterge. Otetul e perfect pentru a curata si dezinfecta tocatoarele din lemn sau pentru a indeparta depunerile de calcar de la robineti.</p>
-        <p><strong>Curata de Sus in Jos:</strong> Cand cureti o camera, incepe intotdeauna de sus (praf pe lustra, pe rafturi) si coboara spre podea. Asa, praful si murdaria care cad vor fi curatate la final, fara sa fie nevoie sa reiei treaba.</p>
-        <p><strong>Un Vas cu Apa si Otet la Fierbere:</strong> Daca ai mirosuri persistente in bucatarie (de la gatit peste, peste ars), pune un vas cu apa si cateva linguri de otet pe foc si lasa-l sa fiarba incet. Aburul va prelua mirosurile neplacute.</p>
-        <p><strong>Foloseste Vechiul Prosop pe Post de Laveta:</strong> Ai un prosop vechi pe care nu-l mai folosesti? Taie-l in bucati. Sunt excelente pentru curatat mobila, geamuri sau chiar pentru a lustrui incaltamintea.</p>
-        <p><strong>Nu Aglomera Spatiul:</strong> Daca ai prea multe obiecte pe mese, pe pervaze sau pe rafturi, curatenia va dura mult mai mult. Un stil de 'less is more' te ajuta enorm. Nu trebuie sa arunci tot, dar incearca sa ai cat mai putine lucruri la vedere.</p>
-        <p><strong>Planifica Curatenia:</strong> In loc sa alergi de colo-colo, gandeste-te dinainte ce ai de facut. Poti face o lista. De exemplu, luni – baie, marti – bucatarie, miercuri – dormitoare, etc. Sau poti aloca cate 30 de minute pe zi pentru cate o sarcina.</p>
-        <p><strong>Aeriseste Intotdeauna:</strong> Dupa ce ai terminat de curatat, deschide geamurile larg pentru 10-15 minute. Aerul curat face minuni si indeparteaza orice urma de mirosuri de la produsele de curatenie.</p>
-      </section>
-
-      <section id="parerea-mea-sincera-ce-conteaza-cel-mai-mult-la-o-curatenie-eficienta">
-        <h2>Parerea Mea Sinceră: Ce Contează Cel Mai Mult la o Curățenie Eficientă?</h2>
-        <p>După atâția ani în care am văzut și am testat tot felul de produse și metode, am ajuns la concluzia că cel mai important aspect al unei curățenii eficiente nu este neapărat cât de scump e <a href="/aspirator-cu-spalare-pentru-covoare/">aspirator</a>ul sau cât de 'magică' e soluția de curățat. Nu, cel mai mult contează <strong>atitudinea și organizarea</strong>.</p>
-        <p>Mi se pare că mulți oameni văd curățenia ca pe o obligație grea, o corvoadă de neevitat. Și, evident, cu o astfel de mentalitate, orice ai face, va fi greu. Eu, de când am început să privesc curățenia mai mult ca pe o formă de grijă față de mine și de spațiul în care trăiesc, totul s-a schimbat. E ca un ritual de 'reset' pentru casă și pentru minte.</p>
-        <p>Am observat că atunci când ai un <strong>plan</strong>, chiar și unul simplu, totul devine mai ușor. Nu trebuie să fie un orar militar, dar să știi ce ai de făcut te ajută enorm. De exemplu, să dedici 15 minute dimineața pentru a pune lucrurile la loc sau a șterge blatul din bucătărie poate preveni o mare problemă mai târziu. E vorba de <strong>consecvență</strong>.</p>
-        <p>Și produsele? Da, contează să alegi ce e bun, ce e eficient și, pe cât posibil, ce e prietenos cu sănătatea și mediul. Dar, din experiența mea, un produs bun folosit corect și la momentul potrivit face mai mult decât zece produse 'miraculoase' aruncate la întâmplare. Am văzut rezultate uimitoare și cu soluții simple, cum ar fi oțetul și bicarbonatul, folosite inteligent.</p>
-        <p>Ce aș recomanda cu tărie? <strong>Investiți în câteva unelte bune:</strong> un <a href="/cel-mai-bun-aspirator-robot-pentru-casa/">aspirator</a> decent, un set de lavete de microfibră de calitate, o mop bun. Acestea vă vor face munca mult mai ușoară și mai eficientă pe termen lung. Nu vă lăsați tentați de soluții rapide și ieftine care promit minuni, dar nu livrează.</p>
-        <p>În final, curățenia eficientă înseamnă un echilibru între <strong>produsele potrivite, o atitudine pozitivă și o bună organizare</strong>. Nu uitați că o casă curată este un spațiu în care te simți bine, un loc unde poți respira liniștit. Și asta merită efortul, nu-i așa?</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des ar trebui sa fac curatenie generala?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde mult de stilul tau de viata, de numarul de persoane din casa si daca ai animale de companie. In general, o curatenie generala temeinica, care include si locurile mai greu accesibile, ar trebui facuta de 2-4 ori pe an, adica o data pe sezon. Insa, daca observi ca se acumuleaza mult praf sau murdarie, nu ezita sa o faci mai des. E mai usor sa mentii curatenia decat sa cureti mizerie adunata.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fac cu mirosurile neplacute din frigider?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Cel mai simplu si eficient mod este sa pui un bol mic cu bicarbonat de sodiu in frigider. Bicarbonatul absoarbe mirosurile. Schimba-l o data pe luna. De asemenea, asigura-te ca nu depozitezi alimente stricate si ca cureti frigiderul periodic cu o solutie de apa cu otet sau cu o solutie de curatat delicata.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Sunt produsele de curatenie ecologice la fel de eficiente ca cele clasice?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                In majoritatea cazurilor, da. Producatorii de produse ecologice au evoluat mult si formulele lor sunt acum foarte eficiente, reusind sa curete la fel de bine ca produsele conventionale, fara a folosi chimicale agresive. Unele pot fi chiar mai puternice in anumite situatii. Plus ca sunt mult mai prietenoase cu mediul si cu sanatatea ta.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum pot curata petele de grasime de pe aragaz sau din hota?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru petele de grasime proaspete, o solutie de apa calda cu putin detergent de vase concentrat ar trebui sa fie suficienta. Pentru grasime incrustata, cel mai bine functioneaza un degresant pe baza de citrice sau o pasta din bicarbonat de sodiu si otet. Lasa solutia sa actioneze cateva minute (sau chiar peste noapte pentru pete vechi), apoi curata cu o laveta umeda. Uneori, o racleta de plastic sau o perie cu peri tari pot ajuta.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce e mai bun: aspirator cu sac sau fara sac?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Ambele au avantaje. Aspiratoarele cu sac sunt, in general, mai igienice la golire, deoarece praful ramane inchis in sac. Sunt potrivite pentru persoanele cu alergii. Aspiratoarele fara sac sunt mai economice pe termen lung, nefiind nevoie sa cumperi saci, insa golirea recipientului poate elibera praf in aer. Daca ai alergii, un aspirator cu sac si filtru HEPA ar fi ideal. Daca nu, ambele variante sunt bune, depinde de preferinte.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum pot indeparta depunerile de calcar din baie?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Cel mai eficient si natural ingredient este otetul alb distilat. Pulverizeaza otet direct pe zonele afectate (robineti, cap de dus, cabina de dus) si lasa-l sa actioneze 15-30 de minute (sau mai mult pentru depuneri groase). Apoi freaca cu o perie sau o laveta aspra si clateste cu apa. Poti folosi si solutii dedicate anticalcar, dar verifica eticheta pentru a te asigura ca sunt potrivite pentru suprafetele tale.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Ca sa cureti eficient, nu freci mai mult, ci mai destept: cureti <strong>de sus in jos</strong>, pe o camera pe rand, imparti in <strong>rutina scurta zilnica</strong> plus o curatenie generala mai rara, si folosesti <strong>uneltele care economisesc timp</strong>. Cele care fac cea mai mare diferenta: un aspirator vertical fara fir, ca Xiaomi G20 Lite, un mop cu aburi, ca Rowenta Steam Power, si solutiile potrivite pe fiecare suprafata, nu un singur detergent la tot.</p>
+      <p>Mai jos ai <strong>sistemul</strong> care scurteaza curatenia si <strong>uneltele testate de mii de cumparatori</strong>, grupate pe ce fac: aspirat, spalat pardoseala, curatat in profunzime cu aburi si solutiile de baza. Plus cum aplici totul pe fiecare camera.</p>
+      <p>Nu ai nevoie de tot deodata. Un aspirator fara fir, un mop cu aburi si trei-patru solutii bine alese schimba complet cat de repede si de usor tii casa curata. Vezi pe fiecare in parte: <a href="/aparat-de-curatat-cu-aburi/">aparatele de curatat cu aburi</a>, <a href="/mop-cu-aburi-pentru-podele/">mopurile cu aburi</a> si <a href="/detergent-ecologic-pentru-casa/">detergentii ecologici</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#reguli">Regulile curateniei eficiente</a></li>
+        <li><a href="#rutina">Rutina scurta vs curatenia generala</a></li>
+        <li><a href="#tabel">Uneltele si solutiile, pe scurt</a></li>
+        <li><a href="#aspirator">Aspiratorul fara fir</a></li>
+        <li><a href="#mop">Mopul cu aburi</a></li>
+        <li><a href="#aparat">Aparatul de curatat cu aburi</a></li>
+        <li><a href="#solutii">Solutii si consumabile</a></li>
+        <li><a href="#camere">Curatenia pe camere</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="reguli">Regulile curateniei eficiente</h2>
+    <p>Diferenta dintre o curatenie de ore si una rapida nu sta in efort, ci in metoda. Cateva reguli simple pe care le folosesc profesionistii:</p>
+    <ul>
+      <li><strong>De sus in jos:</strong> sterge intai praful de pe rafturi, mobila si corpuri de iluminat, si abia la final aspira si spala podeaua. Altfel, murdaria care cade ajunge pe ce ai curatat deja si refaci munca.</li>
+      <li><strong>Dinspre interior spre iesire:</strong> incepe din fundul camerei si termina spre usa, ca sa nu calci pe podeaua proaspat spalata.</li>
+      <li><strong>O camera pe rand:</strong> termina complet o incapere inainte sa treci la alta, cu toate uneltele la indemana, nu sari haotic dintr-o sarcina in alta prin toata casa.</li>
+      <li><strong>Produsul potrivit pe suprafata:</strong> nu folosi un singur detergent la tot. Universal pentru suprafete obisnuite, pasta abraziva pentru pete grele, dezinfectant pentru zonele cu germeni.</li>
+      <li><strong>Lasa solutiile sa actioneze:</strong> pulverizeaza si asteapta cateva minute inainte sa freci sau sa stergi. Chimia lucreaza pentru tine si scoti murdaria cu mai putin efort.</li>
+    </ul>
+
+    <h2 id="rutina">Rutina scurta vs curatenia generala</h2>
+    <p>Cel mai eficient sistem imparte curatenia in doua ritmuri, ca sa nu se adune niciodata prea mult:</p>
+    <p><strong>Rutina scurta, zilnica sau la doua zile (10-15 minute):</strong> o trecere rapida cu aspiratorul fara fir sau cu un mop de praf, sters blaturile din bucatarie, o privire prin baie. Nu lasi murdaria si praful sa se stranga.</p>
+    <p><strong>Curatenia generala, saptamanala sau la doua saptamani:</strong> spalat podelele cu aburi, curatat in profunzime bucataria si baia, sters praful peste tot, aspirat covoarele si mobila. Fiindca ai facut rutina scurta intre timp, generala nu mai devine o corvoada de ore.</p>
+    <p>Ideea e simpla: putin si des bate mult si rar. Iar uneltele care se iau si se pun repede, fara fir si fara galeata, sunt cele care fac rutina scurta posibila.</p>
+
+    <h2 id="tabel">Uneltele si solutiile, pe scurt</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Produs</th><th>Categorie</th><th>Ideal pentru</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cat}</td>
+              <td>{x.ideal}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="aspirator">Aspiratorul fara fir</h2>
+    <p>Unealta care schimba cel mai mult curatenia zilnica: il iei de pe suport, aspiri in cateva minute si il pui la loc, fara sa scoti un aspirator greu si sa cauti priza. Pentru firimituri, par de animale, scari, canapea si masina.</p>
+    <div class="rd-grid">
+      {ASPIRATOR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+    <p class="rd-note">Vrei sa aspiri complet fara maini, cat esti plecat? Vezi si articolul nostru cu <a href="/cele-mai-bune-aspiratoare-robot/">cele mai bune aspiratoare robot cu mop</a>, care lucreaza singure dupa program.</p>
+
+    <img class="rd-fig" src={figAspirator} alt="Aspiratoare verticale fara fir: Xiaomi, SeveShop si Dyson" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mop">Mopul cu aburi</h2>
+    <p>Spala si dezinfecteaza pardoseala doar cu abur fierbinte, fara galeata si fara detergenti, eliminand aproape toti germenii. Pe gresie si faianta foloseste abur mai mult, pe parchet si laminat mai putin, iar lemnul neetansat evita-l.</p>
+    <div class="rd-grid">
+      {MOP.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figMop} alt="Mopuri cu aburi: Rowenta, Black+Decker si Karcher" width="1200" height="675" loading="lazy" />
+
+    <h2 id="aparat">Aparatul de curatat cu aburi</h2>
+    <p>Pentru curatenia in profunzime, acolo unde mopul nu ajunge: rosturile dintre gresie, robinetii, aragazul, cuptorul, dusul si suprafetele grase. Igienizeaza cu abur, fara chimicale, cu accesorii pentru colturi.</p>
+    <div class="rd-grid">
+      {APARAT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <h2 id="solutii">Solutii si consumabile</h2>
+    <p>Curatenia eficienta foloseste produsul potrivit pe fiecare murdarie, nu unul singur la tot: un universal pentru suprafete, o pasta pentru pete grele, un dezinfectant pentru germeni si un mop rapid pentru praful zilnic.</p>
+    <div class="rd-grid">
+      {SOLUTIE.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSolutii} alt="Solutii de curatenie: Mr. Proper, The Pink Stuff, Dettol si Swiffer" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={b64('oferte-aspirator-vertical')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi aspiratoarele verticale la oferta</strong>
+        <span>Reducerile din acest moment la aspiratoare verticale fara fir, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="camere">Curatenia pe camere</h2>
+    <p>Aceleasi unelte, aplicate pe fiecare camera cu ce conteaza acolo:</p>
+    <p><strong>Bucataria:</strong> zona cu cea mai multa grasime si cei mai multi germeni. Degreseaza blaturile si aragazul cu un universal sau, pentru murdaria arsa, cu pasta abraziva; dezinfecteaza blaturile si zona chiuvetei; igienizeaza rosturile si hota cu aparatul de aburi. La final, aspira si spala podeaua.</p>
+    <p><strong>Baia:</strong> aici conteaza dezinfectia si calcarul. Aplica dezinfectantul pe robineti, wc si suprafete si lasa-l sa actioneze; scoate calcarul cu pasta abraziva; igienizeaza rosturile de la dus si gresie cu aburul. Aburul e ideal in baie, unde omoara germenii fara chimicale.</p>
+    <p><strong>Living si dormitor:</strong> domina praful si covoarele. Sterge praful de sus in jos, aspira covoarele, canapeaua si saltelele cu aspiratorul vertical, apoi spala podeaua cu aburi. Un mop rapid tip Swiffer prinde praful si parul intre curateniile mari.</p>
+    <p><strong>Afara, terasa si pavajul:</strong> mopul si aspiratorul nu ajuta; foloseste un aparat de spalat cu presiune, care curata pavajul, mobila de gradina si fatada cu un jet puternic. Vezi articolul nostru cu <a href="/masina-de-spalat-cu-presiune-pentru-acasa/">cel mai bun aparat de spalat cu presiune</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">ED</div>
       <div class="author-info">
-        <h4><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></h4>
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
         <p class="author-role">Consultant Amenajari</p>
-        <p class="author-bio">Elena este pasionata de transformarea caselor in locuinte confortabile. Cu experienta in renovari si amenajari, ofera sfaturi practice pentru orice buget.</p>
+        <p class="author-bio">Elena scrie despre curatenie si intretinerea casei. Cauta aparatele care chiar usureaza treaba, nu pe cele cu cele mai multe functii pe cutie.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="cum-sa-cureti-eficient-casa"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un produs ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="cum-sa-cureti-eficient-casa"
-      currentCategory="curatenie-intretinere"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="cum-sa-cureti-eficient-casa" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cum-sa-cureti-eficient-casa" currentCategory="curatenie-intretinere" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-note { font-size: .95rem; background: var(--color-primary-50, #f0fdf4); border-left: 3px solid var(--color-primary-500, #22c55e); border-radius: 8px; padding: .7rem 1rem; color: var(--color-gray-700); }
+  .rd-note a, .rd p a { color: var(--color-primary-700, #15803d); font-weight: 600; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

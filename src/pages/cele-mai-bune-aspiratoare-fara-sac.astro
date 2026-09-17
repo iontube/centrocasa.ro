@@ -1,0 +1,343 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['aspirator-fara-sac'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Cele mai vandute ---
+  { g: 'top', id: 'D0LF2CYBM', rol: 'Cel mai vandut', short: 'Rowenta Compact Power', putere: '750 W', cap: '1.5 l', zgomot: '79 dB', raza: '8.8 m',
+    specs: ['2953 de pareri, de trei ori mai multe decat urmatorul', 'recipient de 1.5 l, raza de actiune 8.8 m', 'tehnologie ciclonica, fara sac de schimbat', '750 W, sub plafonul UE'],
+    pros: ['De departe cel mai cumparat aspirator din articol, 2953 de pareri', 'Raza de operare de 8.8 m, acoperi o camera fara sa muti stecherul', 'Compact, se depoziteaza usor', 'Pret sub 400 de lei pentru un Rowenta'],
+    cons: ['79 dB, printre cele mai zgomotoase din selectie', 'Recipient de 1.5 l, il golesti des la o casa mare'],
+    verdict: 'Cu 2953 de pareri, Compact Power Cyclonic are de aproape trei ori mai multe decat urmatorul aspirator din articol si e alegerea implicita a pietei romanesti pe fara sac. Nu pentru ca ar fi cel mai performant pe hartie, ci pentru ca nimereste combinatia potrivita: Rowenta e un brand cu service la noi, aparatul e compact si usor de depozitat, are raza de operare de 8.8 metri, deci parcurgi o camera intreaga fara sa schimbi priza, iar pretul sta sub 400 de lei. Nota de 4.51 e buna fara sa fie spectaculoasa, ceea ce la un volum atat de mare de pareri spune mai mult decat un 4.9 din 20 de pareri. Cei 79 de decibeli il aseaza in zona zgomotoasa, iar recipientul de 1.5 litri il golesti des daca ai casa mare sau animale. Il iei cand vrei alegerea sigura, verificata de cei mai multi oameni, fara sa cauti nimic special.' },
+  { g: 'top', id: 'D9MXFDBBM', rol: 'Cea mai mare raza de actiune din grup', short: 'Samsung VCC43Q0V3B', putere: '850 W', cap: '1.3 l', zgomot: '80 dB', raza: '9.2 m',
+    specs: ['1100 de pareri, al doilea ca popularitate', 'raza de operare 9.2 m, cea mai mare din grup', '850 W, aproape de plafonul legal', 'recipient de 1.3 l'],
+    pros: ['1100 de pareri, foarte bine verificat', 'Raza de 9.2 m, cea mai mare dintre cele mai vandute', 'Samsung, brand cu service raspandit', 'Pret sub 360 de lei'],
+    cons: ['80 dB, cel mai zgomotos din tot articolul', 'Cel mai mic recipient din selectie, 1.3 l'],
+    verdict: 'Samsung VCC43Q0V3B e a doua alegere ca popularitate, cu 1100 de pareri, si diferenta fata de Rowenta se vede in doua cifre: raza de operare urca la 9.2 metri, cea mai mare din grupul celor mai vandute, deci acoperi mai mult dintr-o priza, dar recipientul scade la 1.3 litri, cel mai mic din tot articolul. Practic aspiri mai comod, dar golesti mai des. Cei 850 de wati il aseaza aproape de plafonul legal de 900, ceea ce nu inseamna neaparat mai multa aspirare, dar inseamna consum mai mare. Cu 80 de decibeli e cel mai zgomotos aparat din selectie, si diferenta fata de 75 se aude. Il iei cand ai camere lungi si te deranjeaza sa schimbi priza, si nu te deranjeaza sa golesti recipientul mai des.' },
+  { g: 'top', id: 'D55QXHBBM', rol: 'Cel mai silentios dintre cele vandute', short: 'Heinner HVC-V750OR', putere: '750 W', cap: '2.2 l', zgomot: '75 dB', raza: '-',
+    specs: ['75 dB, cel mai silentios din tot articolul', 'recipient de 2.2 l, printre cele mai mari', '777 de pareri', '750 W'],
+    pros: ['Cel mai silentios aspirator din articol, 75 dB', 'Recipient generos de 2.2 l, il golesti rar', '777 de pareri, bine verificat', 'Sub 350 de lei'],
+    cons: ['Nota 4.34, cea mai modesta dintre cele mai vandute', 'Fisa nu declara raza de operare'],
+    verdict: 'Diferenta dintre 75 si 80 de decibeli pare mica scrisa, dar scala e logaritmica si in practica se aude clar, mai ales daca aspiri des sau ai copii care dorm. HVC-V750OR e cel mai silentios aparat din tot articolul si vine si cu al doilea cel mai mare recipient dintre casnice, 2.2 litri, deci il golesti considerabil mai rar decat pe Samsung sau Rowenta. Cele 777 de pareri il aseaza intre modelele verificate, iar pretul sub 350 de lei e corect pentru ce ofera. Nota de 4.34 e insa cea mai slaba din grup si merita sa citesti recenziile, iar fisa nu declara raza de operare, ceea ce inseamna ca nu pot compara direct cat acoperi dintr-o priza. Il iei cand zgomotul te deranjeaza si vrei sa golesti recipientul rar.' },
+  { g: 'top', id: 'D7MB02MBM', rol: 'Cel mai usor de manevrat', short: 'Rowenta Swift Power', putere: '750 W', cap: '1.2 l', zgomot: '77 dB', raza: '7.55 m',
+    specs: ['762 de pareri', '77 dB, sub media selectiei', 'corp mic si usor, se manevreaza simplu', 'recipient de 1.2 l'],
+    pros: ['762 de pareri, bine testat', '77 dB, mai discret decat majoritatea', 'Corp compact, usor de purtat pe scari', 'Rowenta, service la noi'],
+    cons: ['Recipient de doar 1.2 l', 'Raza de 7.55 m, cea mai mica din grup'],
+    verdict: 'Swift Power e varianta si mai mica a lui Rowenta, si asta e si calitatea, si limita lui. Cantareste putin si se manevreaza usor, ceea ce conteaza real daca ai casa pe doua niveluri si il cari pe scari, sau daca il ridici des in si din debara. Cei 77 de decibeli il pun sub media selectiei, iar cele 762 de pareri arata un aparat verificat. In schimb, compactitatea se plateste in doua locuri: recipientul de 1.2 litri e cel mai mic dintre modelele Rowenta de aici, iar raza de operare de 7.55 metri e cea mai scurta din grup, deci schimbi priza mai des. Il iei cand ai apartament mic sau casa cu scari si greutatea conteaza mai mult decat autonomia.' },
+  // --- B. Cu dotari si capacitate mare ---
+  { g: 'dotari', id: 'D73KYDBBM', rol: 'Cel mai bine notat cu putere maxima', short: 'Philips PowerPro Compact', putere: '900 W', cap: '1.5 l', zgomot: '79 dB', raza: '9 m',
+    specs: ['900 W, exact plafonul legal maxim', 'nota 4.63 din 494 de pareri', 'raza de operare 9 m', 'tehnologie PowerCyclone'],
+    pros: ['Nota 4.63, foarte buna la 494 de pareri', '900 W, maximul permis pentru aspiratoare casnice', 'Raza de 9 m', 'Philips, brand cu service la noi'],
+    cons: ['Peste 600 de lei, aproape dublu fata de Rowenta cel mai vandut', '79 dB'],
+    verdict: 'PowerPro Compact atinge exact 900 de wati, adica plafonul maxim pe care legislatia europeana il permite unui aspirator casnic. Asta suna impresionant, dar merita citita sectiunea de mai jos despre wati inainte sa platesti pentru cifra: puterea motorului nu e acelasi lucru cu puterea de aspirare. Ce justifica pretul aici e altceva: nota de 4.63 din 494 de pareri, printre cele mai bune raporturi nota-volum din articol, sistemul PowerCyclone de separare a prafului si raza de 9 metri. Costa insa peste 600 de lei, aproape dublu fata de Rowenta cel mai vandut, care are acelasi recipient de 1.5 litri. Il iei cand vrei un aparat bine cotat de la un brand mare si accepti sa platesti pentru constructie, nu pentru wati.' },
+  { g: 'dotari', id: 'DHL830BBM', rol: 'Cea mai buna combinatie zgomot si capacitate', short: 'Philips PowerPro Expert', putere: '900 W', cap: '2 l', zgomot: '76 dB', raza: '10 m',
+    specs: ['raza de operare 10 m, cea mai mare din articol', 'recipient de 2 l si doar 76 dB', 'nota 4.74, cea mai buna dintre casnice', '900 W'],
+    pros: ['Cea mai mare raza de operare din tot articolul, 10 m', '76 dB cu recipient de 2 l, combinatie rara', 'Nota 4.74, cea mai buna dintre aspiratoarele casnice', 'Philips, service raspandit'],
+    cons: ['750 de lei, cel mai scump aspirator casnic din selectie', 'Corp mai mare, ocupa mai mult la depozitare'],
+    verdict: 'Daca ar exista un castigator pe puncte intre casnice, PowerPro Expert ar fi acela: raza de 10 metri, cea mai mare din articol, recipient de 2 litri, 76 de decibeli, adica in treimea silentioasa, si nota 4.74 din 364 de pareri, cea mai buna dintre aspiratoarele de casa de aici. Practic nu are un punct slab tehnic, ci doar unul comercial: 750 de lei, cel mai scump aspirator casnic din selectie, aproape dublu fata de cel mai vandut model. Diferenta o platesti in autonomie, liniste si capacitate, care se simt daca aspiri des si ai suprafata mare. Corpul e si el mai mare, deci ocupa mai mult in debara. Il iei cand aspiri o casa intreaga si vrei sa nu faci compromisuri, si nu iti pare rau de bani.' },
+  { g: 'dotari', id: 'D3V6R6MBM', rol: 'Cel mai mare recipient', short: 'Rowenta Compact XXL', putere: '550 W', cap: '2.5 l', zgomot: '-', raza: '-',
+    specs: ['recipient de 2.5 l, cel mai mare dintre casnice', 'doar 550 W, cel mai mic consum din articol', 'nota 4.71 din 320 de pareri', 'gama Compact Power XXL'],
+    pros: ['Cel mai mare recipient dintre aspiratoarele casnice, 2.5 l', 'Doar 550 W, cel mai eficient din selectie', 'Nota 4.71, foarte buna', 'Il golesti de aproape doua ori mai rar decat pe Samsung'],
+    cons: ['Fisa nu declara nici zgomotul, nici raza de operare', 'Peste 600 de lei'],
+    verdict: 'Compact Power XXL rezolva reprosul principal adus aspiratoarelor fara sac: golirea deasa a recipientului. Cu 2.5 litri are aproape dublu fata de Samsung si cu un litru mai mult decat cel mai vandut Rowenta, iar diferenta se simte daca ai animale sau covoare, unde recipientul se umple vizibil mai repede. Al doilea lucru remarcabil e consumul: 550 de wati, cel mai mic din articol, ceea ce demonstreaza practic ideea din sectiunea despre wati, pentru ca nota lui de 4.71 din 320 de pareri e mai buna decat a multor modele de 850-900 W. Neajunsul e informational: fisa nu declara nici zgomotul, nici raza de operare, deci pe doua criterii importante nu il pot compara. Il iei cand golirea deasa te enerveaza si vrei consum mic.' },
+  { g: 'dotari', id: 'DB419FBBM', rol: 'Bosch cu derulator automat', short: 'Bosch BGS05A220', putere: '700 W', cap: '1.5 l', zgomot: '78 dB', raza: '9 m',
+    specs: ['derulator automat de cablu', 'filtru igienic PureAir', 'raza de operare 9 m', '700 W, consum moderat'],
+    pros: ['Derulator automat de cablu, detaliu pe care il apreciezi zilnic', 'Filtru igienic PureAir', 'Raza de 9 m la 700 W', 'Bosch, constructie si service de incredere'],
+    cons: ['Nota 4.09, cea mai slaba din articol', 'Accesorii putine in pachet'],
+    verdict: 'Derulatorul automat de cablu pare un moft pana il folosesti: apesi un buton si cablul de noua metri intra singur, in loc sa il infasori manual de fiecare data. Bosch BGS05A220 il are, alaturi de un filtru igienic PureAir si o raza de operare de 9 metri obtinuta la doar 700 de wati, ceea ce inseamna consum mai mic decat la modelele de 850-900. Bosch inseamna constructie solida si service usor de gasit. Problema e nota: 4.09 din 261 de pareri e cea mai slaba din tot articolul, ceea ce merita verificat citind recenziile inainte de comanda, pentru ca la un brand ca Bosch te astepti la mai mult. Il iei daca pui pret pe brand si pe comoditatea derulatorului, dupa ce ai citit parerile.' },
+  { g: 'dotari', id: 'DK96ZJBBM', rol: 'Aceeasi baza, filtru mai bun', short: 'Bosch BGS05A222', putere: '700 W', cap: '1.5 l', zgomot: '78 dB', raza: '9 m',
+    specs: ['filtru EPA 12, superior fata de modelul A220', 'perie de parchet inclusa', 'aceleasi 700 W si 1.5 l ca A220', 'costa cu circa 120 de lei mai mult'],
+    pros: ['Filtru EPA 12, retine mai multe particule fine', 'Include perie de parchet, nu o cumperi separat', 'Aceeasi constructie Bosch', 'Util daca ai alergii'],
+    cons: ['Cu circa 120 de lei mai scump decat A220, la aceeasi putere si capacitate', 'Aceeasi nota modesta, 4.09'],
+    verdict: 'BGS05A222 e acelasi aspirator ca BGS05A220 in tot ce tine de motor si recipient: 700 de wati, 1.5 litri, 78 de decibeli, 9 metri raza. Diferentele sunt doua si merita stiute exact, pentru ca fisa nu le scoate in evidenta: are filtru EPA 12 in loc de filtrul igienic obisnuit, ceea ce inseamna ca retine mai multe particule fine si conteaza daca cineva din casa are alergii sau astm, si vine cu perie de parchet in pachet. Pentru astea platesti circa 120 de lei in plus. Daca ai parchet si alergii, diferenta se justifica. Daca nu ai niciuna dintre ele, iei A220 si economisesti. Il iei pentru filtru, nu pentru performanta de aspirare, care e identica.' },
+  // --- C. Sub 300 de lei ---
+  { g: 'buget', id: 'DRCVJDBBM', rol: 'Cel mai bun sub 300 de lei', short: 'Heinner HVC-MC700RD', putere: '700 W', cap: '2 l', zgomot: '76 dB', raza: '8 m',
+    specs: ['sub 240 de lei, cel mai ieftin din selectie', 'recipient de 2 l, cat la modele de trei ori mai scumpe', '76 dB, in treimea silentioasa', 'raza de operare 8 m'],
+    pros: ['Cel mai mic pret din articol, sub 240 de lei', 'Recipient de 2 l, cat la Philips Expert de 750 de lei', '76 dB, mai silentios decat majoritatea', 'Nota 4.6, foarte buna pentru pret'],
+    cons: ['Materiale de nivel de intrare', 'Accesorii de baza'],
+    verdict: 'HVC-MC700RD e cea mai buna surpriza din articol pe raport. La sub 240 de lei are recipient de 2 litri, adica exact cat Philips PowerPro Expert de 750 de lei, si 76 de decibeli, adica mai silentios decat Rowenta cel mai vandut si decat ambele Bosch. Raza de operare de 8 metri e decenta, iar nota de 4.6 din 247 de pareri arata cumparatori multumiti, nu resemnati. Diferenta fata de aparatele scumpe nu e in fisa tehnica, ci in materiale si in cat rezista balamalele, roțile si furtunul dupa doi ani de folosire, lucruri pe care nicio specificatie nu le arata. Accesoriile sunt de baza. Il iei cand vrei sa cheltui minimum si sa primesti totusi capacitate si liniste peste medie.' },
+  { g: 'buget', id: 'D5D1VXMBM', rol: 'Alternativa la buget minim', short: 'Daewoo RCC-120B-1', putere: '800 W', cap: '1.5 l', zgomot: '79 dB', raza: '-',
+    specs: ['sub 260 de lei', '800 W, recipient 1.5 l', '228 de pareri', 'nota 3.97, cea mai slaba din selectie'],
+    pros: ['Pret sub 260 de lei', '228 de pareri, deci suficient de testat', 'Recipient de 1.5 l, standard pentru categorie', 'Daewoo, brand cunoscut'],
+    cons: ['Nota 3.97, singura sub 4 din tot articolul', '79 dB si fara raza declarata'],
+    verdict: 'Il includem cu o precizare care conteaza: nota de 3.97 e singura sub 4 din tot articolul, iar la 228 de pareri cifra e destul de solida ca sa nu fie un accident. Asta nu inseamna ca aparatul e defect, ci ca o parte dintre cumparatori au fost nemultumiti, si merita sa citesti chiar recenziile negative inainte, ca sa vezi daca reprosurile lor te privesc. Are 800 de wati, recipient de 1.5 litri si costa sub 260 de lei, adica se aseaza in aceeasi zona cu Heinner HVC-MC700RD, care are insa recipient mai mare, e mai silentios si are nota 4.6. Comparatia directa nu il avantajeaza. Il iei doar daca il gasesti la o reducere care il duce sensibil sub Heinner, altfel al doilea e alegerea mai buna la acelasi buget.' },
+  // --- D. Umed-uscat, pentru atelier ---
+  { g: 'atelier', id: 'DKC5CBBBM', rol: 'Cel mai vandut de atelier', short: 'Karcher WD 3', putere: '1000 W', cap: '17 l', zgomot: '-', raza: '-',
+    specs: ['recipient de 17 l, de zece ori cat unul casnic', 'aspira si lichide, nu doar praf', '772 de pareri cu nota 4.79', '1000 W, exceptat de la plafonul UE'],
+    pros: ['Recipient de 17 l, aspiri moloz, aschii sau apa fara sa golesti', 'Aspira si umed, nu doar uscat', 'Nota 4.79 din 772 de pareri, excelenta', 'Karcher, standardul categoriei'],
+    cons: ['Nu e un aspirator de covoare, e de atelier si garaj', 'Mare si greu de depozitat intr-un apartament'],
+    verdict: 'WD 3 nu concureaza cu aspiratoarele de mai sus, e alt tip de unealta, si e important de inteles inainte de comanda. Aspira si uscat, si umed, deci il folosesti pentru moloz dupa o renovare, aschii in atelier, frunze in garaj sau apa dintr-o inundatie la subsol, situatii in care un aspirator casnic s-ar strica. Recipientul de 17 litri e de zece ori mai mare decat al unui aparat de casa. Cei 1000 de wati depasesc plafonul UE de 900 tocmai pentru ca aparatele astea nu intra sub acelasi regulament, nu pentru ca ar aspira mai bine covoare. Cu 772 de pareri si nota 4.79 e cel mai apreciat aparat din tot articolul. Il iei ca al doilea aspirator, pentru garaj, atelier sau casa in renovare, nu ca inlocuitor pentru cel de covoare.' },
+  { g: 'atelier', id: 'D3NN0LMBM', rol: 'Aceeasi baza, alt pachet', short: 'Karcher WD 3 V-17', putere: '1000 W', cap: '17 l', zgomot: '-', raza: '-',
+    specs: ['acelasi recipient de 17 l ca WD 3', 'nota 4.76 din 590 de pareri', 'diferenta e in accesoriile din pachet', '1000 W'],
+    pros: ['Aceleasi capacitati ca WD 3, la un pret apropiat', 'Nota 4.76 din 590 de pareri', 'Recipient de 17 l', 'Karcher, piese si accesorii usor de gasit'],
+    cons: ['Practic identic cu WD 3, verifica ce accesorii primesti', 'Aceleasi limite: nu e aspirator de covoare'],
+    verdict: 'WD 3 V-17 si WD 3 sunt, ca aparat, acelasi lucru: 1000 de wati, recipient de 17 litri, aceeasi constructie Karcher si note aproape identice, 4.76 fata de 4.79. Diferenta sta in pachetul de accesorii si in denumirea comerciala folosita de retailer, nu in performanta. Practic, alegerea intre ele se face pe pret in ziua in care cumperi si pe ce accesorii sunt incluse, asa ca merita deschise ambele pagini si comparate listele de continut. Daca gasesti V-17 mai ieftin, nu pierzi nimic luandu-l. Daca preturile sunt egale, ia-l pe cel cu mai multe accesorii. Il iei in aceleasi situatii ca WD 3: garaj, atelier, renovare, aspirare de lichide.' },
+  { g: 'atelier', id: 'D4MJNJMBM', rol: 'Cel mai compact de atelier', short: 'Karcher WD 2 Plus', putere: '1000 W', cap: '12 l', zgomot: '-', raza: '-',
+    specs: ['recipient de 12 l, mai mic si mai usor de depozitat', 'nota 4.81, cea mai buna din tot articolul', '361 de pareri', 'aspira si umed, si uscat'],
+    pros: ['Nota 4.81, cea mai mare din tot articolul', 'Recipient de 12 l, mai usor de manevrat si depozitat', 'Cel mai ieftin Karcher din selectie', 'Aspira si lichide'],
+    cons: ['12 l in loc de 17, il golesti mai des la lucrari mari', 'Tot prea mare pentru un apartament mic'],
+    verdict: 'WD 2 Plus e varianta mai mica din familia Karcher si, pe hartie, cea mai apreciata din tot articolul: nota 4.81 din 361 de pareri, peste orice alt aparat de aici, casnic sau de atelier. Recipientul de 12 litri in loc de 17 il face mai usor de carat si de depozitat, ceea ce conteaza daca il tii intr-o camara sau pe balcon, nu intr-un garaj. Aspira si umed, si uscat, la fel ca fratii mai mari, si e cel mai ieftin Karcher din selectie. Compromisul e evident: la o renovare serioasa il golesti mai des decat pe WD 3. Ramane, ca toate din grupul asta, prea mare pentru un apartament mic si nepotrivit ca aspirator principal de covoare. Il iei cand vrei un aparat de atelier fara sa sacrifici tot balconul.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const TOP = PICKS.filter(x => x.g === 'top');
+const DOTARI = PICKS.filter(x => x.g === 'dotari');
+const BUGET = PICKS.filter(x => x.g === 'buget');
+const ATELIER = PICKS.filter(x => x.g === 'atelier');
+
+const hero = '/imagini/articole/cele-mai-bune-aspiratoare-fara-sac.webp';
+const figTop = '/imagini/articole/aspirator-fara-sac-top.webp';
+const figDotari = '/imagini/articole/aspirator-fara-sac-dotari.webp';
+const figAtelier = '/imagini/articole/aspirator-fara-sac-atelier.webp';
+const figPutere = '/imagini/articole/aspirator-putere-ue.webp';
+const published = '2026-07-20T17:47:59+03:00';
+
+const faq = [
+  { question: 'Cati wati trebuie sa aiba un aspirator bun?', answer: 'Intrebarea asta nu mai are un raspuns util, si motivul e legislativ. Din septembrie 2017, Uniunea Europeana limiteaza puterea motorului aspiratoarelor casnice la 900 de wati, dupa ce anterior scazuse plafonul de la nelimitat la 1600. Practic, orice aspirator de casa vandut legal in Romania are intre 550 si 900 de wati, iar diferenta dintre ele spune ceva despre consum, nu despre cat de bine aspira. Puterea de aspirare reala se masoara in kilopascali sau in debit de aer, cifre pe care producatorii nu le trec aproape niciodata pe fisa de pe eMAG. In selectia de aici, cel mai bine notat aspirator casnic are 900 de wati, dar cel cu recipientul cel mai mare si nota excelenta are doar 550.' },
+  { question: 'Fara sac sau cu sac?', answer: 'Fara sac inseamna un recipient de plastic pe care il golesti in cos si il clatesti, cu sac inseamna ca schimbi periodic un consumabil care costa bani. Avantajele variantei fara sac sunt costul zero de intretinere si faptul ca vezi cat ai aspirat, iar dezavantajele sunt ca praful se ridica inapoi in aer cand golesti recipientul, ceea ce conteaza daca ai alergii, si ca filtrele trebuie spalate periodic. Aspiratoarele cu sac retin praful mai bine la golire, dar sacii costa constant. Pentru majoritatea gospodariilor, fara sac e alegerea rationala. Daca cineva din casa are alergii sau astm, un model fara sac dar cu filtru EPA sau HEPA, cum e Bosch BGS05A222 din selectie, reduce problema.' },
+  { question: 'Ce capacitate de recipient imi trebuie?', answer: 'Depinde de suprafata si de cat de repede se umple. Recipientele din selectie merg de la 1.2 la 2.5 litri la aparatele casnice si sar la 12-17 litri la cele de atelier. Pentru un apartament de doua camere fara animale, 1.2-1.5 litri inseamna golire la fiecare doua-trei aspirari, ceea ce e acceptabil. Pentru o casa, covoare groase sau animale care lasa par, diferenta dintre 1.5 si 2.5 litri se simte in fiecare saptamana. Modelele cu recipient mare din selectie sunt Rowenta Compact Power XXL cu 2.5 litri si Heinner HVC-V750OR cu 2.2, iar in zona ieftina, Heinner HVC-MC700RD ofera 2 litri la sub 240 de lei, adica exact cat un Philips de trei ori mai scump.' },
+  { question: 'Cat de zgomotos e un aspirator fara sac?', answer: 'Toate sunt zgomotoase, iar intervalul e mai ingust decat s-ar crede: modelele din selectie care declara valoarea stau intre 75 si 80 de decibeli. Ca reper, 80 de decibeli inseamna aproximativ nivelul unui blender sau al traficului aglomerat, iar diferenta de cinci decibeli pana la 75 se aude clar, pentru ca scala e logaritmica. Nu exista in categoria asta un aspirator pe care sa il numesti silentios. Cel mai discret din articol e Heinner HVC-V750OR cu 75 de decibeli, urmat de Philips PowerPro Expert si Heinner HVC-MC700RD cu 76. La celalalt capat, Samsung VCC43Q0V3B declara 80. Daca zgomotul e o problema reala in casa, diferenta merita luata in calcul la alegere.' },
+  { question: 'Ce este raza de operare si de ce conteaza?', answer: 'Raza de operare e distanta maxima la care ajungi de la priza, adica lungimea cablului plus a furtunului si a tubului, si e specificatia pe care o ignora aproape toata lumea pana incepe sa aspire. Cu o raza mica schimbi priza de mai multe ori pe camera, ceea ce e enervant si incetineste treaba. In selectie, valorile merg de la 7.55 metri la Rowenta Swift Power pana la 10 metri la Philips PowerPro Expert. Pentru un apartament obisnuit, 8 metri sunt suficienti. Pentru camere lungi sau case cu holuri, diferenta pana la 9-10 metri chiar conteaza. Cateva modele nu declara aceasta valoare pe eMAG, printre care Rowenta Compact Power XXL si Heinner HVC-V750OR.' },
+  { question: 'Aspiratoarele Karcher sunt mai bune pentru ca au 1000 W?', answer: 'Nu, si aici e o confuzie usor de facut. Aparatele Karcher WD din selectie au 1000 de wati pentru ca sunt aspiratoare umed-uscat de atelier, iar acestea nu intra sub regulamentul european care limiteaza aspiratoarele casnice la 900. Puterea mai mare nu inseamna ca aspira mai bine covoarele; inseamna ca sunt proiectate pentru alt tip de munca: moloz, aschii, frunze si lichide. Un Karcher WD nu inlocuieste un aspirator de casa, pentru ca nu are periile si filtrarea potrivite pentru covoare si praf fin, iar dimensiunea il face incomod intr-un apartament. Invers, un aspirator casnic se strica daca aspiri apa sau moloz cu el. Sunt unelte complementare, nu alternative.' },
+  { question: 'Cum intretin un aspirator fara sac?', answer: 'Trei lucruri, si toate sunt simple. Goleste recipientul cand ajunge la semnul maxim, nu mai tarziu, pentru ca un recipient prea plin scade puterea de aspirare si forteaza motorul. Spala filtrele periodic, o data la una-doua luni la folosire obisnuita, si lasa-le sa se usuce complet inainte sa le pui la loc, pentru ca un filtru umed favorizeaza mucegaiul si mirosul. Verifica furtunul si peria daca simti ca aspira mai slab, pentru ca cel mai frecvent motiv nu e motorul stricat, ci un blocaj cu par sau scame. Aspiratoarele fara sac isi pierd din putere in principal din cauza filtrelor infundate, nu a uzurii motorului, iar asta se rezolva cu apa si rabdare.' },
+  { question: 'Cat costa un aspirator fara sac bun?', answer: 'Selectia acopera de la 235 la 750 de lei la aparatele casnice. Sub 300 de lei gasesti Heinner HVC-MC700RD, care ofera recipient de 2 litri si 76 de decibeli, adica specificatii peste asteptarile segmentului, si Daewoo RCC-120B-1, care are insa nota sub 4. Intre 340 si 400 de lei stau cele mai vandute modele, Rowenta Compact Power cu 2953 de pareri, Samsung VCC43Q0V3B si Heinner HVC-V750OR, si aici e zona cu cel mai bun echilibru intre pret si incredere. Peste 600 de lei intra Philips PowerPro Compact si Expert si Rowenta Compact Power XXL, unde platesti raza mai mare, recipient mai mare si note mai bune. Aspiratoarele de atelier Karcher costa intre 385 si 411 lei, dar sunt o categorie separata.' },
+];
+
+const images = [hero, figTop, figDotari, figAtelier, figPutere, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune aspiratoare fara sac in ${SEO_YEAR}: capacitate, zgomot si raza`}
+  description="14 aspiratoare fara sac comparate pe capacitate, zgomot si raza de operare, de la 235 la 750 de lei. Plus de ce watii de pe cutie nu spun nimic despre aspirare."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Elena Dragomir"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Curatenie si Intretinere', url: '/curatenie-intretinere/' }, { name: 'Cele mai bune aspiratoare fara sac' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/curatenie-intretinere/">Curatenie si Intretinere</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune aspiratoare fara sac</span>
+    </nav>
+
+    <h1>Cele mai bune aspiratoare fara sac</h1>
+    <p class="rd-byline">de <a href="/autori/elena-dragomir/">Elena Dragomir</a>, Consultant Amenajari · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune aspiratoare fara sac: modele casnice si de atelier" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Cel mai cumparat aspirator fara sac din selectie e <strong>Rowenta Compact Power Cyclonic</strong>, cu 2953 de pareri, de trei ori mai multe decat urmatorul. Cel mai bine notat dintre casnice e <strong>Philips PowerPro Expert</strong>, cu 4.74 si cea mai mare raza din articol, 10 metri. Sub 300 de lei, <strong>Heinner HVC-MC700RD</strong> ofera un recipient de 2 litri, cat la modele de trei ori mai scumpe.</p>
+      <p>Un lucru de stiut inainte sa compari fise: <strong>watii de pe cutie nu spun aproape nimic</strong>. Din 2017, legislatia europeana limiteaza motorul aspiratoarelor casnice la 900 W, deci toate sunt intre 550 si 900, iar diferenta tine de consum, nu de aspirare. Ce conteaza cu adevarat e <strong>capacitatea recipientului</strong>, <strong>zgomotul</strong> si <strong>raza de operare</strong>. Pe astea le compar mai jos.</p>
+      <p>Daca de fapt cauti un aparat pe care sa nu il impingi tu, vezi <a href="/cele-mai-bune-aspiratoare-robot/">aspiratoarele robot</a>. Pentru covoare patate si tapiterie, un <a href="/aspirator-cu-spalare-pentru-covoare/">aspirator cu spalare</a> face altceva decat orice model de aici.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#top">Cele mai vandute</a></li>
+        <li><a href="#dotari">Cu dotari si capacitate mare</a></li>
+        <li><a href="#buget">Sub 300 de lei</a></li>
+        <li><a href="#atelier">Umed-uscat, pentru atelier</a></li>
+        <li><a href="#wati">De ce nu conteaza watii de pe cutie</a></li>
+        <li><a href="#alergii">Cel mai bun aspirator fara sac pentru alergii</a></li>
+        <li><a href="#animale">Cel mai bun aspirator pentru par de animale</a></li>
+        <li><a href="#ieftin">Cel mai ieftin care merita</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#intretinere">Intretinere si filtre</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Putere</th><th>Recipient</th><th>Zgomot</th><th>Raza</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.putere}</td>
+              <td>{x.cap}</td>
+              <td>{x.zgomot}</td>
+              <td>{x.raza}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="top">Cele mai vandute</h2>
+    <p>Cele patru modele pe care le cumpara cei mai multi oameni, cu 762 pana la 2953 de pareri fiecare. La preturi apropiate, intre 345 si 400 de lei, iar diferentele dintre ele stau in recipient, zgomot si raza.</p>
+    {TOP.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figTop} alt="Cele mai vandute aspiratoare fara sac: Rowenta, Samsung si Heinner" width="1600" height="900" loading="lazy" />
+
+    <h2 id="dotari">Cu dotari si capacitate mare</h2>
+    <p>Peste 450 de lei apar recipientele de 2-2.5 litri, razele de 9-10 metri, derulatorul automat de cablu si filtrele mai fine. Nu aspira fundamental mai bine, dar aspiri mai comod si golesti mai rar.</p>
+    {DOTARI.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figDotari} alt="Aspiratoare fara sac cu dotari: Philips PowerPro, Rowenta XXL si Bosch" width="1600" height="900" loading="lazy" />
+
+    <h2 id="buget">Sub 300 de lei</h2>
+    <p>Doua optiuni, iar diferenta dintre ele e mai mare decat sugereaza pretul apropiat. Una ofera specificatii peste segment, cealalta are singura nota sub 4 din tot articolul.</p>
+    {BUGET.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <h2 id="atelier">Umed-uscat, pentru atelier</h2>
+    <p>Alta categorie de unealta, inclusa pentru ca apare in aceleasi cautari si e usor de confundat. Aspira si lichide, are recipient de 12-17 litri si e facuta pentru garaj, atelier sau renovare, nu pentru covoare.</p>
+    {ATELIER.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figAtelier} alt="Aspiratoare umed-uscat Karcher pentru atelier si garaj" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-aspirator-fara-sac').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate aspiratoarele fara sac la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="wati">De ce nu conteaza watii de pe cutie</h2>
+    <p>E prima cifra pe care o compara toata lumea in magazin si, de vreo opt ani, aproape cea mai putin utila.</p>
+    <p>Uniunea Europeana a impus un plafon la puterea motorului aspiratoarelor casnice: <strong>maximum 1600 W din 2014 si maximum 900 W din septembrie 2017</strong>. Inainte existau pe piata aparate de 2000-2400 W, si de acolo vine reflexul de a cauta wati multi. Astazi, orice aspirator de casa vandut legal in Uniune se incadreaza sub 900, deci comparatia dintre 750 si 900 spune ceva despre consumul de curent, nu despre cat de bine aspira.</p>
+
+    <img class="rd-chart" src={figPutere} alt="Grafic: puterea aspiratoarelor din selectie raportata la plafoanele impuse de UE, 900 W din 2017" width="1100" height="1896" loading="lazy" />
+
+    <p>Se vede clar in grafic: toate aparatele casnice din selectie stau sub linia de 900 W, iar singurele care o depasesc sunt cele trei Karcher, si nu pentru ca ar fi mai puternice la aspirat covoare, ci pentru ca <strong>aspiratoarele umed-uscat de atelier nu intra sub acelasi regulament</strong>.</p>
+    <p>Puterea de aspirare reala se masoara altfel: in <strong>kilopascali</strong>, cat vid poate crea aparatul, si in <strong>debit de aer</strong>, cati litri sau decimetri cubi de aer misca pe secunda. Sunt cifrele care conteaza, si exact ele lipsesc aproape intotdeauna din fisele de pe eMAG. Regulamentul european obliga si la o eticheta energetica ce include clasa de aspirare pe covor si pe suprafete dure si limite de zgomot, dar nici acestea nu apar in listarile pe care le vezi cand cumperi.</p>
+    <p>Dovada practica din chiar aceasta selectie: <strong>Rowenta Compact Power XXL</strong> are cea mai mica putere din articol, 550 W, si totodata cel mai mare recipient si o nota de 4.71, mai buna decat a majoritatii modelelor de 850-900 W. Daca watii ar fi contat, clasamentul ar fi aratat exact invers.</p>
+    <p>Ce sa compari in loc:</p>
+    <ul>
+      <li><strong>Capacitatea recipientului</strong> — cat de des il golesti. Intre 1.2 si 2.5 litri la casnice, iar diferenta se simte saptamanal.</li>
+      <li><strong>Raza de operare</strong> — de cate ori schimbi priza intr-o camera. Intre 7.55 si 10 metri in selectie.</li>
+      <li><strong>Zgomotul</strong> — intre 75 si 80 dB, un interval ingust dar audibil.</li>
+      <li><strong>Filtrul</strong> — EPA sau HEPA daca cineva din casa are alergii, filtru obisnuit altfel.</li>
+      <li><strong>Numarul de pareri</strong> — la un aparat cu motor si piese mobile, un volum mare de pareri spune mai mult decat orice specificatie.</li>
+    </ul>
+
+    <h2 id="alergii">Cel mai bun aspirator fara sac pentru alergii</h2>
+    <p>Aspiratoarele fara sac au un dezavantaj concret aici: la golirea recipientului, praful fin se ridica inapoi in aer. Cu sac, praful ramane inchis. Daca cineva din casa are alergii sau astm, asta conteaza mai mult decat orice alta specificatie.</p>
+    <p>Solutia in interiorul categoriei e filtrul. <strong>Bosch BGS05A222</strong> e singurul din selectie cu <strong>filtru EPA 12</strong>, care retine particulele fine mult mai bine decat un filtru obisnuit, si vine si cu perie de parchet. Costa cu circa 120 de lei mai mult decat BGS05A220, care e identic in rest, iar aceasta diferenta e practic pretul filtrului.</p>
+    <p>Doua obiceiuri care conteaza la fel de mult ca aparatul: goleste recipientul afara sau deasupra unui cos acoperit, nu in mijlocul bucatariei, si spala filtrele lunar, pentru ca un filtru infundat lasa sa treaca inapoi tocmai ce ar trebui sa retina.</p>
+
+    <h2 id="animale">Cel mai bun aspirator pentru par de animale</h2>
+    <p>Cu animale in casa, criteriul care se schimba e capacitatea, pentru ca parul umple recipientul mult mai repede decat praful obisnuit, si nu puterea.</p>
+    <p><strong>Rowenta Compact Power XXL</strong> are 2.5 litri, cel mai mare recipient dintre casnice, aproape dublu fata de Samsung, deci golesti de doua ori mai rar. <strong>Heinner HVC-V750OR</strong> vine cu 2.2 litri si e cel mai silentios din articol, o combinatie buna daca animalul se sperie de zgomot. Iar la buget mic, <strong>Heinner HVC-MC700RD</strong> ofera 2 litri sub 240 de lei.</p>
+    <p>Ce nu rezolva niciunul dintre ele: parul infasurat pe peria rotativa. Verifica peria la cateva saptamani si taie parul strans cu o foarfeca mica, altfel aspirarea slabeste treptat si dai vina pe motor.</p>
+
+    <h2 id="ieftin">Cel mai ieftin care merita</h2>
+    <p><strong>Heinner HVC-MC700RD</strong>, la sub 240 de lei, e cea mai buna afacere din articol si nu doar in segmentul lui: are recipient de 2 litri, cat Philips PowerPro Expert de 750 de lei, si 76 de decibeli, adica mai silentios decat Rowenta cel mai vandut si decat ambele Bosch. Nota de 4.6 din 247 de pareri arata cumparatori multumiti.</p>
+    <p>Alternativa din acelasi interval, <strong>Daewoo RCC-120B-1</strong> la 259 de lei, are recipient mai mic, e mai zgomotos si are nota 3.97, singura sub 4 din tot articolul. Comparatia directa nu il avantajeaza, deci il iei doar daca il prinzi la o reducere care il duce sensibil sub Heinner.</p>
+    <p>Ce nu primesti la pretul asta: materiale premium si accesorii multe. Diferenta fata de un Philips sau un Bosch nu se vede in fisa tehnica, ci in cat rezista roțile, furtunul si clemele dupa doi-trei ani de folosire zilnica.</p>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la aspiratoarele fara sac in stoc pe eMAG, sortate dupa numarul de pareri, si am eliminat modelele verticale fara fir, robotii si aparatele de mana, care sunt categorii separate cu criterii proprii de alegere.</p>
+    <p>Am pastrat cate un singur model din fiecare linie de produs. La Rowenta, de exemplu, aceeasi gama Compact Power apare in patru variante care impart aceleasi 2953 de pareri, iar includerea tuturor ar fi umflat lista fara sa adauge informatie.</p>
+    <p><strong>Am inclus deliberat si trei aspiratoare umed-uscat Karcher</strong>, desi nu sunt aparate casnice, pentru ca apar in aceleasi cautari, sunt tot fara sac si sunt usor de confundat cu ele. Cei 1000 de wati ai lor par sa le recomande fata de restul, cand de fapt sunt semnul ca fac altceva. Un articol care le-ar fi ignorat ar fi lasat neexplicata exact confuzia asta.</p>
+    <p>Nu testam aparatele in laborator si nu pretindem asta. Comparam specificatiile reale din fisele produselor, volumul si nota parerilor, si le raportam la ce prevede regulamentul european despre puterea si eticheta energetica a aspiratoarelor.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <ul>
+      <li><strong>Capacitatea recipientului.</strong> Primul criteriu real. 1.2-1.5 l pentru un apartament fara animale, 2-2.5 l pentru casa, covoare sau animale.</li>
+      <li><strong>Raza de operare.</strong> Sub 8 metri schimbi priza des intr-o camera lunga. Peste 9 acoperi confortabil.</li>
+      <li><strong>Zgomotul.</strong> Toate sunt intre 75 si 80 dB. Nu exista aspirator silentios in categoria asta, doar unele mai putin obositoare.</li>
+      <li><strong>Filtrul.</strong> EPA sau HEPA daca sunt alergii in casa. Altfel, filtrul standard e suficient.</li>
+      <li><strong>Greutatea si forma.</strong> Conteaza daca ai scari sau il ridici des. Un aparat compact se cara usor, dar are recipient mic.</li>
+      <li><strong>Derulatorul automat de cablu.</strong> Pare accesoriu, dar il folosesti la fiecare aspirare.</li>
+    </ul>
+
+    <h2 id="intretinere">Intretinere si filtre</h2>
+    <p>Un aspirator fara sac care aspira mai slab dupa un an nu are, in majoritatea cazurilor, motorul uzat. Are filtrele infundate.</p>
+    <ul>
+      <li><strong>Goleste recipientul la semnul maxim</strong>, nu peste. Un recipient plin scade aspirarea si forteaza motorul.</li>
+      <li><strong>Spala filtrele lunar</strong> si lasa-le sa se usuce complet, 24 de ore, inainte sa le montezi la loc. Un filtru umed face mucegai si miros.</li>
+      <li><strong>Verifica furtunul si peria</strong> cand simti scaderea puterii. Cel mai frecvent vinovat e un ghem de par sau scame, nu aparatul.</li>
+      <li><strong>Taie parul de pe peria rotativa</strong> la cateva saptamani, daca ai animale.</li>
+      <li><strong>Nu aspira niciodata lichide</strong> cu un aparat casnic. Pentru asta exista modelele umed-uscat din articol.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Aparatele casnice din selectie merg de la 235 la 750 de lei.</p>
+    <p><strong>Sub 300 de lei</strong> stau Heinner HVC-MC700RD, cu specificatii peste segment, si Daewoo RCC-120B-1, cu singura nota sub 4 din articol.</p>
+    <p><strong>Intre 340 si 400 de lei</strong> e zona celor mai vandute: Rowenta Compact Power cu 2953 de pareri, Samsung VCC43Q0V3B, Heinner HVC-V750OR si Rowenta Swift Power. Aici gasesti cel mai bun echilibru intre pret si incredere, si tot aici cumpara majoritatea.</p>
+    <p><strong>Peste 450 de lei</strong> intra Bosch si Philips, unde platesti raza mai mare, recipient mai mare, derulator automat si filtre mai fine. Philips PowerPro Expert la 750 de lei e cel mai scump aparat casnic din selectie si totodata cel mai bine notat.</p>
+    <p><strong>Aspiratoarele Karcher</strong> costa intre 385 si 411 lei, dar nu se compara direct cu restul: sunt unelte de atelier, cumparate ca al doilea aspirator.</p>
+    <p>Observatia de buget: intre cel mai ieftin model decent, la 235 de lei, si cel mai scump casnic, la 750, diferenta nu e in cat de curata iese casa, ci in cat de comod aspiri si cat de rar golesti. Daca aspiri un apartament de doua camere o data pe saptamana, modelele din zona de 350 de lei sunt suficiente. Pentru curatenie mai profunda pe covoare, vezi si <a href="/mop-cu-aburi-pentru-podele/">mopurile cu aburi</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">ED</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/elena-dragomir/" class="author-name-link">Elena Dragomir</a></p>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Elena scrie despre curatenie si intretinerea casei. Cauta aparatele care chiar usureaza treaba, nu pe cele cu cele mai multe functii pe cutie.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-aspiratoare-fara-sac" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-aspiratoare-fara-sac" currentCategory="curatenie-intretinere" articles={relatedArticles} />
+  </article>
+</Layout>

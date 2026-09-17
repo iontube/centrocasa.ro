@@ -1,5 +1,7 @@
 ---
 import ArticleCard from './ArticleCard.astro';
+import keywordsData from '../../keywords.json';
+import { slugify } from '../lib/articles.mjs';
 
 interface Article {
   title: string;
@@ -19,20 +21,28 @@ interface Props {
 
 const { currentSlug, currentCategory, articles } = Astro.props;
 
-// Filter out current article and prioritize same category
-const otherArticles = articles.filter(a => a.slug !== currentSlug);
-const sameCategory = otherArticles.filter(a => a.categorySlug === currentCategory);
-const differentCategory = otherArticles.filter(a => a.categorySlug !== currentCategory);
+// Relevanta DOAR pe categorie + ACELASI grup de vizibilitate: articolele vechi (legacy)
+// nu se amesteca cu cele noi, in nicio directie. Daca nu exista peer, sectiunea nu apare.
+const legacyBySlug = new Map(keywordsData.completed.map(a => [a.slug || slugify(a.keyword), !!a.legacy]));
+const currentLegacy = legacyBySlug.get(currentSlug) ?? false;
+const sameGroup = a => a.slug !== currentSlug && (legacyBySlug.get(a.slug) ?? false) === currentLegacy;
+const byDate = (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime();
 
-// Get up to 3 similar articles, prioritizing same category
-const similarArticles = [...sameCategory, ...differentCategory]
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  .slice(0, 3);
+const dinCategorie = articles.filter(a => sameGroup(a) && a.categorySlug === currentCategory).sort(byDate);
+
+// Primul articol dintr-o categorie noua nu are niciun peer, iar sectiunea disparea complet:
+// pagina ramanea fara nicio iesire in subsol, prost si pentru cititor, si pentru linkuirea interna.
+// Cand categoria nu are destui vecini, completam cu cele mai noi articole din restul site-ului.
+const completare = dinCategorie.length < 3
+  ? articles.filter(a => sameGroup(a) && a.categorySlug !== currentCategory).sort(byDate)
+  : [];
+const similarArticles = [...dinCategorie, ...completare].slice(0, 3);
+const dinAlteCategorii = dinCategorie.length === 0;
 ---
 
 {similarArticles.length > 0 && (
   <section class="similar-articles">
-    <h2 class="similar-articles-title">Articole similare</h2>
+    <h2 class="similar-articles-title">{dinAlteCategorii ? 'Alte articole recente' : 'Articole similare'}</h2>
     <div class="similar-grid">
       {similarArticles.map(article => (
         <ArticleCard {...article} showExcerpt={false} />

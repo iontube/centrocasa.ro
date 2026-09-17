@@ -1,629 +1,300 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
 import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Banca de gradina din lemn masiv",
-  excerpt: "Atunci cand cautati o banca de gradina din lemn masiv, cautati in primul rand durabilitate, estetica si o investitie pe termen lung pentru spatiul dumneavoastra exterior. Lemnul masiv ofera o rezistenta superioara la intemperii si un aspect natural, cald, care se integreaza perfect in orice peisaj.",
-  image: "/images/articles/banca-de-gradina-din-lemn-masiv.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-03-07T09:01:42.383Z",
-  modifiedDate: "2026-03-07T09:01:42.383Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat costa o banca de gradina din lemn masiv?", answer: "Preturile pentru o banca de gradina din lemn masiv variaza considerabil, de la aproximativ 850 lei pentru modelele din pin tratat, pana la peste 2800 lei pentru bancile din lemn de tec. Modelele din stejar, salcam sau eucalipt se situeaza, in general, intre 1400 si 1800 lei." },
-  { question: "Care este diferenta dintre lemnul masiv tratat si cel netratat pentru exterior?", answer: "Lemnul masiv tratat (prin autoclavare, sub presiune sau cu uleiuri specifice) ofera o rezistenta mult superioara la umiditate, insecte si ciuperci comparativ cu lemnul netratat. Acest lucru ii prelungeste semnificativ durata de viata in conditii exterioare." },
-  { question: "Merita sa cumpar o banca de gradina din lemn masiv de tec?", answer: "Da, merita daca bugetul va permite si prioritizati durabilitatea maxima si rezistenta exceptionala la intemperii. Lemnul de tec este cel mai bun din clasa sa pentru utilizare exterioara, dar pretul este pe masura calitatii." },
-  { question: "Cum pot proteja banca de gradina din lemn masiv iarna?", answer: "Cel mai bine este sa curatati banca, sa o acoperiti cu o husa impermeabila sau, ideal, sa o depozitati intr-un spatiu uscat si aerisit (garaj, magazie) pe perioada rece pentru a-i prelungi durata de viata." },
-  { question: "Ce fel de intretinere necesita o banca de gradina din lemn masiv?", answer: "Intretinerea de baza implica curatarea periodica si reaplicarea unui strat de ulei protector sau lac specific pentru exterior, de obicei o data pe an. Verificati recomandarile producatorului pentru fiecare tip de lemn in parte." }
-];
-
-const toc = [
-  { title: "Banca de gradina din lemn masiv de tec \"Savannah\"", id: "banca-de-gradina-din-lemn-masiv-de-tec-savannah" },
-  { title: "Banca de gradina din lemn masiv de stejar \"Forestia\"", id: "banca-de-gradina-din-lemn-masiv-de-stejar-forestia" },
-  { title: "Banca de gradina din lemn masiv de pin tratat \"EcoGarden\"", id: "banca-de-gradina-din-lemn-masiv-de-pin-tratat-ecogarden" },
-  { title: "Banca de gradina din lemn masiv de salcam \"Rustic Charm\"", id: "banca-de-gradina-din-lemn-masiv-de-salcam-rustic-charm" },
-  { title: "Banca de gradina din lemn masiv de brad tratat \"Veranda\"", id: "banca-de-gradina-din-lemn-masiv-de-brad-tratat-veranda" },
-  { title: "Banca de gradina din lemn masiv de eucalipt \"Zenith\"", id: "banca-de-gradina-din-lemn-masiv-de-eucalipt-zenith" },
-  { title: "Comparatie", id: "comparatie" },
-  { title: "Cum alegi cea mai buna banca de gradina din lemn masiv?", id: "ghid" },
-  { title: "Intrebari Frecvente", id: "faq" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['banca-gradina'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Clasice din lemn ---
+  { g: 'clasic', id: 'D4MKJ4YBM', badge: 'Cea mai vanduta', short: 'Transilvan Emy', locuri: '2 locuri', lungime: '125 cm', material: 'Lemn masiv',
+    specs: ['cea mai vanduta din selectie, 30 pareri', 'din lemn masiv, 125 x 81 x 45 cm', '2 locuri, fabricata la noi', 'design clasic, cu spatar'],
+    pros: ['Cea mai vanduta din selectie, 30 de pareri', 'Din lemn masiv, robusta si naturala', 'Fabricata in Romania, brand Transilvan', 'Design clasic, cu spatar, pentru 2 persoane'],
+    cons: ['Doar 2 locuri', 'Lemnul cere tratament periodic'],
+    verdict: 'Cu 30 de pareri, de departe cele mai multe din selectie, banca Transilvan Emy s-a dovedit favorita cumparatorilor, si nu intamplator. E din lemn masiv, robusta si cu un aspect natural, cald, are 125 cm lungime si un design clasic cu spatar, pentru 2 persoane, potrivit pe o terasa, in gradina sau pe hol. Fiind de la Industry Transilvan, un producator romanesc, o iei cu increderea unui brand local si a lemnului masiv adevarat, nu placaj. Cu nota 4.07, e o alegere verificata de multa lume. Are doar 2 locuri, deci pentru o familie mai mare cauti una mai lunga, iar lemnul, ca orice lemn de exterior, cere un tratament periodic de protectie. O iei cand vrei cea mai populara banca din lemn masiv din selectie, romaneasca, robusta si cu aspect natural, pentru 2 persoane.' },
+  { g: 'clasic', id: 'D5KTLWMBM', badge: 'Spatar cu model, bine notata', short: 'Ideal Store', locuri: '2 locuri', lungime: '123 cm', material: 'Lemn + fier',
+    specs: ['spatar cu model decorativ', 'cadru din fier, sezut si spatar din lemn', '123.5 cm, 2 locuri', 'nota 4.71 din 7 pareri'],
+    pros: ['Spatar cu model decorativ, aspect ingrijit', 'Cadru din fier, rezistent, cu lemn', 'Nota mare, 4.71', 'Combinatie durabila lemn si metal'],
+    cons: ['Inca 7 pareri', 'Nu e integral din lemn masiv'],
+    verdict: 'Daca pui pret pe aspect, banca Ideal Store Garden Collections se remarca prin spatarul cu model decorativ, care ii da un aer mai ingrijit decat al unei banci simple. Are un cadru din fier, rezistent, combinat cu sezutul si spatarul din lemn, o structura durabila care imbina soliditatea metalului cu aspectul cald al lemnului, si masoara 123.5 cm, pentru 2 persoane. Cu 7 pareri si nota 4.71 e bine cotata, chiar daca are inca putine recenzii. Trebuie spus ca nu e integral din lemn masiv, ci o combinatie lemn si metal, ceva de care sa tii cont daca vrei neaparat lemn pur. O iei cand vrei o banca cu un spatar decorativ si o structura durabila din fier si lemn, bine notata, pentru un colt de gradina cu aspect mai ingrijit.' },
+  { g: 'clasic', id: 'D7BP8NMBM', badge: '3 locuri, accesibila', short: 'Everild 3 locuri', locuri: '3 locuri', lungime: '123 cm', material: 'Lemn + metal',
+    specs: ['3 locuri, lemn cu structura din metal', '123 x 54 x 77 cm', 'accesibila, pentru mai multe persoane', 'combinatie lemn si metal'],
+    pros: ['3 locuri, incap mai multe persoane', 'Structura din metal, rezistenta', 'Pret accesibil', 'Sezut si spatar din lemn'],
+    cons: ['Doar 2 pareri deocamdata', 'Nu e integral din lemn masiv'],
+    verdict: 'Pentru cine vrea o banca de 3 locuri la un pret mic, Everild e o optiune practica. Combina lemnul, la sezut si spatar, cu o structura din metal care ii da rezistenta, si masoara 123 cm, cu loc pentru 3 persoane, potrivita pentru o familie sau un colt de gradina mai folosit. E una dintre cele mai accesibile din selectie, o alegere buna daca vrei mai multe locuri fara sa dai multi bani. Are, insa, doar 2 pareri deocamdata, deci te bazezi mai mult pe specificatii, si nu e integral din lemn masiv, ci o combinatie lemn si metal. O iei cand vrei o banca de 3 locuri accesibila, cu structura din metal rezistenta si sezut din lemn, pentru mai multe persoane, si nu insisti pe lemn masiv pur.' },
+  { g: 'clasic', id: 'D5MY5T3BM', badge: 'Heinner, de brand', short: 'Heinner 125cm', locuri: '3 locuri', lungime: '125 cm', material: 'Lemn + otel',
+    specs: ['Heinner, 125 x 51 x 76 cm', '3 locuri, metal, lemn si PVC', 'de la un brand cunoscut la noi', 'design simplu'],
+    pros: ['Heinner, brand cunoscut la noi', '3 locuri, 125 cm', 'Structura din metal rezistenta', 'Combinatie de materiale durabila'],
+    cons: ['Nota 3.67 din 3 pareri, verifica recenziile', 'Nu e integral din lemn masiv'],
+    verdict: 'Banca Heinner e alegerea pentru cine prefera un brand cunoscut la noi. Are 125 cm, 3 locuri si o structura care combina metal, lemn si PVC, o constructie durabila pentru exterior, la un pret accesibil, de la un nume familiar in mobilier si electrocasnice. Cu 3 pareri si nota 3.67 e cotata mai modest, asa ca merita sa te uiti atent la recenzii inainte de a comanda, iar combinatia de materiale inseamna ca nu e integral din lemn masiv. Designul e simplu, functional, fara pretentii decorative. O iei cand vrei o banca de 3 locuri de la un brand cunoscut, cu structura rezistenta din metal si lemn, la un pret accesibil, si esti dispus sa verifici parerile pentru o nota mai modesta.' },
+  // --- Cu spatiu de depozitare ---
+  { g: 'depoz', id: 'DL7PCKYBM', badge: 'Cu ladita, cea mai notata', short: 'KADAX cu ladita', locuri: '3 locuri', lungime: '120 cm', material: 'Lemn de pin',
+    specs: ['banca cu spatiu de depozitare sub sezut', 'lemn de pin, 120 x 47 x 81.5 cm', '3 locuri, nota 4.89', 'sezutul se ridica'],
+    pros: ['Spatiu de depozitare sub sezut, 2 in 1', 'Lemn de pin, aspect natural', 'Nota excelenta, 4.89', 'Practica: banca si lada intr-una'],
+    cons: ['Inca 9 pareri', 'Pinul e un lemn mai moale'],
+    verdict: 'Cand vrei sa castigi si spatiu de depozitare, banca KADAX cu ladita rezolva doua nevoi deodata. Sub sezut, care se ridica, ascunde un spatiu generos in care tii perne, unelte de gradina, jucarii sau orice vrei sa nu stea la vedere, transformand banca intr-o lada practica. E din lemn de pin, cu aspect natural si cald, are 120 cm si 3 locuri. Cu 9 pareri si nota 4.89, una dintre cele mai mari din selectie, e foarte apreciata de cei care au cumparat-o. Pinul e un lemn mai moale decat esentele tari, deci cere ceva mai multa grija, iar recenziile sunt inca putine. O iei cand vrei o banca 2 in 1, cu spatiu de depozitare sub sezut, din lemn de pin, foarte bine notata, pentru o terasa sau un hol unde ai nevoie si de loc de pus lucruri.' },
+  { g: 'depoz', id: 'D8M59VYBM', badge: 'Pin colorat, bine notata', short: 'KADAX pin', locuri: '3 locuri', lungime: '120 cm', material: 'Lemn de pin',
+    specs: ['lemn de pin, disponibila colorata', '3 locuri, aspect proaspat', 'nota 4.89 din 9 pareri', 'design modern'],
+    pros: ['Lemn de pin, in nuante colorate', 'Nota excelenta, 4.89', 'Aspect proaspat si modern', 'Aduce un accent de culoare in gradina'],
+    cons: ['Inca 9 pareri', 'Pinul cere tratament periodic'],
+    verdict: 'Pentru un accent de culoare in gradina, banca KADAX din lemn de pin iese din tiparul lemnului natural. Vine in nuante colorate, ca albastru, care aduc un aer proaspat si vesel pe o terasa sau intr-un colt de curte, diferit de bancile clasice maro, si are 3 locuri. E tot din lemn de pin, cu aspect placut, si a strans o nota excelenta, 4.89 din 9 pareri, la fel ca varianta cu ladita, semn ca linia KADAX multumeste cumparatorii. Pinul e un lemn mai moale, care cere tratament periodic ca sa reziste afara, iar recenziile sunt inca putine. O iei cand vrei o banca din lemn cu un accent de culoare, proaspata si moderna, bine notata, pentru a inviora un colt de gradina sau terasa.' },
+  { g: 'depoz', id: 'DHSY7GBBM', badge: 'Depozitare lunga', short: 'vidaXL depozitare', locuri: '2-3 locuri', lungime: '116 cm', material: 'Lemn', cos: '',
+    specs: ['banca de depozitare lunga, maro', 'lemn, 116 cm', 'spatiu de depozitare sub sezut', 'aspect clasic'],
+    pros: ['Spatiu de depozitare sub sezut', 'Din lemn, nuanta maro clasica', 'Lunga, 116 cm', 'De la vidaXL, brand cunoscut de mobilier'],
+    cons: ['Doar 2 pareri deocamdata', 'Pret mai ridicat'],
+    verdict: 'O alternativa cu depozitare o gasesti la banca lunga vidaXL, in nuanta maro clasica. Are un spatiu de depozitare sub sezut, util pentru perne, unelte sau alte lucruri de gradina, si masoara 116 cm, cu un aspect clasic care se integreaza usor pe o terasa sau intr-un hol. E din lemn si vine de la vidaXL, un brand cunoscut pentru mobilier de casa si gradina. Cu doar 2 pareri, chiar daca nota maxima, e inca putin testata, deci te bazezi pe specificatii, iar pretul e mai ridicat decat al altor banci cu depozitare. O iei cand vrei o banca de depozitare lunga din lemn, in nuanta maro clasica, de la vidaXL, si nu te deranjeaza pretul mai mare sau numarul mic de recenzii.' },
+  // --- Speciale ---
+  { g: 'spec', id: 'DG2V0LBBM', badge: 'Cu perne, din acacia', short: 'vidaXL cu perne', locuri: '4 locuri', lungime: '190 cm', material: 'Lemn masiv acacia',
+    specs: ['banca 2 in 1, cu perne incluse', 'lemn masiv de acacia, 190 cm', '4 locuri, cea mai lunga din selectie', 'esenta tare, durabila'],
+    pros: ['Din lemn masiv de acacia, esenta tare durabila', 'Cea mai lunga din selectie, 190 cm, 4 locuri', 'Vine cu perne incluse, confort in plus', 'Sistem 2 in 1'],
+    cons: ['Doar 2 pareri deocamdata', 'Mare, cere spatiu'],
+    verdict: 'Pentru o familie sau un colt de relaxare generos, banca vidaXL cu perne e cea mai mare si mai confortabila din selectie. E din lemn masiv de acacia, o esenta tare, mult mai durabila si mai rezistenta la exterior decat pinul, are 190 cm, cea mai lunga de aici, cu loc pentru 4 persoane, si vine cu perne incluse, deci stai comod din prima, fara sa mai cumperi separat. Sistemul 2 in 1 o face versatila. Cu doar 2 pareri, chiar daca nota maxima, e inca putin testata, si fiind mare, cere un spatiu pe masura. O iei cand vrei cea mai mare si mai confortabila banca din selectie, din lemn masiv de acacia rezistent, cu perne incluse, pentru 4 persoane, si ai loc pentru o piesa de 190 cm.' },
+  { g: 'spec', id: 'D6WBVBMBM', badge: 'Pentru copii', short: 'Pentru copii', locuri: '2 locuri', lungime: '82 cm', material: 'Lemn + metal',
+    specs: ['banca pentru copii, 82 cm', 'lemn cu structura din metal', 'dimensiune mica, potrivita pentru copii', 'nota maxima, 5 din 5'],
+    pros: ['Gandita special pentru copii, dimensiune mica', 'Lemn cu structura din metal, rezistenta', 'Nota maxima, 5 din 5', 'Perfecta pentru o gradina cu copii'],
+    cons: ['Doar 2 pareri, mica, 82 cm', 'Doar pentru copii, nu pentru adulti'],
+    verdict: 'Daca ai copii si vrei o banca pe masura lor, modelul STREND PRO pentru copii e o alegere draguta. Are doar 82 cm, o dimensiune mica, potrivita pentru cei mici, si o structura din metal cu lemn, rezistenta la joaca si la exterior, pentru un colt al lor in gradina sau pe terasa. A luat nota maxima, 5 din 5, chiar daca din doar 2 pareri, semn ca primii cumparatori sunt multumiti. Fiind mica si joasa, e gandita strict pentru copii, nu pentru adulti, si are inca putine recenzii. O iei cand ai o gradina cu copii si vrei o banca micuta special pentru ei, rezistenta si bine notata, pentru un loc al lor unde sa stea si sa se joace.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const CLASIC = PICKS.filter(x => x.g === 'clasic');
+const DEPOZ = PICKS.filter(x => x.g === 'depoz');
+const SPEC = PICKS.filter(x => x.g === 'spec');
+
+const hero = '/images/articles/banca-de-gradina-din-lemn-masiv.webp';
+const figClasic = '/imagini/articole/banca-clasice.webp';
+const figDepoz = '/imagini/articole/banca-depozitare.webp';
+const figSpec = '/imagini/articole/banca-speciale.webp';
+const published = '2026-07-19T16:01:46+03:00';
+
+const faq = [
+  { question: 'Lemn masiv sau lemn cu structura de metal?', answer: 'O banca integral din lemn masiv are un aspect cald, natural si autentic, si e alegerea clasica pentru o gradina traditionala; in schimb, e mai grea, mai scumpa si cere mai multa intretinere, tratament periodic impotriva umezelii si a insectelor. O banca cu sezut si spatar din lemn si cadru din metal imbina aspectul cald al lemnului cu rezistenta si stabilitatea metalului, e adesea mai accesibila si mai usoara, dar nu are farmecul lemnului pur. Daca pui pret pe aspectul natural si autentic si esti dispus la intretinere, alege lemnul masiv; daca vrei ceva mai rezistent, mai ieftin si mai usor de intretinut, o combinatie lemn si metal e o solutie buna.' },
+  { question: 'Ce esenta de lemn e mai buna pentru exterior?', answer: 'Conteaza mult, pentru ca o banca sta afara, expusa la ploaie, soare si umezeala. Esentele tari, ca acacia, stejarul sau teak-ul, sunt cele mai rezistente in exterior: dense, durabile si mai putin sensibile la umezeala si la insecte, motiv pentru care o banca din acacia, ca modelul cu perne din selectie, tine mai mult afara. Pinul, mai raspandit si mai ieftin, e un lemn moale: arata bine si e accesibil, dar cere mai multa grija, un tratament periodic de protectie, altfel se degradeaza mai repede. Daca vrei o banca de durata cu intretinere mai putina, alege o esenta tare; daca bugetul conteaza si esti dispus la ceva mai multa grija, pinul e o alegere buna.' },
+  { question: 'La ce foloseste o banca cu spatiu de depozitare?', answer: 'O banca cu spatiu de depozitare, la care sezutul se ridica si ascunde o lada dedesubt, rezolva doua nevoi deodata: iti da un loc de stat si un spatiu de depozitare ascuns, foarte util in gradina sau pe terasa, unde spatiul e adesea limitat. In lada tii pernele de exterior, ferite de ploaie, uneltele mici de gradina, jucariile copiilor sau orice vrei sa nu stea la vedere. E o solutie practica mai ales pe o terasa mica, unde fiecare piesa trebuie sa fie multifunctionala. Modelele KADAX din selectie au acest spatiu. Daca ai nevoie si de loc de depozitare, nu doar de o banca, o varianta cu ladita merita cu siguranta.' },
+  { question: 'Ce dimensiune de banca sa aleg?', answer: 'Depinde de cate persoane vrei sa stea si de spatiul disponibil. O banca de 2 locuri, in general in jur de 120-125 cm, e potrivita pentru un colt de relaxare, langa o masa mica sau pe un hol, iar una de 3 locuri, tot in jurul a 120-125 cm dar cu sezut mai lat, incape mai multe persoane. Pentru o familie sau un grup, o banca lunga, de 155-190 cm, ca cea din acacia din selectie, ofera loc pentru 4 persoane. Masoara spatiul din gradina sau de pe terasa inainte, si gandeste-te unde o pui: langa masa, pe hol, sub o fereastra sau intr-un colt, alegand lungimea in functie de loc si de cati vor sta pe ea.' },
+  { question: 'Cum intretin o banca de gradina din lemn?', answer: 'Lemnul de exterior are nevoie de grija ca sa reziste, iar cheia e protectia impotriva umezelii. Aplica un tratament de exterior, ulei, lac sau lazura, cel putin o data pe an, de obicei primavara, ca sa aperi lemnul de apa, de razele UV si de insecte, care altfel il innegresc, il crapa si il degradeaza. Curata banca de praf si frunze si sterge apa care balteste dupa ploaie. Iarna, cel mai bine e sa o aduci la adapost sau sa o acoperi cu o husa, pentru ca inghetul si umezeala prelungita strica lemnul cel mai mult. Esentele tari, ca acacia, cer mai putina grija decat pinul, dar si ele beneficiaza de un tratament periodic. Cu aceasta intretinere simpla, o banca din lemn tine multi ani si isi pastreaza aspectul cald.' },
+  { question: 'Unde e cel mai bine sa pun o banca de gradina?', answer: 'O banca de gradina isi gaseste locul in multe zone: intr-un colt de relaxare, sub un pom sau o pergola, langa o masa de gradina, pe o terasa, langa intrarea in casa sau chiar pe hol, ca banca de interior. Ideal, o asezi intr-un loc cu putina umbra, unde sa fie placut sa stai vara, si ferita, pe cat posibil, de expunerea directa si indelungata la soare si ploaie, care obosesc lemnul. Daca o pui pe iarba sau pamant, aseaza-o pe o suprafata cat mai plana si stabila, si evita ca picioarele sa stea permanent in apa sau noroi, ca sa nu putrezeasca la baza. Gandeste-te cum folosesti spatiul si alege un loc unde banca sa fie si utila, si frumoasa.' },
+  { question: 'Cat costa o banca de gradina din lemn?', answer: 'In selectie, bancile din lemn accesibile pornesc de la circa 275 de lei pentru un model mic, ca cel pentru copii, si de la circa 330 de lei pentru una de 3 locuri cu structura de metal. Bancile clasice din lemn masiv, ca cea romaneasca Transilvan, sunt in jur de 470-525 de lei, iar cele cu spatiu de depozitare, ca modelele KADAX, intre circa 580 si 920 de lei. Cele mari, din lemn masiv de esenta tare si cu perne, ca modelul din acacia, ajung spre 745 de lei. Cel mai bun raport il gasesti alegand dimensiunea si esenta potrivite nevoii, o banca simpla din lemn masiv pentru un colt clasic, sau una cu depozitare daca ai nevoie si de spatiu.' },
+];
+
+const images = [hero, figClasic, figDepoz, figSpec, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Banca de gradina din lemn masiv - CentroCasa"
-  description="Atunci cand cautati o banca de gradina din lemn masiv, cautati in primul rand durabilitate, estetica si o investitie pe termen lung pentru spatiul dumneavoastra exterior. Lemnul masiv ofera o rezistenta superioara la intemperii si un aspect natural, cald, care se integreaza perfect in orice peisaj."
-  image="/images/articles/banca-de-gradina-din-lemn-masiv.webp"
+  title="Cele mai bune banci de gradina din lemn masiv in 2026: clasice, cu depozitare si speciale"
+  description="Care sunt cele mai bune banci de gradina din lemn masiv in 2026: modele clasice de la Transilvan si Ideal Store, banci cu spatiu de depozitare de la KADAX, si variante speciale, cu perne sau pentru copii, comparate pe numar de locuri, lungime si material. Plus lemn masiv vs lemn cu metal si cum intretii lemnul."
+  image={hero}
   type="article"
-  publishedTime="2026-03-07T09:01:42.383Z"
-  modifiedTime="2026-03-07T09:01:42.383Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune banci de gradina din lemn masiv' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      Mobilier Gradina
-      <span class="breadcrumb-separator">/</span>
-      <span>Banca de gradina din lemn masiv</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune banci de gradina din lemn masiv</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        Mobilier Gradina
-        <span class="article-date">7 martie 2026</span>
-      </div>
-      <h1 class="article-title">Banca de gradina din lemn masiv</h1>
-    </header>
+    <h1>Cele mai bune banci de gradina din lemn masiv</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/banca-de-gradina-din-lemn-masiv.webp" alt="Banca de gradina din lemn masiv" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune banci de gradina din lemn masiv: clasice, cu depozitare si speciale" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list" id="toc-desktop-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`} data-toc-id={item.id}>{item.title}</a></li>
-        ))}
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      <section id="intro">
-        <p>Atunci cand cautati o <strong>banca de gradina din lemn masiv</strong>, cautati in primul rand durabilitate, estetica si o investitie pe termen lung pentru spatiul dumneavoastra exterior. Lemnul masiv ofera o rezistenta superioara la intemperii si un aspect natural, cald, care se integreaza perfect in orice peisaj. O astfel de piesa de mobilier nu este doar un loc unde sa va relaxati, ci si un element central de design pentru terasa sau gradina.</p><p>Ce face o <strong>banca de gradina din lemn masiv</strong> sa fie o alegere potrivita pentru dumneavoastra? Raspunsul sta in combinatia dintre frumusetea naturala a lemnului, capacitatea sa de a rezista in timp si senzatia de confort pe care o ofera. Spre deosebire de materialele sintetice sau lemnul prelucrat, lemnul masiv adauga un plus de valoare si autenticitate spatiului dumneavoastra exterior, transformandu-l intr-o oaza de relaxare.</p><p>In acest articol, vom analiza cele mai bune optiuni de <strong>banca de gradina din lemn masiv</strong> disponibile pe piata, comparand caracteristicile, preturile si oferind recomandari clare pentru a va ajuta sa luati cea mai informata decizie de cumparare. Fie ca aveti nevoie de o piesa clasica sau de una cu un design modern, veti gasi aici informatiile necesare.</p>
-      </section>
-
-
-          <article class="product-review" id="banca-de-gradina-din-lemn-masiv-de-tec-savannah">
-            <div class="product-review__header">
-              <span class="section-tag">Premium</span>
-              <h3>Banca de gradina din lemn masiv de tec "Savannah"</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Banca de gradina
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Lemn masiv de tec
-              </div>
-              <div class="product-review__spec">
-                <strong>Dimensiuni</strong>150 cm (lungime) x 60 cm (latime) x 90 cm (inaltime)
-              </div>
-              <div class="product-review__spec">
-                <strong>Greutate suportata</strong>250 kg
-              </div>
-              <div class="product-review__spec">
-                <strong>Inaltime sezut</strong>45 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Finisaj</strong>Ulei natural pentru tec
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Banca de gradina "Savannah" din lemn masiv de tec reprezinta o optiune de top pentru cei care cauta eleganta si rezistenta. Lemnul de tec este renumit pentru proprietatile sale exceptionale de rezistenta la umiditate, insecte si razele UV, ceea ce o face ideala pentru utilizare exterioara pe tot parcursul anului. Designul clasic, cu spatar curbat si brate finisate, adauga un aer de rafinament oricarei gradini sau terase.</p><p>Ce avantaje concrete ofera lemnul de tec? In primul rand, este un material hipoalergenic si non-toxic, sigur pentru toata familia. In plus, textura sa naturala si culoarea calda se potrivesc perfect cu elemente de mobilier din <a href="/set-masa-si-scaune-pentru-gradina/">set masa si scaune pentru gradina</a>, creand un ansamblu armonios.</p><p>Am testat in conditii variate aceasta banca si am constatat ca rezista excelent la expunerea directa la soare si ploaie, fara semne de degradare. Finisajul cu ulei natural ii mentine aspectul lucios si protejeaza lemnul, insa necesita o reaplicare anuala pentru a pastra luciul optim.</p><p>Cum se compara cu alte optiuni de lemn masiv? Spre deosebire de bancile din pin sau stejar netratate corespunzator, tecul isi pastreaza integritatea structurala si estetica pe o perioada mult mai lunga, fara a necesita tratamente chimice complexe. Rezistenta sa naturala la factorii de mediu este superioara.</p><p>Pentru cine este potrivita aceasta banca? Este ideala pentru proprietarii de case cu gradini amenajate, terase generoase sau zone de relaxare exterioara care doresc o piesa de mobilier premium, durabila si cu un design atemporal. De asemenea, este o alegere excelenta pentru cei care cauta o <strong>banca de gradina din lemn masiv</strong> cu intretinere minima pe termen lung.</p><p>Pretul pentru banca "Savannah" este de 2800 lei. Desi pare o investitie initiala mai mare, durabilitatea sa pe zeci de ani justifica costul. Recomandarea noastra este sa achizitionati aceasta banca daca prioritizati calitatea superioara, rezistenta exceptionala si un aspect sofisticat.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Rezistenta exceptionala la intemperii datorita lemnului de tec</li>
-              <li>Design clasic, elegant, care se integreaza usor in orice decor</li>
-              <li>Durabilitate pe termen lung, cu o intretinere redusa</li>
-              <li>Material natural, hipoalergenic si non-toxic</li>
-              <li>Confort sporit datorita designului ergonomic</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Pretul initial este mai ridicat comparativ cu alte tipuri de lemn</li>
-              <li>Necesita o reaplicare anuala a uleiului de tec pentru a-si pastra aspectul optim</li>
-              <li>Greutatea poate face dificila mutarea frecventa a bancii</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="banca-de-gradina-din-lemn-masiv-de-stejar-forestia">
-            <div class="product-review__header">
-              <span class="section-tag">Raport Calitate-Pret</span>
-              <h3>Banca de gradina din lemn masiv de stejar "Forestia"</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Banca de gradina
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Lemn masiv de stejar
-              </div>
-              <div class="product-review__spec">
-                <strong>Dimensiuni</strong>120 cm (lungime) x 55 cm (latime) x 85 cm (inaltime)
-              </div>
-              <div class="product-review__spec">
-                <strong>Greutate suportata</strong>200 kg
-              </div>
-              <div class="product-review__spec">
-                <strong>Inaltime sezut</strong>42 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Finisaj</strong>Lac pe baza de apa, rezistent la UV
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Banca de gradina "Forestia" din lemn masiv de stejar ofera un echilibru excelent intre frumusetea naturala a lemnului si o rezistenta buna la factorii de mediu, la un pret accesibil. Stejarul este un lemn dur, cu o structura robusta, care, atunci cand este tratat corespunzator, poate rezista mult timp in conditii exterioare.</p><p>Ce inseamna pentru dumneavoastra finisajul cu lac pe baza de apa? Acesta ofera o protectie eficienta impotriva umiditatii si a razelor solare, prevenind decolorarea si degradarea lemnului. In plus, este un finisaj ecologic, cu emisii reduse de compusi organici volatili.</p><p>Am observat ca aceasta banca se potriveste excelent in gradini rustice sau in zone unde se doreste un aspect natural, neprelucrat excesiv. Este o piesa de mobilier solida, care nu da semne de instabilitate chiar si dupa o utilizare intensa. Comparativ cu bancile din pin, stejarul ofera o duritate superioara si o rezistenta mai buna la zgarieturi.</p><p>Pentru cine este potrivita banca "Forestia"? Este o alegere ideala pentru familiile care cauta o <strong>banca de gradina din lemn masiv</strong> durabila, dar nu vor sa depaseasca un anumit buget. De asemenea, este potrivita pentru cei care apreciaza aspectul natural al lemnului de stejar si doresc o piesa de mobilier simpla, dar functionala.</p><p>Un avantaj major al acestei banci este usurinta cu care se asorteaza cu alte elemente de mobilier de exterior. Puteti completa cu usurinta decorul terasei, poate chiar cu un <a href="/balansoar-de-gradina-pentru-2-persoane/">balansoar de gradina pentru 2 persoane</a>, pentru un plus de confort.</p><p>Pretul bancii "Forestia" este de 1450 lei. Consideram ca acest pret reflecta calitatea materialului si a finisajului. Recomandam aceasta banca celor care cauta un produs cu un raport calitate-pret excelent, o <strong>banca de gradina din lemn masiv</strong> care sa reziste in timp fara a necesita o investitie initiala foarte mare.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Lemn masiv de stejar, durabil si rezistent</li>
-              <li>Finisaj ecologic pe baza de apa, rezistent la UV</li>
-              <li>Raport calitate-pret excelent</li>
-              <li>Design simplu, versatil, usor de integrat</li>
-              <li>Greutate moderata, mai usor de manevrat decat tecul</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Necesita tratament anual cu lac sau ceara pentru a-si mentine aspectul optim</li>
-              <li>Mai putin rezistenta la umiditate extrema comparativ cu lemnul de tec</li>
-              <li>Spatarul nu este la fel de curbat ca la modelele premium, oferind un confort usor redus pentru utilizare prelungita</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="banca-de-gradina-din-lemn-masiv-de-pin-tratat-ecogarden">
-            <div class="product-review__header">
-              <span class="section-tag">Pentru Buget Mic</span>
-              <h3>Banca de gradina din lemn masiv de pin tratat "EcoGarden"</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Banca de gradina
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Lemn masiv de pin tratat prin autoclavare
-              </div>
-              <div class="product-review__spec">
-                <strong>Dimensiuni</strong>100 cm (lungime) x 50 cm (latime) x 80 cm (inaltime)
-              </div>
-              <div class="product-review__spec">
-                <strong>Greutate suportata</strong>180 kg
-              </div>
-              <div class="product-review__spec">
-                <strong>Inaltime sezut</strong>40 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Finisaj</strong>Lemn tratat prin autoclavare (impregnare sub presiune)
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Banca de gradina "EcoGarden" din lemn masiv de pin tratat este solutia ideala pentru cei care au un buget limitat, dar doresc totusi o piesa de mobilier pentru gradina. Tratamentul prin autoclavare confera lemnului de pin o rezistenta sporita la umiditate, insecte si ciuperci, prelungindu-i durata de viata in conditii exterioare.</p><p>Cum functioneaza tratamentul prin autoclavare? Procesul implica impregnarea lemnului cu substante de protectie sub presiune, asigurand o penetrare uniforma si o protectie de lunga durata. Acest lucru face ca pinul tratat sa fie o alternativa mult mai durabila la pinul netratat, fiind potrivit pentru utilizare in exterior.</p><p>Am evaluat aceasta banca din perspectiva functionalitatii si a raportului cost-beneficiu. Este o optiune solida, cu un design simplu, dar eficient. Desi lemnul de pin nu are aceeasi densitate ca stejarul sau tecul, tratamentul aplicat ii compenseaza in mare masura dezavantajele legate de durabilitate.</p><p>Pentru cine este recomandata aceasta banca? Este perfecta pentru studentii care isi amenajeaza o mica terasa, pentru cei care cauta o solutie temporara sau pentru gradinile mai mici unde nu este necesara o piesa de mobilier de mari dimensiuni. Este o <strong>banca de gradina din lemn masiv</strong> accesibila, care isi face treaba.</p><p>Comparativ cu bancile din plastic sau metal, lemnul masiv, chiar si pinul tratat, ofera o senzatie mult mai naturala si primitoare. De asemenea, este mai usor de asortat cu alte elemente de mobilier de gradina, cum ar fi cele din <a href="/set-masa-si-scaune-pentru-gradina/">set masa si scaune pentru gradina</a>.</p><p>Pretul bancii "EcoGarden" este de 850 lei. Aceasta pozitioneaza banca ca fiind una dintre cele mai accesibile optiuni de pe piata pentru o <strong>banca de gradina din lemn masiv</strong>. Recomandarea noastra este sa alegeti acest model daca bugetul este principalul dumneavoastra criteriu, dar doriti totusi un produs din lemn natural, cu o rezistenta decenta la intemperii.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Pret foarte accesibil, ideal pentru bugete restranse</li>
-              <li>Lemn de pin tratat prin autoclavare, rezistent la umiditate si insecte</li>
-              <li>Usor de asortat cu diverse stiluri de amenajare</li>
-              <li>Design compact, potrivit pentru spatii mai mici</li>
-              <li>Greutate redusa, usor de mutat</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Durabilitate mai mica pe termen lung comparativ cu tecul sau stejarul</li>
-              <li>Aspectul lemnului poate fi mai putin premium</li>
-              <li>Necesita o verificare periodica a tratamentului si eventual o reimpregnare la cativa ani</li>
-              <li>Poate fi mai putin stabila daca este supusa la forte mari</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="banca-de-gradina-din-lemn-masiv-de-salcam-rustic-charm">
-            <div class="product-review__header">
-              <span class="section-tag">Alegerea Noastra</span>
-              <h3>Banca de gradina din lemn masiv de salcam "Rustic Charm"</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Banca de gradina
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Lemn masiv de salcam
-              </div>
-              <div class="product-review__spec">
-                <strong>Dimensiuni</strong>135 cm (lungime) x 58 cm (latime) x 88 cm (inaltime)
-              </div>
-              <div class="product-review__spec">
-                <strong>Greutate suportata</strong>220 kg
-              </div>
-              <div class="product-review__spec">
-                <strong>Inaltime sezut</strong>43 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Finisaj</strong>Ulei protector pentru lemn exterior
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Banca de gradina "Rustic Charm" din lemn masiv de salcam se distinge prin rezistenta sa naturala si aspectul sau distinctiv. Salcamul este un lemn dur, similar ca proprietati cu stejarul, dar adesea mai accesibil ca pret. Este o alegere excelenta pentru cei care cauta o <strong>banca de gradina din lemn masiv</strong> cu o buna rezistenta la intemperii si un design atragator.</p><p>Ce face lemnul de salcam o optiune buna? Este cunoscut pentru rezistenta sa la putrezire si la atacul insectelor, datorita continutului ridicat de taninuri. Acest lucru inseamna ca banca va rezista frumos in gradina dumneavoastra pentru multi ani, chiar si in conditii de umiditate.</p><p>Am testat aceasta banca si am apreciat robustetea sa. Se simte solida sub greutate si nu scoate zgomote neplacute la miscare. Finisajul cu ulei protector ii accentueaza textura naturala a lemnului si ii confera o protectie suplimentara.</p><p>Cum se compara cu o banca din pin tratat? Salcamul este, in general, mai durabil si mai rezistent la intemperii decat pinul tratat prin autoclavare, oferind o durata de viata mai lunga. De asemenea, aspectul sau este adesea considerat mai premium.</p><p>Pentru cine este potrivita banca "Rustic Charm"? Este ideala pentru cei care doresc o piesa de mobilier de gradina cu un aspect natural, rustic, dar care sa fie in acelasi timp foarte durabila. Se potriveste perfect langa flori, langa un mic iaz sau pe o terasa din lemn.</p><p>Pretul bancii "Rustic Charm" este de 1700 lei. Acest pret reflecta calitatea lemnului de salcam si finisajul protector. Recomandarea noastra este sa alegeti aceasta banca daca doriti o <strong>banca de gradina din lemn masiv</strong> care sa imbine durabilitatea excelenta cu un design rustic, la un pret rezonabil.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Lemn masiv de salcam, durabil si rezistent natural la intemperii si insecte</li>
-              <li>Aspect rustic, natural, care completeaza peisajul gradinii</li>
-              <li>Finisaj protector pentru o rezistenta sporita</li>
-              <li>Greutate suportata generoasa</li>
-              <li>Spatar confortabil, usor inclinat</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Aspectul poate fi prea rustic pentru anumite amenajari moderne</li>
-              <li>Necesita reaplicarea uleiului protector o data pe an pentru a-si mentine aspectul optim</li>
-              <li>Lemnul de salcam poate avea variatii de culoare de la o piesa la alta</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="banca-de-gradina-din-lemn-masiv-de-brad-tratat-veranda">
-            <div class="product-review__header">
-              <span class="section-tag">Best Buy 2026</span>
-              <h3>Banca de gradina din lemn masiv de brad tratat "Veranda"</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Banca de gradina
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Lemn masiv de brad tratat
-              </div>
-              <div class="product-review__spec">
-                <strong>Dimensiuni</strong>140 cm (lungime) x 58 cm (latime) x 85 cm (inaltime)
-              </div>
-              <div class="product-review__spec">
-                <strong>Greutate suportata</strong>230 kg
-              </div>
-              <div class="product-review__spec">
-                <strong>Inaltime sezut</strong>44 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Finisaj</strong>Vopsea pe baza de apa, rezistenta la UV (disponibila in diverse culori)
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Banca de gradina "Veranda" din lemn masiv de brad tratat ofera o solutie practica si estetica pentru orice spatiu exterior. Bradul, tratat corespunzator, devine un material rezistent, iar finisajul colorat adauga un strop de personalitate gradinii dumneavoastra.</p><p>Cum se traduce tratamentul si vopseaua pentru dumneavoastra? In primul rand, lemnul este protejat impotriva umiditatii, a insectelor si a degradarii cauzate de soare. In al doilea rand, vopseaua pe baza de apa ofera o bariera suplimentara si permite personalizarea bancii in functie de stilul dorit, fie ca este vorba de culori vii sau nuante pastelate.</p><p>Am testat acest model in diverse culori si am constatat ca vopseaua isi mentine bine aderenta si culoarea chiar si dupa expunere prelungita la soare. Este o banca solida, cu o capacitate de greutate impresionanta, ceea ce o face potrivita pentru utilizare frecventa.</p><p>Ce o diferentiaza de alte banci din lemn masiv? Posibilitatea de a alege dintr-o gama variata de culori este un avantaj major. Puteti asorta banca cu alte elemente de mobilier sau cu decoratiunile din gradina, creand un ambient unitar. De asemenea, bradul tratat este o optiune mai accesibila decat lemnul de esenta tare.</p><p>Pentru cine este potrivita banca "Veranda"? Este ideala pentru familiile care doresc o <strong>banca de gradina din lemn masiv</strong> colorata, personalizabila si rezistenta. Se potriveste de minune pe terase, in curti sau chiar pe balcoane generoase. Este o alegere buna daca va ganditi sa achizitionati si o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela de gradina rezistenta la vant</a> pentru a completa zona de relaxare.</p><p>Pretul bancii "Veranda" variaza intre 1100 si 1300 lei, in functie de culoare. Consideram ca acest pret este justificat de calitatea materialului, a tratamentului si a finisajului. Recomandarea noastra este sa alegeti acest model daca doriti o <strong>banca de gradina din lemn masiv</strong> functionala, rezistenta, cu posibilitate de personalizare cromatica si un pret atractiv.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Lemn masiv de brad tratat, rezistent la intemperii</li>
-              <li>Finisaj colorat, rezistent la UV, cu posibilitate de personalizare</li>
-              <li>Capacitate mare de greutate</li>
-              <li>Raport bun calitate-pret</li>
-              <li>Design clasic, potrivit pentru diverse stiluri</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Bradul tratat este mai putin dur decat lemnul de esenta tare (salcam, stejar, tec)</li>
-              <li>Necesita verificari periodice ale stratului de vopsea</li>
-              <li>Poate fi mai greu de asortat daca preferati un aspect 100% natural al lemnului</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-review" id="banca-de-gradina-din-lemn-masiv-de-eucalipt-zenith">
-            <div class="product-review__header">
-              <span class="section-tag">Raport Calitate-Pret</span>
-              <h3>Banca de gradina din lemn masiv de eucalipt "Zenith"</h3>
-              <div class="product-review__specs-grid">
-              <div class="product-review__spec">
-                <strong>Tip</strong>Banca de gradina
-              </div>
-              <div class="product-review__spec">
-                <strong>Material</strong>Lemn masiv de eucalipt
-              </div>
-              <div class="product-review__spec">
-                <strong>Dimensiuni</strong>125 cm (lungime) x 55 cm (latime) x 80 cm (inaltime)
-              </div>
-              <div class="product-review__spec">
-                <strong>Greutate suportata</strong>200 kg
-              </div>
-              <div class="product-review__spec">
-                <strong>Inaltime sezut</strong>42 cm
-              </div>
-              <div class="product-review__spec">
-                <strong>Finisaj</strong>Ulei protector pentru lemn exterior
-              </div>
-              </div>
-            </div>
-            <div class="product-review__content">
-              <p>Banca de gradina "Zenith" din lemn masiv de eucalipt reprezinta o alternativa excelenta la tec, oferind o rezistenta comparabila la intemperii la un pret mai accesibil. Eucaliptul este un lemn dur, cu o densitate ridicata, ceea ce il face potrivit pentru utilizare in medii exterioare.</p><p>Ce inseamna pentru dumneavoastra lemnul de eucalipt? Inseamna o durabilitate buna, rezistenta la umiditate si o frumusete naturala, cu o textura fina si o culoare calda, adesea cu nuante de rosu sau maro.</p><p>Am evaluat aceasta banca si am constatat ca se simte robusta si bine construita. Designul este simplu, dar elegant, si se potriveste bine in diverse tipuri de gradini, de la cele moderne la cele mai traditionale. Uleiul protector aplicat pe lemn ii accentueaza frumusetea naturala si ii ofera o protectie de baza.</p><p>Cum se compara cu o banca din stejar? Eucaliptul are o rezistenta la intemperii comparabila, uneori chiar superioara, datorita rezistentei sale naturale la umiditate. In plus, lemnul de eucalipt are adesea o textura mai fina si un aspect mai omogen.</p><p>Pentru cine este potrivita banca "Zenith"? Este ideala pentru cei care cauta o <strong>banca de gradina din lemn masiv</strong> cu o durabilitate ridicata, dar nu doresc sa cheltuie la fel de mult ca pentru o piesa din tec. Este o alegere buna pentru terase, balcoane sau zone de relaxare in gradina.</p><p>Pretul bancii "Zenith" este de 1600 lei. Acest pret o plaseaza intr-o pozitie competitiva pe piata, oferind un raport calitate-pret foarte bun. Recomandarea noastra este sa alegeti aceasta banca daca doriti o <strong>banca de gradina din lemn masiv</strong> durabila, cu un aspect placut si o rezistenta buna la conditiile exterioare, la un cost moderat.</p>
-
-              <div class="product-review__lists">
-                <div>
-                  <h4>Avantaje</h4>
-                  <ul class="product-review__pros">
-              <li>Lemn masiv de eucalipt, durabil si rezistent la umiditate</li>
-              <li>Aspect natural elegant, cu textura fina</li>
-              <li>Raport bun calitate-pret</li>
-              <li>Constructie solida</li>
-              <li>Intretinere relativ redusa</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4>Dezavantaje</h4>
-                  <ul class="product-review__cons">
-              <li>Necesita reaplicarea uleiului protector anual pentru a-si mentine aspectul si protectia</li>
-              <li>Poate fi mai greu de gasit in stoc comparativ cu lemnul de pin sau brad</li>
-              <li>Designul este mai putin elaborat decat la modelele premium</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </article>
-
-
-          <section id="comparatie">
-            <h2>Comparatie</h2>
-            <p>Pentru a va usura decizia, am creat un tabel comparativ cu principalele caracteristici ale bancilor de gradina din lemn masiv analizate. Acesta va permite sa vizualizati rapid diferentele si sa alegeti modelul cel mai potrivit nevoilor dumneavoastra.</p>
-            <div class="comparison-outer">
-              <div class="comparison-hint">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                Gliseaza pentru a vedea tot tabelul
-              </div>
-              <div class="comparison-wrap">
-                <table class="comparison-table">
-                  <thead>
-                    <tr>
-                      <th>Produs</th>
-                      <th>Tip</th>
-                      <th>Putere</th>
-                      <th>Suprafata</th>
-                      <th>Functii</th>
-                      <th>PotrivitPentru</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-              <tr>
-                <td><strong>Savannah (Tec)</strong></td>
-                <td>Banca de gradina</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>Rezistenta superioara la intemperii, design clasic</td>
-                <td>Premium, durabilitate maxima</td>
-              </tr>
-
-              <tr>
-                <td><strong>Forestia (Stejar)</strong></td>
-                <td>Banca de gradina</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>Lemn dur, finisaj ecologic, raport calitate-pret</td>
-                <td>Familie, buget mediu</td>
-              </tr>
-
-              <tr>
-                <td><strong>EcoGarden (Pin tratat)</strong></td>
-                <td>Banca de gradina</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>Pret accesibil, tratament autoclavare</td>
-                <td>Buget redus, uz frecvent</td>
-              </tr>
-
-              <tr>
-                <td><strong>Rustic Charm (Salcam)</strong></td>
-                <td>Banca de gradina</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>Durabilitate naturala, aspect rustic</td>
-                <td>Gradini rustice, durabilitate buna</td>
-              </tr>
-
-              <tr>
-                <td><strong>Veranda (Brad tratat)</strong></td>
-                <td>Banca de gradina</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>Finisaj colorat, personalizabil, rezistent la UV</td>
-                <td>Personalizare, familie</td>
-              </tr>
-
-              <tr>
-                <td><strong>Zenith (Eucalipt)</strong></td>
-                <td>Banca de gradina</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>Rezistenta la umiditate, aspect fin</td>
-                <td>Buget mediu, durabilitate buna</td>
-              </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-
-          <section id="ghid">
-            <h2>Cum alegi cea mai buna banca de gradina din lemn masiv?</h2>
-            <div class="guide">
-              <h4>Ce tip de lemn masiv este cel mai potrivit pentru gradina mea?</h4><p>Alegerea tipului de lemn masiv depinde de bugetul dumneavoastra si de nivelul de rezistenta la intemperii dorit. Lemnul de tec este cel mai rezistent, dar si cel mai scump. Lemnul de stejar, salcam si eucalipt ofera un echilibru bun intre durabilitate si pret. Lemnul de pin sau brad tratat este cea mai accesibila optiune, dar necesita o atentie sporita la intretinere.</p><h4>Ce finisaj protejeaza cel mai bine lemnul in exterior?</h4><p>Finisajele pe baza de uleiuri sau lacuri speciale pentru exterior sunt esentiale pentru a proteja lemnul masiv de razele UV, umiditate si variatii de temperatura. Alegeti produse care sunt rezistente la apa si care nu se crapa sau se cojesc usor. Verificati daca lemnul a fost tratat prin autoclavare sau sub presiune pentru o protectie sporita.</p><h4>Ce dimensiuni ar trebui sa aiba banca de gradina din lemn masiv?</h4><p>Dimensiunile bancii trebuie sa se potriveasca spatiului disponibil si numarului de persoane care o vor folosi. O banca standard are intre 100 si 150 cm lungime si poate gazdui confortabil 2-3 persoane. Inainte de a cumpara, masurati spatiul unde intentionati sa plasati banca pentru a evita neplaceri.</p><h4>Cat de importanta este intretinerea unei banci de gradina din lemn masiv?</h4><p>Intretinerea regulata este cheia pentru a prelungi durata de viata a unei banci de gradina din lemn masiv. Curatati-o de praf si resturi vegetale, reaplicati uleiul sau lacul protector conform recomandarilor producatorului (de obicei anual) si, daca este posibil, protejati-o de conditiile meteo extreme pe timpul iernii. O buna intretinere inseamna o investitie pe termen lung.</p>
-            </div>
-          </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat costa o banca de gradina din lemn masiv?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Preturile pentru o banca de gradina din lemn masiv variaza considerabil, de la aproximativ 850 lei pentru modelele din pin tratat, pana la peste 2800 lei pentru bancile din lemn de tec. Modelele din stejar, salcam sau eucalipt se situeaza, in general, intre 1400 si 1800 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Care este diferenta dintre lemnul masiv tratat si cel netratat pentru exterior?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Lemnul masiv tratat (prin autoclavare, sub presiune sau cu uleiuri specifice) ofera o rezistenta mult superioara la umiditate, insecte si ciuperci comparativ cu lemnul netratat. Acest lucru ii prelungeste semnificativ durata de viata in conditii exterioare.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar o banca de gradina din lemn masiv de tec?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca bugetul va permite si prioritizati durabilitatea maxima si rezistenta exceptionala la intemperii. Lemnul de tec este cel mai bun din clasa sa pentru utilizare exterioara, dar pretul este pe masura calitatii.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum pot proteja banca de gradina din lemn masiv iarna?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Cel mai bine este sa curatati banca, sa o acoperiti cu o husa impermeabila sau, ideal, sa o depozitati intr-un spatiu uscat si aerisit (garaj, magazie) pe perioada rece pentru a-i prelungi durata de viata.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce fel de intretinere necesita o banca de gradina din lemn masiv?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Intretinerea de baza implica curatarea periodica si reaplicarea unui strat de ulei protector sau lac specific pentru exterior, de obicei o data pe an. Verificati recomandarile producatorului pentru fiecare tip de lemn in parte.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Cea mai vanduta banca din lemn din selectie e <strong>Transilvan Emy</strong>, romaneasca, din lemn masiv, iar cele mai bine notate, modelele <strong>KADAX cu spatiu de depozitare</strong>, sunt 2 in 1. Pentru o familie, banca <strong>vidaXL din acacia</strong>, de 190 cm cu perne, e cea mai mare si mai confortabila.</p>
+      <p>La o banca de gradina conteaza <strong>materialul</strong>, lemn masiv sau lemn cu cadru de metal, <strong>numarul de locuri</strong> si lungimea, si daca are <strong>spatiu de depozitare</strong>. Mai jos gasesti direct recomandarile, grupate pe clasice, cu depozitare si speciale, iar sub ele un ghid despre cum alegi si cum intretii lemnul. Daca amenajezi coltul de relaxare de la zero, vezi si <a href="/set-masa-si-scaune-pentru-gradina/">seturile de masa si scaune de gradina</a>.</p>
+      <p>Trebuie spus cinstit: multe dintre bancile din selectie sunt produse cu inca putine pareri, iar o parte combina lemnul cu o structura de metal, nu sunt integral din lemn masiv, lucruri pe care le-am notat clar la fiecare. Le-am ales dupa material, dimensiune si dotari, si le-am impartit pe clasice, cu spatiu de depozitare si speciale, ca sa gasesti repede tipul potrivit gradinii tale.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#clasic">Clasice din lemn</a></li>
+        <li><a href="#depoz">Cu spatiu de depozitare</a></li>
+        <li><a href="#spec">Speciale: cu perne si pentru copii</a></li>
+        <li><a href="#de-ce">De ce o banca de gradina</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#intretinere">Intretinerea lemnului</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Locuri</th><th>Lungime</th><th>Material</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.locuri}</td>
+              <td>{x.lungime}</td>
+              <td>{x.material}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="clasic">Clasice din lemn</h2>
+    <p>Bancile obisnuite de sezut, cu spatar, in stilul clasic de gradina. Unele integral din lemn masiv, altele cu sezut din lemn si cadru de metal, mai rezistent. Alegerea de baza pentru un colt de relaxare in curte sau pe terasa.</p>
+    <div class="rd-grid">
+      {CLASIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figClasic} alt="Banci clasice din lemn: Transilvan, Ideal Store, Everild, Heinner" width="1200" height="675" loading="lazy" />
+
+    <h2 id="depoz">Cu spatiu de depozitare</h2>
+    <p>Bancile 2 in 1, la care sezutul se ridica si ascunde o lada dedesubt: stai pe ele si depozitezi perne, unelte sau jucarii. Solutia practica pentru o terasa mica, unde fiecare piesa trebuie sa fie multifunctionala.</p>
+    <div class="rd-grid">
+      {DEPOZ.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figDepoz} alt="Banci cu spatiu de depozitare: KADAX si vidaXL" width="1200" height="675" loading="lazy" />
+
+    <h2 id="spec">Speciale: cu perne si pentru copii</h2>
+    <p>De la o banca mare din acacia cu perne incluse, pentru o familie, la una micuta gandita pentru copii. Pentru nevoi aparte, care ies din tiparul bancii clasice de doua sau trei locuri.</p>
+    <div class="rd-grid">
+      {SPEC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figSpec} alt="Banci speciale: cu perne din acacia si pentru copii" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-banca').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate bancile de gradina la oferta</strong>
+        <span>Reducerile din acest moment la banci de gradina din lemn, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce o banca de gradina</h2>
+    <p>O banca de gradina e una dintre cele mai simple si mai placute piese de mobilier de exterior: iti da un loc unde sa stai, sa te odihnesti si sa te bucuri de curte, fara efortul unui <a href="/cele-mai-bune-seturi-de-mobilier-de-gradina/">set complet de mobilier</a>. Fie ca o pui sub un pom, langa intrare sau intr-un colt de relaxare, o banca <strong>invita la sezut</strong> si transforma un spatiu gol intr-unul folosit.</p>
+    <p>Pe langa rolul practic, o banca din lemn <strong>infrumuseteaza gradina</strong>: lemnul aduce caldura si un aer natural, autentic, care se potriveste perfect intr-un decor de exterior, langa plante si verdeata. E o piesa atemporala, care nu se demodeaza, si care poate deveni un punct de atractie sau un colt intim, dupa cum o asezi. Iar variantele cu spatiu de depozitare adauga si utilitate, oferind un loc ascuns pentru perne sau unelte. Pentru o curte, o terasa sau chiar un hol, o banca din lemn e o alegere simpla care aduce si confort, si frumusete. Pe o terasa umbrita de o <a href="/pergola-din-lemn-pentru-terasa/">pergola din lemn</a>, coltul de sezut devine si mai placut.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua banci:</p>
+    <ul>
+      <li><strong>Materialul:</strong> lemn masiv integral, pentru aspect autentic si cald, dar cu intretinere; sau lemn cu cadru de metal, mai rezistent, mai ieftin si mai usor de intretinut.</li>
+      <li><strong>Esenta lemnului:</strong> esentele tari, ca acacia, rezista mai bine afara; pinul, mai ieftin, e mai moale si cere mai multa grija.</li>
+      <li><strong>Numarul de locuri si lungimea:</strong> 2-3 locuri pentru un colt, 120-125 cm; una lunga, de 155-190 cm, pentru o familie.</li>
+      <li><strong>Spatiul de depozitare:</strong> o banca cu ladita sub sezut iti da si loc de pus perne, unelte sau jucarii, practica pe o terasa mica.</li>
+      <li><strong>Confortul:</strong> unele vin cu perne incluse; la restul, adaugi tu perne pentru un sezut mai placut.</li>
+      <li><strong>Numarul de pareri:</strong> multe modele sunt noi, cu putine recenzii, deci verifica atent descrierea si dimensiunile inainte de a comanda.</li>
+    </ul>
+
+    <h2 id="intretinere">Intretinerea lemnului</h2>
+    <p>O banca din lemn sta afara, expusa la ploaie, soare si umezeala, asa ca <strong>intretinerea e conditia ca sa reziste</strong>. Cel mai important e sa aplici un tratament de exterior, ulei, lac sau lazura, cel putin o data pe an, de obicei primavara, ca sa aperi lemnul de apa, de razele UV si de insecte, care altfel il innegresc, il crapa si il degradeaza in cateva sezoane. Curata banca de praf si de frunze si nu lasa apa sa balteasca pe sezut sau la imbinari.</p>
+    <p>Iarna, cel mai bine e sa <strong>aduci banca la adapost</strong> sau sa o acoperi cu o husa, pentru ca inghetul si umezeala prelungita sunt cei mai mari dusmani ai lemnului. Ai grija ca picioarele sa nu stea permanent in apa sau noroi, ca sa nu putrezeasca la baza, si aseaza banca pe o suprafata plana si stabila. Esentele tari, ca acacia, cer mai putina grija decat pinul, care e mai moale, dar toate beneficiaza de un tratament periodic. Cu aceasta intretinere simpla, o banca din lemn isi pastreaza aspectul cald si rezista multi ani, in loc sa se degradeze dupa una-doua veri.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de material, dimensiune si dotari:</p>
+    <p><strong>Accesibile:</strong> de la circa 275 de lei pentru un model mic, ca cel pentru copii, si de la 330 de lei pentru una de 3 locuri cu structura de metal si sezut din lemn.</p>
+    <p><strong>Clasice din lemn masiv:</strong> in jur de 470-525 de lei, ca banca romaneasca Transilvan, integral din lemn masiv, cu design clasic.</p>
+    <p><strong>Cu depozitare si mari:</strong> bancile cu spatiu de depozitare, ca KADAX, sunt intre circa 580 si 920 de lei, iar cele mari din acacia cu perne ajung spre 745 de lei.</p>
+    <p>Pe langa pret, alege dupa <strong>nevoie</strong>: o banca simpla din lemn masiv pentru un colt clasic, una cu depozitare daca ai nevoie si de spatiu, sau una mare din esenta tare pentru o familie. Fiind multe produse noi, cu putine pareri, verifica bine materialul si dimensiunile inainte de a comanda, si tine cont ca lemnul masiv cere mai multa intretinere decat o combinatie lemn si metal.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
         <p class="author-role">Designer Interior</p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-bio">Maria scrie despre mobilier de gradina si amenajari interioare. Se uita la materiale, dimensiuni si cat rezista lucrurile afara, peste ierni.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="banca-de-gradina-din-lemn-masiv"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <!-- Prev/Next Navigation -->
-    <PrevNextNav
-      currentSlug="banca-de-gradina-din-lemn-masiv"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="banca-de-gradina-din-lemn-masiv" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="banca-de-gradina-din-lemn-masiv" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
-
-  <script>
-    document.querySelectorAll('.comparison-outer').forEach(outer => {
-      const wrap = outer.querySelector('.comparison-wrap');
-      if (!wrap) return;
-      function checkScroll() {
-        const canScroll = wrap.scrollWidth > wrap.clientWidth;
-        const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 2;
-        outer.classList.toggle('can-scroll', canScroll && !atEnd);
-      }
-      checkScroll();
-      wrap.addEventListener('scroll', checkScroll, { passive: true });
-      window.addEventListener('resize', checkScroll, { passive: true });
-    });
-
-    const tocLinks = document.querySelectorAll('#toc-desktop-list a[data-toc-id]');
-    if (tocLinks.length > 0) {
-      const ids = Array.from(tocLinks).map(a => a.dataset.tocId);
-      const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              tocLinks.forEach(a => a.classList.remove('active'));
-              const match = Array.from(tocLinks).find(a => a.dataset.tocId === entry.target.id);
-              match?.classList.add('active');
-            }
-          }
-        },
-        { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
-      );
-      sections.forEach(s => observer.observe(s));
-    }
-  </script>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

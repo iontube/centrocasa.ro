@@ -1,0 +1,327 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['dezumidificator'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. 6-12 l/24h, o singura camera ---
+  { g: 'mic', id: 'DBZSWLMBM', rol: 'Cel mai ieftin cu compresor', short: 'AlecoAir D8 Junior', cap: '8 l/24h', supr: '10 m²', zgomot: '43 dB',
+    specs: ['8 litri pe zi, pentru camere de pana la 10 m²', 'cel mai mic pret din selectie pentru un aparat cu compresor', 'agent de racire R290', 'gama Junior, 1161 de pareri pe linie'],
+    pros: ['Cel mai accesibil aparat cu compresor din selectie', 'Compact, potrivit pentru o baie sau un dressing', 'Gama Junior are un istoric lung de pareri bune', 'Agent de racire R290, modern'],
+    cons: ['8 litri pe zi ajung doar pentru o incapere mica', '43 dB, se aude in dormitor noaptea'],
+    verdict: 'D8 Junior e pragul de intrare, si e cinstit cu ce promite: 8 litri pe zi si o suprafata recomandata de 10 metri patrati. Asta inseamna o baie, un dressing, un hol umed sau o camera mica, nu un apartament. Important e ca are compresor, deci lucreaza pe acelasi principiu ca aparatele de trei ori mai scumpe, spre deosebire de cutiile cu granule de la 40 de lei, care absorb cateva sute de mililitri si apoi se opresc. Gama Junior aduna 1161 de pareri, cu nota 4.84, si e printre cele mai vandute de la AlecoAir. Cei 43 de decibeli sunt insa reali: intr-un dormitor, noaptea, il auzi. Il iei cand ai o singura incapere mica cu probleme de umezeala si vrei sa rezolvi cu buget minim, nu cand vrei sa usuci toata casa.' },
+  { g: 'mic', id: 'DVL8K2MBM', rol: 'Cel mai bun raport calitate-pret', short: 'Turbionaire EPI 12', cap: '12 l/24h', supr: '26 m²', zgomot: '38 dB',
+    specs: ['12 litri pe zi pentru 26 m², cea mai mare suprafata din grup', 'sub 530 de lei', 'functie de purificare a aerului', 'interval de operare declarat 5-35°C'],
+    pros: ['Acopera 26 m², mai mult decat modelele de acelasi pret', 'Cel mai mic pret din grupul de 12 litri', 'Are si functie de purificare', '38 dB, mai discret decat gama Junior'],
+    cons: ['Fara Wi-Fi, spre deosebire de versiunea EPI 12 WIFI', 'Rezervorul cere golire manuala mai des la umiditate mare'],
+    verdict: 'Din toata selectia, EPI 12 e aparatul care da cel mai mult pentru cel mai putin. La sub 530 de lei acopera 26 de metri patrati, cu 6 mai mult decat modelele AlecoAir de 12 litri din aceeasi zona de pret, si scoate aceiasi 12 litri pe zi. In plus filtreaza aerul, nu doar il usuca, ceea ce conteaza daca umezeala a produs deja mucegai si vrei sa reduci si sporii din aer. Cei 38 de decibeli il fac utilizabil intr-un living fara sa acopere televizorul. Nu are Wi-Fi, iar versiunea cu Wi-Fi costa cu 140 de lei mai mult pentru exact aceleasi performante, deci intreaba-te intai daca vei folosi vreodata aplicatia. Il iei cand vrei sa acoperi o camera mare sau un open space fara sa treci de 600 de lei.' },
+  { g: 'mic', id: 'DRSHBWBBM', rol: 'Cel mai silentios', short: 'Turbionaire SENSO 12', cap: '12 l/24h', supr: '20 m²', zgomot: '36 dB',
+    specs: ['36 dB, cel mai silentios din selectie alaturi de SENSO 13', '12 litri pe zi pentru 20 m²', '600 de pareri pe linia SENSO', 'interval de operare 5-35°C'],
+    pros: ['Cel mai silentios aparat din articol, 36 dB', 'Potrivit pentru dormitor, inclusiv noaptea', 'Linia SENSO are 600 de pareri si nota 4.68', 'Pret sub 600 de lei'],
+    cons: ['20 m² acoperiti, mai putin decat EPI 12 la pret similar', 'Fara purificare, spre deosebire de SENSO 13'],
+    verdict: 'Daca aparatul urmeaza sa stea intr-un dormitor, zgomotul conteaza mai mult decat orice cifra de pe cutie, iar SENSO 12 e cel mai discret din tot articolul, la 36 de decibeli. Ca reper, asta e sub nivelul unei conversatii soptite, deci poti dormi cu el pornit. Scoate 12 litri pe zi si acopera 20 de metri patrati, suficient pentru un dormitor obisnuit sau o camera de copil. Linia SENSO strange 600 de pareri cu nota 4.68, deci e verificata. Comparativ cu EPI 12, care costa aproape la fel, pierzi 6 metri patrati de acoperire si functia de purificare, dar castigi doi decibeli in minus, care in dormitor se simt. Il iei exact pentru asta: camera in care dormi, unde nu vrei sa auzi aparatul.' },
+  { g: 'mic', id: 'DXNDN7MBM', rol: 'Cel mai vandut sub 600 de lei', short: 'AlecoAir D12 Junior', cap: '12 l/24h', supr: '18 m²', zgomot: '43 dB',
+    specs: ['12 litri pe zi pentru 18 m²', 'gama Junior, 1161 de pareri, nota 4.84', 'agent de racire R290', 'sub 600 de lei'],
+    pros: ['Gama Junior are cel mai bun raport pareri-nota din selectie', 'AlecoAir, brand specializat pe tratarea aerului', '12 litri pe zi la sub 600 de lei', 'Constructie simpla, putine lucruri de stricat'],
+    cons: ['43 dB, printre cele mai zgomotoase din selectie', '18 m² acoperiti, cel mai putin din grupul de 12 litri'],
+    verdict: 'D12 Junior e alegerea sigura din grup, in sensul cel mai plictisitor si mai bun al cuvantului. Nota 4.84 din 1161 de pareri pe linia Junior e cel mai solid semnal de multumire din tot articolul, iar AlecoAir e un brand care face doar aparate pentru tratarea aerului, nu electrocasnice de toate felurile. Scoate 12 litri pe zi pe 18 metri patrati si nu incearca sa faca altceva: nu purifica, nu are Wi-Fi, nu are ecran colorat. Cei 43 de decibeli il scot din discutie pentru dormitor, iar suprafata acoperita e cea mai mica dintre modelele de 12 litri de aici. Il iei cand vrei aparatul pe care l-au cumparat cei mai multi oameni multumiti, pentru o camera de zi sau un birou, si nu te intereseaza dotarile.' },
+  // --- B. 13-16 l/24h, apartament ---
+  { g: 'mediu', id: 'D96C7LMBM', rol: 'Cel mai bun pentru dormitor', short: 'Turbionaire SENSO 13', cap: '13 l/24h', supr: '22 m²', zgomot: '36 dB',
+    specs: ['36 dB si purificare, combinatie rara', '13 litri pe zi pentru 22 m²', 'Wi-Fi, control din aplicatie', 'sub 600 de lei'],
+    pros: ['La fel de silentios ca SENSO 12, dar cu purificare in plus', 'Wi-Fi inclus la un pret sub 600 de lei', '13 litri pe zi, cu un metru patrat in plus fata de SENSO 12', 'Linia SENSO, 600 de pareri, nota 4.68'],
+    cons: ['Diferenta reala fata de SENSO 12 e mica, verifica daca merita', 'Filtrul de purificare se schimba periodic, cost recurent'],
+    verdict: 'SENSO 13 e SENSO 12 cu doua lucruri in plus care conteaza intr-un dormitor: filtreaza aerul si se comanda din telefon, la un pret aproape identic. Ramane la 36 de decibeli, deci tot il poti tine pornit noaptea, si urca usor la 13 litri pe zi si 22 de metri patrati. Purificarea nu e un moft cand vorbim de umezeala, pentru ca acolo unde a fost umed apar spori de mucegai, iar un filtru ii retine in loc sa ii plimbe prin camera. Wi-Fi-ul il pornesti de la birou ca sa gasesti camera uscata cand ajungi acasa. Diferenta fata de SENSO 12 e insa mica in cifre, iar filtrul devine un consumabil pe care il inlocuiesti periodic. Il iei cand aparatul sta in dormitor si vrei si aer curat, nu doar uscat.' },
+  { g: 'mediu', id: 'DWNC1XMBM', rol: 'Cel mai bun pentru un apartament intreg', short: 'Turbionaire Smart 16M', cap: '16 l/24h', supr: '25 m²', zgomot: '40 dB',
+    specs: ['16 litri pe zi pentru 25 m²', '824 de pareri pe linia Smart', 'sub 630 de lei', 'interval de operare 5-35°C'],
+    pros: ['16 litri pe zi la sub 630 de lei, cel mai ieftin din grupul de 16', '824 de pareri, printre cele mai multe din selectie', 'Acopera 25 m², bun pentru living sau doua camere alaturate', 'Se muta usor dintr-o camera in alta'],
+    cons: ['40 dB, prea mult pentru dormitor noaptea', 'Fara purificare'],
+    verdict: 'Smart 16M e punctul in care un dezumidificator inceteaza sa fie o solutie pentru o camera si devine una pentru o casa. Cei 16 litri pe zi acopera 25 de metri patrati, iar in practica il muti din living in dormitor si inapoi, in functie de unde e problema mai mare. La sub 630 de lei e cel mai ieftin din grupul de 16 litri, iar cele 824 de pareri de pe linia Smart il aseaza printre modelele bine verificate din articol. Cei 40 de decibeli inseamna insa ca il pornesti in dormitor ziua, nu noaptea, si nu are functie de purificare. Il iei cand ai umezeala in mai multe camere si vrei un singur aparat pe care sa il plimbi, in loc de doua fixe.' },
+  { g: 'mediu', id: 'DWLSWLMBM', rol: 'Cel mai bine dotat la 16 litri', short: 'AlecoAir D16 HOME', cap: '16 l/24h', supr: '25 m²', zgomot: '43 dB',
+    specs: ['16 litri pe zi pentru 25 m²', 'Wi-Fi si functie de uscare a rufelor', '478 de pareri, nota 4.68', 'agent de racire R290'],
+    pros: ['Functie dedicata de uscare a rufelor, utila iarna', 'Wi-Fi, control din aplicatie', 'AlecoAir, brand specializat pe aer', '16 litri pe zi pentru 25 m²'],
+    cons: ['43 dB, cel mai zgomotos din grup', 'Costa cu 60 de lei mai mult decat Turbionaire la aceeasi capacitate'],
+    verdict: 'D16 HOME rezolva o problema pe care multi nu o leaga de dezumidificator: rufele uscate in casa iarna. Fiecare incarcatura de rufe intinsa in living elibereaza cativa litri de apa in aer, iar de acolo vin geamurile aburite si petele negre din colturi. Functia dedicata de uscare porneste aparatul la putere maxima, orientat spre uscator, si scurteaza timpul considerabil, consumand mai putin decat un uscator electric. In rest e un aparat de 16 litri pentru 25 de metri patrati, cu Wi-Fi, de la un brand specializat, cu 478 de pareri si nota 4.68. Cei 43 de decibeli il fac zgomotos, iar Turbionaire ofera aceeasi capacitate cu 60 de lei mai putin. Il iei daca usuci rufe in casa iarna, pentru ca acolo isi scoate diferenta de pret.' },
+  { g: 'mediu', id: 'D4Y668BBM', rol: 'Cel mai cumparat din articol', short: 'AlecoAir D14 PURIFY', cap: '12 l/24h', supr: '20 m²', zgomot: '35 dB',
+    specs: ['1609 de pareri pe linia PURIFY, cele mai multe din selectie', '35 dB, cel mai silentios din tot articolul', 'purificare cu filtru, nu doar dezumidificare', 'consum declarat 165 W'],
+    pros: ['Linia PURIFY are cele mai multe pareri din articol, 1609, nota 4.87', 'Cel mai silentios aparat din selectie, 35 dB', 'Dezumidificare si purificare in acelasi aparat', 'Consum mic, 165 W'],
+    cons: ['Doar 12 litri pe zi pentru 20 m², la un pret de 849 de lei', 'Platesti in mare parte partea de purificare'],
+    verdict: 'D14 PURIFY e aparatul catre care se indreapta cei mai multi cumparatori din tot articolul, cu 1609 pareri pe linie si nota 4.87, cea mai mare din selectie. Motivul e combinatia: 35 de decibeli, cel mai silentios de aici, plus purificare reala cu filtru, la un consum declarat de 165 W. Practic tine loc si de purificator de aer, ceea ce intr-un dormitor cu umezeala si mucegai rezolva ambele probleme cu un singur aparat si o singura priza. Partea mai putin comoda e raportul: 849 de lei pentru 12 litri pe zi si 20 de metri patrati, adica performanta de dezumidificare a unor modele de 550 de lei. Diferenta o platesti pe liniste si pe filtrare. Il iei cand aparatul sta in camera in care dormi si vrei si aer curat, si accepti ca nu iei cea mai multa apa pe leu.' },
+  // --- C. 20-35 l/24h, casa si subsol ---
+  { g: 'mare', id: 'D7TJ7MYBM', rol: 'Cel mai bun raport la capacitate mare', short: 'Freezy Air Dry 20', cap: '20 l/24h', supr: '45 m²', zgomot: '36 dB',
+    specs: ['20 litri pe zi pentru 45 m²', '36 dB la capacitate mare, combinatie rara', 'purificare inclusa', 'interval de operare 5-32°C'],
+    pros: ['20 litri pe zi la 849 de lei, cel mai bun raport din grupul mare', 'Doar 36 dB desi are capacitate dubla fata de modelele mici', 'Acopera 45 m², un apartament de doua camere', 'Are si purificare'],
+    cons: ['185 de pareri, cele mai putine din grupul mare', 'Brand mai putin cunoscut decat AlecoAir sau Turbionaire'],
+    verdict: 'Freezy Air Dry 20 e anomalia buna din articol: scoate 20 de litri pe zi, acopera 45 de metri patrati si ramane la 36 de decibeli, adica la fel de discret ca modelele de 12 litri din grupul mic. La 849 de lei ajunge la aceeasi eticheta cu D14 PURIFY, care face insa doar 12 litri si acopera 20 de metri patrati, deci pe partea de dezumidificare pura primesti aproape dublu pentru aceiasi bani. Are si purificare. Reversul e istoricul: 185 de pareri si un brand pe care putini l-au auzit, fata de AlecoAir si Turbionaire, care domina restul selectiei. Il iei cand vrei capacitate mare fara zgomot si fara sa treci de 900 de lei, si nu te deranjeaza ca brandul e mai putin cunoscut.' },
+  { g: 'mare', id: 'D9NDN7MBM', rol: 'Cel mai bun pentru beci si pivnita', short: 'AlecoAir D22 PURIFY', cap: '22 l/24h', supr: '50 m²', zgomot: '46 dB',
+    specs: ['22 litri pe zi pentru 50 m²', 'capacitate suficienta pentru spatii reci', 'linia PURIFY, 1609 de pareri', 'purificare inclusa'],
+    pros: ['22 litri pe zi, capacitatea recomandata pentru subsoluri', 'Acopera 50 m², un beci sau un demisol intreg', 'Linia PURIFY are cele mai multe pareri din articol', 'Purificare inclusa, utila unde e mucegai'],
+    cons: ['46 dB, printre cele mai zgomotoase', 'Ca orice aparat cu compresor, pierde eficienta sub 10°C'],
+    verdict: 'Pentru un beci sau un demisol, regula e sa alegi mai mare decat pare necesar, iar D22 PURIFY e primul model din selectie care intra cu adevarat in categoria asta: 22 de litri pe zi si 50 de metri patrati. Motivul pentru care se supradimensioneaza la subsol e temperatura. Aparatele cu compresor, si toate cele 12 de aici sunt cu compresor, isi pierd eficienta pe masura ce se raceste aerul, pentru ca serpentina ingheata si aparatul intra in cicluri de dezghetare in loc sa usuce. Sub 10 grade, un model mic devine aproape inutil, in timp ce unul de 20-25 de litri inca face treaba. Purificarea ajuta acolo unde umezeala a produs deja mucegai. Cei 46 de decibeli conteaza mai putin intr-un subsol unde nu doarme nimeni. Il iei pentru beci, demisol sau garaj, cu conditia ca temperatura sa nu coboare sub 10 grade iarna.' },
+  { g: 'mare', id: 'DDF8D4BBM', rol: 'Cel mai bine notat din selectie', short: 'AlecoAir D23', cap: '23 l/24h', supr: '55 m²', zgomot: '46 dB',
+    specs: ['nota 4.91, cea mai mare din articol', '23 litri pe zi pentru 55 m²', 'consum redus de energie', '556 de pareri'],
+    pros: ['Cea mai buna nota din tot articolul, 4.91 din 556 de pareri', '23 litri pe zi pentru 55 m²', 'Consum optimizat, contează la functionare continua', 'Purificare inclusa'],
+    cons: ['1299 de lei, in a doua jumatate a intervalului de pret', '46 dB'],
+    verdict: 'Nota de 4.91 din 556 de pareri e cea mai mare din tot articolul si vine dintr-un segment unde asteptarile sunt mari, pentru ca aparatul costa 1299 de lei. Scoate 23 de litri pe zi si acopera 55 de metri patrati, deci tine o casa mica sau un demisol mare, iar accentul producatorului cade pe consumul redus, ceea ce nu e un detaliu de marketing la un aparat care merge ore intregi zilnic, uneori luni la rand. Diferenta de pret fata de D22 PURIFY, care face aproape la fel de mult, se justifica prin nota si prin eficienta energetica, nu prin litri in plus. Il iei cand aparatul va merge mult si vrei sa platesti mai putin la curent pe termen lung, sau pur si simplu cand te iei dupa parerile celor care l-au cumparat.' },
+  { g: 'mare', id: 'D9NQHB3BM', rol: 'Cea mai mare capacitate', short: 'AlecoAir D35 ARIO', cap: '35 l/24h', supr: '110 m²', zgomot: '42 dB',
+    specs: ['35 litri pe zi, cel mai puternic din selectie', 'acopera 110 m², o casa intreaga', '42 dB desi are cea mai mare capacitate', 'purificare inclusa'],
+    pros: ['Cea mai mare capacitate din articol, 35 l pe zi', 'Acopera 110 m², adica o casa intreaga', 'Doar 42 dB pentru capacitatea asta', 'Purificare inclusa'],
+    cons: ['1699 de lei, cel mai scump din selectie', 'Supradimensionat pentru un apartament obisnuit'],
+    verdict: 'D35 ARIO e aparatul pentru situatiile in care umezeala nu e un inconvenient, ci o problema de structura: o casa noua care inca se usuca, un demisol inundat, o cladire nelocuita o vreme sau un spatiu de 110 metri patrati. Scoate 35 de litri pe zi, aproape triplu fata de modelele obisnuite de apartament, si reuseste sa ramana la 42 de decibeli, ceea ce la capacitatea asta e notabil. Are si purificare. Pentru un apartament normal e supradimensionat si nu are sens sa platesti 1699 de lei ca sa scoti 12 litri, cati iti trebuie. Il iei cand chiar ai suprafata sau problema care il cere, si ai calculat inainte ca un model de 20-25 de litri nu ajunge.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const MIC = PICKS.filter(x => x.g === 'mic');
+const MEDIU = PICKS.filter(x => x.g === 'mediu');
+const MARE = PICKS.filter(x => x.g === 'mare');
+
+const hero = '/imagini/articole/cele-mai-bune-dezumidificatoare.webp';
+const figMic = '/imagini/articole/dezumidificator-camera.webp';
+const figMediu = '/imagini/articole/dezumidificator-apartament.webp';
+const figMare = '/imagini/articole/dezumidificator-casa.webp';
+const figValoare = '/imagini/articole/dezumidificator-lei-per-litru.webp';
+const figTemp = '/imagini/articole/dezumidificator-temperatura.webp';
+const published = '2026-07-20T16:23:16+03:00';
+
+const faq = [
+  { question: 'Cati litri pe zi imi trebuie?', answer: 'Regula practica pleaca de la suprafata si de la cat de umed e spatiul. Pentru o camera mica sau o baie, intre 15 si 20 de metri patrati, ajung 10-15 litri pe zi. Pentru un apartament sau o suprafata de 30-50 de metri patrati cu umezeala vizibila, ai nevoie de 20-30 de litri. Peste 50 de metri patrati sau cand vorbim de un subsol cu probleme serioase, treci de 30 de litri. Sfatul care se repeta la toti producatorii e sa alegi cu o treapta mai mult decat pare necesar: un aparat usor supradimensionat atinge umiditatea dorita mai repede si apoi merge in regim redus, in loc sa functioneze permanent la maximum, ceea ce inseamna si mai putina uzura, si mai putin zgomot.' },
+  { question: 'De ce nu merge bine dezumidificatorul in beci iarna?', answer: 'Pentru ca toate aparatele accesibile, inclusiv cele 12 din acest articol, functioneaza cu compresor. Ele racesc o serpentina sub temperatura aerului, apa din aer condenseaza pe ea si se scurge in rezervor. Cand aerul din incapere e deja rece, serpentina ajunge sub zero grade si se acopera de gheata, iar aparatul intra in cicluri de dezghetare in care nu mai extrage nimic. Sub 10 grade petrece tot mai mult timp dezghetandu-se decat uscand. Multe modele declara in fisa un interval de operare care coboara pana la 5 grade, dar asta inseamna ca porneste, nu ca lucreaza eficient. Pentru spatii care stau sub 10 grade iarna exista aparate cu absorbtie, cu alt principiu de functionare, care nu depind de temperatura. Nu se gasesc insa usor pe piata de la noi.' },
+  { question: 'Dezumidificator sau aer conditionat cu functie de uscare?', answer: 'Sunt doua lucruri diferite, desi par sa faca acelasi lucru. Aerul conditionat in modul dry scade umiditatea ca efect secundar al racirii, deci raceste camera in acelasi timp, ceea ce iarna sau in sezonul rece e exact ce nu vrei. In plus, nu poti seta un nivel de umiditate, doar il lasi sa mearga. Un dezumidificator dedicat lucreaza invers: mentine temperatura aproape neschimbata, pentru ca aerul uscat e reincalzit usor la iesire, si il setezi la un procent anume de umiditate, dupa care porneste si se opreste singur. Daca problema ta e umezeala, nu caldura, aparatul dedicat e alegerea corecta si consuma mai putin pentru acelasi rezultat.' },
+  { question: 'Ce umiditate ar trebui sa am in casa?', answer: 'Intervalul confortabil si sanatos e intre 40 si 60 la suta umiditate relativa, iar tinta pe care o seteaza majoritatea oamenilor e in jur de 50. Sub 40 la suta aerul devine prea uscat si apar iritatii ale cailor respiratorii, piele uscata si electricitate statica. Peste 60 la suta incep problemele opuse: acarienii se inmultesc, apare condensul pe geamuri si, in colturile reci ale peretilor, mucegaiul. Peste 70 la suta mucegaiul se dezvolta vizibil in cateva zile. Aproape toate aparatele din selectie au un higrostat, deci setezi procentul dorit si aparatul porneste si se opreste singur ca sa il mentina, fara sa stea pornit degeaba.' },
+  { question: 'Cat consuma un dezumidificator?', answer: 'Mult mai putin decat se asteapta lumea. Modelele din selectie declara consumuri intre 165 si aproximativ 300 de wati in functionare, adica in jurul unui bec puternic sau al unui laptop, nu al unui radiator. La 165 de wati si opt ore de functionare pe zi ajungi la circa 1.3 kWh zilnic. Important e ca aparatul nu merge continuu: odata atinsa umiditatea setata, se opreste si reporneste doar cand e nevoie, deci consumul real e sub cel teoretic. Un aparat supradimensionat consuma paradoxal mai putin pe termen lung, pentru ca atinge tinta repede si apoi sta. La modelele cu purificare, filtrul adauga un cost de inlocuire periodica, nu de curent.' },
+  { question: 'Unde il asez in camera?', answer: 'La cel putin 20-30 de centimetri de pereti si de mobila, ca aerul sa circule liber prin el pe toate partile. Nu il lipi de perete, nici nu il baga intr-un colt inchis sau sub o masa, pentru ca isi aspira propriul aer uscat si crede ca a terminat treaba. Pozitia ideala e cat mai aproape de sursa de umezeala: langa peretele cu condens, in dreptul uscatorului de rufe sau la baza scarii, daca vorbim de un demisol. Usile si geamurile incaperii trebuie sa fie inchise cat timp lucreaza, altfel trage umezeala din tot restul casei si nu termina niciodata. Daca il muti dintr-o camera in alta, lasa-l cateva minute inainte sa il pornesti, mai ales daca l-ai transportat culcat.' },
+  { question: 'Trebuie sa golesc rezervorul mereu?', answer: 'Nu neaparat, si asta e una dintre cele mai utile functii pe care putini o verifica inainte de cumparare. Toate aparatele au un rezervor, de obicei intre 2 si 5 litri, care se umple si opreste automat aparatul cand e plin. Intr-un spatiu foarte umed, un aparat de 20 de litri pe zi umple un rezervor de 3 litri de cateva ori pe zi, ceea ce devine obositor. Solutia e evacuarea continua: aproape toate modelele au un racord pe care atasezi un furtun si il duci intr-o scurgere, la o chiuveta sau afara, iar apoi aparatul merge nesupravegheat saptamani intregi. Pentru beci, demisol sau casa de vacanta, functia asta nu e optionala, e obligatorie.' },
+  { question: 'Cat costa un dezumidificator bun?', answer: 'Selectia acopera intervalul de la 534 la 1699 de lei si se imparte destul de clar. Pana in 600 de lei gasesti aparate de 8-13 litri pe zi pentru o singura camera, ca AlecoAir D8 si D12 Junior sau Turbionaire EPI 12 si SENSO 12, iar la pretul asta primesti compresor adevarat, nu granule. Intre 600 si 900 de lei intra modelele de 16-20 de litri pentru un apartament, plus cele cu purificare, cum sunt Turbionaire Smart 16M, AlecoAir D16 HOME, D14 PURIFY si Freezy Air Dry 20. Peste 1100 de lei ajungi la 22-35 de litri pentru case si subsoluri, cu AlecoAir D22 PURIFY, D23 si D35 ARIO. Cel mai bun raport din tot articolul il gasesti in jur de 850 de lei, unde Freezy Air Dry 20 da 20 de litri si 45 de metri patrati.' },
+];
+
+const images = [hero, figMic, figMediu, figMare, figValoare, figTemp, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune dezumidificatoare in ${SEO_YEAR}: cati litri pe zi iti trebuie`}
+  description="12 dezumidificatoare comparate pe capacitate, suprafata acoperita si zgomot, de la 534 la 1699 de lei. Plus de ce niciunul nu merge bine in beci iarna."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Alina Munteanu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Incalzire si Climatizare', url: '/incalzire-climatizare/' }, { name: 'Cele mai bune dezumidificatoare' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/incalzire-climatizare/">Incalzire si Climatizare</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune dezumidificatoare</span>
+    </nav>
+
+    <h1>Cele mai bune dezumidificatoare pentru casa si beci</h1>
+    <p class="rd-byline">de <a href="/autori/alina-munteanu/">Alina Munteanu</a>, Specialist Incalzire si Climatizare · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune dezumidificatoare: modele pentru o camera, pentru apartament si pentru casa sau beci" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Cel mai cumparat dezumidificator din selectie e <strong>AlecoAir D14 PURIFY</strong>, cu 1609 pareri pe gama si 35 dB, cel mai silentios de aici. Cel mai bun raport il da <strong>Turbionaire EPI 12</strong>, care acopera 26 m² la sub 530 de lei, iar pentru capacitate mare fara zgomot, <strong>Freezy Air Dry 20</strong> scoate 20 de litri pe zi pe 45 m². Cea mai buna nota, 4.91, o are <strong>AlecoAir D23</strong>.</p>
+      <p>Singura cifra care conteaza cu adevarat cand alegi e <strong>capacitatea in litri pe zi</strong>, pentru ca ea decide ce suprafata poti usca. Pe criteriul asta sunt impartite cele 12 modele de mai jos: pentru o camera, pentru un apartament, si pentru o casa sau un beci. Restul, Wi-Fi si ecrane, sunt secundare.</p>
+      <p>Daca problema ta e umezeala din cauza rufelor uscate in casa iarna, vezi si <a href="/cele-mai-bune-uscatoare-de-rufe/">uscatoarele de rufe cu pompa de caldura</a>, care rezolva cauza in loc de efect.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#mic">Pentru o camera, 8-12 litri pe zi</a></li>
+        <li><a href="#mediu">Pentru un apartament, 13-16 litri pe zi</a></li>
+        <li><a href="#mare">Pentru o casa sau un beci, 20-35 litri pe zi</a></li>
+        <li><a href="#valoare">Cat platesti pentru fiecare litru extras</a></li>
+        <li><a href="#beci">Cel mai bun dezumidificator pentru beci si pivnita</a></li>
+        <li><a href="#dormitor">Cel mai bun dezumidificator pentru dormitor</a></li>
+        <li><a href="#purificator">Cel mai bun dezumidificator cu purificator</a></li>
+        <li><a href="#ieftin">Cel mai ieftin dezumidificator care merita</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#capacitate">Cum calculezi capacitatea</a></li>
+        <li><a href="#greseli">Greseli care fac aparatul inutil</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Suprafata</th><th>Zgomot</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.supr}</td>
+              <td>{x.zgomot}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mic">Pentru o camera, 8-12 litri pe zi</h2>
+    <p>Aparate pentru o singura incapere de pana la 26 de metri patrati: o baie, un dormitor, un birou sau o camera de copil. Toate au compresor, deci lucreaza pe acelasi principiu ca modelele scumpe, doar la scara mai mica.</p>
+    {MIC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMic} alt="Dezumidificatoare pentru o camera: AlecoAir Junior, Turbionaire EPI si SENSO" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mediu">Pentru un apartament, 13-16 litri pe zi</h2>
+    <p>Zona in care un singur aparat acopera mai multe camere, daca il muti, sau o suprafata de pana la 25 de metri patrati fix. Aici apar si dotarile care chiar schimba ceva: purificarea si uscarea rufelor.</p>
+    {MEDIU.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMediu} alt="Dezumidificatoare pentru apartament: Turbionaire Smart, AlecoAir D16 HOME si D14 PURIFY" width="1600" height="900" loading="lazy" />
+
+    <h2 id="mare">Pentru o casa sau un beci, 20-35 litri pe zi</h2>
+    <p>De aici incolo vorbim de suprafete de la 45 la 110 metri patrati si de spatii cu probleme reale: demisoluri, garaje, case nelocuite o vreme sau constructii noi care inca se usuca.</p>
+    {MARE.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figMare} alt="Dezumidificatoare de mare capacitate: Freezy Air Dry 20, AlecoAir D22 PURIFY si D35 ARIO" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-dezumidificator').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate dezumidificatoarele la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="valoare">Cat platesti pentru fiecare litru extras</h2>
+    <p>Pretul de pe eticheta nu spune mare lucru pana nu il imparti la capacitate. Asa arata selectia cand o masori in lei pentru fiecare litru extras pe zi:</p>
+
+    <img class="rd-chart" src={figValoare} alt="Grafic: cati lei costa fiecare litru extras pe zi, la cele 12 dezumidificatoare din selectie" width="1100" height="1682" loading="lazy" />
+
+    <p>Rezultatul rastoarna clasamentul din capul listei. <strong>AlecoAir D14 PURIFY</strong>, cel mai cumparat aparat din articol, e ultimul la acest capitol: 71 de lei pentru fiecare litru, pentru ca platesti 849 de lei pentru doar 12 litri pe zi. La celalalt capat, <strong>Turbionaire Smart 16M</strong> ajunge la 39 de lei pe litru, adica aproape jumatate.</p>
+    <p>Asta nu inseamna ca D14 PURIFY e o alegere proasta. Inseamna ca banii in plus se duc in altceva decat capacitate: in cei 35 de decibeli, cei mai putini din articol, si in filtrul de purificare. Daca aparatul sta in dormitor, platesti pentru liniste si e o decizie rationala. Daca sta in living sau in demisol, unde nimeni nu doarme, platesti pentru ceva ce nu iti foloseste.</p>
+    <p>Cea mai interesanta pozitie e <strong>Freezy Air Dry 20</strong>: acelasi pret de 849 de lei ca D14 PURIFY, dar 20 de litri in loc de 12 si 36 de decibeli in loc de 35. Practic aceeasi liniste, aproape dublul capacitatii, aceiasi bani.</p>
+
+    <h2 id="beci">Cel mai bun dezumidificator pentru beci si pivnita</h2>
+    <p>Alegerea pentru un subsol nu se face dupa metri patrati, ci dupa temperatura, si aici majoritatea oamenilor cumpara gresit.</p>
+    <p>Toate cele 12 aparate din articol functioneaza cu <strong>compresor</strong>: racesc o serpentina, apa din aer condenseaza pe ea si se scurge in rezervor. Cand aerul e deja rece, serpentina coboara sub zero grade si se acopera de gheata, iar aparatul intra in cicluri de dezghetare in care nu extrage nimic. <strong>Sub 10 grade petrece mai mult timp dezghetandu-se decat uscand.</strong></p>
+    <p>Fisele tehnice complica lucrurile: modelele Turbionaire declara un interval de operare de la 5 grade, iar Freezy Air de la 5 grade. Cifra aia inseamna ca aparatul <em>porneste</em> la temperatura respectiva, nu ca lucreaza eficient acolo. Sunt doua lucruri diferite, iar diferenta o platesti in curent consumat degeaba.</p>
+
+    <img class="rd-chart" src={figTemp} alt="Grafic: eficienta unui dezumidificator cu compresor scade puternic sub 15 grade si se prabuseste sub 10 grade" width="1100" height="860" loading="lazy" />
+    <p>Practic, pentru un beci se aplica trei situatii:</p>
+    <ul>
+      <li><strong>Peste 15 grade tot anul</strong>, cum e un demisol sub o casa incalzita: orice model de 20-25 de litri face treaba. <strong>AlecoAir D22 PURIFY</strong> e alegerea potrivita, cu 22 de litri pe zi si 50 de metri patrati.</li>
+      <li><strong>Intre 10 si 15 grade</strong>: iti trebuie neaparat un model mare, care compenseaza pierderea de eficienta prin capacitate bruta. Tot D22 PURIFY sau <strong>AlecoAir D23</strong>, nu unul de 12 litri.</li>
+      <li><strong>Sub 10 grade iarna</strong>, cum e o pivnita neincalzita: niciun aparat cu compresor nu e o solutie buna. Ai nevoie de unul cu absorbtie, care foloseste alt principiu si nu depinde de temperatura. Nu se gasesc usor pe piata de la noi, iar in selectia asta nu exista niciunul.</li>
+    </ul>
+    <p>Al doilea lucru obligatoriu la subsol e <strong>evacuarea continua</strong>. Un aparat de 22 de litri umple un rezervor de 3-4 litri de cateva ori pe zi, iar intr-un beci in care cobori o data pe saptamana asta inseamna ca sta oprit aproape tot timpul. Ataseaza un furtun la racordul de evacuare si du-l la o scurgere.</p>
+
+    <h2 id="dormitor">Cel mai bun dezumidificator pentru dormitor</h2>
+    <p>Aici singurul criteriu care conteaza cu adevarat e zgomotul, pentru ca un aparat pe care il opresti noaptea nu rezolva nimic: umezeala apare tocmai noaptea, cand temperatura scade si condensul se depune pe geamuri si pe pereti reci.</p>
+    <p>Doua modele din selectie coboara la nivelul la care poti dormi cu ele pornite. <strong>AlecoAir D14 PURIFY</strong> e cel mai silentios din tot articolul, la 35 dB, si adauga purificarea, utila daca umezeala a produs deja mucegai. <strong>Turbionaire SENSO 12</strong> vine la 36 dB si costa cu 250 de lei mai putin, dar fara filtrare.</p>
+    <p>Ca reper, 35 dB e sub nivelul unei conversatii soptite. De la 40 dB in sus, ceea ce inseamna majoritatea celorlalte modele din articol, aparatul se aude clar intr-o camera linistita noaptea.</p>
+
+    <h2 id="purificator">Cel mai bun dezumidificator cu purificator</h2>
+    <p>Combinatia are sens mai des decat pare: acolo unde a fost umezeala, aproape sigur exista si spori de mucegai in aer, iar un aparat care doar usuca ii lasa sa circule prin camera.</p>
+    <p>Din selectie, <strong>AlecoAir D14 PURIFY</strong> e cel mai cumparat, cu 1609 pareri pe gama, iar <strong>Freezy Air Dry 20</strong> ofera cea mai multa capacitate cu filtrare inclusa, 20 de litri pe zi la acelasi pret de 849 de lei. Pentru suprafete mari, <strong>AlecoAir D23</strong> combina nota cea mai buna din articol cu purificarea.</p>
+    <p>Un detaliu de buget pe care merita sa il stii inainte: filtrul e consumabil si se inlocuieste periodic. Nu e un cost mare, dar e recurent, iar la modelele fara purificare nu exista deloc.</p>
+
+    <h2 id="ieftin">Cel mai ieftin dezumidificator care merita</h2>
+    <p><strong>AlecoAir D8 Junior</strong>, la circa 534 de lei, e cel mai ieftin aparat cu compresor din selectie, iar cuvantul important e compresor.</p>
+    <p>Sub pragul asta gasesti pe eMAG dezumidificatoare pasive, cu granule, la 40 de lei. Nu sunt aparate defecte sau proaste, sunt altceva: absorb cateva sute de mililitri de apa intr-un recipient si apoi se opresc, pana schimbi rezerva. Pentru un dulap, o masina sau o camara mica pot fi suficiente. Pentru o camera cu condens pe geamuri nu fac nimic vizibil, iar diferenta nu e de calitate, ci de ordin de marime: cateva sute de mililitri in total, fata de 8 litri pe zi.</p>
+    <p>Daca bugetul permite inca 30 de lei, <strong>Turbionaire EPI 12</strong> la circa 529 de lei da 12 litri pe zi si acopera 26 de metri patrati in loc de 10. E cel mai bun salt de valoare din tot articolul.</p>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la dezumidificatoarele in stoc pe eMAG, sortate dupa numarul de pareri, si am eliminat de la inceput doua categorii: aparatele pasive cu granule, care nu au compresor si nu sunt comparabile, si aparatele de aer conditionat cu functie de uscare, care sunt altceva.</p>
+    <p>Am pastrat apoi cate un singur model din fiecare linie de produs, pentru ca aceleasi aparate apar pe eMAG in mai multe variante de culoare sau capacitate care ar fi umplut lista degeaba. Selectia finala urmareste sa acopere intervalul de capacitate de la 8 la 35 de litri pe zi, pentru ca aia e cifra dupa care se alege.</p>
+    <p><strong>O precizare despre pareri.</strong> eMAG afiseaza acelasi numar de pareri pentru toate variantele dintr-o gama: cele 1609 pareri apar la patru modele PURIFY diferite, iar cele 1161 la patru modele Junior. Cifra e reala, dar apartine liniei de produs, nu exact modelului pe care il vezi. Am folosit-o ca semnal de incredere in gama, nu ca dovada despre un anumit aparat, si asa ar trebui citita si de tine.</p>
+    <p>Nu testam aparatele in laborator si nu pretindem asta. Comparam specificatiile reale din fisele produselor, volumul si nota parerilor, si le raportam la ce spun sursele tehnice despre dimensionare si despre limitele compresoarelor la temperaturi scazute.</p>
+
+    <h2 id="capacitate">Cum calculezi capacitatea</h2>
+    <p>Capacitatea se exprima in litri de apa extrasi in 24 de ore si e singura cifra care decide daca aparatul rezolva problema sau doar face zgomot.</p>
+    <ul>
+      <li><strong>15-20 m², umezeala moderata</strong>: 10-15 litri pe zi. O baie, un dormitor, un birou.</li>
+      <li><strong>30-50 m², umezeala vizibila</strong>: 20-30 de litri pe zi. Un apartament sau un demisol.</li>
+      <li><strong>Peste 50 m² sau probleme serioase</strong>: peste 30 de litri pe zi.</li>
+    </ul>
+    <p>Sfatul care se repeta la toti producatorii e sa alegi cu o treapta peste ce pare necesar, si are o logica ce pare contraintuitiva: un aparat supradimensionat consuma <em>mai putin</em> pe termen lung. Atinge umiditatea setata repede, apoi se opreste si porneste doar ca sa o mentina. Unul subdimensionat merge permanent la maximum, consuma continuu, se uzeaza mai repede si tot nu ajunge la tinta.</p>
+    <p>Al doilea reper, dupa suprafata, e <strong>nivelul de umiditate</strong>. Zona confortabila e intre 40 si 60 la suta, cu tinta uzuala la 50. Peste 60 apar condensul si acarienii, iar peste 70 mucegaiul se dezvolta vizibil in cateva zile. Aproape toate modelele din selectie au higrostat, deci setezi procentul si aparatul se ocupa singur.</p>
+
+    <h2 id="greseli">Greseli care fac aparatul inutil</h2>
+    <p>Un dezumidificator potrivit poate parea defect din cauza unor lucruri care nu tin de el.</p>
+    <ul>
+      <li><strong>Lipit de perete sau intr-un colt.</strong> Isi aspira propriul aer uscat si crede ca a terminat treaba. Lasa 20-30 cm libere pe toate partile.</li>
+      <li><strong>Usile deschise.</strong> Trage umezeala din tot restul casei si nu termina niciodata. Inchide incaperea cat timp lucreaza.</li>
+      <li><strong>Rezervorul plin, neobservat.</strong> Aparatul se opreste automat si sta oprit zile intregi. Daca nu esti langa el zilnic, foloseste evacuarea continua cu furtun.</li>
+      <li><strong>Asezat departe de sursa.</strong> Pune-l langa peretele cu condens, langa uscatorul de rufe sau la baza scarii in demisol, nu in mijlocul camerei.</li>
+      <li><strong>Asteptari gresite iarna, in spatii reci.</strong> Sub 10 grade orice aparat cu compresor pierde masiv din eficienta. Nu e defect, e limita tehnologiei.</li>
+      <li><strong>Filtrul nespalat.</strong> La modelele cu purificare, un filtru infundat scade debitul de aer si aparatul extrage vizibil mai putin.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 534 la 1699 de lei si se imparte destul de curat pe capacitate.</p>
+    <p><strong>Pana in 600 de lei</strong> stau aparatele de 8-13 litri pe zi pentru o singura camera: AlecoAir D8 si D12 Junior, Turbionaire EPI 12 si SENSO 12. La pretul asta primesti deja compresor adevarat, ceea ce e granita reala a categoriei.</p>
+    <p><strong>Intre 600 si 900 de lei</strong> intra modelele de 16-20 de litri pentru un apartament, plus cele cu purificare: Turbionaire Smart 16M, AlecoAir D16 HOME, D14 PURIFY si Freezy Air Dry 20. Aici e si cel mai bun raport din tot articolul, la Freezy Air, cu 20 de litri si 45 de metri patrati pentru 849 de lei.</p>
+    <p><strong>Peste 1100 de lei</strong> ajungi la 22-35 de litri pentru case si subsoluri: AlecoAir D22 PURIFY, D23 si D35 ARIO. Diferenta de pret la acest nivel se duce in capacitate si in eficienta energetica, nu in dotari.</p>
+    <p>O observatie utila de buget: pretul nu creste proportional cu capacitatea. D14 PURIFY costa 849 de lei pentru 12 litri, iar Freezy Air Dry 20 costa tot 849 pentru 20 de litri. Diferenta o platesti pe liniste, 35 dB fata de 36, si pe brand. Daca aparatul nu sta in dormitor, al doilea e mult mai mult aparat pentru aceiasi bani. Pentru restul casei, vezi si <a href="/cele-mai-bune-aparate-de-aer-conditionat/">aparatele de aer conditionat</a>, care usuca aerul ca efect secundar al racirii, si <a href="/cele-mai-bune-uscatoare-de-rufe/">uscatoarele de rufe</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">AM</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/alina-munteanu/" class="author-name-link">Alina Munteanu</a></p>
+        <p class="author-role">Specialist Incalzire si Climatizare</p>
+        <p class="author-bio">Alina scrie despre incalzire si climatizare. Calculeaza puterea necesara pe suprafata si compara consumul real, nu doar pretul de pe raft.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-dezumidificatoare" currentCategory="incalzire-climatizare" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-dezumidificatoare" currentCategory="incalzire-climatizare" articles={relatedArticles} />
+  </article>
+</Layout>

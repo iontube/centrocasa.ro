@@ -1,0 +1,296 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['uscatoare-rufe'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { id: 'DC550J3BM', badge: 'Cel mai bun raport', cap: '9 kg',
+    specs: ['pompa de caldura', '9 kg, familie', 'nota 4.85 din 111 pareri', 'clasa A++'],
+    pros: ['Nota foarte buna, 4.85 din 111 pareri', '9 kg, acopera o familie', 'Pompa de caldura, consum mic', 'Cel mai mic pret dintre modelele bine notate'],
+    cons: ['Brand mai putin cunoscut decat Bosch sau Samsung', 'Fara functii smart'],
+    verdict: 'Cel mai bun echilibru pret-dotari, si prima recomandare pentru majoritatea gospodariilor. Heinner iti da un uscator cu pompa de caldura de 9 kg, deci usuca o incarcatura de familie dintr-o data, la un pret mult sub cel al marcilor premium. Are pompa de caldura, adica cea mai eficienta tehnologie, cu consum mic de curent, si o nota de 4.85 din 111 pareri, printre cele mai bune si cele mai testate din selectie. Nu are numele de brand al unui Bosch si nici functii smart, dar face exact ce trebuie sa faca un uscator, bine si ieftin. Il iei cand vrei un uscator de familie, eficient si bine notat, fara sa platesti pentru un brand premium.' },
+  { id: 'D6MFD0MBM', badge: 'Cel mai ieftin', cap: '8 kg',
+    specs: ['pompa de caldura', '8 kg', 'control din aplicatie', 'cel mai mic pret'],
+    pros: ['Cel mai mic pret din top, sub 1600 de lei', 'Pompa de caldura, consum mic', 'Control smart din aplicatie', 'Capacitate de 8 kg'],
+    cons: ['Nota mai mica, 4.28', 'Brand mai putin apreciat la premium', 'Uscare mai lenta pe programele complete'],
+    verdict: 'Cel mai ieftin uscator cu pompa de caldura din selectie si alegerea cand vrei sa cobori pretul cat mai mult, fara sa renunti la tehnologia eficienta. Candy Smart Pro are 8 kg, pompa de caldura si control din aplicatie, deci pornesti sau urmaresti programul din telefon. Nota de 4.28 e mai mica decat la modelele scumpe, iar oamenii mentioneaza ca uscarea completa dureaza mai mult, ceva de asteptat la acest pret. Ramane insa un uscator cu pompa de caldura adevarata, nu unul ieftin prin evacuare. Il iei cand ai buget strans si vrei totusi consum mic, nu cel mai rapid sau mai silentios uscator.' },
+  { id: 'DW2RSFMBM', badge: 'Cel mai bun mijloc de gama', cap: '8 kg',
+    specs: ['pompa de caldura', '8 kg', 'multe programe', 'brand Beko'],
+    pros: ['Beko, brand de incredere la electrocasnice mari', 'Pompa de caldura, eficient', 'Nota foarte buna, 4.78 din 100 de pareri', 'Multe programe, pentru fiecare tip de tesatura'],
+    cons: ['Mai scump decat modelele de intrare', 'Fara capacitate de 9 kg'],
+    verdict: 'Cel mai echilibrat uscator din selectie, la mijlocul de gama, de la Beko, un brand de incredere pentru electrocasnice mari. Are 8 kg, pompa de caldura si multe programe pentru diferite tipuri de tesaturi, plus o nota de 4.78 din 100 de pareri, printre cele mai bine sustinute din top. E pasul logic peste modelele ieftine: platesti ceva mai mult, dar primesti un brand cu service raspandit, piese usor de gasit si o constructie mai solida. Nu are capacitate de 9 kg, dar 8 kg ajung pentru cei mai multi. Il iei cand vrei un uscator de brand, eficient si bine notat, fara sa intri in zona premium de pret.' },
+  { id: 'D7RYKCYBM', badge: 'Cel mai bland cu hainele', cap: '8 kg',
+    specs: ['pompa de caldura', '8 kg', 'temperatura joasa, constanta', 'brand Electrolux'],
+    pros: ['Pompa de caldura, temperatura blanda, protejeaza hainele', 'Electrolux, brand consacrat', 'Programe pentru tesaturi delicate', 'Nota buna, 4.70'],
+    cons: ['Mai scump decat mijlocul de gama', 'Numar mai mic de pareri'],
+    verdict: 'Alegerea daca ai multe haine delicate sau vrei sa iti tii hainele ca noi cat mai mult. Uscatoarele cu pompa de caldura usuca la o temperatura mai joasa si mai constanta decat cele clasice, ceea ce menajeaza fibrele, iar Electrolux face asta bine, cu programe dedicate pentru tesaturi delicate. E un brand consacrat, cu o constructie de calitate, iar nota de 4.70 arata clienti multumiti. Costa mai mult decat mijlocul de gama si are un numar mai mic de pareri decat modelele populare. Il iei cand tii la hainele tale, ai materiale sensibile si vrei un uscator care usuca bland, nu la temperatura mare.' },
+  { id: 'DKPTN6BBM', badge: 'Multe programe, capacitate mare', cap: '8 kg',
+    specs: ['pompa de caldura', '8 kg', 'multe programe automate', 'brand Hotpoint'],
+    pros: ['Multe programe si optiuni automate', 'Pompa de caldura, consum mic', 'Senzori care opresc uscarea la timp', 'Brand cunoscut, Hotpoint'],
+    cons: ['Mai scump decat mijlocul de gama', 'Nota ceva mai mica, 4.56'],
+    verdict: 'Alegerea daca vrei un uscator cu multe programe si automatizari, care sa faca treaba in locul tau. Hotpoint Natis are pompa de caldura si o gama larga de programe si optiuni, plus senzori de umiditate care simt cand hainele sunt uscate si opresc ciclul, ca sa nu le usuce excesiv si sa le strice. Capacitatea de 8 kg acopera o familie. Nota de 4.56 e ceva mai mica decat la Beko sau Bosch, iar pretul urca in zona superioara a gamei medii. Il iei cand vrei un uscator care se descurca singur, cu programe pentru orice tip de rufe si automatizari care iti scutesc grija.' },
+  { id: 'D75CK2MBM', badge: 'Premium, 9 kg, smart', cap: '9 kg',
+    specs: ['pompa de caldura', '9 kg, familie mare', 'functii smart', 'brand Samsung'],
+    pros: ['9 kg, pentru o familie mare', 'Functii smart, control din aplicatie', 'Pompa de caldura, eficient', 'Samsung, brand premium cu 109 pareri'],
+    cons: ['Scump, peste 5000 de lei', 'Functiile smart nu sunt esentiale pentru toti'],
+    verdict: 'Alegerea daca ai o familie mare si vrei un uscator premium, cu capacitate si functii smart. Samsung DV90 are 9 kg, deci usuca o incarcatura mare dintr-o data, pompa de caldura pentru consum mic si functii smart care iti lasa sa pornesti si sa urmaresti programul din telefon. Nota de 4.66 din 109 pareri il aseaza printre premium-urile bine sustinute. Costa peste 5000 de lei, iar functiile smart, desi comode, nu sunt esentiale pentru toata lumea. Il iei cand ai multe rufe de uscat, vrei un brand premium si iti place sa comanzi electrocasnicele din aplicatie.' },
+  { id: 'D6674ZMBM', badge: 'Cel mai apreciat premium', cap: '8 kg',
+    specs: ['pompa de caldura', '8 kg', 'cel mai testat, 179 pareri', 'brand Bosch'],
+    pros: ['Cel mai apreciat din top, 4.85 din 179 de pareri', 'Bosch, cea mai buna reputatie la fiabilitate', 'Pompa de caldura, uscare eficienta si blanda', 'Constructie de calitate, tine ani buni'],
+    cons: ['Cel mai scump din selectie', 'Capacitate de 8 kg, nu 9'],
+    verdict: 'Cel mai apreciat uscator din tot topul si alegerea daca vrei sa cumperi o data si sa uiti de el. Bosch WTH85207 are cele mai multe pareri din selectie, 179, cu o nota de 4.85, ceea ce spune multe despre fiabilitatea pentru care Bosch e cunoscut la electrocasnice mari. Are pompa de caldura, usuca eficient si bland cu hainele si e construit sa tina ani buni, nu doar cateva sezoane. E cel mai scump din top si are 8 kg, nu 9, dar pentru cei mai multi ajunge. Il iei cand vrei cel mai sigur pariu pe termen lung, un uscator de brand premium care sa nu iti dea batai de cap.' },
+  { id: 'D7L3T1MBM', badge: 'Cel mai bine notat', cap: '8 kg',
+    specs: ['pompa de caldura', '8 kg', 'cea mai buna nota, 4.90', 'brand AEG'],
+    pros: ['Cea mai buna nota din top, 4.90', 'AEG, brand premium apreciat pentru calitate', 'Pompa de caldura, uscare eficienta', 'Programe si automatizari complete'],
+    cons: ['Foarte scump, peste 6000 de lei', 'Numar mai mic de pareri decat Bosch'],
+    verdict: 'Uscatorul cu cea mai buna nota din tot topul, 4.90, si alegerea daca vrei varful de calitate si esti dispus sa platesti pentru el. AEG e un brand premium, apreciat pentru constructie si finisaj, iar acest model aduce pompa de caldura, uscare eficienta si blanda si o gama completa de programe si automatizari. Nota maxima vine de la ceva mai putine pareri decat Bosch, dar toate foarte bune. E printre cele mai scumpe din selectie, peste 6000 de lei. Il iei cand vrei cel mai bine notat uscator, de la un brand premium, si bugetul nu e prima grija, ci calitatea si durabilitatea.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/uscatoare-rufe.webp';
+const figTop = '/imagini/articole/uscatoare-rufe-top.webp';
+const figConsum = '/imagini/articole/uscatoare-rufe-consum.webp';
+const figCap = '/imagini/articole/uscatoare-rufe-capacitate.webp';
+const published = '2026-07-18T07:58:34+03:00';
+
+const faq = [
+  { question: 'Pompa de caldura, condensare sau evacuare?', answer: 'Pompa de caldura e cea mai buna astazi: recicleaza aerul cald si consuma pana la 50-60% mai putin curent decat un uscator prin condensare sau prin evacuare. Usuca la temperatura mai joasa, deci e mai blanda cu hainele. Cele prin evacuare cer un tub spre exterior, iar cele prin condensare simple consuma mai mult. Toate uscatoarele bune de azi, inclusiv toate din aceasta selectie, sunt cu pompa de caldura.' },
+  { question: 'Ce capacitate de uscator imi trebuie?', answer: 'Regula simpla e sa alegi o capacitate apropiata de a masinii de spalat, ca sa poti usca ce speli dintr-o data. Pentru o persoana sau un cuplu, 7 kg ajung. Pentru o familie de 3-4 persoane, 8 kg sunt standardul. Pentru o familie mare sau cand speli des rufe voluminoase, alege 9 kg. Un uscator prea mic te obliga la mai multe cicluri, iar unul mult prea mare consuma degeaba pe incarcaturi mici.' },
+  { question: 'Cat consuma un uscator cu pompa de caldura?', answer: 'Mult mai putin decat unul clasic: pana la 50-60% mai putin curent la aceeasi incarcatura. Diferenta se vede clar pe factura daca usuci des. Uita-te la clasa energetica: A++ e buna, iar A+++ consuma si mai putin, deci pe termen lung, un model A+++ mai scump se poate amortiza din economia la curent. Programele eco reduc si ele consumul, cu pretul unui ciclu ceva mai lung.' },
+  { question: 'Unde pot pune uscatorul?', answer: 'Aici e marele avantaj al pompei de caldura: nu are nevoie de tub de evacuare spre exterior, deci il pui aproape oriunde, in baie, bucatarie, hol sau intr-un spatiu tehnic, atat timp cat ramane loc in jur pentru circulatia aerului. Multe uscatoare se pot aseza si peste masina de spalat, cu un kit de prindere, ca sa economisesti spatiu. Ai grija doar sa nu il inghesui, ca sa nu se supraincalzeasca.' },
+  { question: 'Cum intretin un uscator de rufe?', answer: 'Curata filtrul de scame dupa fiecare folosire, altfel se infunda si uscatorul consuma mai mult si usuca mai greu. Goleste rezervorul de apa condensata dupa fiecare ciclu, daca nu e legat la scurgere. Curata periodic condensatorul, dupa instructiunile producatorului; unele modele au auto-curatare. Cu aceasta rutina simpla, un uscator cu pompa de caldura functioneaza eficient ani buni.' },
+  { question: 'Ce sunt senzorii de umiditate si de ce conteaza?', answer: 'Senzorii de umiditate masoara cat de uscate sunt hainele si opresc programul automat cand sunt gata, in loc sa mearga un timp fix. Asta inseamna doua lucruri bune: nu usuci hainele excesiv, ceea ce le-ar deteriora, si nu consumi curent degeaba pe minute in plus. Aproape toate uscatoarele bune au senzori de umiditate; e o functie pe care merita sa o cauti.' },
+];
+
+const images = [hero, figTop, figConsum, figCap, ...PICKS.map(x => x.p.image)];
+const money = (n) => n.toLocaleString('ro-RO');
+const b64 = (s) => Buffer.from(s).toString('base64');
+const shortName = (n) => n.replace(/’/g, "'").replace(/^Uscator (de rufe )?(cu pompa de caldura )?/i, '').split(',')[0];
+---
+
+<Layout
+  title="Cele mai bune uscatoare de rufe in 2026: 8 modele cu pompa de caldura comparate"
+  description="Ce uscator de rufe sa iti iei in 2026: 8 modele cu pompa de caldura comparate pe capacitate, consum, programe si pareri reale, de la Candy ieftin la Bosch si AEG premium. Plus ce capacitate iti trebuie si unde il pui."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune uscatoare de rufe' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune uscatoare de rufe</span>
+    </nav>
+
+    <h1>Cele mai bune uscatoare de rufe in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune uscatoare de rufe cu pompa de caldura: Heinner, Beko, Bosch si Samsung" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru majoritatea gospodariilor, cel mai bun uscator din acest moment este <strong>Heinner HHPD-M9</strong>: pompa de caldura, 9 kg si cea mai buna nota la pret mic. Daca vrei un brand premium care tine ani buni, <strong>Bosch WTH85207</strong> e cel mai apreciat, iar <strong>AEG</strong> are cea mai buna nota. La buget, <strong>Candy</strong> costa sub 1600 de lei.</p>
+      <p>La uscatoare, o veste buna: toate modelele bune de azi sunt cu pompa de caldura, cea mai eficienta tehnologie, deci nu mai trebuie sa alegi intre tipuri, ci sa te uiti la capacitate, consum si brand. Mai jos iti explicam de ce pompa de caldura a inlocuit restul, ce capacitate iti trebuie, si ai 8 modele comparate pe consum, programe si parerile reale ale cumparatorilor.</p>
+      <p>Am pornit de la cele mai vandute uscatoare de pe eMAG, le-am verificat capacitatea, eficienta si dotarile si le-am asezat de la buget la premium. Vezi si <a href="/uscator-de-rufe-cu-pompa-de-caldura/">uscatoarele cu pompa de caldura</a> si <a href="/masina-de-spalat-rufe-automata/">masinile de spalat rufe automate</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#pompa">De ce toate sunt cu pompa de caldura</a></li>
+        <li><a href="#capacitate">Ce capacitate iti trebuie</a></li>
+        <li><a href="#pe-scurt">Care uscator pentru cine</a></li>
+        <li><a href="#produse">Cele 8 uscatoare pe larg</a></li>
+        <li><a href="#consum">Clasa energetica si cat costa la curent</a></li>
+        <li><a href="#programe">Programe, senzori si intretinere</a></li>
+        <li><a href="#unde">Unde il pui</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="pompa">De ce toate uscatoarele bune sunt cu pompa de caldura</h2>
+    <p>Pana acum cativa ani existau trei tipuri de uscatoare; azi, unul le-a inlocuit aproape complet la modelele bune. Uite de ce:</p>
+    <ul>
+      <li><strong>Cu evacuare:</strong> arunca aerul cald si umed afara printr-un tub. Rapid, dar cere o gaura in perete si pierde toata caldura, deci consuma mult.</li>
+      <li><strong>Cu condensare:</strong> raceste aerul umed si strange apa intr-un rezervor. Practic in apartament, dar consuma tot mult, pentru ca incalzeste aer nou de fiecare data.</li>
+      <li><strong>Cu pompa de caldura:</strong> recicleaza aerul cald in loc sa il arunce, deci consuma pana la 50-60% mai putin curent. Usuca la temperatura mai joasa, mai blanda cu hainele, si nu are nevoie de tub spre exterior.</li>
+    </ul>
+    <p>De aceea toate cele 8 modele de mai jos sunt cu pompa de caldura. Costa ceva mai mult la cumparare decat un uscator clasic, dar diferenta se recupereaza din factura daca usuci des, si iti menajeaza si hainele.</p>
+
+    <h2 id="capacitate">Ce capacitate iti trebuie</h2>
+    <p>Dupa ce tehnologia e clara, decizia mare e capacitatea, masurata in kilograme de rufe uscate. Regula simpla e sa o alegi apropiata de a masinii de spalat, ca sa usuci ce speli dintr-o data:</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Gospodarie</th><th>Capacitate</th></tr></thead>
+        <tbody>
+          <tr><td>1-2 persoane</td><td>7 kg</td></tr>
+          <tr><td>Familie de 3-4 persoane</td><td>8 kg</td></tr>
+          <tr><td>Familie mare sau rufe voluminoase</td><td>9 kg</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Un uscator prea mic te obliga la mai multe cicluri, iar unul mult prea mare consuma degeaba pe incarcaturi mici. Pentru cei mai multi, 8 kg sunt echilibrul potrivit; treci la 9 kg doar daca chiar ai des rufe multe.</p>
+
+    <h2 id="pe-scurt">Pe scurt: care uscator pentru cine</h2>
+    <p>Daca esti grabit, tabelul rezuma capacitatea si pretul fiecarui model. Preturile si numarul de pareri sunt luate direct de pe eMAG.</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Cel mai bun la</th><th>Pret</th><th>Pareri</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td>{shortName(x.p.name)}</td>
+              <td>{x.cap}</td>
+              <td>{x.badge}</td>
+              <td>{money(x.p.price)} lei</td>
+              <td>{x.p.rating ? `${x.p.rating.toFixed(2)} (${x.p.reviews})` : '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="produse">Cele 8 uscatoare pe larg</h2>
+    <p>Le-am aranjat de la cel mai bun raport la premium. Fiecare card are pretul, nota si numarul de pareri direct de pe eMAG, plus capacitatea si punctele tari si slabe.</p>
+    <div class="rd-grid">
+      {PICKS.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figTop} alt="Uscatoare de rufe de la buget la premium: Candy, Heinner si Bosch" width="1200" height="675" loading="lazy" />
+
+    <h2 id="consum">Clasa energetica si cat costa la curent</h2>
+    <p>Uscatorul e un electrocasnic care consuma, deci clasa energetica conteaza direct pe factura, mai ales daca usuci des.</p>
+    <p>Toate modelele cu pompa de caldura sunt eficiente, dar difera intre ele: <strong>A++</strong> e o clasa buna, iar <strong>A+++</strong> consuma si mai putin. Diferenta pare mica pe hartie, dar la cateva cicluri pe saptamana, timp de ani, se aduna. Un model A+++ mai scump la cumparare se poate amortiza din economia la curent, daca il folosesti mult.</p>
+    <p>Un al doilea lucru care scade consumul sunt <strong>programele eco</strong>: usuca la temperatura mai joasa, pe un ciclu ceva mai lung, dar cu cel mai mic consum. Daca nu esti grabit, folosindu-le des reduci simtitor factura. Pe scurt: daca usuci mult, merita sa platesti pentru o clasa mai buna si sa folosesti programele eco.</p>
+
+    <img class="rd-fig" src={figConsum} alt="Pompa de caldura consuma pana la 60% mai putin curent" width="1200" height="675" loading="lazy" />
+
+    <h2 id="programe">Programe, senzori si intretinere</h2>
+    <p>Dincolo de capacitate si consum, cateva dotari fac diferenta la folosirea de zi cu zi.</p>
+
+    <h3>Senzorii de umiditate</h3>
+    <p>Masoara cat de uscate sunt hainele si opresc programul cand sunt gata, in loc sa mearga un timp fix. Asa nu usuci hainele excesiv, ceea ce le-ar strica, si nu consumi curent degeaba. Aproape toate uscatoarele bune ii au; e o functie de cautat.</p>
+
+    <h3>Programele</h3>
+    <p>Un uscator bun are programe pentru fiecare tip de rufe: bumbac, sintetice, lana, delicate, sport. Programul eco e cel mai economic, iar unele au si un program rapid pentru cand te grabesti. Cu cat sunt mai multe, cu atat tratezi mai bine fiecare tesatura.</p>
+
+    <h3>Intretinerea</h3>
+    <p>E simpla, dar obligatorie: curata filtrul de scame dupa fiecare folosire, goleste rezervorul de apa condensata dupa fiecare ciclu, daca nu e legat la scurgere, si curata periodic condensatorul. Unele modele au condensator cu auto-curatare, care iti scuteste efortul. Un filtru infundat e cea mai frecventa cauza pentru care un uscator usuca greu si consuma mult.</p>
+
+    <img class="rd-fig" src={figCap} alt="Uscatoare de rufe de brand: Electrolux, Hotpoint si Samsung" width="1200" height="675" loading="lazy" />
+
+    <h2 id="unde">Unde il pui</h2>
+    <p>Aici e marele avantaj al pompei de caldura: fara tub de evacuare spre exterior, il asezi aproape oriunde. Cateva idei:</p>
+    <ul>
+      <li><strong>In baie, bucatarie sau hol:</strong> oriunde ai loc si o priza, atat timp cat ramane spatiu in jur pentru circulatia aerului.</li>
+      <li><strong>Peste masina de spalat:</strong> multe uscatoare se pot aseza deasupra masinii, cu un kit de prindere, ca sa economisesti spatiu intr-o baie mica.</li>
+      <li><strong>Intr-un spatiu tehnic:</strong> o debara sau o camera de serviciu, cu conditia sa nu il inghesui, ca sa nu se supraincalzeasca.</li>
+    </ul>
+    <p>Lasa cativa centimetri liberi in jur si nu il pune lipit intre pereti, ca aerul sa circule si uscatorul sa lucreze eficient.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-uscatoare-rufe')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate uscatoarele de rufe la oferta</strong>
+        <span>Reducerile din acest moment la uscatoare cu pompa de caldura, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-uscatoare-de-rufe" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-uscatoare-de-rufe" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

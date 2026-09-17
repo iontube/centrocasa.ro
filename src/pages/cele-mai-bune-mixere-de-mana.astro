@@ -1,0 +1,290 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['mixere'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Accesibile ---
+  { g: 'acc', id: 'DGJVLKMBM', rol: 'Cel mai bun raport la pret mic', short: 'Heinner White Orchid', putere: '400 W', viteze: '6 + Turbo', extra: 'Teluri + carlige', pret: '75 lei',
+    specs: ['400 W, 6 viteze plus functie Turbo', 'teluri pentru batut si carlige de framantare incluse', 'buton de scoatere a accesoriilor', 'nota 4.82, foarte bine cotat pentru pret'],
+    pros: ['400 W la doar 75 de lei, raport greu de batut', '147 de pareri, bine testat', 'Vine cu teluri si carlige de aluat', '6 viteze plus Turbo, mai multe ca la modelele scumpe'],
+    cons: ['Brand mai putin cunoscut', 'Constructie de plastic, aparat de baza'],
+    verdict: 'La 75 de lei, cu 400 W si 6 viteze plus Turbo, Heinner White Orchid e cel mai bun raport din articol pentru cine nu vrea sa dea multi bani. Puterea de 400 W il aseaza peste multe modele accesibile, deci se descurca nu doar cu frisca si albusuri, ci si cu un aluat mai consistent, iar in cutie gasesti si teluri, si carlige de framantare, adica esti gata de orice fara sa cumperi accesorii separat. Cele 147 de pareri si nota 4.82 arata ca oamenii care l-au luat sunt multumiti. Compromisurile tin de brandul mai putin cunoscut si de constructia de plastic, normale la pretul asta. Il iei cand vrei un mixer complet, cu putere decenta, la cel mai mic pret rezonabil.' },
+  { g: 'acc', id: 'DBBF67BBM', rol: 'Brand cunoscut, simplu si fiabil', short: 'Tefal Quick Mix', putere: '300 W', viteze: '5 + Turbo', extra: 'Cu carlige', pret: '110 lei',
+    specs: ['300 W, 5 viteze plus Turbo', 'carlige de framantare pentru aluat', 'de la Tefal, cu service in tara', 'usor si simplu de folosit'],
+    pros: ['Brand Tefal, cu piese si service', '160 de pareri, bine cotat', 'Are carlige de framantare incluse', 'Usor si comod in mana'],
+    cons: ['300 W, modest pentru aluaturi grele', 'Fara accesorii extra'],
+    verdict: 'Pentru cine vrea linistea unui brand cunoscut fara sa dea mult, Tefal Quick Mix e alegerea simpla si sigura. Cei 300 W sunt suficienti pentru treaba de zi cu zi, frisca, albusuri, compozitie de checuri, iar carligele de framantare incluse ii permit si aluaturi mai usoare, doar ca la o coca grea de paine se va opinti, aici puterea isi spune cuvantul. Are 5 viteze plus Turbo, e usor in mana si vine cu service Tefal in tara, un plus la un aparat cu piese care se pot uza. Cele 160 de pareri il confirma ca o alegere de incredere. Il iei cand vrei un mixer de brand, simplu si fiabil, pentru gatit obisnuit, si nu framanti des aluaturi grele.' },
+  { g: 'acc', id: 'DH29RSBBM', rol: 'Philips la pret mic', short: 'Philips HR3705', putere: '300 W', viteze: '5 + Turbo', extra: 'Palete + carlige', pret: '99 lei',
+    specs: ['300 W, 5 viteze plus Turbo', 'palete de amestecat si carlige de framantare', 'de la Philips', 'nota 4.77'],
+    pros: ['Philips sub 100 de lei', 'Palete si carlige incluse', 'Nota 4.77, foarte bine cotat', 'Brand de incredere'],
+    cons: ['300 W, la fel de modest pentru aluat greu', '95 de pareri, mai putin ca liderii'],
+    verdict: 'Aproape geaman cu Tefal Quick Mix ca profil, HR3705 iti da un Philips sub 100 de lei, cu 300 W, 5 viteze si Turbo, plus palete de amestecat si carlige de framantare in cutie. Diferentele fata de Tefal sunt mici si tin mai mult de preferinta pentru brand: ambele fac aceeasi treaba de baza bine, ambele se poticnesc la aluaturi grele din cauza puterii de 300 W. Nota de 4.77 il recomanda. Cu 95 de pareri e ceva mai putin testat decat Tefal, dar bine cotat de cei care l-au luat. Il iei cand preferi Philips si vrei un mixer ieftin, complet, pentru creme, spume si aluaturi usoare.' },
+  { g: 'acc', id: 'D2X1BPMBM', rol: 'Cel mai ieftin din articol', short: 'Hausberg HB-4112', putere: '250 W', viteze: '7', extra: 'De baza', pret: '49 lei',
+    specs: ['250 W, 7 trepte de viteza', 'teluri pentru batut', 'pretul cel mai mic din selectie', 'compact si usor'],
+    pros: ['Sub 50 de lei, cel mai accesibil', '7 trepte de viteza, control fin', 'Compact, incape oriunde', 'Suficient pentru frisca si spume'],
+    cons: ['250 W, doar pentru preparate usoare', 'Aparat de baza, fara accesorii extra'],
+    verdict: 'Cel mai ieftin mixer din articol, si e cinstit sa il privesti ca atare: un aparat de baza pentru cine bate rar frisca sau spuma de albus si nu vrea sa dea nici 50 de lei. Cei 250 W sunt cei mai modesti din selectie, deci sta bine cu preparatele usoare, dar la un aluat cat de cat consistent il vei simti cum se chinuie. In schimb are 7 trepte de viteza, mai multe decat modele de cateva ori mai scumpe, ceea ce ajuta la un control fin, si e mic si usor. Pentru o bucatarie in care mixerul iese din dulap de cateva ori pe an, e suficient. Il iei cand vrei absolut minimul functional, la cel mai mic pret, pentru preparate usoare.' },
+  // --- B. Echilibrate, bine notate ---
+  { g: 'echil', id: 'D2BKYDBBM', rol: 'Cel mai vandut mixer de brand', short: 'Philips Viva', putere: '450 W', viteze: '5 + Turbo', extra: 'Cu carlige', pret: '130 lei',
+    specs: ['450 W, 5 viteze plus Turbo', 'carlige de framantare pentru aluaturi', 'de la Philips, gama Viva', 'nota 4.76, cel mai vandut din articol dupa Bosch'],
+    pros: ['287 de pareri, printre cele mai vandute', '450 W, duce si aluaturi mai consistente', 'Brand Philips, cu service', 'Raport foarte bun putere-pret'],
+    cons: ['Fara accesorii extra fata de carlige', 'Nu are cutie de depozitare'],
+    verdict: 'Cu 287 de pareri, e unul dintre cele mai cumparate mixere din articol, si prinde un echilibru foarte bun. Fata de modelele de 300 W, cei 450 W ai lui Philips Viva fac o diferenta reala: duce nu doar frisca si spume, ci si aluaturi mai consistente, de checuri sau cozonac, fara sa se chinuie. Are 5 viteze plus Turbo si carlige de framantare incluse, iar in spate e Philips, cu service in tara. La 130 de lei, e locul unde raportul putere-pret devine cu adevarat bun, motiv pentru care se vinde atat. Nu are cutie de depozitare sau accesorii speciale, dar face esentialul foarte bine. Il iei cand vrei cel mai echilibrat mixer de brand, cu putere reala, la un pret rezonabil.' },
+  { g: 'echil', id: 'DDZ3C4YBM', rol: 'Bine notat, cu cutie de depozitare', short: 'KD Home PowerWhisk', putere: '500 W', viteze: '5 viteze', extra: 'Cu cutie', pret: '159 lei',
+    specs: ['500 W, viteza mare de rotatie a telurilor', 'cutie de depozitare pentru aparat si accesorii', 'teluri si carlige incluse', 'nota 4.88, printre cele mai mari'],
+    pros: ['Nota 4.88, foarte bine cotat pe 217 pareri', '500 W, putere buna pentru aluaturi', 'Cutie de depozitare, tii totul la un loc', 'Teluri si carlige incluse'],
+    cons: ['Brand mai putin cunoscut', 'Fara service national ca la Philips'],
+    verdict: 'KD Home PowerWhisk aduce doua lucruri utile peste un mixer obisnuit: putere si ordine. Cei 500 W stau confortabil cu aluaturi consistente, iar cutia de depozitare, in care intra aparatul cu tot cu teluri si carlige, rezolva o problema pe care putini o iau in seama, dar toti o traiesc: unde tii accesoriile mici ca sa nu le pierzi prin sertare. Cu nota 4.88 pe 217 pareri, e printre cele mai apreciate din articol. Compromisul e brandul mai putin cunoscut si lipsa unei retele nationale de service, normale la un producator mai mic. Il iei cand vrei putere buna, accesorii complete si o cutie care sa le tina pe toate la un loc, la un pret corect.' },
+  { g: 'echil', id: 'DP57DG3BM', rol: 'Cea mai mare putere accesibila', short: 'EvoSmart HM615', putere: '600 W', viteze: '5 viteze', extra: 'Cutie + 5 accesorii', pret: '182 lei',
+    specs: ['600 W, cea mai mare putere din articol', 'cutie de depozitare si 5 accesorii', 'teluri, carlige si palete', 'nota 4.95, printre cele mai mari'],
+    pros: ['600 W, cel mai puternic mixer din selectie', '5 accesorii, acoperi orice preparat', 'Cutie de depozitare inclusa', 'Nota 4.95, excelent cotat'],
+    cons: ['102 pareri, mai putin decat liderii', 'Brand mai putin cunoscut'],
+    verdict: 'Daca framanti des aluaturi grele si vrei cel mai puternic mixer de mana din articol, EvoSmart HM615 e raspunsul, cu 600 W. Puterea asta conteaza real la o coca de cozonac sau de paine, unde un mixer de 300 W se supraincalzeste, iar unul de 600 W trece prin ea fara efort. Vine cu cutie de depozitare si 5 accesorii, teluri, carlige si palete, deci esti pregatit pentru orice, de la frisca la aluat. Nota de 4.95, una dintre cele mai mari din articol, il recomanda puternic, chiar daca are mai putine pareri decat Philips sau Bosch, 102. Brandul e mai putin cunoscut. Il iei cand pui pret pe putere maxima si accesorii complete, la un pret inca rezonabil.' },
+  { g: 'echil', id: 'DR5N6H3BM', rol: 'Cea mai mare nota din articol', short: 'Latkon HMLTK01', putere: '400 W', viteze: '6 + Turbo', extra: 'Teluri + carlige', pret: '130 lei',
+    specs: ['400 W, 6 viteze plus Turbo', 'teluri si carlige de framantare', 'nota 4.97, cea mai mare din articol', 'design curat'],
+    pros: ['Nota 4.97, cea mai mare din tot articolul', '400 W si 6 viteze plus Turbo', 'Teluri si carlige incluse', 'Design ingrijit'],
+    cons: ['74 de pareri, cel mai putin testat din grupa', 'Brand mai putin cunoscut'],
+    verdict: 'Cu nota 4.97, Latkon are cea mai mare apreciere din tot articolul, iar cei care l-au luat par aproape unanim incantati. Are 400 W, 6 viteze plus Turbo si vine cu teluri si carlige de framantare, deci acopera bine gama de preparate obisnuite, de la frisca la aluat de checuri. La 130 de lei se aseaza in aceeasi zona cu Philips Viva, oferind mai multe viteze, dar cu ceva mai putina putere si mult mai putine pareri, 74. Nota exceptionala e principalul lui argument, dar merita citita in contextul numarului mai mic de recenzii. Il iei cand vrei un mixer bine echipat, foarte bine notat, si nu te deranjeaza un brand mai putin cunoscut cu mai putine pareri.' },
+  // --- C. Premium Bosch ---
+  { g: 'bosch', id: 'E8DRKBBBM', rol: 'Cel mai vandut premium, si cu pasator', short: 'Bosch MFQ36440', putere: '450 W', viteze: '5 + Turbo', extra: 'Cu pasator', pret: '280 lei',
+    specs: ['450 W, 5 viteze plus Turbo', 'vine si cu picior pasator si vas gradat', 'teluri FineCreamer si carlige de framantare', 'de la Bosch, brand de referinta'],
+    pros: ['303 pareri, cel mai testat mixer din articol', 'Include un picior pasator, e doi in unu', 'Teluri speciale pentru creme mai fine', 'Brand Bosch, fiabil si cu service'],
+    cons: ['Mai scump decat modelele fara brand mare', 'Nota 4.6, buna, nu de varf'],
+    verdict: 'Cu 303 pareri, e cel mai cumparat mixer din articol, iar Bosch adauga aici ceva ce putine modele au: un picior pasator inclus, cu vas gradat, care il transforma practic in doua aparate. Bati frisca si aluat cu telurile si carligele, apoi schimbi accesoriul si passeaza o supa direct in oala, ceva ce un mixer clasic nu poate. Telurile FineCreamer sunt gandite pentru creme mai fine, iar in spate e Bosch, cu fiabilitatea si service-ul unui brand mare. Cei 450 W duc si aluaturi consistente. Costa mai mult decat un mixer fara brand, iar nota de 4.6 e buna fara sa fie de varf, dar platesti pentru versatilitate si nume. Il iei cand vrei si mixer, si pasator, de la un brand de incredere.' },
+  { g: 'bosch', id: 'DDYCXMBBM', rol: 'Bosch mai puternic', short: 'Bosch MFQ40303', putere: '500 W', viteze: '5 + Turbo', extra: 'Teluri + carlige', pret: '310 lei',
+    specs: ['500 W, 5 viteze plus Turbo', 'teluri fine si carlige de framantare', 'constructie Bosch, robusta', 'nota 4.73'],
+    pros: ['500 W, putere buna pentru aluaturi grele', 'Constructie Bosch, durabila', '211 pareri, bine testat', 'Teluri fine si carlige incluse'],
+    cons: ['Nu include pasator ca MFQ36440', 'Mai scump decat versiunea de 450 W'],
+    verdict: 'Pentru cine vrea un Bosch pur mixer, mai puternic, MFQ40303 urca la 500 W, util daca framanti des aluaturi grele si vrei un motor care nu se opinteste. Are aceeasi calitate de constructie Bosch, teluri fine si carlige de framantare, si 211 pareri in spate, cu nota 4.73. Fata de MFQ36440, cel mai vandut, renunta la piciorul pasator, deci nu e doi in unu, dar castiga putere, 500 fata de 450 W. Diferenta de pret intre ele e mica, asa ca alegerea se face intre versatilitate, cu pasator, si putere pura, fara. Il iei cand vrei un mixer Bosch cat mai puternic si nu ai nevoie de functia de pasator.' },
+  { g: 'bosch', id: 'DXGFPMBBM', rol: 'Bosch cu picior pasator din inox', short: 'Bosch MFQ36480', putere: '450 W', viteze: '5 + Turbo', extra: 'Picior inox', pret: '371 lei',
+    specs: ['450 W, 5 viteze plus Turbo', 'picior pasator din inox si accesoriu de tocat', 'teluri si carlige de framantare', 'cel mai complet accesorizat din articol'],
+    pros: ['Picior pasator din inox, mai durabil decat plasticul', 'Vine si cu accesoriu de tocat', 'Cel mai complet set de accesorii', 'Brand Bosch, fiabil'],
+    cons: ['Cel mai scump din articol', '70 de pareri, mai putin testat'],
+    verdict: 'Varful gamei Bosch din articol, MFQ36480 e pentru cine vrea un singur aparat care sa faca cat mai mult. Pe langa mixerul de mana cu teluri si carlige, vine cu un picior pasator din inox, mai durabil decat cel de plastic, si cu un accesoriu de tocat, deci acopera batut, passat si maruntit, aproape ca un set de bucatarie intr-o cutie. E cel mai complet accesorizat din selectie. Reversul e pretul, cel mai mare din articol, si numarul mai mic de pareri, 70. Practic platesti pentru piciorul de inox si accesoriul de tocare in plus fata de MFQ36440. Il iei cand vrei cel mai versatil mixer Bosch, cu pasator de inox si functie de tocare, si bugetul permite.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const ECHIL = PICKS.filter(x => x.g === 'echil');
+const BOSCH = PICKS.filter(x => x.g === 'bosch');
+
+const hero = '/imagini/articole/cele-mai-bune-mixere-de-mana.webp';
+const figAcc = '/imagini/articole/mixere-accesibile.webp';
+const figEchil = '/imagini/articole/mixere-echilibrate.webp';
+const figBosch = '/imagini/articole/mixere-bosch.webp';
+const published = '2026-07-21T21:37:32+03:00';
+
+const faq = [
+  { question: 'Ce putere imi trebuie la un mixer de mana?', answer: 'Depinde ce prepari des. Pentru frisca, spuma de albus, creme si compozitii de checuri, un mixer de 250-300 W e suficient. Daca framanti aluaturi mai consistente, de cozonac, paine sau fursecuri, cauta de la 400-450 W in sus, pentru ca un motor slab se supraincalzeste si se poticneste in coca groasa. Peste 500-600 W ai o rezerva confortabila pentru orice aluat. Regula practica: sub 300 W pentru copt usor si spume, de la 450 W in sus daca framanti des. Nu are rost sa platesti pentru 600 W daca faci doar frisca, dar nici sa iei 250 W daca framanti cozonac.' },
+  { question: 'Mixer de mana sau blender vertical?', answer: 'Sunt aparate cu scopuri opuse, desi lumea le confunda. Un mixer de mana are teluri care se invart si incorporeaza aer: bate frisca, spuma de albus, aluat, creme. Un blender vertical, sau de imersie, are o lama la capat si passeaza: face supa crema, piure, sosuri, il bagi direct in oala. Nu poti bate frisca ferma cu un blender vertical si nici nu poti passa o supa cu un mixer cu teluri. Daca coci, ai nevoie de mixer; daca faci supe crema, de blender vertical. Unele mixere Bosch vin insa cu un picior pasator inclus, deci le ai pe amandoua intr-un aparat.' },
+  { question: 'La ce folosesc telurile si la ce carligele de aluat?', answer: 'Sunt accesorii diferite pentru treburi diferite, si de obicei vin ambele in cutie. Telurile, sau paletele de amestecat, sunt cele in forma de balon sau plate; ele incorporeaza aer si sunt pentru frisca, spuma de albus, creme si compozitii usoare de prajitura. Carligele de framantare sunt cele in forma de spirala; ele nu bat, ci intind si pliaza aluatul, si sunt facute pentru cocile mai groase, de paine, pizza sau cozonac. Daca pui teluri intr-un aluat greu, se infunda si forteaza motorul; daca pui carlige la frisca, nu o bat cum trebuie. Foloseste accesoriul potrivit preparatului.' },
+  { question: 'Cate viteze si ce e functia Turbo?', answer: 'Un mixer de mana bun ar trebui sa aiba cel putin 5 viteze, ca sa reglezi intensitatea dupa reteta: incepi incet ca sa nu imprastii faina sau lichidul, apoi urci pentru batut. Mai multe trepte inseamna control mai fin, dar de la 5 in sus diferenta e mica. Functia Turbo e un buton care da un plus scurt de putere, la viteza maxima, util cand vrei sa termini de batut rapid sau sa razbesti printr-o portiune mai groasa de aluat. Nu e obligatorie, dar e comoda. Pe scurt: 5 viteze plus Turbo acopera nevoile aproape oricui.' },
+  { question: 'Care e diferenta fata de un mixer cu bol, cu stativ?', answer: 'Un mixer de mana il tii in mana si il misti tu prin vas; e usor, ieftin, se depoziteaza usor si e perfect pentru volume mici si medii de treaba. Un mixer cu bol, sau planetar, sta pe un stativ si are propriul castron rotativ, in care framanta si bate singur, fara sa il tii; e mult mai puternic si potrivit pentru cine coace des si in cantitati mari, dar e scump, greu si ocupa mult loc. Pentru un gospodar obisnuit, care coace din cand in cand, un mixer de mana bun e suficient si mult mai practic. Mixerul cu bol are sens pentru pasionatii de patiserie.' },
+  { question: 'Pot framanta aluat de paine cu un mixer de mana?', answer: 'Da, dar cu masura si cu carligele potrivite. Cu carligele de framantare montate, un mixer de mana intinde si pliaza aluatul in locul mainilor tale, ceea ce scuteste efort. Insa la cocile foarte groase si la cantitati mari, motorul unui mixer de mana se incalzeste si se poate opri de protectie, mai ales sub 400 W. Pentru aluaturi de paine dese, alege un model de 450-600 W, framanta in reprize scurte, lasand motorul sa se odihneasca, si nu depasi cantitatea recomandata in manual. Daca framanti paine des si mult, un mixer cu bol e mai potrivit; ocazional, unul de mana puternic se descurca.' },
+  { question: 'Ce inseamna ca mixerul vine cu pasator sau picior?', answer: 'Inseamna ca primesti, pe langa mixerul cu teluri, si un accesoriu de blender vertical, un picior lung cu lama la capat, care se monteaza pe acelasi motor. Practic ai doua aparate intr-unul: bati si framanti cu telurile si carligele, apoi schimbi accesoriul si passezi o supa crema sau un piure direct in oala. Modelele Bosch MFQ36440 si MFQ36480 din articol vin cu un astfel de picior, ultimul chiar din inox, mai durabil. E un plus real de versatilitate, mai ales daca nu vrei sa cumperi separat si un blender vertical. Verifica in specificatii daca piciorul e inclus, nu toate modelele il au.' },
+  { question: 'Cum curat un mixer de mana?', answer: 'Simplu, pentru ca partile care se murdaresc se detaseaza. Apesi butonul de scoatere a accesoriilor, scoti telurile sau carligele si le speli cu apa calda si detergent, ca pe orice tacam; multe sunt compatibile cu masina de spalat vase, verifica in manual. Corpul cu motorul il stergi doar cu o carpa umeda si niciodata nu il bagi in apa, pentru ca are motor si cablu. Daca ai folosit piciorul pasator, clateste-l imediat dupa, cat resturile sunt moi. Spala accesoriile repede dupa folosire, inainte sa se usuce aluatul sau crema pe ele, altfel se curata mult mai greu.' },
+];
+
+const images = [hero, figAcc, figEchil, figBosch, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune mixere de mana in ${SEO_YEAR}: de la buget la Bosch cu pasator`}
+  description="11 mixere de mana comparate pe putere si accesorii, de la 49 la 371 de lei. Cata putere iti trebuie pentru aluat si cand merita unul care vine si cu pasator."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune mixere de mana' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune mixere de mana</span>
+    </nav>
+
+    <h1>Cele mai bune mixere de mana</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune mixere de mana: de la modele accesibile la Bosch cu teluri, carlige de framantare si picior pasator" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Un mixer de mana e facut sa incorporeze aer: bate frisca ferma, spuma de albus, aluat de cozonac sau compozitie de checuri. Nu-l confunda cu blenderul vertical, cel cu lama, care passeaza supe si face piure; sunt aparate cu scopuri opuse. Odata ce stii ca vrei un mixer cu teluri, decizia se reduce la doua lucruri: <strong>cata putere</strong> si <strong>ce accesorii</strong> vine.</p>
+      <p>Cel mai vandut din articol, <strong>Bosch MFQ36440</strong>, are 303 pareri si vine chiar cu un picior pasator, deci e si mixer, si blender vertical. Daca vrei cel mai bun raport de brand accesibil, <strong>Philips Viva</strong>, cu 450 W la 130 de lei, e cel mai cumparat dupa Bosch. Iar la buget, <strong>Heinner White Orchid</strong> ofera 400 W si accesorii complete la doar 75 de lei.</p>
+      <p>Puterea se alege dupa ce coci: <strong>250-300 W ajung pentru frisca si compozitii usoare</strong>, dar pentru aluaturi grele de paine sau cozonac vrei de la 450 W in sus, altfel motorul se poticneste. Accesoriile conteaza si ele: telurile bat, carligele framanta, iar unele modele adauga un pasator. De aceea le-am grupat dupa putere si dotari, nu dupa pret.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Accesibile, pentru orice bucatarie</a></li>
+        <li><a href="#echil">Echilibrate, cu putere si accesorii</a></li>
+        <li><a href="#bosch">Premium, de la Bosch</a></li>
+        <li><a href="#putere">Cata putere iti trebuie, dupa ce coci</a></li>
+        <li><a href="#accesorii">Teluri, carlige si pasator: ce fac</a></li>
+        <li><a href="#vs-blender">Mixer de mana, blender vertical sau mixer cu bol</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Putere</th><th>Viteze</th><th>Accesorii</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.putere}</td>
+              <td>{x.viteze}</td>
+              <td>{x.extra}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Accesibile, pentru orice bucatarie</h2>
+    <p>Sub 130 de lei gasesti mixere care fac bine treaba de baza: frisca, spume, creme si aluaturi usoare. Au 250-400 W, ceva mai putin pentru cocile grele, dar mai mult decat suficient pentru copt ocazional. Difera intre ele prin putere, numarul de viteze si ce accesorii includ.</p>
+    {ACC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figAcc} alt="Mixere de mana accesibile, Heinner, Tefal si Philips" width="1600" height="900" loading="lazy" />
+
+    <h2 id="echil">Echilibrate, cu putere si accesorii</h2>
+    <p>Intre 130 si 190 de lei intri in zona cu cel mai bun raport pentru cine coace des: 450-600 W, care duc si aluaturi consistente, accesorii complete si adesea o cutie de depozitare. Aici stau si cel mai vandut mixer de brand, si cateva dintre cele mai bine notate din articol.</p>
+    {ECHIL.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figEchil} alt="Mixere de mana echilibrate, Philips Viva, KD Home si EvoSmart" width="1600" height="900" loading="lazy" />
+
+    <h2 id="bosch">Premium, de la Bosch</h2>
+    <p>Peste 280 de lei, gama Bosch domina segmentul premium din articol. Sunt mixere solide, cu teluri fine si carlige de framantare, iar unele includ un picior pasator, care le face doi in unu: mixer si blender vertical. Costa mai mult, dar aduc constructie durabila si versatilitate.</p>
+    {BOSCH.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figBosch} alt="Mixere de mana Bosch, cu pasator si picior din inox" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-mixere').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate mixerele de mana la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="putere">Cata putere iti trebuie, dupa ce coci</h2>
+    <p>E primul criteriu si cel mai usor de gresit, fie luand prea putin si chinuind motorul, fie platind pentru wati pe care nu ii folosesti. Reperul, dupa ce prepari des:</p>
+    <ul>
+      <li><strong>250-300 W</strong> pentru frisca, spuma de albus, creme si compozitii usoare de prajitura. Suficient pentru copt ocazional.</li>
+      <li><strong>400-500 W</strong> pentru aluaturi mai consistente, de checuri, cozonac sau fursecuri, unde un motor slab se poticneste.</li>
+      <li><strong>500-600 W</strong> pentru cine framanta des coci grele, de paine, si vrea o rezerva confortabila de putere.</li>
+    </ul>
+    <p>Un semn ca puterea e prea mica: motorul se incalzeste, incetineste vizibil in aluat si, la unele modele, se opreste singur ca sa se protejeze. Daca ti se intampla des, ai luat un mixer sub nevoile tale. Invers, daca faci doar frisca si spume, un mixer de 600 W nu iti aduce nimic in plus fata de unul de 300, doar costa mai mult.</p>
+
+    <h2 id="accesorii">Teluri, carlige si pasator: ce fac</h2>
+    <p>Accesoriile decid ce poti pregati, iar de obicei vin cateva in cutie. Merita sa stii care la ce e bun.</p>
+    <ul>
+      <li><strong>Teluri sau palete de amestecat.</strong> Incorporeaza aer si sunt pentru frisca, spuma de albus, creme si compozitii usoare. Sunt accesoriul folosit cel mai des.</li>
+      <li><strong>Carlige de framantare.</strong> In forma de spirala, nu bat, ci intind si pliaza aluatul. Absolut necesare pentru coci mai groase, de paine, pizza sau cozonac.</li>
+      <li><strong>Picior pasator.</strong> Un accesoriu de blender vertical, prezent la unele modele Bosch, cu care passezi supe si piureuri direct in oala. Transforma mixerul in doi aparate.</li>
+    </ul>
+    <p>Regula simpla: pune telurile la ce trebuie batut, carligele la ce trebuie framantat. Daca inversezi, fie nu bati frisca bine cu carligele, fie infunzi si fortezi motorul cu telurile intr-un aluat greu. Iar un buton de scoatere a accesoriilor, prezent la majoritatea, iti scuteste degetele cand le schimbi.</p>
+
+    <h2 id="vs-blender">Mixer de mana, blender vertical sau mixer cu bol</h2>
+    <p>Trei aparate care se confunda des, dar fac lucruri diferite. Alegerea gresita e cea mai frecventa cauza de nemultumire.</p>
+    <p>Un <strong>mixer de mana</strong> are teluri si incorporeaza aer: bate frisca, spume, aluat. Il tii in mana si il misti prin vas. E ieftin, usor si perfect pentru copt ocazional sau mediu.</p>
+    <p>Un <strong>blender vertical</strong>, sau de imersie, are o lama si passeaza: supe crema, piureuri, sosuri, direct in oala. Nu bate frisca ferma. E aparat separat, desi unele mixere Bosch il includ ca picior pasator.</p>
+    <p>Un <strong>mixer cu bol</strong>, planetar, sta pe stativ, are castron propriu si framanta singur, fara sa il tii. E mult mai puternic, dar scump, greu si voluminos, pentru cine coace des si mult. Pentru un gospodar obisnuit, un mixer de mana bun e mai practic si de ajuns.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Iei putin, dar framanti cozonac.</strong> Un mixer de 250-300 W se chinuie in aluatul greu. Pentru coci dese, alege de la 450 W in sus.</li>
+      <li><strong>Confunzi mixerul cu blenderul vertical.</strong> Mixerul bate si aereaza, blenderul passeaza. Daca vrei supe crema, ai nevoie de blender, nu de mixer, sau de un model cu pasator inclus.</li>
+      <li><strong>Folosesti accesoriul gresit.</strong> Teluri in aluat greu infunda si forteaza motorul; carlige la frisca nu o bat cum trebuie.</li>
+      <li><strong>Platesti putere degeaba.</strong> Daca faci doar frisca si spume, un mixer de 600 W nu iti aduce nimic peste unul de 300.</li>
+      <li><strong>Ignori de unde tii accesoriile.</strong> Fara o cutie, telurile si carligele mici se pierd prin sertare. Un model cu cutie de depozitare rezolva asta.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la mixerele de mana in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca aceleasi aparate apar listate de mai multe ori, in culori diferite, la acelasi pret.</p>
+    <p><strong>Le-am grupat dupa putere si dotari, nu dupa pret</strong>, pentru ca puterea, raportata la ce coci, si accesoriile sunt deciziile care conteaza. Am tinut in articol doar mixerele clasice, cu teluri, si am lasat deoparte blenderele verticale intrate la aceeasi cautare, pentru ca sunt alta categorie, cu alt scop.</p>
+    <p>Am comparat specificatiile reale din fise, puterea, numarul de viteze si accesoriile incluse, si am semnalat unde un model aduce ceva in plus, cum e piciorul pasator la Bosch, sau unde puterea e prea mica pentru aluaturi grele. Nu testam aparatele in laborator si nu pretindem asta. Ne bazam pe date reale, mii de pareri cumulate, specificatii de la producator si documentare, apoi le traducem in recomandari clare. Un mixer de mana se completeaza firesc cu <a href="/cele-mai-bune-multicookere/">un multicooker</a> pentru gatit si cu <a href="/cele-mai-bune-blendere/">un blender</a> pentru smoothie si supe crema.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 49 la 371 de lei, un interval mic, pentru ca mixerele de mana sunt printre cele mai accesibile electrocasnice.</p>
+    <p><strong>Sub 130 de lei</strong> stau mixerele accesibile, de la Hausberg si Heinner la Tefal si Philips, cu 250-400 W. Fac bine frisca, spume si aluaturi usoare, cu accesoriile de baza incluse.</p>
+    <p><strong>Intre 130 si 190 de lei</strong> e zona cu cel mai bun raport pentru cine coace des: Philips Viva, KD Home, EvoSmart si Latkon, cu 450-600 W, accesorii complete si adesea cutie de depozitare.</p>
+    <p><strong>Peste 280 de lei</strong> intri la gama Bosch, cu constructie durabila si, la unele modele, picior pasator care le face si blender vertical. Merita cand vrei un brand de referinta si versatilitate, nu doar un mixer simplu.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-mixere-de-mana" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-mixere-de-mana" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

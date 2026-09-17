@@ -1,0 +1,278 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['panouri-solare'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Fotovoltaice (curent) ---
+  { g: 'fotovoltaic', id: 'DHCYQDYBM', badge: 'Cel mai vandut kit',
+    specs: ['kit off-grid complet', 'invertor 3000W', 'independent de retea', 'nota 4.87 din 47 pareri'],
+    pros: ['Cel mai vandut kit fotovoltaic, 47 de pareri', 'Off-grid, functioneaza si la pana de curent', 'Vine ca sistem, cu invertor inclus', 'Nu depinde de reteaua nationala'],
+    cons: ['Pentru autonomie reala ai nevoie si de baterii', 'Cere montaj, cabluri si structura de fixare', 'Off-grid, nu injecteaza surplusul in retea'],
+    verdict: 'Cel mai vandut kit fotovoltaic din selectie si alegerea daca vrei o sursa de curent independenta, mai ales pentru pene de curent. Fiind off-grid, sistemul functioneaza pe cont propriu, spre deosebire de cele on-grid, care se opresc automat cand cade reteaua. Vine cu invertor de 3000W, care transforma curentul continuu de la panouri in curent alternativ, ca cel din priza. Cele 47 de pareri il fac cel mai testat din top. Pentru autonomie reala, adaugi baterii de stocare, uneori cumparate separat, si e nevoie de montaj, cabluri si structura de fixare. Il iei cand vrei un sistem solar independent, ca back-up la pene de curent sau pentru o casa fara racord.' },
+  { g: 'fotovoltaic', id: 'DKLCZDYBM', badge: 'Kit mic, pentru inceput',
+    specs: ['kit off-grid', 'invertor 1000W', 'sistem de intrare', 'nota 4.82'],
+    pros: ['Kit complet la un pret mai mic', 'Bun ca prim sistem sau pentru consumatori mici', 'Off-grid, independent', 'Nota buna, 4.82'],
+    cons: ['Putere de 1000W, doar pentru consumatori mici', 'Tot cere baterii si montaj', 'Nu acopera o casa intreaga'],
+    verdict: 'Alegerea daca vrei sa incepi cu un sistem solar mic, fara sa investesti mult de la inceput. Kitul de 1000W e potrivit pentru consumatori mici: cateva becuri, un frigider mic, incarcarea telefoanelor si a unui laptop, la o cabana, o rulota sau ca back-up de urgenta. Vine ca sistem off-grid complet si are o nota buna, 4.82. Fiind de 1000W, nu acopera o casa intreaga cu toate electrocasnicele, iar pentru autonomie tot ai nevoie de baterii si de montaj. Il iei cand vrei sa testezi energia solara pe un sistem mic, la o cabana sau ca rezerva, fara sa treci direct la un sistem mare si scump.' },
+  { g: 'fotovoltaic', id: 'DGG2D43BM', badge: 'Cel mai bine notat panou',
+    specs: ['panou 200W', 'monocristalin, eficient', 'pentru extindere sau kit propriu', 'nota 4.96'],
+    pros: ['Cea mai buna nota din top, 4.96', 'Monocristalin, cea mai eficienta tehnologie', '200W, echilibru bun pret-putere', 'Bun pentru a-ti face propriul sistem'],
+    cons: ['E doar panoul, fara invertor si baterii', 'Trebuie sa stii ce cumperi pe langa el'],
+    verdict: 'Cel mai bine notat produs din top, cu 4.96, si alegerea daca iti faci propriul sistem sau extinzi unul existent. Panoul de 200W e monocristalin, adica din siliciu de mare puritate, cea mai eficienta tehnologie de pe piata, cu randament de 15-20%. Cei 200W sunt un echilibru bun intre pret si putere, iar panoul se leaga usor la un invertor si baterii pe care le ai deja sau le cumperi separat. E doar panoul, deci trebuie sa stii ce iei pe langa el: invertor, controler, cabluri. Il iei cand vrei sa construiesti sau sa extinzi un sistem solar si cauti un panou eficient, bine notat, la un pret corect.' },
+  { g: 'fotovoltaic', id: 'DXL0TCYBM', badge: 'Panou de putere mare',
+    specs: ['panou 450W', 'monocristalin', 'putere mare, sisteme de casa', 'nota 4.94'],
+    pros: ['450W, putere mare per panou', 'Monocristalin, eficient', 'Mai putine panouri pentru aceeasi putere', 'Nota foarte buna, 4.94'],
+    cons: ['Panou mare, cere spatiu de montaj', 'Tot doar panoul, fara restul sistemului'],
+    verdict: 'Alegerea daca construiesti un sistem mai mare, de casa, si vrei putere multa per panou. Cu 450W, un singur panou produce cat doua de 200W, deci acoperi aceeasi putere cu mai putine panouri si mai putine conexiuni, exact ce cauti la un sistem de acoperis. E monocristalin, eficient, cu o nota de 4.94. Fiind de putere mare, panoul e si fizic mare, deci ai nevoie de spatiu de montaj pe acoperis sau in curte, si, ca la orice panou individual, trebuie sa il completezi cu invertor, structura si restul. Il iei cand dimensionezi un sistem de casa si vrei panouri puternice, ca sa reduci numarul lor.' },
+  { g: 'fotovoltaic', id: 'D9BNFLYBM', badge: 'Cel mai ieftin panou',
+    specs: ['panou 100W', 'monocristalin', 'compact', 'cel mai mic pret'],
+    pros: ['Cel mai mic pret la un panou din top', 'Monocristalin, eficient', 'Compact, usor de montat', 'Nota maxima, 4.96'],
+    cons: ['Doar 100W, pentru consumatori mici', 'Ai nevoie de mai multe pentru putere reala'],
+    verdict: 'Cel mai ieftin panou din selectie si un bun punct de intrare in energia solara. Cu 100W, e potrivit pentru consumatori mici sau ca prima piesa dintr-un sistem pe care il extinzi: incarcarea unei baterii, cateva becuri, un panou pentru o rulota sau o cabana. E monocristalin, deci eficient in ciuda pretului mic, si are nota maxima, 4.96, de la cumparatori. Fiind de doar 100W, pentru o putere reala ai nevoie de mai multe legate impreuna. Il iei cand vrei sa incepi ieftin, sa testezi sau sa alimentezi un consumator mic, si esti dispus sa adaugi panouri pe masura ce ai nevoie de mai multa energie.' },
+  // --- Portabile ---
+  { g: 'portabil', id: 'DHMXJ4YBM', badge: 'Portabil premium',
+    specs: ['panou pliabil 100W', 'brand Anker', 'pentru statii portabile', 'camping si urgente'],
+    pros: ['Anker, brand consacrat la incarcare', 'Pliabil, il duci usor in rucsac sau masina', 'Se leaga la statii portabile de curent', 'Nota maxima de la cumparatori'],
+    cons: ['Cel mai scump portabil din top', 'Necesita o statie sau baterie pentru stocare'],
+    verdict: 'Cel mai bun panou portabil din selectie, pentru camping, drumetii sau urgente. Anker e un brand consacrat la produse de incarcare, iar acest panou de 100W se plaza si il duci usor in rucsac sau in portbagaj, apoi il desfaci si il orientezi spre soare. Se leaga la o statie portabila de curent sau la o baterie, pe care le incarci pentru telefon, laptop, lumini sau un frigider mic la cort. Are nota maxima de la cumparatori. E cel mai scump portabil din top si, ca sa stochezi energia, ai nevoie si de o statie sau o baterie. Il iei cand mergi des in natura sau vrei o sursa de curent de urgenta, usor de transportat.' },
+  { g: 'portabil', id: 'DQ2F8ZMBM', badge: 'Portabil, putere buna',
+    specs: ['panou portabil 145W', 'monocristalin', 'mai multa putere', 'pentru incarcare'],
+    pros: ['145W, mai multa putere decat modelele mici', 'Monocristalin, eficient', 'Portabil, pentru camping si teren', 'Pret rezonabil pentru putere'],
+    cons: ['Mai mare si mai greu decat un panou de 45W', 'Numar mic de pareri'],
+    verdict: 'Alegerea daca vrei un panou portabil cu mai multa putere, fara sa treci la unul premium. Cu 145W, Breckner Germany incarca mai repede o baterie sau o statie decat modelele mici de 40-50W, util cand ai mai multe aparate de alimentat la cort sau pe teren. E monocristalin, eficient, si costa rezonabil pentru puterea oferita. Fiind mai puternic, e si ceva mai mare si mai greu decat un panou compact, iar numarul de pareri e mic, normal la aceasta categorie. Il iei cand vrei un portabil serios, pentru camping sau lucru pe teren, si ai nevoie de mai multa putere decat un panou mic de urgenta.' },
+  { g: 'portabil', id: 'DPW0P23BM', badge: 'Portabil compact',
+    specs: ['panou portabil 45W', 'brand Ecoflow', 'Type-C, rezistent la apa', 'compact'],
+    pros: ['Ecoflow, brand cunoscut la energie portabila', 'Compact si usor, incape oriunde', 'Iesire Type-C, incarci direct aparate', 'Rezistent la apa'],
+    cons: ['Doar 45W, pentru aparate mici', 'Nu incarca rapid o statie mare'],
+    verdict: 'Cel mai compact panou portabil din top, pentru cine vrea ceva mic, de dus mereu cu el. Ecoflow, un brand cunoscut la energie portabila, face acest panou de 45W cu iesire Type-C, deci incarci direct telefonul, o lanterna sau o baterie externa, fara alte accesorii. E rezistent la apa si suficient de mic sa incapa in rucsac. Fiind de doar 45W, e pentru aparate mici, nu pentru a incarca rapid o statie mare de curent. Il iei cand vrei un panou solar de buzunar, pentru drumetii, plaja sau urgente, si iti trebuie sa tii telefonul si cateva aparate mici incarcate, nu sa alimentezi o casa.' },
+  // --- Termic (apa calda) ---
+  { g: 'termic', id: 'D39FLN3BM', badge: 'Pentru apa calda',
+    specs: ['panou solar termic', 'presurizat, boiler 150L inox', 'apa calda tot anul', 'nu produce curent'],
+    pros: ['Face apa calda menajera, nu curent', 'Presurizat, apa calda la presiunea retelei', 'Boiler de 150L din inox, pentru o familie', 'Functioneaza tot anul, inclusiv iarna'],
+    cons: ['Doar pentru apa calda, nu alimenteaza aparate', 'Montaj pe acoperis, cu instalator'],
+    verdict: 'Singurul panou termic din selectie si o alegere buna daca vrei sa faci economie la apa calda, nu la curent. Atentie, e complet diferit de un panou fotovoltaic: nu produce electricitate, ci incalzeste direct apa cu ajutorul soarelui, pe care o folosesti la baie si in bucatarie. Fiind presurizat, iti da apa calda la presiunea retelei, cu debit constant, si are un boiler de 150L din inox, suficient pentru o familie. Functioneaza tot anul, inclusiv iarna, spre deosebire de modelele nepresurizate, care se golesc pe frig. Se monteaza pe acoperis, de un instalator. Il iei cand vrei sa reduci factura la apa calda menajera, nu sa produci curent.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const FOTOVOLTAIC = PICKS.filter(x => x.g === 'fotovoltaic');
+const PORTABIL = PICKS.filter(x => x.g === 'portabil');
+const TERMIC = PICKS.filter(x => x.g === 'termic');
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/panouri-solare.webp';
+const figFoto = '/imagini/articole/panouri-solare-fotovoltaic.webp';
+const figPortabil = '/imagini/articole/panouri-solare-portabil.webp';
+const figTermic = '/imagini/articole/panouri-solare-termic.webp';
+const published = '2026-07-18T08:22:51+03:00';
+
+const faq = [
+  { question: 'Care e diferenta dintre panoul fotovoltaic si cel termic?', answer: 'Panoul fotovoltaic transforma lumina soarelui in curent electric, pe care il folosesti pentru orice aparat din casa. Panoul termic incalzeste direct apa cu ajutorul soarelui, pentru baie si bucatarie, si nu produce deloc electricitate. Sunt doua produse complet diferite, pentru nevoi diferite: unul iti scade factura la curent, celalalt pe cea la apa calda. Alege dupa ce vrei sa economisesti.' },
+  { question: 'On-grid sau off-grid?', answer: 'Un sistem on-grid e legat la reteaua nationala si poate trimite surplusul de energie inapoi in retea, dar se opreste automat la pana de curent, din motive de siguranta. Unul off-grid e independent, cu baterii de stocare, si functioneaza si cand cade reteaua, deci e ideal ca back-up sau pentru o casa fara racord. Daca vrei siguranta la pene de curent sau esti departe de retea, off-grid; daca vrei sa reduci factura si sa vinzi surplusul, on-grid.' },
+  { question: 'Monocristalin sau policristalin?', answer: 'Panourile monocristaline sunt facute din siliciu de mare puritate, au cel mai bun randament, 15-20%, si sunt mai mici pentru aceeasi putere, deci ocupa mai putin loc. Cele policristaline sunt ceva mai ieftine, dar mai putin eficiente si mai mari. Astazi, aproape toti aleg monocristalin, pentru ca diferenta de pret s-a redus, iar eficienta mai mare inseamna mai multa energie de pe acelasi spatiu de acoperis. Toate panourile din aceasta selectie sunt monocristaline.' },
+  { question: 'Cate panouri imi trebuie pentru casa?', answer: 'Depinde de cat consumi si de puterea panourilor. Pentru un sistem de 5 kW, care acopera nevoile multor case, ai nevoie de circa 10 panouri de 500W sau 13 de 410W, care ocupa 25-30 mp de acoperis. Pentru 10 kW, numarul aproape se dubleaza. Un sistem complet costa in general 4500-7000 de lei per kW instalat, cu tot cu invertor, structura si montaj. Pentru dimensionarea exacta, pornesti de la consumul tau din facturi.' },
+  { question: 'Panou termic presurizat sau nepresurizat?', answer: 'Cel presurizat foloseste o pompa, iti da apa calda la presiunea retelei, cu debit constant, si merge tot anul, inclusiv iarna, deci e potrivit pentru o casa locuita permanent. Cel nepresurizat e mai ieftin si nu are pompa, dar da apa calda doar 6-8 luni pe an si trebuie golit pe ger, ca sa nu inghete si sa crape tevile, deci e mai bun pentru o casa de vacanta. Pentru locuit permanent, alege presurizat.' },
+  { question: 'Merita un panou solar portabil?', answer: 'Da, daca mergi des in natura sau vrei o sursa de curent de urgenta. Un panou portabil, pliabil, incarca o statie sau o baterie pe care apoi alimentezi telefonul, laptopul, lumini sau un frigider mic la camping ori in timpul unei pene de curent. Pentru telefon si aparate mici, un panou de 40-50W ajunge; pentru mai multe aparate sau incarcare rapida, alege 100-150W. Nu inlocuieste un sistem de casa, dar e util pe teren si in urgente.' },
+];
+
+const images = [hero, figFoto, figPortabil, figTermic, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
+---
+
+<Layout
+  title="Cele mai bune panouri solare in 2026: fotovoltaice, portabile si termice"
+  description="Ce panouri solare sa iti iei in 2026: kituri si panouri fotovoltaice pentru curent, panouri portabile pentru camping si panouri termice pentru apa calda, comparate cu pareri reale. Plus on-grid vs off-grid si cate panouri iti trebuie."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Radu Popescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Amenajari si Instalatii', url: '/amenajari-instalatii/' }, { name: 'Cele mai bune panouri solare' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/amenajari-instalatii/">Amenajari si Instalatii</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune panouri solare</span>
+    </nav>
+
+    <h1>Cele mai bune panouri solare in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/radu-popescu/">Radu Popescu</a>, Consultant Amenajari · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune panouri solare: fotovoltaice, portabile si termice" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru curent, cel mai bun punct de plecare este un <strong>kit fotovoltaic off-grid Solid Volt</strong>, iar daca iti faci sistemul, panourile <strong>Breckner</strong> monocristaline sunt cele mai bine notate. Pentru camping sau urgente, un panou portabil <strong>Anker</strong> se plaza si il duci oriunde. Iar pentru apa calda, un panou <strong>termic ECOBLIS</strong> face economie fara sa produca curent.</p>
+      <p>La panouri solare, prima intrebare nu e brandul, ci ce vrei sa faci cu ele: curent electric sau apa calda. Sunt doua produse complet diferite, iar in interiorul celor de curent mai e o alegere, intre sisteme fixe de casa si panouri portabile. Mai jos le-am impartit pe cele trei nevoi si iti explicam cum alegi corect.</p>
+      <p>Am pornit de la cele mai vandute panouri de pe eMAG, le-am verificat puterea, tipul de celule si utilizarea si le-am grupat pe fotovoltaice, portabile si termice. Ca back-up de curent, vezi <a href="/cele-mai-bune-generatoare-de-curent/">generatoarele de curent</a>, iar pentru economie la racire, <a href="/cele-mai-bune-aparate-de-aer-conditionat/">aparatele de aer conditionat eficiente</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#fel">Fotovoltaic sau termic: doua lucruri diferite</a></li>
+        <li><a href="#fotovoltaic">Kituri si panouri fotovoltaice</a></li>
+        <li><a href="#portabil">Panouri solare portabile</a></li>
+        <li><a href="#termic">Panouri solare termice (apa calda)</a></li>
+        <li><a href="#cum-alegi">Cum alegi un sistem fotovoltaic</a></li>
+        <li><a href="#cat-produce">Cat produce si cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="fel">Fotovoltaic sau termic: doua lucruri diferite</h2>
+    <p>E cea mai importanta lamurire, pentru ca multi le confunda. Sub numele de panou solar se ascund doua produse care nu au aproape nimic in comun:</p>
+    <ul>
+      <li><strong>Panoul fotovoltaic</strong> transforma lumina in curent electric, pe care il folosesti pentru orice aparat din casa. Astea sunt cele la care se gandeste lumea cand zice sistem solar.</li>
+      <li><strong>Panoul termic</strong> incalzeste direct apa cu soarele, pentru baie si bucatarie, si nu produce deloc electricitate. Scade factura la apa calda, nu la curent.</li>
+    </ul>
+    <p>Alege intai ce vrei: sa produci curent sau sa faci apa calda. Apoi, daca vrei curent, mai decizi intre un sistem fix de casa si un panou portabil. Mai jos le luam pe rand.</p>
+
+    <h2 id="fotovoltaic">Kituri si panouri fotovoltaice (pentru curent)</h2>
+    <p>Astea produc curent electric. Un kit vine gata gandit, cu invertor; un panou individual il legi la sistemul tau. Le-am aranjat de la kitul cel mai vandut la panourile de completat.</p>
+    <div class="rd-grid">
+      {FOTOVOLTAIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figFoto} alt="Kituri si panouri fotovoltaice: Solid Volt, Breckner si panou 450W" width="1200" height="675" loading="lazy" />
+
+    <h2 id="portabil">Panouri solare portabile (camping, urgente)</h2>
+    <p>Pliabile si usoare, se leaga la o statie sau o baterie si tin aparatele incarcate la camping ori intr-o pana de curent. Nu inlocuiesc un sistem de casa, dar sunt utile pe teren.</p>
+    <div class="rd-grid">
+      {PORTABIL.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPortabil} alt="Panouri solare portabile Anker si Breckner pentru camping" width="1200" height="675" loading="lazy" />
+
+    <h2 id="termic">Panouri solare termice (apa calda)</h2>
+    <p>Astea nu produc curent, ci incalzesc apa cu soarele. Sunt pentru cine vrea sa reduca factura la apa calda menajera, mai ales o casa locuita permanent.</p>
+    <div class="rd-grid">
+      {TERMIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figTermic} alt="Panou solar termic pentru apa calda si kit fotovoltaic mic" width="1200" height="675" loading="lazy" />
+
+    <h2 id="cum-alegi">Cum alegi un sistem fotovoltaic</h2>
+    <p>Daca mergi pe curent, cateva lucruri conteaza mai mult decat brandul.</p>
+
+    <h3>On-grid sau off-grid</h3>
+    <p>Un sistem on-grid e legat la retea si poate trimite surplusul inapoi, dar se opreste la pana de curent. Unul off-grid e independent, cu baterii, si merge si cand cade reteaua. Pentru back-up si case fara racord, off-grid; pentru reducerea facturii si vanzarea surplusului, on-grid.</p>
+
+    <h3>Tipul de celule</h3>
+    <p>Monocristalin inseamna cel mai bun randament, 15-20%, si panouri mai mici pentru aceeasi putere. E ce aleg aproape toti azi, pentru ca produce mai multa energie de pe acelasi spatiu. Toate panourile din selectie sunt monocristaline.</p>
+
+    <h3>Puterea si invertorul</h3>
+    <p>Panourile moderne au intre 100 si 550W. Pentru un sistem de casa, panourile de putere mare, 400-450W, cer mai putine bucati si conexiuni. Invertorul transforma curentul continuu de la panouri in curent alternativ, ca cel din priza, si trebuie dimensionat dupa puterea sistemului. Un kit vine deja cu invertorul potrivit; la panourile individuale, il alegi separat.</p>
+
+    <h2 id="cat-produce">Cat produce si cat costa</h2>
+    <p>Ca sa ai o idee de scara, un sistem fotovoltaic de casa se dimensioneaza in kilowati:</p>
+    <p>Un sistem de <strong>5 kW</strong>, care acopera nevoile multor case, cere circa 10 panouri de 500W sau 13 de 410W si ocupa 25-30 mp de acoperis. Pentru <strong>10 kW</strong>, numarul aproape se dubleaza. Pornesti de la consumul tau din facturi ca sa stii de cati kW ai nevoie.</p>
+    <p>Ca pret, un sistem complet costa in general <strong>4500-7000 de lei per kW instalat</strong>, cu tot cu panouri, invertor, structura de montaj, cabluri si manopera. Un kit mic off-grid, ca cele din top, porneste de la sub 1000 de lei, dar acopera doar consumatori mici. Un panou termic pentru apa calda e o investitie separata, care se amortizeaza din economia la incalzirea apei. Cheia e sa pornesti de la nevoia ta reala: daca vrei curent, calculezi consumul si mergi pe fotovoltaic; daca te doare factura la apa calda, un panou termic se plateste singur mai repede, iar cele doua se pot pune si impreuna pe aceeasi casa.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-panouri-solare')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate panourile solare la oferta</strong>
+        <span>Reducerile din acest moment la panouri fotovoltaice si termice, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">RP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/radu-popescu/" class="author-name-link">Radu Popescu</a></p>
+        <p class="author-role">Consultant Amenajari</p>
+        <p class="author-bio">Radu are peste 9 ani in amenajari si dotari pentru casa, de la usi si cabine de dus la panouri solare si generatoare, si explica pe intelesul tuturor ce conteaza la montaj, materiale si eficienta.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-panouri-solare" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-panouri-solare" currentCategory="amenajari-instalatii" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

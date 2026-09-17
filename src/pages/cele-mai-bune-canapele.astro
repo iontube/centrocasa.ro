@@ -1,0 +1,314 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['canapele'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  { id: 'D1R3KDYBM', badge: 'Cel mai bun coltar',
+    specs: ['coltar extensibil', '260 x 140 cm', 'lada de depozitare', 'suprafata dormit 210 x 140'],
+    pros: ['Cel mai apreciat coltar din top, 4.81 din 147 de pareri', 'Lada mare de depozitare sub sezut', 'Arcuri elicoidale si poliuretan, sezut ferm', 'Se face pat de 210 x 140 cm, cat un matrimonial'],
+    cons: ['Are nevoie de un living spatios, are 260 cm', 'Se livreaza in colete, cere asamblare'],
+    verdict: 'Cel mai bine notat coltar din selectie si prima recomandare daca ai loc pentru el. Are 260 cm, lada mare de depozitare sub sezut pentru asternuturi si un mecanism de extensie care il transforma intr-un pat de 210 x 140 cm, adica aproape cat un matrimonial. Sezutul e ferm, pe arcuri elicoidale si poliuretan, deci nu se lasa dupa cateva luni. Stofa e placuta si usor de intretinut. Cele 147 de pareri, cu nota 4.81, confirma ca oamenii sunt multumiti pe termen lung. Il iei daca ai un living generos si vrei un coltar care serveste si de pat pentru oaspeti.' },
+  { id: 'DKKZLPYBM', badge: 'Cea mai bine notata',
+    specs: ['canapea extensibila', '210 x 93 cm', 'lada de depozitare', 'stofa'],
+    pros: ['Cea mai mare nota din tot topul, 4.98', 'Extensibila, cu lada de depozitare', 'Stofa placuta, sezut confortabil', '210 cm, echilibru bun intre spatiu si confort'],
+    cons: ['E canapea dreapta, nu coltar', 'Numar mai mic de pareri, 80'],
+    verdict: 'Canapeaua cu cea mai buna nota din tot topul, 4.98, si alegerea daca vrei o extensibila dreapta, fara coltar. Are 210 cm, se face pat si ascunde o lada de depozitare pentru asternuturi. Stofa e moale si sezutul confortabil, iar oamenii care au cumparat-o sunt aproape unanim multumiti. Nefiind coltar, incape si intr-un living mediu, unde un coltar de 260 cm ar fi prea mult. Are un numar mai mic de pareri decat Bonito, dar toate foarte bune. O alegi pentru un living de dimensiuni normale, cand vrei o canapea extensibila frumoasa si bine facuta.' },
+  { id: 'D97JKYMBM', badge: 'Cel mai bun raport',
+    specs: ['canapea extensibila', '195 x 98 cm', 'culoare gri', 'compacta'],
+    pros: ['Extensibila la sub 1500 de lei', 'Compacta, 195 cm, intra in living mic', 'Nota buna, 4.59 din 113 pareri', 'Gri neutru, se asorteaza usor'],
+    cons: ['Doar canapea dreapta, fara coltar', 'Lada de depozitare mai mica'],
+    verdict: 'Echilibrul cel mai convenabil dintre pret si dotari, si alegerea pentru un living mic sau mediu. La sub 1500 de lei ai o canapea extensibila de la un brand cunoscut, compacta la 195 cm, deci incape si acolo unde spatiul e strans. Culoarea gri e neutra si se potriveste cu orice amenajare. Nota de 4.59 din 113 pareri e solida pentru acest segment de pret. Nu e coltar si lada de depozitare e mai mica, dar pentru ce costa acopera exact nevoile unei case obisnuite. O iei cand vrei o extensibila buna, la un pret corect, fara sa platesti pentru un coltar mare.' },
+  { id: 'DRJYM0MBM', badge: 'Cea mai ieftina de 3 locuri',
+    specs: ['canapea fixa 3 locuri', '215 x 80 cm', 'culoare maro', 'fara extensie'],
+    pros: ['Pret mic pentru o canapea de 3 locuri', '215 cm, incap trei persoane', 'Design clasic, maro cald', 'Peste 110 pareri'],
+    cons: ['Nu e extensibila, nu se face pat', 'Fara lada de depozitare', 'Nota medie, 4.22'],
+    verdict: 'Cu pretul cel mai mic pentru o canapea de trei locuri intr-un living, daca nu ai nevoie sa se transforme in pat. Are 215 cm, incap trei persoane comod, si un design clasic in maro cald care merge in aproape orice camera. Fiind fixa, nu are mecanism de extensie si nici lada de depozitare, deci e pur si simplu o canapea de stat, nu una de dormit. Nota de 4.22 e medie, la nivelul pretului. O alegi cand vrei o canapea simpla si ieftina pentru living, iar functia de pat sau depozitarea nu conteaza pentru tine.' },
+  { id: 'D18FG5MBM', badge: 'Premium, cu tetiere reglabile',
+    specs: ['coltar extensibil premium', 'tetiere reglabile', 'lada de depozitare', '245 cm'],
+    pros: ['Tetiere reglabile pentru sprijinul cefei', 'Nota foarte buna, 4.84', 'Lada de depozitare plus suprafata de dormit', 'Finisaj si stofa de calitate'],
+    cons: ['Cel mai scump din top, peste 3200 de lei', 'Are nevoie de un living mare'],
+    verdict: 'In zona premium, pentru cine vrea un coltar de top si are bugetul pentru el. Fata de Bonito, Paloma adauga tetiere reglabile, care sustin ceafa cand stai lasat pe spate, plus un finisaj si o stofa de calitate mai buna. Are lada de depozitare si se face pat, ca un coltar complet. Nota de 4.84 din peste 100 de pareri il aseaza printre cele mai apreciate. E cel mai scump din top, peste 3200 de lei, si cere un living mare ca sa il pui in valoare. Il iei daca vrei confort maxim, tetiere reglabile si esti dispus sa platesti pentru un coltar de calitate.' },
+  { id: 'DJ1GRKBBM', badge: 'Coltar reversibil',
+    specs: ['coltar extensibil reversibil', '245 x 145 cm', 'montaj stanga sau dreapta', 'textil'],
+    pros: ['Coltul se monteaza pe stanga SAU pe dreapta, dupa camera', 'Extensibil, cu suprafata de dormit', '245 cm, coltar generos', 'Peste 120 de pareri'],
+    cons: ['Nota medie, 4.21', 'Textil mai simplu decat stofa Laguna', 'Cere atentie la orientare cand il montezi'],
+    verdict: 'Coltarul de ales daca nu esti sigur pe ce parte iti trebuie coltul sau te-ai putea muta. Fiind reversibil, il montezi cu sezlongul pe stanga sau pe dreapta, cum iti cere camera, ca sa nu blochezi o usa sau o fereastra. Are 245 cm, e extensibil si ofera o suprafata buna de dormit. Materialul textil e mai simplu decat stofa de pe modelele Laguna, iar nota de 4.21 e medie, dar pretul e mai bun pentru un coltar de dimensiunea asta. Il iei cand vrei flexibilitate la amenajare si un coltar generos, fara sa platesti cat pe un Laguna.' },
+  { id: 'DYMSLFBBM', badge: 'Cea mai ieftina extensibila',
+    specs: ['click-clack extensibila', 'lada de depozitare', 'husa din bumbac', 'compacta'],
+    pros: ['Cel mai mic pret pentru o extensibila cu lada', 'Mecanism click-clack simplu de folosit', 'Lada pentru asternuturi', 'Husa din bumbac'],
+    cons: ['Nota mica, 3.83, calitate pe masura pretului', 'Click-clack bun mai ales pentru uz ocazional', 'Salteaua e subtire, nu pentru dormit zilnic pe termen lung'],
+    verdict: 'La cel mai mic pret ai o canapea care se face pat si are si depozitare, cu compromisurile de asteptat la acest pret. Mecanismul click-clack e simplu: ridici sezutul pana auzi un clic, apoi il lasi jos si devine pat, iar dedesubt e o lada pentru asternuturi. Husa e din bumbac. Nota de 3.83 e cea mai mica din top, iar oamenii reclama mai ales confortul la dormit pe termen lung: salteaua e subtire, deci e potrivita pentru oaspeti ocazionali, nu pentru cineva care doarme pe ea in fiecare noapte. O iei strict daca ai buget mic si vrei o extensibila pentru folosit din cand in cand.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const site = 'https://centrocasa.ro';
+const hero = '/imagini/articole/canapele.webp';
+const figBuget = '/imagini/articole/canapele-buget.webp';
+const figTip = '/imagini/articole/canapele-tip.webp';
+const figPremium = '/imagini/articole/canapele-premium.webp';
+const published = '2026-07-17T16:10:00+03:00';
+
+const faq = [
+  { question: 'Canapea sau coltar, ce sa aleg?', answer: 'Depinde de cat loc ai si de cate persoane stau de obicei. O canapea dreapta de 2 sau 3 locuri incape intr-un living mic sau mediu si e mai usor de mutat. Un coltar cere un living mai mare, dar ofera mai multe locuri, mai mult confort si de obicei o lada de depozitare mai mare. Daca ai spatiu si familie, coltarul e mai practic; pentru o garsoniera sau un living mic, o canapea dreapta e alegerea corecta.' },
+  { question: 'Ce mecanism de extensie e cel mai bun?', answer: 'Pentru uz zilnic, mecanismele cu sertar sau tip acordeon sunt cele mai bune, pentru ca scot o saltea mai groasa si rezista mai bine la deschideri dese. Click-clack, unde ridici si lasi sezutul jos, e rapid si simplu, dar mai potrivit pentru uz ocazional. Daca cineva doarme pe canapea in fiecare noapte, cauta un mecanism robust si o saltea de densitate mare, nu doar cel mai mic pret.' },
+  { question: 'Ce inseamna coltar reversibil?', answer: 'Un coltar reversibil se poate monta cu coltul, adica partea lunga pentru relaxare, pe stanga sau pe dreapta, cum iti cere camera. Asa nu blochezi o usa sau o fereastra si poti schimba orientarea daca muti mobila sau te muti. Coltarele care nu sunt reversibile vin fixe, pe stanga sau pe dreapta, si trebuie sa alegi corect din start, dupa cum arata camera.' },
+  { question: 'Ce material de tapiterie sa aleg?', answer: 'Stofa e placuta la atingere, se curata usor si arata bine mult timp, dar cere aspirat regulat. Pielea ecologica se sterge cel mai usor, nu se pateaza si nu se decoloreaza la soare, buna daca ai copii sau animale. Catifeaua sau materialul plusat sunt cele mai moi si camufleaza urmele, dar se curata cu grija. Pentru o casa cu trafic mare, pielea ecologica sau o stofa deasa sunt cele mai practice.' },
+  { question: 'Merita o canapea cu lada de depozitare?', answer: 'Da, mai ales intr-un apartament mic. Lada de sub sezut tine asternuturi, perne si paturi fara sa ocupe dulapuri, iar la o canapea extensibila e locul firesc pentru lenjeria de pat. La coltare, lada e de obicei mai mare decat la canapelele drepte. Daca ai deja depozitare din belsug, nu e obligatorie, dar in cele mai multe case ajuta.' },
+  { question: 'Cat costa o canapea buna?', answer: 'O canapea extensibila decenta incepe pe la 950-1100 de lei, pentru modele compacte cu mecanism simplu. Zona cu cel mai bun raport e 1400-2200 de lei, unde gasesti extensibile bune si coltare de la branduri cunoscute, cu lada de depozitare. Peste 2800-3200 de lei intri in coltarele premium, cu tetiere reglabile si finisaje mai bune. Sub 900 de lei sunt mai ales modele de uz ocazional.' },
+];
+
+const images = [hero, figBuget, figTip, figPremium, ...PICKS.map(x => x.p.image)];
+const money = (n) => n.toLocaleString('ro-RO');
+const b64 = (s) => Buffer.from(s).toString('base64');
+const shortName = (n) => n.replace(/’/g, "'").replace(/^(Canapea|Coltar) (extensibila|extensibil|fixa)?\s*/i, '').split(',')[0];
+---
+
+<Layout
+  title="Cele mai bune canapele in 2026: 7 modele comparate (extensibile, coltare, cu lada)"
+  description="Ce canapea sa iti iei in 2026: 7 canapele si coltare comparate pe forma, mecanism de extensie, material si pareri reale, de la Best Sleep ieftina la Laguna premium. Plus canapea sau coltar si cat costa."
+  image={hero}
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Ioana Stan"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobila si Dormitor', url: '/mobila-dormitor/' }, { name: 'Cele mai bune canapele' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobila-dormitor/">Mobila si Dormitor</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune canapele</span>
+    </nav>
+
+    <h1>Cele mai bune canapele in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/ioana-stan/">Ioana Stan</a>, Consultant Amenajari Dormitor · actualizat iulie 2026</p>
+
+    <img class="rd-hero" src={hero} alt="Cele mai bune canapele: coltare si canapele extensibile Laguna, KringX si Best Sleep" width="1200" height="675" fetchpriority="high" />
+
+    <div class="rd-intro">
+      <p>Pentru un living cu loc destul, cel mai bun coltar din acest moment este <strong>Laguna Bonito</strong>: extensibil, cu lada de depozitare si o suprafata de dormit cat un pat matrimonial. Daca ai un living mai mic, <strong>KringX Drammen</strong> iti da o extensibila buna sub 1500 de lei. Daca vrei cel mai putin cheltuit, <strong>Best Sleep</strong> costa sub 950 de lei, iar pentru confort premium, <strong>Laguna Paloma</strong> are tetiere reglabile.</p>
+      <p>Prima intrebare la o canapea nu e brandul, ci forma: canapea dreapta sau coltar, fixa sau extensibila. De asta depinde cat loc ocupa, cate persoane incap si daca se face pat. Mai jos ai intai cum alegi forma, apoi 7 canapele si coltare comparate pe mecanism, material si parerile reale ale cumparatorilor.</p>
+      <p>Am pornit de la cele mai vandute canapele de pe eMAG, le-am verificat constructia, de la mecanismul de extensie la dimensiuni si material, si le-am asezat dupa spatiul si bugetul pentru care se potrivesc. Pentru restul livingului, vezi <a href="/cele-mai-bune-piese-de-mobila-pentru-living/">piesele de mobila pentru living</a> si <a href="/covor-modern-pentru-living/">covoarele moderne</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#pe-scurt">Care canapea pentru cine</a></li>
+        <li><a href="#forma">Canapea sau coltar, fixa sau extensibila</a></li>
+        <li><a href="#produse">Cele 7 canapele pe larg</a></li>
+        <li><a href="#cum-alegi">Cum alegi o canapea</a></li>
+        <li><a href="#mecanism">Mecanismul de extensie si uzul zilnic</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cat-costa">Cat costa o canapea buna</a></li>
+        <li><a href="#intretinere">Cum ai grija de canapea</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="pe-scurt">Pe scurt: care canapea pentru cine</h2>
+    <p>Daca esti grabit, tabelul rezuma forma, dimensiunile si pretul fiecarui model. Preturile si numarul de pareri sunt luate direct de pe eMAG si se pot schimba.</p>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Tip</th><th>Cea mai buna la</th><th>Pret</th><th>Pareri</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td>{shortName(x.p.name)}</td>
+              <td>{x.specs[0]}</td>
+              <td>{x.badge}</td>
+              <td>{money(x.p.price)} lei</td>
+              <td>{x.p.rating ? `${x.p.rating.toFixed(2)} (${x.p.reviews})` : '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="forma">Canapea sau coltar, fixa sau extensibila</h2>
+    <p>Forma e prima decizie si tine de cat loc ai si cum folosesti canapeaua. Sunt doua intrebari simple.</p>
+
+    <h3>Canapea dreapta sau coltar</h3>
+    <p>O canapea dreapta de 2 sau 3 locuri, intre 150 si 220 cm, incape intr-un living mic sau mediu si e usor de mutat. Un coltar, de la 240 cm in sus, cere un living mai mare, dar ofera mai multe locuri, o zona de relaxare si de obicei o lada de depozitare mai mare. Regula simpla: sub 15-18 mp de living, mergi pe canapea dreapta; peste, un coltar se pune in valoare.</p>
+
+    <h3>Fixa sau extensibila</h3>
+    <p>O canapea fixa e doar de stat si costa mai putin. Una extensibila se transforma in pat, utila daca dormi ocazional pe ea sau primesti oaspeti peste noapte. Aproape toate modelele bune de azi sunt extensibile si au si lada de depozitare, iar diferenta de pret fata de una fixa e mica. Ia fixa doar daca sigur nu vei folosi functia de pat.</p>
+
+    <img class="rd-fig" src={figTip} alt="Canapea dreapta sau coltar: cum alegi dupa spatiul din living" width="1200" height="675" loading="lazy" />
+
+    <h2 id="produse">Cele 7 canapele pe larg</h2>
+    <p>Le-am aranjat de la coltarele cele mai apreciate la modelele accesibile. Fiecare card are pretul, nota si numarul de pareri direct de pe eMAG, plus dimensiunile si punctele tari si slabe.</p>
+    <div class="rd-grid">
+      {PICKS.map(x => (
+        <ProductCard
+          name={x.p.name.replace(/’/g, "'")}
+          image={x.p.image}
+          price={x.p.price}
+          rating={x.p.rating}
+          reviews={x.p.reviews}
+          badge={x.badge}
+          specs={x.specs}
+          pros={x.pros}
+          cons={x.cons}
+          verdict={x.verdict}
+          outKey={'p-' + x.id}
+        />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Canapele bune sub 1500 de lei: Best Sleep, Modella Star si KringX" width="1200" height="675" loading="lazy" />
+
+    <h2 id="cum-alegi">Cum alegi o canapea</h2>
+    <p>Dupa ce ai stabilit forma, restul deciziei se rezuma la cateva lucruri concrete.</p>
+
+    <h3>Materialul tapiteriei</h3>
+    <p>Stofa e placuta la atingere, arata bine mult timp si se curata usor, dar cere aspirat regulat. Pielea ecologica se sterge cel mai usor si nu se pateaza, buna daca ai copii sau animale. Catifeaua si materialul plusat sunt cele mai moi si camufleaza urmele, dar cer curatare cu grija. Pentru trafic mare, pielea ecologica sau o stofa deasa sunt cele mai practice.</p>
+
+    <h3>Salteaua si suprafata de dormit</h3>
+    <p>Daca vei dormi pe canapea, conteaza cat de mare si de groasa e salteaua ascunsa. Un coltar ca Bonito scoate o suprafata de 210 x 140 cm, cat un matrimonial, iar salteaua pe spuma densa sustine spatele. La modelele ieftine, salteaua e subtire si buna doar pentru oaspeti ocazionali, nu pentru somn zilnic.</p>
+
+    <h3>Lada de depozitare</h3>
+    <p>Lada de sub sezut tine asternuturi, perne si paturi fara sa ocupe dulapuri. La coltare e de obicei mai mare decat la canapelele drepte. Intr-un apartament mic, e un plus real; verifica sa fie prezenta, pentru ca nu toate modelele o au.</p>
+
+    <h3>Constructia si sezutul</h3>
+    <p>Un sezut ferm, pe arcuri si poliuretan de densitate mare, isi pastreaza forma ani buni; unul din burete moale se lasa repede. Cauta scheletul pe structura solida, nu doar detalii de aspect. Numarul de pareri conteaza: un model cu peste 100 de pareri bune s-a dovedit deja in timp.</p>
+
+    <img class="rd-fig" src={figPremium} alt="Cele mai apreciate canapele Laguna: Morelia, Paloma si Bonito" width="1200" height="675" loading="lazy" />
+
+    <h2 id="mecanism">Mecanismul de extensie si uzul zilnic</h2>
+    <p>Daca cineva doarme pe canapea des, mecanismul conteaza la fel de mult ca stofa. Sunt cateva tipuri, cu utilizari diferite.</p>
+    <ul>
+      <li><strong>Click-clack:</strong> ridici sezutul pana auzi un clic, apoi il lasi jos si devine pat. E rapid si ieftin, cu lada dedesubt, dar mai potrivit pentru uz ocazional.</li>
+      <li><strong>Sertar (extensibil clasic):</strong> tragi partea din fata spre tine si iese o saltea pliata in trei. E cel mai comod pentru uz zilnic si aproape mereu are lada de depozitare.</li>
+      <li><strong>Acordeon:</strong> salteaua se desface ca un acordeon si da o suprafata uniforma, buna pentru somn regulat.</li>
+    </ul>
+    <p>Pentru dormit in fiecare noapte, cauta un mecanism cu sertar sau acordeon si o saltea de densitate mare, nu cel mai mic pret. Click-clack e suficient daca folosesti patul din cand in cand, pentru oaspeti.</p>
+
+    <h2 id="greseli">Greseli frecvente cand cumperi o canapea</h2>
+    <p>Cateva capcane in care cad multi cumparatori:</p>
+    <ul>
+      <li><strong>Iei un coltar prea mare pentru living.</strong> Un coltar de 260 cm intr-o camera de 12 mp blocheaza circulatia. Masoara locul inainte, mai ales pe latura cu coltul.</li>
+      <li><strong>Cumperi o extensibila ieftina pentru dormit zilnic.</strong> Salteaua subtire si mecanismul slab cedeaza repede la folosire zilnica. Pentru somn regulat, investeste in mecanism si saltea.</li>
+      <li><strong>Nu verifici orientarea coltarului.</strong> Un coltar fix pe partea gresita blocheaza o usa sau o fereastra. Daca nu esti sigur, ia unul reversibil.</li>
+      <li><strong>Alegi materialul dupa aspect, nu dupa trai.</strong> Cu copii sau animale, catifeaua deschisa la culoare se pateaza; pielea ecologica sau stofa deasa se curata mult mai usor.</li>
+      <li><strong>Ignori lada de depozitare.</strong> Intr-un apartament mic, o canapea fara lada inseamna asternuturi prin dulapuri. Verifica daca o are.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa o canapea buna</h2>
+    <p>Pragurile arata cam asa in 2026:</p>
+    <p><strong>900 - 1200 de lei</strong> sunt canapelele compacte, extensibile cu mecanism simplu, ca Best Sleep sau Modella Star. Bune pentru un living mic sau pentru uz ocazional.</p>
+    <p><strong>1400 - 2200 de lei</strong> aduc extensibile bune si coltare de la branduri cunoscute, cu lada de depozitare, ca KringX Drammen, Laguna Morelia sau Modella Rileft. Aici e cel mai bun raport pentru majoritatea caselor.</p>
+    <p><strong>2200 - 3200 de lei</strong> sunt coltarele mari, cu suprafata de dormit generoasa si lada mare, ca Laguna Bonito. Platesti pentru spatiu si constructie mai buna.</p>
+    <p><strong>Peste 3200 de lei</strong> intri in coltarele premium, cu tetiere reglabile si finisaje superioare, ca Laguna Paloma. Confort maxim, pentru un living mare.</p>
+
+    <h2 id="intretinere">Cum ai grija de canapea</h2>
+    <p>O canapea ingrijita arata bine ani buni; una neglijata se pateaza si se lasa. Rutina difera dupa material.</p>
+    <ul>
+      <li><strong>Stofa si catifea:</strong> aspira saptamanal cu peria moale si curata petele cat sunt proaspete, cu apa si sapun fara culoare. La catifea, nu freca prea insistent in acelasi loc.</li>
+      <li><strong>Piele ecologica:</strong> sterge cu o laveta moale si solutie bland, iar din cand in cand hidrateaza materialul cu o crema dedicata, ca sa nu craape.</li>
+      <li><strong>Toate:</strong> intoarce si scutura pernele periodic, ca sa se uzeze uniform, si nu lasa canapeaua in soare direct, care decoloreaza tesatura.</li>
+    </ul>
+    <p>La modelele extensibile, deschide si inchide mecanismul cu grija, fara sa fortezi, si aeriseste salteaua ascunsa din cand in cand, ca sa nu prinda umezeala. O canapea extensibila e si pat de oaspeti; pentru somn zilnic, vezi <a href="/cele-mai-bune-saltele/">cele mai bune saltele</a>.</p>
+
+    <div class="rd-offers" data-o={b64('oferte-canapele')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate canapelele la oferta</strong>
+        <span>Reducerile din acest moment la canapele si coltare, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">IS</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/ioana-stan/" class="author-name-link">Ioana Stan</a></p>
+        <p class="author-role">Consultant Amenajari Dormitor</p>
+        <p class="author-bio">Ioana ajuta de peste 7 ani oameni sa isi aleaga mobila si tapiterie potrivita pentru casa lor, cu focus pe confort, materiale si durabilitate.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-canapele" currentCategory="mobila-dormitor" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-canapele" currentCategory="mobila-dormitor" articles={relatedArticles} />
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

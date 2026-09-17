@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { categories } from '../lib/categories.mjs';
+---
+
+<Layout
+  title="Despre noi - CentroCasa"
+  description="Despre CentroCasa: te ajutam sa alegi cele mai bune produse pentru casa si gradina, cu recomandari cinstite, pe date reale si pe experienta a mii de cumparatori. Afla cine suntem, ce gasesti pe site si cum lucram."
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Despre noi' }]}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <span>Despre noi</span>
+    </nav>
+
+    <h1>Despre CentroCasa</h1>
+    <p class="rd-byline">Recomandari cinstite pentru casa si gradina ta</p>
+
+    <div class="rd-intro">
+      <p>CentroCasa te ajuta sa iei decizii bune cand cumperi pentru casa si gradina, fara sa pierzi ore intregi citind specificatii sau pareri contradictorii. Adunam ce conteaza cu adevarat, <strong>produse verificate, recenzii reale si sfaturi clare</strong>, si iti spunem pe scurt ce sa alegi si de ce.</p>
+    </div>
+
+    <h2>Ce facem</h2>
+    <p>Ne place sa credem ca facem munca de documentare in locul tau. Pentru fiecare nevoie, de la o masina de spalat sau un frigider, pana la un balansoar de gradina sau o aplica de perete, comparam cele mai bune produse din magazine, le grupam pe nevoi reale, capacitate, dimensiune, buget, si scriem verdicte oneste, cu avantaje si dezavantaje.</p>
+    <p>Nu vindem nimic direct si nu tinem partea niciunui brand. Scopul nostru e simplu: sa pleci de aici stiind exact ce produs ti se potriveste, ca sa nu regreti cumparatura.</p>
+
+    <h2>Ce gasesti pe site</h2>
+    <p>Articolele noastre acopera tot ce tine de o casa si o curte bine puse la punct, impartite pe categorii:</p>
+    <ul>
+      {categories.map(cat => (
+        <li><a href={`/${cat.slug}/`}>{cat.name}</a></li>
+      ))}
+    </ul>
+    <p>In fiecare gasesti recomandari comparate, ghiduri de alegere si raspunsuri la intrebarile frecvente, tot ce iti trebuie ca sa alegi in cunostinta de cauza.</p>
+
+    <h2>Cum lucram</h2>
+    <p>Recomandarile noastre se bazeaza pe date reale: produse in stoc, mii de recenzii de la cumparatori adevarati, specificatii oficiale si research independent, nu pe pareri aruncate la intamplare. Suntem transparenti si cu ce nu facem, si cu felul in care ne finantam. Am explicat totul in detaliu in pagina <a href="/cum-testam/">Cum testam si recomandam produsele</a>.</p>
+
+    <h2>Cine scrie</h2>
+    <p>In spatele articolelor sunt <a href="/autori/">autori specializati pe categorii</a>, de la electrocasnice si gradinarit, pana la design interior si curatenie. Fiecare aduce experienta lui in zona pe care scrie, ca recomandarile sa fie practice si de incredere.</p>
+
+    <h2>Ia legatura cu noi</h2>
+    <p>Ai o intrebare, o sugestie sau ai gasit o informatie care nu mai e de actualitate? Ne-ar placea sa auzim de la tine, <a href="/contact/">scrie-ne oricand</a>. Feedbackul cititorilor ne ajuta sa fim mai buni.</p>
+  </article>
+</Layout>
+
+<style>
+  .rd { max-width: 800px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.4rem; margin: 2rem 0 .8rem; }
+  .rd p { line-height: 1.7; margin: 0 0 1rem; }
+  .rd a { color: var(--color-primary-700, #15803d); font-weight: 600; text-decoration: underline; }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .6rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  @media (max-width: 640px) { .rd { padding-left: .7rem; padding-right: .7rem; } .rd h1 { font-size: 1.6rem; } }
+</style>

@@ -167,6 +167,25 @@ function generateCategorySitemap() {
   console.log(`Created: category-sitemap.xml (${categories.length} categories)`);
 }
 
+// Pagini statice institutionale
+function generatePageSitemap() {
+  const pages = ['', 'despre', 'cum-testam', 'autori', 'contact', 'privacy-policy', 'terms', 'cookies'];
+  let urlEntries = '';
+  for (const slug of pages) {
+    urlEntries += `
+	<url>
+		<loc>${SITE_URL}/${slug ? slug + '/' : ''}</loc>
+		<lastmod>${now}</lastmod>
+	</url>`;
+  }
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urlEntries}
+</urlset>`;
+  fs.writeFileSync(path.join(DIST_DIR, 'page-sitemap.xml'), xml);
+  console.log(`Created: page-sitemap.xml (${pages.length} pages)`);
+}
+
 // Generate sitemap index
 function generateSitemapIndex(postFilenames) {
   const articles = getArticles();
@@ -185,6 +204,10 @@ function generateSitemapIndex(postFilenames) {
   sitemapEntries += `
 	<sitemap>
 		<loc>${SITE_URL}/category-sitemap.xml</loc>
+		<lastmod>${latestDate}</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>${SITE_URL}/page-sitemap.xml</loc>
 		<lastmod>${latestDate}</lastmod>
 	</sitemap>`;
 
@@ -271,6 +294,7 @@ function main() {
 
   const postFilenames = generatePostSitemaps();
   generateCategorySitemap();
+  generatePageSitemap();
   generateSitemapIndex(postFilenames);
   generateSitemapXsl();
 

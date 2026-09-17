@@ -1,0 +1,302 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['cuptoare-elec-inco'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. Accesibile, sub 1300 ---
+  { g: 'acc', id: 'DPLMZMYBM', rol: 'Cel mai ieftin', short: 'Arctic 71 l', cap: '71 l', cur: 'Manuala', ctrl: 'Butoane', pret: '950 lei',
+    specs: ['71 litri, clasa A, latime 60 cm', 'grill, low grill si gatire cu aer cald', 'curatare manuala, fara sistem dedicat', 'nota 4.89 pe 47 de pareri'],
+    pros: ['Cel mai mic pret din articol, sub 950 de lei', 'Volum mare, 71 de litri', 'Gatire cu aer cald pentru coacere uniforma', 'Nota 4.89, cea mai mare din articol'],
+    cons: ['Fara sistem de autocuratare dedicat', 'Doar 47 de pareri'],
+    verdict: 'Arctic ARVIE1110XD e cea mai ieftina cale spre un cuptor incorporabil de la un brand cu service in tara, sub 950 de lei. Are 71 de litri, mult peste media de 65, deci incap doua tavi, si o functie de gatire cu aer cald care coace mai uniform decat un cuptor pur static. Nota 4.89 pe 47 de pareri e cea mai mare din articol, semn ca la pretul asta multumeste. Compromisul e ca nu are un sistem de autocuratare dedicat, deci peretii se sterg manual, cu aparatul cald si o solutie de degresat. Il iei cand vrei cel mai mic pret pe un cuptor incapator, si nu te deranjeaza sa il speli de mana.' },
+  { g: 'acc', id: 'D34XC2MBM', rol: 'Alternativa inox', short: 'Heinner 72 l', cap: '72 l', cur: 'Manuala', ctrl: 'Butoane', pret: '961 lei',
+    specs: ['72 litri, clasa A, finisaj inox', '6 functii: grill, coacere, dezghetare, preincalzire', 'curatare manuala', 'butoane rotative'],
+    pros: ['72 de litri, cel mai incapator din grupa', 'Finisaj inox, arata bine langa plita', '6 functii de gatire pentru pret', 'Brand cunoscut, cu piese si service'],
+    cons: ['Fara autocuratare', 'Doar 27 de pareri'],
+    verdict: 'Heinner HBO-V656G-IX e cuptorul de ales daca vrei un aspect inox curat la pret mic, la circa 961 de lei. Cei 72 de litri il fac cel mai incapator din grupa accesibila, iar cele 6 functii, grill, coacere, dezghetare si preincalzire, acopera tot ce gatesti obisnuit acasa. Se comanda cu butoane rotative simple, fara meniuri de invatat, iar finisajul inox se potriveste langa o plita de acelasi tip. Are putine pareri, 27, si nu are autocuratare, deci il speli manual. Il iei cand vrei un cuptor mare, inox si ieftin, de la un brand cu service, fara pretentii de curatare automata.' },
+  { g: 'acc', id: 'DJ1Q67YBM', rol: 'Cel mai vandut accesibil', short: 'Arctic 71 l catalitic', cap: '71 l', cur: 'Catalitica', ctrl: 'Butoane', pret: '1099 lei',
+    specs: ['71 litri, curatare catalitica', 'grill, low grill, gatire cu aer cald', 'pereti catalitici care ard grasimea in timpul gatirii', 'nota 4.79 pe 76 de pareri'],
+    pros: ['Cel mai vandut din grupa, 76 de pareri', 'Curatare catalitica, mai putina munca la spalat', '71 de litri, incapator', 'Gatire cu aer cald pentru uniformitate'],
+    cons: ['Peretii catalitici se uzeaza in ani si nu se inlocuiesc usor', 'Doar zona catalitica se autocurata, restul manual'],
+    verdict: 'Arctic ARVI1130BC e fratele mai bine dotat al celui mai ieftin model, cu un plus care conteaza la un cuptor incorporabil: curatarea catalitica. Peretii sunt acoperiti cu un email poros care descompune stropii de grasime chiar in timpul gatirii, la peste 200 de grade, asa ca ai mult mai putin de frecat. E cel mai vandut din grupa accesibila, cu 76 de pareri si nota 4.79, la circa 1099 de lei. Are aceiasi 71 de litri generosi si gatire cu aer cald. De stiut: catalitic nu inseamna zero munca, doar peretii tratati se curata singuri, tavanul si usa tot le stergi, iar peretii se uzeaza in timp. Il iei cand vrei un cuptor incapator, dovedit si cu ceva mai putina curatenie de facut.' },
+  { g: 'acc', id: 'D553BCMBM', rol: 'Curatare cu aburi', short: 'Electrolux AquaClean', cap: '65 l', cur: 'AquaClean', ctrl: 'Butoane', pret: '1199 lei',
+    specs: ['65 litri, 9 programe, convectie', 'curatare cu aburi AquaClean', 'grill, coacere, convectie, dezghetare', 'brand premium la pret accesibil'],
+    pros: ['Curatare cu aburi AquaClean, ecologica, fara chimicale', 'Convectie pentru coacere uniforma', '9 programe de gatire', 'Brand premium sub 1200 de lei'],
+    cons: ['Aburul inmoaie doar murdaria usoara, nu petele arse', 'Doar 28 de pareri'],
+    verdict: 'Electrolux EOF5H40BX aduce un brand premium sub 1200 de lei, cu doua atuuri: convectie adevarata, adica un ventilator care imprastie caldura uniform, si curatarea cu aburi AquaClean. Aceasta din urma e cea mai simpla forma de autocuratare: pui apa intr-o tava, o incalzesti la circa 90 de grade, iar aburul inmoaie murdaria in vreo 30 de minute, apoi o stergi cu o carpa. E ecologica, fara chimicale si fara consumul urias al pirolizei. Are 65 de litri si 9 programe. Limita ei e ca aburul rezolva grasimea proaspata si stropii, nu petele vechi, arse; la alea tot freci. Il iei cand vrei convectie si o curatare usoara, blanda cu aparatul.' },
+  { g: 'acc', id: 'DXL0G7BBM', rol: 'Cu SteamClean', short: 'Hansa 62 l', cap: '62 l', cur: 'SteamClean', ctrl: 'Butoane', pret: '1299 lei',
+    specs: ['62 litri, convectie, SteamCleaning', 'grill, coacere, convectie, dezghetare, deshidratare', 'curatare cu aburi', 'multiple functii de gatire'],
+    pros: ['SteamCleaning cu aburi, curatare blanda', 'Convectie plus functie de deshidratare', 'Multe functii de gatire', 'Design curat pentru bucatarii moderne'],
+    cons: ['Nota 4.19, cea mai mica din articol', 'Curatarea cu aburi doar pentru murdarie usoara'],
+    verdict: 'Hansa BOES68461 e alegerea cu cele mai multe functii din grupa accesibila: pe langa grill, coacere si convectie, are si deshidratare, utila pentru fructe sau legume uscate acasa. Curatarea SteamCleaning merge pe acelasi principiu al aburului ca AquaClean, blanda si fara chimicale, buna pentru intretinerea curenta. Are 62 de litri si un design curat, potrivit intr-o bucatarie moderna. Nota lui, 4.19, e cea mai mica din articol, pe 62 de pareri, deci experientele sunt ceva mai amestecate, un lucru de cantarit. Il iei cand vrei multe functii, inclusiv deshidratare, si o curatare usoara cu aburi, la un pret inca rezonabil.' },
+  // --- B. Echilibrate, 1300-2000 ---
+  { g: 'ech', id: 'D8P36JBBM', rol: 'Alegerea noastra', short: 'Zanussi 57 l', cap: '57 l', cur: 'Manuala', ctrl: 'Butoane', pret: '1682 lei',
+    specs: ['57 litri, clasa A, finisaj inox', 'grill si rumenire', 'nota 4.75 pe 132 de pareri', 'brand din grupul Electrolux'],
+    pros: ['Nota 4.75 pe 132 de pareri, cel mai bun echilibru din articol', 'Brand din grupul Electrolux, constructie solida', 'Finisaj inox rezistent la amprente', 'Simplu de folosit, cu butoane'],
+    cons: ['57 de litri, mai mic decat modelele de 71-72', 'Fara sistem de autocuratare dedicat'],
+    verdict: 'Zanussi ZOB442XU e alegerea noastra pentru ca imbina cel mai bine increderea si pretul: are nota 4.75 pe 132 de pareri, cel mai solid raport din tot articolul, la circa 1680 de lei. Zanussi face parte din grupul Electrolux, deci constructia si fiabilitatea sunt de brand mare, iar finisajul inox arata bine si nu se pateaza usor. Se comanda simplu, cu butoane, si are grill si functie de rumenire pentru o crusta frumoasa. Cei 57 de litri sunt sub media articolului, dar suficienti pentru o tava normala, iar curatarea se face manual. Il iei cand vrei cel mai dovedit cuptor din selectie, de la un brand serios, fara sa platesti pentru varf de gama.' },
+  { g: 'ech', id: 'DY77M73BM', rol: 'Bosch, cel mai accesibil', short: 'Bosch 66 l EcoClean', cap: '66 l', cur: 'EcoClean', ctrl: 'Butoane', pret: '1569 lei',
+    specs: ['66 litri, convectie 3D hot air', 'curatare EcoClean cu strat ceramic', 'grill, coacere, convectie, rumenire', 'nota 4.46 pe 139 de pareri'],
+    pros: ['Cea mai accesibila cale spre un Bosch, sub 1600 de lei', 'Convectie pentru coacere uniforma pe mai multe niveluri', 'EcoClean, strat ceramic care absoarbe grasimea', '139 de pareri, cel mai verificat din grupa'],
+    cons: ['EcoClean e mai putin eficient decat piroliza pe murdaria grea', 'Nota 4.46, buna dar nu de top'],
+    verdict: 'Bosch HBF133BA1 e cel mai ieftin mod de a avea un cuptor Bosch incorporabil, sub 1600 de lei, si aduce doua lucruri care conteaza. Primul e convectia, cu ventilator, care coace uniform si iti lasa sa faci doua tavi deodata. Al doilea e EcoClean, un strat ceramic special pe peretii din spate care absoarbe si descompune grasimea la temperaturi de gatire, deci speli mai putin. E cel mai verificat model din grupa, cu 139 de pareri. De retinut ca EcoClean e o autocuratare usoara, nu piroliza; pe murdaria arata tot ai de lucru. Il iei cand vrei fiabilitatea Bosch si convectie, la cel mai mic pret al brandului.' },
+  { g: 'ech', id: 'DPP9TQBBM', rol: '72 l, cu functie pizza', short: 'Electrolux 72 l', cap: '72 l', cur: 'Manuala', ctrl: 'Butoane', pret: '1799 lei',
+    specs: ['72 litri, SurroundCook, functie pizza', 'grill, coacere, dezghetare, timer', 'volum mare pentru familie', 'brand premium'],
+    pros: ['72 de litri, spatiu pentru tavi mari', 'Functie dedicata pizza, cu caldura de jos puternica', 'SurroundCook pentru distributie buna a caldurii', 'Timer si control simplu'],
+    cons: ['Fara autocuratare dedicata', 'Mai scump decat Zanussi, cu nota mai mica'],
+    verdict: 'Electrolux EOD3H50TX e cuptorul incapator al grupei echilibrate, cu 72 de litri in care intra tavi mari si un pui intreg fara probleme. Are o functie dedicata pentru pizza, cu caldura puternica de jos care face blatul crocant, si sistemul SurroundCook care distribuie caldura in jurul mancarii. E de la Electrolux, deci constructie de brand mare, cu grill, coacere si dezghetare. Nu are autocuratare dedicata si costa mai mult decat Zanussi, care are o nota mai mare, deci il iei mai ales pentru volumul de 72 de litri si functia pizza. Il iei cand gatesti des cantitati mari sau pizza de casa si vrei un cuptor mare de la un brand premium.' },
+  { g: 'ech', id: 'DVZ9BMBBM', rol: '8 functii, hidrolitica', short: 'Hansa 8 functii', cap: '65 l', cur: 'Hidrolitica', ctrl: 'Butoane', pret: '1819 lei',
+    specs: ['8 functii, convectie, clasa A', 'curatare hidrolitica cu aburi', 'grill, convectie, dezghetare, deshidratare', 'reglaj precis prin butoane'],
+    pros: ['8 functii de gatire, cele mai multe din grupa', 'Curatare hidrolitica, ecologica cu aburi', 'Convectie plus deshidratare', 'Reglaj precis'],
+    cons: ['Nota 4.45 pe doar 67 de pareri', 'Hidrolitica nu rezolva petele arse'],
+    verdict: 'Hansa BOES68465 e pentru cine vrea cat mai multe moduri de gatire intr-un cuptor incorporabil, cu 8 functii, de la convectie si grill la deshidratare. Curatarea hidrolitica foloseste aburul, ca AquaClean, deci intretinerea curenta e usoara si fara chimicale. Are convectie pentru coacere uniforma si un reglaj precis prin butoane. Cu 67 de pareri si nota 4.45 e mai putin verificat decat Bosch sau Zanussi, si, ca la orice curatare cu aburi, petele vechi arse tot cer frecat. Il iei cand pui pret pe versatilitate, adica pe cat mai multe programe si functii, si vrei o curatare blanda cu aburi.' },
+  // --- C. Premium, peste 2000 ---
+  { g: 'prem', id: 'D9FCD0MBM', rol: 'Premium accesibil', short: 'Electrolux 72 l premium', cap: '72 l', cur: 'Catalitica', ctrl: 'Butoane', pret: '1999 lei',
+    specs: ['72 litri, convectie, catalitic', 'grill, coacere, convectie, functie pizza', 'curatare catalitica pe pereti', 'finisaj premium Electrolux'],
+    pros: ['72 de litri plus convectie si catalitic', 'Functie pizza si mai multe moduri de gatire', 'Curatare catalitica, mai putina munca', 'Constructie premium Electrolux'],
+    cons: ['Doar 33 de pareri', 'Pretul intra deja in zona premium'],
+    verdict: 'Electrolux EOD3C70TK e poarta de intrare in zona premium, la circa 2000 de lei, si aduna dotarile bune intr-un singur aparat: 72 de litri, convectie cu ventilator, functie pizza si curatare catalitica pe pereti. Practic e varianta mai completa a modelului EOD3H50 din grupa echilibrata, cu autocuratarea catalitica in plus, care descompune grasimea in timpul gatirii si iti lasa mai putin de frecat. Finisajul si constructia sunt de brand mare. Are putine pareri, 33, fiind un model mai nou sau mai de nisa. Il iei cand vrei un cuptor mare, complet, cu convectie si curatare catalitica, si esti dispus sa treci de pragul de 2000 de lei pentru un Electrolux bine echipat.' },
+  { g: 'prem', id: 'DKDRP6BBM', rol: 'Varf de gama Bosch', short: 'Bosch 66 l top', cap: '66 l', cur: 'EcoClean', ctrl: 'Digital', ctrl2: true, pret: '3570 lei',
+    specs: ['66 litri, EcoClean Direct', 'constructie si finisaj varf de gama', 'grill, coacere, control avansat', 'nota 4.46 pe 139 de pareri'],
+    pros: ['Constructie si finisaj de varf de gama Bosch', 'EcoClean Direct pe mai multi pereti', 'Fiabilitate si service de brand premium', 'Aparat pe care te bazezi multi ani'],
+    cons: ['Peste 3500 de lei, de peste doua ori cat Bosch-ul accesibil', 'La functie de baza, diferenta fata de HBF133 e mica'],
+    verdict: 'Bosch HBF153BS0 e varful de gama Bosch din articol, la circa 3570 de lei, cu o constructie si un finisaj net peste restul si un sistem EcoClean Direct extins pe mai multi pereti. E cuptorul pe care il iei cand vrei ce e mai bun de la Bosch si il tii zece ani fara griji. Trebuie spus insa clar, ca sa nu platesti degeaba: la coacere si grill, treaba de baza, diferenta fata de Bosch HBF133 de la 1569 de lei e mica; ce platesti in plus e finisajul, detaliile de constructie si sistemul de curatare mai extins. Il iei doar daca pui pret pe varful de gama Bosch si il asortezi cu electrocasnice scumpe de acelasi brand; altfel, HBF133 face aproape la fel, mult mai ieftin.' },
+  { g: 'prem', id: 'DLZS47BBM', rol: 'Design rustic', short: 'Electrolux rustic', cap: '72 l', cur: 'Catalitica', ctrl: 'Butoane', pret: '3630 lei',
+    specs: ['72 litri, convectie, functie pizza', 'design rustic, in nuanta crem cu manere clasice', 'curatare catalitica', 'multifunctional'],
+    pros: ['Design rustic, pentru bucatarii clasice si de lemn', '72 de litri, convectie si functie pizza', 'Curatare catalitica', 'Iese din tiparul inox-negru'],
+    cons: ['Cel mai scump din articol, peste 3600 de lei', 'Nota 4.14, cea mai mica din grupa premium'],
+    verdict: 'Electrolux EOA5220AOR e singurul cuptor din articol care nu arata modern, inox sau negru, ci rustic, in nuanta crem cu manere clasice, gandit pentru bucatariile de lemn sau in stil traditional. Daca amenajezi o bucatarie clasica si vrei ca electrocasnicele sa se integreze, nu sa iasa in evidenta, asta e alegerea. Dincolo de aspect, e un cuptor complet: 72 de litri, convectie, functie pizza si curatare catalitica. Costa insa cel mai mult din articol, peste 3600 de lei, si are nota 4.14, cea mai mica din grupa premium, deci platesti in buna parte pentru designul aparte. Il iei strict cand ai o bucatarie rustica si vrei un cuptor pe masura, nu pentru functii, care se gasesc si mai ieftin.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const ACC = PICKS.filter(x => x.g === 'acc');
+const ECH = PICKS.filter(x => x.g === 'ech');
+const PREM = PICKS.filter(x => x.g === 'prem');
+
+const hero = '/imagini/articole/cele-mai-bune-cuptoare-electrice-incorporabile.webp';
+const figAcc = '/imagini/articole/cuptor-inco-accesibile.webp';
+const figEch = '/imagini/articole/cuptor-inco-echilibrate.webp';
+const figPrem = '/imagini/articole/cuptor-inco-premium.webp';
+const published = '2026-07-24T23:20:00+03:00';
+
+const faq = [
+  { question: 'Ce diferenta e intre un cuptor incorporabil si unul de blat?', answer: 'Un cuptor incorporabil se monteaza incastrat in mobilier, intr-o nisa dedicata, fie sub blatul de lucru, fie intr-o coloana la inaltimea ochilor, pentru un aspect uniform si fronturi continue in bucatariile moderne. Are latimea standard de 60 de centimetri si cere o instalare fixa. Un cuptor de blat, sau de sine statator, se aseaza pe o masa sau pe un raft si merge bagat direct in priza, fara montaj, il muti oricand si e mai ieftin. Daca renovezi bucataria si vrei mobila cu fronturi continue, ia incorporabil. Daca stai cu chirie, ai bucatarie mica sau vrei un al doilea cuptor mobil, uita-te la cele de blat, care au articolul lor.' },
+  { question: 'Ce sistem de autocuratare sa aleg: catalitic, cu aburi sau piroliza?', answer: 'Sunt trei niveluri. Curatarea catalitica are pereti acoperiti cu un email poros care descompune stropii de grasime chiar in timpul gatirii, la peste 200 de grade; e ieftina si comoda, dar curata doar peretii tratati, iar acestia se uzeaza in ani. Curatarea cu aburi, numita AquaClean, hidrolitica sau SteamClean, foloseste apa incalzita la circa 90 de grade care inmoaie murdaria in 30 de minute, apoi o stergi; e ecologica si blanda, dar rezolva doar murdaria proaspata, nu petele arse. Piroliza e cea mai puternica: incinge cuptorul gol la 400-500 de grade si arde tot la o cenusa fina pe care doar o stergi; e insa cea mai scumpa si consuma mult curent. Pentru majoritatea, catalitic sau cu aburi acopera nevoile; piroliza merita doar daca gatesti mult si greu si vrei zero frecat.' },
+  { question: 'Ce inseamna convectie la un cuptor si de ce conteaza?', answer: 'Convectia, sau gatirea cu aer cald, inseamna ca un ventilator din spatele cuptorului imprastie caldura uniform in toata incinta, in loc sa vina doar de sus si de jos, ca la un cuptor static. Rezultatul e ca mancarea se coace uniform, fara zone mai crude sau mai arse, si poti folosi doua tavi in acelasi timp, pe niveluri diferite, fara ca una sa iasa mai putin coapta. In plus, timpul de coacere scade, deci consumi mai putin curent la aceeasi preparare. Aproape toate cuptoarele bune din articol au convectie; e o functie pe care merita sa o cauti, mai ales daca coci des prajituri, paine sau gatesti pentru multi.' },
+  { question: 'Ce dimensiune de nisa imi trebuie pentru un cuptor incorporabil?', answer: 'Cuptoarele incorporabile au o latime standard de aproape 60 de centimetri, mai exact in jur de 59.4-59.6 cm la corp, iar nisa din mobilier trebuie sa aiba circa 60 de centimetri latime, cu putin joc pe fiecare parte. Inaltimea standard a corpului e de aproximativ 59-60 de centimetri, iar adancimea uzuala tot in jur de 55-56 cm. Important e ca nisa sa lase spatiu de ventilatie, de obicei cativa centimetri in spate si o fanta jos sau sus, ca aerul cald sa circule si cuptorul sa nu se supraincalzeasca. Verifica intotdeauna dimensiunile de incastrare din fisa produsului, nu doar dimensiunile exterioare, si compara-le cu nisa din mobilierul tau inainte de comanda.' },
+  { question: 'Cuptorul se monteaza sub blat sau in coloana?', answer: 'Amandoua variantele functioneaza, iar cuptoarele incorporabile electrice se preteaza la ambele. Montajul sub blat, cel mai raspandit, pune cuptorul jos, sub suprafata de lucru, adesea cu plita deasupra; e clasic si ieftin de amenajat. Montajul in coloana ridica cuptorul la inaltimea pieptului sau a ochilor, intr-un corp inalt de mobilier, ceea ce e mult mai comod la spate, pentru ca nu te mai apleci sa scoti tava, si e la moda in bucatariile noi. Alegerea tine de spatiu si de preferinta: daca ai loc de o coloana, e mai ergonomica; daca nu, montajul sub blat merge la fel de bine. Cuptorul e acelasi, doar pozitia difera.' },
+  { question: 'De cate functii am nevoie la un cuptor?', answer: 'Depinde de cat de variat gatesti, dar cateva functii cheie acopera aproape tot. Coacerea clasica, cu caldura de sus si de jos, si convectia, cu aer cald si ventilator, sunt esentiale si le au majoritatea. Grillul rumeneste si da o crusta la carne sau gratineaza. Dincolo de astea, functii precum pizza, cu caldura puternica de jos, dezghetarea, deshidratarea sau preincalzirea rapida sunt utile daca le folosesti, dar nu esentiale. Un cuptor cu 6-8 functii, cum sunt cele din grupa echilibrata a articolului, e mai mult decat suficient pentru o bucatarie de familie. Nu plati mult in plus doar pentru un numar mare de programe pe care nu le vei folosi; conteaza sa aiba convectie si grill bune.' },
+  { question: 'De ce sunt unele cuptoare de trei ori mai scumpe decat altele?', answer: 'Diferenta o fac in principal brandul, finisajul, sistemul de curatare si detaliile de constructie, nu neaparat cat de bine coc. In articol, de exemplu, un Bosch de varf costa peste 3500 de lei, iar un alt Bosch, cu aceeasi treaba de baza de coacere si grill, costa 1569; ce platesti in plus e finisajul, un sistem de curatare mai extins si perceptia de gama. La fel, un Electrolux rustic depaseste 3600 de lei mai ales pentru designul aparte. Regula practica: pentru un cuptor bun, cu convectie, grill si o curatare catalitica sau cu aburi, zona corecta e 1000-2000 de lei. Peste 3000 platesti pentru varf de gama, design sau piroliza, si merita doar daca ai un motiv anume.' },
+  { question: 'Un cuptor incorporabil vine cu plita inclusa?', answer: 'Nu, in mod normal cuptorul si plita se cumpara separat, chiar daca se monteaza adesea impreuna, cuptorul sub blat si plita deasupra. Sunt aparate independente: cuptorul se conecteaza la o priza dedicata de putere mare, iar plita, la randul ei, are propria racordare, pe gaz sau electrica. Avantajul e ca le poti combina cum vrei, un cuptor electric cu o plita pe gaz sau pe inductie, dupa preferinta si racordurile din casa. Exista si pachete cuptor plus plita vandute impreuna, uneori mai avantajoase, dar si atunci sunt doua aparate distincte. Cand iti amenajezi bucataria, gandeste-le ca pe o pereche si verifica sa fie compatibile ca stil si dimensiuni de nisa.' },
+];
+
+const images = [hero, figAcc, figEch, figPrem, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune cuptoare electrice incorporabile in ${SEO_YEAR}: de la catalitic la EcoClean, pe fiecare buget`}
+  description="12 cuptoare electrice incorporabile comparate pe curatare, functii si pret, de la 950 la 3630 de lei. Cand alegi catalitic, cu aburi sau EcoClean."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune cuptoare electrice incorporabile' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer.replace(/<[^>]+>/g, '') }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune cuptoare electrice incorporabile</span>
+    </nav>
+
+    <h1>Cele mai bune cuptoare electrice incorporabile</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cuptoare electrice incorporabile, de la modele catalitice accesibile la premium cu autocuratare avansata" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>La un cuptor incorporabil, cea mai mare diferenta dintre doua modele nu e cat de bine coc, ci cat de greu le speli si cat de comod le comanzi. Il incastrezi o data in mobilier si ramane acolo ani buni, asa ca merita luat unul dovedit. Cel mai bine notat din selectie, cu 132 de pareri si nota 4.75, e <strong>Zanussi ZOB442XU</strong>, la circa 1680 de lei. Daca vrei sa dai mult mai putin, <strong>Arctic ARVI1130BC</strong> porneste de la 1099, cu curatare catalitica; iar daca vrei varf de gama, <strong>Bosch HBF153BS0</strong> e sus, la 3570.</p>
+      <p>Decizia se face pe trei lucruri. <strong>Sistemul de curatare</strong> conteaza cel mai mult zi de zi: catalitic, cu aburi sau piroliza, fiecare cu compromisul lui. Apoi <strong>functiile</strong>, mai ales convectia, adica aerul cald cu ventilator care coace uniform. Si <strong>montajul</strong>, sub blat sau in coloana, plus nisa de fix 60 de centimetri in care trebuie sa incapa.</p>
+      <p>Le-am impartit pe buget, pentru ca acolo se vad cel mai clar dotarile: accesibile pana in 1300 de lei, echilibrate intre 1300 si 2000, si premium peste 2000. Toate sunt modele <strong>incorporabile</strong>, incastrate in mobilier; cele de sine statatoare, care se pun pe blat, au <a href="/cele-mai-bune-cuptoare-electrice-de-blat/">articolul lor separat</a>.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#acc">Accesibile, sub 1300 de lei</a></li>
+        <li><a href="#ech">Echilibrate, 1300-2000 de lei</a></li>
+        <li><a href="#prem">Premium, peste 2000 de lei</a></li>
+        <li><a href="#curatare">Sistemul de curatare, decizia cheie</a></li>
+        <li><a href="#functii">Convectie, grill si functii</a></li>
+        <li><a href="#montaj">Montajul: nisa, coloana sau sub blat</a></li>
+        <li><a href="#vs">Incorporabil, de blat sau cu microunde</a></li>
+        <li><a href="#greseli">Greseli frecvente la cumparare</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Capacitate</th><th>Curatare</th><th>Control</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.cap}</td>
+              <td>{x.cur}</td>
+              <td>{x.ctrl}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="acc">Accesibile, sub 1300 de lei</h2>
+    <p>Aici stau cuptoarele care fac treaba de baza bine, la cel mai mic pret. Volumul e adesea mare, 65-72 de litri, iar curatarea merge de la manuala la catalitica sau cu aburi. Le-am pus de la cel mai ieftin la cel mai bine dotat din grupa.</p>
+    {ACC.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figAcc} alt="Cuptoare electrice incorporabile accesibile, Arctic 71 l si Electrolux cu AquaClean" width="1600" height="900" loading="lazy" />
+
+    <h2 id="ech">Echilibrate, 1300-2000 de lei</h2>
+    <p>Zona cu cel mai bun raport pentru cei mai multi: branduri mari, convectie adevarata si mai multe functii, fara sa intri in premium. Aici sta alegerea noastra si cel mai accesibil Bosch.</p>
+    {ECH.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figEch} alt="Cuptoare electrice incorporabile echilibrate, Bosch, Zanussi si Electrolux" width="1600" height="900" loading="lazy" />
+
+    <h2 id="prem">Premium, peste 2000 de lei</h2>
+    <p>Ultima grupa e pentru finisaj de varf, curatare avansata sau un design anume. Aici e important sa privesti pretul cu ochi critic: uneori platesti mult in plus pentru aspect, nu pentru cum coace.</p>
+    {PREM.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figPrem} alt="Cuptoare electrice incorporabile premium, Electrolux, Bosch de varf si Electrolux rustic" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-cuptoare-elec-inco').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate cuptoarele incorporabile la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="curatare">Sistemul de curatare, decizia cheie</h2>
+    <p>La un cuptor pe care il folosesti saptamanal, cat de greu il speli conteaza mai mult decat pare. Sunt trei sisteme, de la cel mai simplu la cel mai puternic, si merita sa stii ce iei.</p>
+    <ul>
+      <li><strong>Catalitic.</strong> Peretii au un email poros care descompune stropii de grasime chiar in timpul gatirii, la peste 200 de grade. Ieftin si comod, dar curata doar peretii tratati, nu usa sau tavanul, iar stratul se uzeaza in ani si nu se schimba usor. In articol, Arctic ARVI1130BC si cele doua Electrolux.</li>
+      <li><strong>Cu aburi (AquaClean, hidrolitic, SteamClean).</strong> Pui apa intr-o tava, o incalzesti la circa 90 de grade, iar aburul inmoaie murdaria in vreo 30 de minute, apoi o stergi. Ecologic, bland cu aparatul, fara chimicale, dar rezolva doar murdaria proaspata, nu petele vechi arse. Electrolux EOF5 si cele doua Hansa.</li>
+      <li><strong>Piroliza.</strong> Cea mai puternica: cuptorul gol se incinge la 400-500 de grade si arde tot la o cenusa fina, pe care doar o stergi. Zero frecat, dar cea mai scumpa si consuma mult curent la fiecare ciclu. In selectia noastra nu am inclus modele pirolitice, care trec de obicei bine de 2500 de lei.</li>
+    </ul>
+    <p>Bosch foloseste un al patrulea sistem, <strong>EcoClean</strong>, un strat ceramic care absoarbe grasimea la temperaturi de gatire, undeva intre catalitic si aburi ca eficienta. Pentru majoritatea oamenilor, catalitic sau cu aburi acopera nevoile; piroliza merita doar daca gatesti des si greu si vrei sa nu freci niciodata.</p>
+
+    <h2 id="functii">Convectie, grill si functii</h2>
+    <p>Dupa curatare, functiile decid cat de bine si de variat gatesti. Nu conteaza numarul mare de programe, ci sa le aiba pe cele care chiar folosesc.</p>
+    <p>Cea mai importanta e <strong>convectia</strong>, sau gatirea cu aer cald: un ventilator in spate imprastie caldura uniform, deci mancarea se coace egal, poti folosi doua tavi deodata si timpul scade, ceea ce inseamna si mai putin curent. Aproape toate modelele bune din articol o au; e prima functie de cautat.</p>
+    <p><strong>Grillul</strong> rumeneste si da o crusta la carne sau gratineaza, iar unele au si <strong>functie pizza</strong>, cu caldura puternica de jos pentru un blat crocant, cum e la Electrolux de 72 de litri. Restul, dezghetarea, deshidratarea, preincalzirea rapida, sunt bonusuri utile daca le folosesti. Un cuptor cu 6-8 functii acopera lejer o bucatarie de familie; nu plati in plus doar pentru un numar mare de programe.</p>
+
+    <h2 id="montaj">Montajul: nisa, coloana sau sub blat</h2>
+    <p>Fiind incastrat, un cuptor incorporabil cere o nisa potrivita in mobilier, iar aici greselile costa. Cateva repere.</p>
+    <ul>
+      <li><strong>Latimea standard e 60 de centimetri.</strong> Corpul are in jur de 59.4-59.6 cm, iar nisa trebuie sa aiba circa 60, cu putin joc pe fiecare parte. Toate modelele din articol respecta acest standard.</li>
+      <li><strong>Verifica dimensiunile de incastrare, nu doar cele exterioare.</strong> Fisa produsului da separat inaltimea, latimea si adancimea nisei recomandate. Compara-le cu mobilierul tau inainte de comanda.</li>
+      <li><strong>Lasa spatiu de ventilatie.</strong> Aerul cald trebuie sa circule in spate si printr-o fanta, altfel cuptorul se supraincalzeste. Nu astupa complet nisa.</li>
+      <li><strong>Sub blat sau in coloana.</strong> Sub blat, cel clasic, pune cuptorul jos, adesea cu plita deasupra. In coloana, il ridica la nivelul pieptului, mult mai comod la spate cand scoti tava. Cuptorul e acelasi; alegi dupa spatiu si confort.</li>
+    </ul>
+    <p>Un cuptor electric merge racordat la o priza dedicata de putere mare; pentru montaj, mai ales in coloana, cere ajutorul unui specialist daca nu esti sigur pe racordare.</p>
+
+    <h2 id="vs">Incorporabil, de blat sau cu microunde</h2>
+    <p>Trei aparate se confunda des cand amenajezi bucataria, dar au roluri diferite. Merita clarificat, ca sa iei ce iti trebuie.</p>
+    <p><strong>Cuptorul incorporabil</strong>, cel din acest articol, se incastreaza fix in mobilier, pentru un aspect uniform, si e ales cand renovezi si vrei fronturi continue. <strong>Cuptorul de blat</strong>, de sine statator, se pune pe o masa si merge in priza fara montaj, mai ieftin si mobil, bun la chirie sau ca al doilea cuptor; il gasesti in articolul despre <a href="/cele-mai-bune-cuptoare-electrice-de-blat/">cuptoare electrice de blat</a>.</p>
+    <p><strong>Cuptorul cu microunde incorporabil</strong> e cu totul altceva: incalzeste si decongeleaza rapid prin unde, dar nu coace si nu rumeneste ca un cuptor adevarat. Multi le pun impreuna in coloana, microunde sus, cuptor jos. Daca asta cauti, vezi <a href="/cele-mai-bune-cuptoare-cu-microunde-incorporabile/">microundele incorporabile</a>. Iar pentru crocant cu putin ulei, o <a href="/cele-mai-bune-friteuze-cu-aer-cald/">friteuza cu aer cald</a> completeaza bine cuptorul, fara sa il inlocuiasca.</p>
+
+    <h2 id="greseli">Greseli frecvente la cumparare</h2>
+    <ul>
+      <li><strong>Nu masori nisa.</strong> Cuptorul are 60 cm, dar conteaza si inaltimea si adancimea de incastrare. Masoara mobilierul si compara cu fisa, altfel nu intra.</li>
+      <li><strong>Iei piroliza fara sa ai nevoie.</strong> E scumpa si consuma mult. Daca nu gatesti des si greu, catalitic sau cu aburi e suficient si mult mai ieftin.</li>
+      <li><strong>Astupi ventilatia.</strong> Fara spatiu de aer in nisa, cuptorul se supraincalzeste. Lasa fanta si spatiul din spate libere.</li>
+      <li><strong>Platesti mult pentru brand.</strong> Un cuptor de varf poate costa de doua-trei ori cat unul care coace la fel. Peste 2000 de lei, verifica ce primesti in plus.</li>
+      <li><strong>Ratezi convectia.</strong> Un cuptor pur static coace neuniform. Cauta gatirea cu aer cald, cu ventilator, aproape obligatorie azi.</li>
+      <li><strong>Astepti plita in cutie.</strong> Cuptorul si plita se cumpara separat. Gandeste-le ca pereche, dar sunt doua aparate.</li>
+    </ul>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la cuptoarele electrice incorporabile in stoc pe eMAG, sortate dupa numarul de pareri, si am pastrat un singur exemplar per model, pentru ca acelasi cuptor apare adesea in mai multe finisaje, inox sau negru, cu coduri diferite. Arctic, de exemplu, are o intreaga familie pe aceeasi baza de 71 de litri; am ales cel mai ieftin si cel mai vandut din ea. Am lasat deoparte modelele pe gaz, care sunt o categorie aparte.</p>
+    <p><strong>Le-am grupat pe buget</strong>, pentru ca acolo se vad cel mai clar dotarile, si am urmarit in fiecare grupa sistemul de curatare, convectia, functiile si capacitatea reala din fise. Am semnalat clar unde un pret mai mare nu aduce mai mult la functie, cum e la Bosch-ul de peste 3500 de lei fata de cel de 1569, sau la Electrolux rustic, unde platesti in buna parte designul.</p>
+    <p>Am acoperit doar cuptoarele <strong>incorporabile electrice</strong>; cele de blat, microundele incorporabile si plitele au articolele lor. Nu testam aparatele in laborator si nu pretindem asta: ne bazam pe pareri, pe specificatiile de la producator si pe documentare. Un cuptor bun se asorteaza cu restul bucatariei, de la <a href="/cele-mai-bune-plite-incorporabile-pe-gaz/">o plita incorporabila</a> la <a href="/cele-mai-bune-hote-incorporabile/">o hota</a>.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 950 la 3630 de lei, dar grosul valorii sta intre 1000 si 2000.</p>
+    <p><strong>Sub 1300 de lei</strong> iei un cuptor incapator, cu grill si gatire cu aer cald, uneori cu curatare catalitica sau cu aburi. Arctic, Heinner, Electrolux EOF5 si Hansa fac treaba de baza bine, la brand cunoscut. Aici e cel mai bun pret pe litru si pe functie.</p>
+    <p><strong>Intre 1300 si 2000 de lei</strong> e zona cu cel mai bun echilibru: Bosch, Zanussi si Electrolux aduc convectie adevarata, constructie de brand mare si mai multe functii. Alegerea noastra, Zanussi, sta aici, la 1680 de lei, cu cea mai buna nota din articol.</p>
+    <p><strong>Peste 2000 de lei</strong> intri in premium: finisaj de varf, curatare mai extinsa sau design anume, ca Electrolux rustic. Cu grija insa, un Bosch de 3570 de lei coace ca unul de 1569; sumele mari se justifica pentru aspect, brand sau piroliza, nu pentru functia de baza.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p set:html={f.answer}></p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-cuptoare-electrice-incorporabile" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-cuptoare-electrice-incorporabile" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

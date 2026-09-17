@@ -1,10 +1,12 @@
 ---
 ---
 
-<div class="cookie-banner" id="cookie-banner">
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-live="polite" aria-label="Consimtamant cookie-uri">
   <div class="cookie-content">
     <p class="cookie-text">
-      Folosim cookies pentru o experienta mai buna. <a href="/cookies/">Detalii</a>.
+      Folosim cookie-uri esentiale pentru functionarea site-ului. Cu acordul tau, am putea folosi si
+      cookie-uri de masurare si continut personalizat. Poti accepta sau refuza oricand.
+      <a href="/cookies/">Detalii</a>.
     </p>
     <div class="cookie-buttons">
       <button class="btn btn-secondary" id="cookie-decline">Refuz</button>
@@ -17,19 +19,33 @@
   const banner = document.getElementById('cookie-banner');
   const acceptBtn = document.getElementById('cookie-accept');
   const declineBtn = document.getElementById('cookie-decline');
+  const gtagFn = (window as any).gtag || function () {};
 
-  // Check if user already made a choice
+  // Afiseaza banner-ul doar daca nu s-a ales inca
   if (!localStorage.getItem('cookies-consent')) {
     banner?.classList.add('show');
   }
 
   acceptBtn?.addEventListener('click', () => {
     localStorage.setItem('cookies-consent', 'accepted');
+    gtagFn('consent', 'update', {
+      ad_storage: 'granted',
+      ad_user_data: 'granted',
+      ad_personalization: 'granted',
+      analytics_storage: 'granted'
+    });
     banner?.classList.remove('show');
   });
 
   declineBtn?.addEventListener('click', () => {
     localStorage.setItem('cookies-consent', 'declined');
+    // consimtamantul ramane 'denied' (valoarea implicita din Consent Mode)
+    gtagFn('consent', 'update', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied'
+    });
     banner?.classList.remove('show');
   });
 </script>

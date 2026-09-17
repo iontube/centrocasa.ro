@@ -1,0 +1,291 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['espressor-manual'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Cu carafa de lapte, spumare automata ---
+  { g: 'auto', id: 'DYW0RMBBM', badge: 'Cele mai multe pareri', short: 'Breville Prima Latte', lapte: 'Carafa 0.3 l', presiune: '15 bar', rezervor: '1.5 l',
+    specs: ['1539 de pareri, cele mai multe din grup', 'carafa de lapte detasabila, 0.3 l', 'accepta si cafea macinata, si paduri', 'curatare automata a circuitului de lapte'],
+    pros: ['De departe cel mai testat model din grup, 1539 de pareri', 'Carafa de lapte se detaseaza si intra in frigider intre cafele', 'Merge si cu paduri, daca nu vrei sa dozezi', 'Rezervor generos de 1.5 l'],
+    cons: ['Carafa de 0.3 l e mica pentru doua cappuccino la rand', 'Corpul e inox si aluminiu peste plastic, nu metal masiv'],
+    verdict: 'Daca te uiti la un singur numar din tot articolul, uita-te la asta: 1539 de pareri, cu nota 4.43. Nicio alta cafetiera din selectie nu are atatia oameni in spate, iar la un aparat cu piese in miscare si circuit de lapte, volumul de pareri spune mai mult decat fisa tehnica. Prima Latte VCF045X face espresso, cappuccino si latte dintr-o carafa care se prinde lateral, iar cand termini o scoti si o pui in frigider, fara sa speli furtunuri. Circuitul de lapte are un program propriu de curatare, partea care de obicei se strica prima la aparatele de genul asta. Accepta si cafea macinata, si paduri, deci poti incepe fara sa cumperi rasnita. Carafa de 0.3 l se goleste insa repede daca faci doua cappuccino unul dupa altul, si trebuie reumpluta. E aparatul pe care il iei cand vrei lapte spumat fara sa inveti nimic si preferi un model verificat de mii de oameni in locul unuia mai nou si mai spectaculos pe hartie.' },
+  { g: 'auto', id: 'D3KBYDBBM', badge: 'De\'Longhi accesibil', short: 'De\'Longhi ECP 31.21', lapte: 'Duza automata', presiune: '15 bar', rezervor: '1.1 l',
+    specs: ['cel mai ieftin De\'Longhi din selectie', 'setare de temperatura, rar la pretul asta', 'mentine cana calda pe capac', 'merge cu macinata sau paduri'],
+    pros: ['Intri in gama De\'Longhi sub 550 de lei', 'Poti seta temperatura, nu doar pornit-oprit', 'Suprafata de sus tine cestile calde', 'Oprire automata'],
+    cons: ['Carcasa e din plastic', 'Rezervor de 1.1 l, mai mic decat la Breville'],
+    verdict: 'ECP 31.21 e usa de intrare in De\'Longhi si se vede unde a taiat producatorul: carcasa e plastic, nu metal. In rest primesti lucruri pe care rar le gasesti sub 550 de lei, cum ar fi setarea de temperatura, care conteaza mai mult decat pare, pentru ca apa prea fierbinte arde cafeaua si scoate gust amar. Suprafata de deasupra tine cestile calde, un detaliu mic ce schimba rezultatul, fiindca espresso turnat in ceasca rece isi pierde jumatate din temperatura instant. Cele 337 de pareri cu nota 4.36 arata un aparat asezat, fara surprize. Merge si cu paduri, deci il poti folosi ca pe un aparat cu capsule in zilele grabite si ca pe unul manual in weekend. Il alegi cand vrei numele De\'Longhi si control pe temperatura la buget mic, si nu te deranjeaza plasticul.' },
+  { g: 'auto', id: 'DXH40NBBM', badge: 'Cea mai mare putere', short: 'Studio Casa Barista', lapte: 'Cana 700 ml', presiune: '15 bar', rezervor: '1.2 l',
+    specs: ['1470 W, cea mai mare putere din selectie', 'cana de lapte de 700 ml, cea mai incapatoare', 'carcasa inox', 'vine cu tamper inclus'],
+    pros: ['Cana de lapte de 700 ml, tine pentru mai multe cappuccino la rand', 'Cea mai mare putere din articol, 1470 W, se incalzeste rapid', 'Carcasa din inox', 'Include tamper, nu il cumperi separat'],
+    cons: ['Doar 146 de pareri, cele mai putine din grup', 'Nota 4.21, cea mai modesta dintre modelele cu carafa'],
+    verdict: 'Barista latte rezolva exact reprosul care se aduce celorlalte modele cu carafa: capacitatea. Cana de lapte are 700 ml, mai mult decat dublul celei de la Breville Prima Latte, deci faci trei-patru cappuccino fara sa te opresti sa reumpli. Cei 1470 W sunt cea mai mare putere din tot articolul, ceea ce inseamna ca ajunge la temperatura de lucru mai repede decat restul, util dimineata. Carcasa e inox, si vine cu tamper in cutie, accesoriul pe care majoritatea producatorilor te lasa sa il cumperi separat. Partea slaba e istoricul: 146 de pareri si nota 4.21 sunt cele mai modeste din grup, deci e mai putin verificat in timp decat Breville. Il iei cand faci cafea pentru mai multi oameni odata si capacitatea canii de lapte conteaza mai mult decat numarul de pareri.' },
+  { g: 'auto', id: 'DLHCB4BBM', badge: 'Carafa dubla ca marime', short: 'Breville VCF108X', lapte: 'Carafa 0.6 l', presiune: '19 bar', rezervor: '1.5 l',
+    specs: ['carafa de 0.6 l, dubla fata de Prima Latte 1', 'suport de ceasca reglabil pe inaltime', 'curatare automata a circuitului de lapte', 'accepta macinata si paduri'],
+    pros: ['Carafa de 0.6 l, dubla fata de modelul anterior', 'Suportul de ceasca se regleaza, incap si cani inalte de latte', 'Program de curatare a circuitului de lapte', 'Rezervor de 1.5 l'],
+    cons: ['Doar 178 de pareri, mult sub Prima Latte 1', 'Costa cu 80 de lei mai mult decat versiunea precedenta'],
+    verdict: 'Prima Latte II e raspunsul Breville la reprosul de capacitate: carafa creste de la 0.3 la 0.6 l, deci faci doua-trei bauturi cu lapte fara reumplere. Al doilea castig e suportul de ceasca reglabil pe inaltime, care pare un moft pana incerci sa pui o cana inalta de latte sub un aparat fix si constati ca nu incape. Restul e familiar: 1.5 l rezervor, curatare automata a circuitului de lapte, merge si cu paduri. Are 178 de pareri, adica de aproape zece ori mai putine decat modelul pe care il inlocuieste, asa ca e mai putin testat, chiar daca vine din aceeasi familie. Il alegi cand vrei tot ce face Prima Latte, dar cu o carafa care sa nu te trimita la frigider dupa fiecare a doua cafea, si accepti sa platesti 80 de lei in plus pentru asta.' },
+  { g: 'auto', id: 'DCHCB4BBM', badge: 'Acelasi aparat, alta culoare', short: 'Breville VCF109X', lapte: 'Carafa 0.6 l', presiune: '19 bar', rezervor: '1.5 l',
+    specs: ['identic tehnic cu VCF108X', 'diferenta e finisajul rosu', 'carafa 0.6 l, rezervor 1.5 l', 'aceleasi 178 de pareri, aceeasi nota'],
+    pros: ['Aceleasi dotari ca VCF108X', 'Finisajul rosu, daca asta cauti', 'Carafa de 0.6 l si suport de ceasca reglabil'],
+    cons: ['Costa cu 200 de lei mai mult decat versiunea argintie, la specificatii identice', 'Nu aduce nimic functional in plus'],
+    verdict: 'Il includem ca sa fim clari pe un lucru: VCF109X e acelasi aparat ca VCF108X. Aceeasi presiune, aceeasi carafa de 0.6 l, acelasi rezervor de 1.5 l, aceeasi putere, aceleasi 178 de pareri si aceeasi nota 4.21. Singura diferenta pe care am gasit-o comparand fisele este finisajul, rosu in loc de argintiu, iar pentru ea platesti aproximativ 200 de lei in plus. Uneori merita, daca ai o bucatarie in care aparatul se vede si culoarea conteaza, si nu e nimic gresit in asta. Dar merita sa stii ca platesti design, nu performanta, pentru ca fisa nu o spune si e usor sa presupui ca modelul mai scump face ceva mai mult. Il iei doar daca vrei rosul; altfel, versiunea argintie iti face aceeasi cafea cu 200 de lei mai putin.' },
+  { g: 'auto', id: 'DC8WKCYBM', badge: 'Cea mai buna nota', short: 'Latkon 20 bar', lapte: 'Rezervor 700 ml', presiune: '20 bar', rezervor: '1 l',
+    specs: ['nota 4.89, cea mai mare din tot articolul', 'rezervor de lapte de 700 ml', 'incalzire de cesti pe capac', 'vine cu portafiltru, 2 filtre, presa si lingura'],
+    pros: ['Cea mai buna nota din articol, 4.89 din 167 de pareri', 'Rezervor de lapte mare, 700 ml', 'Poti regla cantitatea de cafea si cantitatea de spuma', 'Include tot ce iti trebuie: presa, lingura de dozare, doua filtre'],
+    cons: ['Brand putin cunoscut, service mai greu de gasit decat la De\'Longhi sau Krups', 'Rezervorul de apa e de 1 l, cel mai mic din grup'],
+    verdict: 'Nota de 4.89 din 167 de pareri e cea mai mare din tot articolul si e greu de ignorat, mai ales ca vine de la un brand pe care putini l-au auzit. Latkon pune in cutie ce alte marci vand separat: portafiltru cu doua filtre, presa de tasat, lingura de dozare, plus incalzire de cesti pe capac. Poti regla si cantitatea de cafea, si cat de multa spuma face, ceea ce inseamna ca ajustezi bautura fara sa intervii manual. Cei 20 de bari de pe cutie nu inseamna insa ca extrage mai bine decat un aparat de 15, si merita citita sectiunea de mai jos despre bari inainte sa platesti pentru cifra aia. Partea de care sa tii cont e brandul: la De\'Longhi sau Krups gasesti service si piese peste ani, la un nume mai mic e o necunoscuta. Il iei cand te iei dupa parerile reale ale cumparatorilor si vrei dotari complete, si accepti riscul unui brand mai putin raspandit.' },
+  // --- Cu spumare manuala, pentru control ---
+  { g: 'manual', id: 'DHGQ27BBM', badge: 'Cel mai cumparat din articol', short: 'De\'Longhi EC221', lapte: 'Duza manuala', presiune: '15 bar', rezervor: '1 l',
+    specs: ['2158 de pareri, cele mai multe din tot articolul', 'duza de spumare manuala, cu sistem cappuccino', 'merge cu macinata sau paduri', 'oprire automata'],
+    pros: ['De departe cel mai cumparat aparat din selectie, 2158 de pareri', 'Duza de spumare cu ajutor, mai iertatoare la incepatori decat una clasica', 'Merge si cu paduri, tranzitie usoara', 'Rezervor si tava detasabile, se curata simplu'],
+    cons: ['Carcasa din plastic la pretul asta', 'Fara accesorii in cutie in afara filtrelor'],
+    verdict: 'Cu 2158 de pareri, EC221 e aparatul cel mai cumparat din tot articolul, cu o margine considerabila, iar asta la un pret care nu e nici cel mai mic, nici cel mai mare. Duza de spumare e manuala, dar are un sistem care ajuta la emulsionare, ceea ce o face mai putin pretentioasa decat o duza clasica de otel unde totul depinde de unghi si de cat de bine simti temperatura laptelui. E compromisul potrivit pentru cine vrea sa invete sa spumeze fara sa strice zece cani de lapte pana prinde. Accepta si paduri, deci trecerea de la un aparat cu capsule nu e brutala. Carcasa e plastic, ceea ce la 850 de lei e greu de aparat, si in cutie nu primesti nici tamper, nici decalcifiant. Il iei cand vrei aparatul cu cel mai lung istoric de cumparatori multumiti si preferi sa inveti spumarea, in loc sa o lasi pe seama unei carafe.' },
+  { g: 'manual', id: 'DYXF7VBBM', badge: 'Rezervor mare', short: 'Krups XP320830', lapte: 'Duza manuala', presiune: '15 bar', rezervor: '1.5 l',
+    specs: ['rezervor de 1.5 l, printre cele mai mari', 'duza clasica de spumare', 'oprire automata', 'nota 4.38 din 218 pareri'],
+    pros: ['Rezervor de 1.5 l, il reumpli rar', 'Krups, brand cu service raspandit la noi', 'Duza clasica, buna pentru cine vrea sa invete corect', 'Nota solida, 4.38'],
+    cons: ['Face un singur tip de bautura, fara pretentii de latte', 'Carcasa din plastic'],
+    verdict: 'XP320830 e aparatul simplu si sincer din grup. Nu incearca sa faca trei bauturi la buton, nu are carafa, nu are ecran: are un portafiltru, o duza de abur si un rezervor de 1.5 l pe care il umpli rar. Krups e un brand cu service raspandit la noi, ceea ce conteaza la un aparat cu pompa si boiler, unde peste cativa ani s-ar putea sa ai nevoie de o piesa. Duza e una clasica, fara sistemul de ajutor de la De\'Longhi, deci ai control complet asupra texturii laptelui, dar si toata raspunderea: aici chiar inveti sa spumezi. Cele 218 pareri cu nota 4.38 il aseaza confortabil, fara sa iasa in evidenta. Il alegi cand vrei un aparat fara artificii, de la un brand cu service, si esti dispus sa exersezi spumarea in loc sa o primesti de-a gata.' },
+  { g: 'manual', id: 'D93NZ2YBM', badge: 'Singurul cu corp de metal', short: 'De\'Longhi Dedica EC685', lapte: 'Duza manuala', presiune: '15 bar', rezervor: '1.1 l',
+    specs: ['carcasa din metal, singura din selectie', 'latime slim, 15 cm', '1300 W, se incalzeste in circa 40 de secunde', 'in cutie: portafiltru, 3 filtre, decalcifiant, lingura'],
+    pros: ['Singurul aparat cu carcasa din metal din tot articolul', 'Slim, incape pe un blat ingust', 'Cea mai completa cutie: portafiltru, trei filtre, decalcifiant, lingura de dozare', 'Se incalzeste repede, 1300 W'],
+    cons: ['Cel mai scump din selectie', 'Rezervorul de 1.1 l trebuie reumplut mai des'],
+    verdict: 'Dedica Style e singurul aparat din articol cu carcasa din metal, si diferenta se simte in mana, nu doar la privit: nu se misca pe blat cand desprinzi portafiltrul, gestul care la aparatele usoare de plastic te face sa tii de ele cu cealalta mana. Latimea slim de aproximativ 15 cm rezolva o problema reala in bucatariile mici, unde blatul liber e mai scump decat aparatul. Cei 1300 W il aduc la temperatura de lucru in mai putin de un minut. In cutie primesti trei filtre, portafiltrul, lingura de dozare si, detaliu rar, o doza de decalcifiant, adica exact consumabilul de care vei avea nevoie primul. Cele 472 de pareri cu nota 4.42 vin dintr-un model vandut de ani buni. E cel mai scump din selectie si are un rezervor de doar 1.1 l. Il iei cand vrei constructie serioasa intr-un spatiu ingust si intentionezi sa folosesti aparatul zilnic, ani la rand.' },
+  // --- Sub 300 de lei ---
+  { g: 'buget', id: 'DH9XV6BBM', badge: 'Cel mai bun sub 300', short: 'Heinner HEM-850', lapte: 'Duza manuala', presiune: '15 bar', rezervor: '1.5 l',
+    specs: ['15 bari reali, cu pompa', 'rezervor de 1.5 l, cel mai mare din grup', 'carcasa inox', 'filtru dublu din inox'],
+    pros: ['Pompa adevarata de 15 bari, sub 300 de lei', 'Rezervor de 1.5 l, cat la aparate de trei ori mai scumpe', 'Carcasa din inox, nu plastic', 'Nota 4.37, cea mai buna din grupul de buget'],
+    cons: ['Face o singura bautura odata', 'Fara accesorii in cutie'],
+    verdict: 'HEM-850BKSL e aparatul pe care il recomand cuiva care vrea sa incerce espresso cu portafiltru fara sa investeasca serios. Are pompa de 15 bari, adica aceeasi tehnologie ca modelele de patru ori mai scumpe, un rezervor de 1.5 l cat la Krups, si carcasa din inox in loc de plastic. Filtrul dublu din inox si duza de spumare manuala completeaza un aparat care, pe hartie, nu are ce sa ii reprosezi la 280 de lei. Nota de 4.37 din 150 de pareri sustine impresia. Diferenta fata de aparatele scumpe nu e in lista de dotari, ci in stabilitatea temperaturii si in cat rezista in timp, lucruri pe care fisa tehnica nu le arata. Face o singura bautura odata si vine fara accesorii. Il iei cand vrei sa vezi daca ritualul cu portafiltru ti se potriveste, inainte sa dai 900 de lei pe unul.' },
+  { g: 'buget', id: 'D3Q1S7MBM', badge: 'Cel mai ieftin cu pompa', short: 'Heinner Boquette', lapte: 'Functie abur', presiune: '15 bar', rezervor: '1.2 l',
+    specs: ['cel mai ieftin aparat cu pompa reala din selectie', '15 bari, 850 W', 'rezervor detasabil de 1.2 l', 'protectie la supraincalzire'],
+    pros: ['Cel mai ieftin aparat cu pompa de 15 bari din articol', 'Rezervor detasabil de 1.2 l, se umple la robinet', 'Are functie de abur pentru lapte', 'Nota 4.33 din 198 de pareri'],
+    cons: ['Fisa nu precizeaza tipul sistemului de spumare', 'Materiale de nivel de intrare'],
+    verdict: 'Boquette e pragul de jos la care mai primesti tehnologia corecta: pompa de 15 bari, nu abur. La 253 de lei asta conteaza mai mult decat orice alt detaliu, pentru ca desparte un aparat care face espresso de unul care face altceva. Rezervorul de 1.2 l se detaseaza, deci il umpli direct la robinet in loc sa cari aparatul, iar protectia la supraincalzire e prezenta. Are functie de abur pentru lapte, desi fisa eMAG nu precizeaza ce fel de sistem de spumare foloseste, asa ca nu pot spune cat de usor se lucreaza cu el. Cele 198 de pareri cu nota 4.33 arata cumparatori multumiti la banii dati. Materialele sunt de nivel de intrare si se vede. Il iei cand bugetul e strict sub 300 de lei si vrei totusi un aparat cu pompa, nu unul cu abur.' },
+  { g: 'buget', id: 'DJX6QSBBM', badge: 'Atentie: aparat cu abur', short: 'Heinner HEM-200', lapte: 'Duza manuala', presiune: '3.5 bar', rezervor: '0.25 l',
+    specs: ['3.5 bari, sub pragul pentru espresso adevarat', 'functioneaza cu abur, nu cu pompa', 'rezervor de 0.25 l, doua cesti', 'cel mai ieftin din articol, 152 de lei'],
+    pros: ['Cel mai mic pret din articol', 'Filtru din inox si duza de spumare', '278 de pareri, deci multi cumparatori', 'Ocupa foarte putin loc'],
+    cons: ['3.5 bari nu ajung pentru espresso cu crema adevarata', 'Rezervor de doar 0.25 l, doua cesti si il reumpli', 'Alta tehnologie decat restul aparatelor din articol'],
+    verdict: 'Il includem cu o precizare care lipseste de pe eticheta: HEM-200 nu e in aceeasi categorie cu celelalte aparate de aici. Are 3.5 bari, iar pentru espresso cu crema adevarata e nevoie de cel putin 7 bari la cafea. Aparatele de acest tip nu folosesc pompa, ci presiunea aburului, aceeasi idee ca la un ibric moka electric. Rezultatul e o cafea concentrata, buna in felul ei, dar nu espresso in sensul in care il astepti de la un aparat cu portafiltru. Rezervorul de 0.25 l inseamna doua cesti si reumplere. Are 278 de pareri si nota 4.1, deci oamenii care l-au cumparat nu sunt nemultumiti, probabil pentru ca la 152 de lei asteptarile sunt pe masura. Il iei doar daca vrei o cafea concentrata ieftina si nu te intereseaza crema sau espresso propriu-zis. Daca vrei espresso adevarat, urca la Boquette, unde pentru 100 de lei in plus primesti pompa de 15 bari.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const AUTO = PICKS.filter(x => x.g === 'auto');
+const MANUAL = PICKS.filter(x => x.g === 'manual');
+const BUGET = PICKS.filter(x => x.g === 'buget');
+
+const hero = '/imagini/articole/cele-mai-bune-espressoare-manuale.webp';
+const figAuto = '/imagini/articole/espressor-manual-carafa.webp';
+const figManual = '/imagini/articole/espressor-manual-control.webp';
+const figBuget = '/imagini/articole/espressor-manual-buget.webp';
+const published = '2026-07-20T15:22:38+03:00';
+
+const faq = [
+  { question: 'Ce inseamna, de fapt, espressor manual?', answer: 'Un espressor manual e un aparat cu pompa electrica si portafiltru, in care tu pui cafeaua macinata, o tasezi si pornesti extractia. Cuvantul manual se refera la partea pe care o faci tu, dozarea si tasarea, nu la generarea presiunii, care ramane treaba pompei. Se deosebeste de espressorul automat, care are rasnita incorporata si macina, doseaza si extrage singur, si de cel cu capsule, unde introduci o capsula si nu atingi cafeaua deloc. Aparatele cu levier, la care chiar tu produci presiunea apasand un brat, sunt o categorie aparte si aproape nu se gasesc in magazinele generaliste de la noi.' },
+  { question: 'Chiar conteaza daca are 15, 19 sau 20 de bari?', answer: 'Mult mai putin decat sugereaza cutia. Cifra de pe ambalaj e presiunea maxima pe care o poate genera pompa, nu cea care ajunge la cafea. Intre pompa si cafea exista o supapa de suprapresiune care regleaza extractia in jurul a 9 bari, valoarea considerata optima de Specialty Coffee Association, pentru ca scoate zaharurile si aromele fara sa treaca in amareala. Asta inseamna ca un aparat de 20 de bari si unul de 15 extrag, in practica, la presiuni apropiate. Ce face diferenta reala e stabilitatea temperaturii, macinarea si prospetimea cafelei. Singurul loc unde cifra chiar conteaza e la capatul de jos: sub 7 bari nu obtii crema adevarata.' },
+  { question: 'Ce este cosul presurizat si de ce ma intereseaza?', answer: 'E detaliul care decide daca mai trebuie sa cumperi si o rasnita. Cosul presurizat, numit si cu perete dublu, are un fund fals cu o singura gaura care creeaza artificial contrapresiune. Asta il face iertator: functioneaza si cu cafea macinata din comert, macinata mai grosier, si scoate oricum ceva ce arata a crema. Cosul nepresurizat, cu perete simplu, are gauri pe toata suprafata si nu iarta nimic: iti trebuie macinare fina si uniforma, deci o rasnita cu pietre, si tasare corecta. In schimb, cu el obtii extractia adevarata si controlul complet. Aparatele accesibile vin aproape intotdeauna cu cosuri presurizate, iar asta e o veste buna daca nu vrei sa investesti inca intr-o rasnita.' },
+  { question: 'Am nevoie de rasnita separata?', answer: 'Depinde de cat de departe vrei sa mergi. Cu un cos presurizat si cafea macinata cumparata de la raft faci o cafea decenta din prima zi, si asta e suficient pentru multa lume. Daca vrei insa sa simti diferenta pentru care ai luat un aparat cu portafiltru, rasnita conteaza mai mult decat aparatul: cafeaua macinata isi pierde aromele in cateva zile dupa deschiderea pungii, iar macinarea din comert e facuta pentru filtru, nu pentru espresso. O rasnita cu pietre, nu cu lame, schimba rezultatul mai vizibil decat trecerea de la un aparat de 500 de lei la unul de 900. Ordinea rezonabila e sa incepi cu aparatul si cafea macinata, iar rasnita sa vina cand simti ca vrei mai mult.' },
+  { question: 'Carafa automata de lapte sau duza manuala?', answer: 'E alegerea care imparte articolul in doua si tine de cat vrei sa te implici. Carafa automata aspira laptele, il spumeaza si il toarna singura: apesi un buton si primesti cappuccino, de fiecare data la fel. Avantajul e consecventa si viteza, dezavantajul e ca spuma iese standard, nu o poti ajusta, si ai de curatat un circuit in plus. Duza manuala inseamna ca tii tu cana, o pozitionezi si simti cand laptele a ajuns la temperatura potrivita. Primele incercari vor fi slabe, dar dupa cateva zeci de cani obtii o spuma mai buna decat orice carafa si poti face si microfoam pentru desene. Alege carafa daca vrei cafeaua rapid, dimineata, fara ritual, si duza daca partea de preparare ti se pare jumatate din placere.' },
+  { question: 'Cat de des trebuie decalcifiat si de ce conteaza?', answer: 'La apa din Romania, care e in general dura, o data la doua-trei luni daca folosesti aparatul zilnic. Calcarul se depune in boiler si pe circuitul de apa, iar efectele apar treptat: apa curge mai greu, temperatura scade, cafeaua iese slaba si, in final, pompa cedeaza. E cea mai frecventa cauza de moarte a aparatelor accesibile si e complet evitabila. Folosesti solutie de decalcifiere dedicata, urmand instructiunile din manual, sau cartuse de filtrare daca aparatul le accepta. De\'Longhi Dedica din selectie vine cu o doza de decalcifiant in cutie, un detaliu rar care iti spune ca producatorul se asteapta sa il folosesti. Daca faci doar un lucru pentru aparatul tau, fa asta.' },
+  { question: 'Pot folosi paduri in loc de cafea macinata?', answer: 'La unele modele, da, si e o portita utila. Padurile sunt discuri de cafea presata in hartie de filtru, care se pun in portafiltru fara sa dozezi si fara sa tasezi. In selectia de aici, modelele De\'Longhi si cele Breville accepta atat cafea macinata, cat si paduri, in timp ce restul lucreaza doar cu macinata. Avantajul e viteza si lipsa mizeriei, dezavantajul e ca alegerea de cafea e mult mai limitata si costul pe ceasca urca. Multi le folosesc ca varianta de zi cu zi, dimineata, si trec pe cafea macinata in weekend. Daca banuiesti ca asa vei proceda si tu, verifica in fisa produsului mentiunea pad cafea inainte sa cumperi.' },
+  { question: 'Cat costa un espressor manual bun?', answer: 'In selectia de aici, aparatele cu pompa reala pornesc de la circa 250 de lei, cu Heinner Boquette, si urca la 280 pentru HEM-850, care are rezervor de 1.5 l si carcasa inox. Zona in care apar carafele automate de lapte incepe pe la 540 de lei, cu De\'Longhi ECP 31.21 si Breville Prima Latte, si merge pana spre 850, la Latkon si Breville Prima Latte II. Aparatele cu spumare manuala si constructie mai serioasa stau intre 850 si 921 de lei, cu De\'Longhi EC221, Krups XP320830 si Dedica Style. Sub 200 de lei intri in zona aparatelor cu abur, care sunt altceva. Pragul unde raportul e cel mai bun e in jur de 550 de lei, unde primesti pompa, carafa de lapte si un brand cu istoric.' },
+];
+
+const images = [hero, figAuto, figManual, figBuget, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune espressoare manuale in ${SEO_YEAR}: cu carafa de lapte sau spumare manuala`}
+  description="12 espressoare manuale cu portafiltru comparate: cu carafa de lapte sau spumare manuala, de la 152 la 921 de lei. Plus ce inseamna barii de pe cutie."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Cristian Popa"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Electrocasnice Casa', url: '/electrocasnice-casa/' }, { name: 'Cele mai bune espressoare manuale' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/electrocasnice-casa/">Electrocasnice Casa</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune espressoare manuale</span>
+    </nav>
+
+    <h1>Cele mai bune espressoare manuale cu portafiltru</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune espressoare manuale cu portafiltru: modele cu carafa de lapte si cu spumare manuala" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Cel mai cumparat espressor manual din selectie e <strong>De'Longhi EC221</strong>, cu 2158 de pareri, care iti da o duza de abur si te lasa sa spumezi tu laptele. Daca vrei cappuccino la apasarea unui buton, <strong>Breville Prima Latte</strong> are 1539 de pareri si o carafa care face laptele singura. Cea mai bine notata e <strong>Latkon</strong>, cu 4.89, iar sub 300 de lei <strong>Heinner HEM-850</strong> are aceeasi pompa de 15 bari ca modelele de trei ori mai scumpe.</p>
+      <p>Espressor manual inseamna ca tu pui cafeaua macinata in portafiltru si o tasezi, iar pompa face extractia. Nu tu produci presiunea. Odata lamurit asta, alegerea se reduce la o singura intrebare: <strong>vrei sa spumezi tu laptele sau vrei sa o faca aparatul</strong>. Pe criteriul asta sunt impartite si cele 12 modele de mai jos.</p>
+      <p>Mai jos gasesti cele 12 modele impartite exact pe criteriul asta, apoi partea pe care fisele tehnice nu ti-o spun: de ce cifra de bari de pe cutie e in mare parte marketing, ce e cosul presurizat si cand chiar ai nevoie de o rasnita separata. Daca vrei, in schimb, ca aparatul sa macine si sa doseze singur, articolul potrivit e cel despre <a href="/espressor-automat-pentru-acasa/">espressoarele automate cu rasnita</a>, iar pentru o privire peste toata categoria, <a href="/cele-mai-bune-espressoare/">espressoarele in general</a>.</p>
+    </div>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#auto">Cu carafa de lapte, spumare automata</a></li>
+        <li><a href="#manual">Cu spumare manuala, pentru control</a></li>
+        <li><a href="#buget">Sub 300 de lei</a></li>
+        <li><a href="#bari">Minciuna cu barii de pe cutie</a></li>
+        <li><a href="#cos">Cosul presurizat si rasnita</a></li>
+        <li><a href="#lapte">Laptele: carafa sau duza</a></li>
+        <li><a href="#greseli">Greseli care strica cafeaua</a></li>
+        <li><a href="#intretinere">Decalcifiere si intretinere</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Lapte</th><th>Presiune</th><th>Rezervor</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.lapte}</td>
+              <td>{x.presiune}</td>
+              <td>{x.rezervor}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="auto">Cu carafa de lapte, spumare automata</h2>
+    <p>Aparatele care aspira laptele dintr-un recipient, il spumeaza si il toarna singure. Apesi un buton si primesti cappuccino sau latte, de fiecare data la fel, fara sa inveti nimic. In schimb, spuma iese standard si ai de curatat un circuit in plus.</p>
+    <div class="rd-grid">
+      {AUTO.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAuto} alt="Espressoare manuale cu carafa automata de lapte: Breville, De'Longhi, Latkon" width="1600" height="900" loading="lazy" />
+
+    <h2 id="manual">Cu spumare manuala, pentru control</h2>
+    <p>Aici tii tu cana sub duza de abur si simti cand laptele a ajuns unde trebuie. Primele incercari ies prost, dar dupa cateva zeci de cani obtii o spuma pe care nicio carafa automata nu o egaleaza. Tot aici stau si aparatele cu constructia cea mai serioasa din selectie.</p>
+    <div class="rd-grid">
+      {MANUAL.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figManual} alt="Espressoare manuale cu duza de spumare: De'Longhi EC221, Krups, Dedica Style" width="1600" height="900" loading="lazy" />
+
+    <h2 id="buget">Sub 300 de lei</h2>
+    <p>Pragul la care inca primesti tehnologia corecta, adica pompa, si cel sub care intri in altceva. Diferenta dintre primele doua modele de aici si al treilea nu e de calitate, ci de tip de aparat, iar eticheta nu o spune.</p>
+    <div class="rd-grid">
+      {BUGET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Espressoare manuale sub 300 de lei: Heinner HEM-850 si Boquette" width="1600" height="900" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-espressor-manual').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate espressoarele manuale la oferta</strong>
+        <span>Reducerile din acest moment la espressoare cu portafiltru, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="bari">Minciuna cu barii de pe cutie</h2>
+    <p>Pe fiecare cutie scrie 15 bari, 19 bari sau 20 de bari, iar logica spune ca mai mult inseamna mai bine. Nu e asa, si merita explicat, pentru ca e principalul criteriu dupa care se compara aparatele in magazine.</p>
+    <p>Cifra de pe cutie e presiunea maxima pe care o poate genera pompa in gol, nu presiunea care ajunge la cafea. Intre pompa si portafiltru exista o supapa de suprapresiune, care trimite surplusul inapoi in rezervor si regleaza extractia undeva in jurul a 9 bari. Valoarea asta nu e aleatoare: e cea considerata optima, pentru ca scoate din cafea zaharurile, acizii si compusii aromati, dar se opreste inainte sa extraga si substantele care dau amareala.</p>
+    <p>Concret, aparatul de 20 de bari din selectie si cele de 15 ajung la cafea cu presiuni apropiate. Presiunea mai mare nu inseamna extractie mai buna; daca ar ajunge nefiltrata la cafea, ar impinge apa prea repede prin ea si ar scoate gust aspru. Ce face cu adevarat diferenta e stabilitatea temperaturii, calitatea macinarii si prospetimea boabelor.</p>
+    <p>Exista totusi un loc unde cifra conteaza, si e la capatul celalalt. Sub aproximativ 7 bari la cafea nu se formeaza crema adevarata. Aparatele de 3.5 bari, cum e Heinner HEM-200 din selectie, nu folosesc pompa deloc, ci presiunea aburului, aceeasi idee ca la un ibric moka. Fac o cafea concentrata care are farmecul ei, dar nu e espresso. Asta e singura granita reala pe care ti-o spune cifra de bari, si e in partea de jos a scalei, nu in cea de sus.</p>
+
+    <h2 id="cos">Cosul presurizat si rasnita</h2>
+    <p>Detaliul asta nu apare aproape niciodata in descrierile din magazin, desi decide daca mai ai de cheltuit cateva sute de lei dupa ce cumperi aparatul.</p>
+    <p>In portafiltru intra un cos metalic, iar el vine in doua feluri:</p>
+    <ul>
+      <li><strong>Cosul presurizat</strong>, numit si cu perete dublu, are un fund fals cu o singura gaura, care creeaza mecanic contrapresiunea necesara. Iarta greselile: merge cu cafea macinata cumparata de la raft, macinata mai grosier decat ar trebui pentru espresso, si scoate oricum un strat de spuma care seamana cu crema. Nu ai nevoie de rasnita.</li>
+      <li><strong>Cosul nepresurizat</strong>, cu perete simplu, are gauri pe tot fundul si nu compenseaza nimic. Iti trebuie macinare fina si uniforma si tasare corecta, altfel apa trece prea repede si obtii o cafea apoasa. In schimb, aici e extractia adevarata si controlul complet.</li>
+    </ul>
+    <p>Aparatele accesibile si de mijloc vin aproape intotdeauna cu cosuri presurizate, iar asta e in favoarea ta la inceput. Poti cumpara aparatul astazi, o punga de cafea macinata de la supermarket, si sa bei o cafea decenta in aceeasi seara, fara nicio investitie suplimentara.</p>
+    <p>Cand incepi sa vrei mai mult, ordinea corecta a cheltuielilor e contraintuitiva: rasnita schimba rezultatul mai mult decat aparatul. Cafeaua macinata isi pierde aromele volatile in cateva zile dupa ce deschizi punga, iar macinarea din comert e calibrata pentru filtru, nu pentru espresso. O rasnita cu pietre, nu cu lame, aduce o diferenta mai mare decat saltul de la un aparat de 500 de lei la unul de 900. Daca ai un buget total fix, un aparat de mijloc plus o rasnita bate un aparat scump plus cafea macinata.</p>
+
+    <h2 id="lapte">Laptele: carafa sau duza</h2>
+    <p>Asta e alegerea care imparte selectia in doua si care ar trebui facuta prima, inainte de pret sau de brand, pentru ca tine de cum vrei sa iti petreci diminetile.</p>
+    <p>Carafa automata aspira laptele printr-un tub, il spumeaza si il toarna in ceasca. Rezultatul e consecvent, rapid si nu cere nicio pricepere. Modelele din selectie difera aici prin capacitate, si diferenta se simte: 0.3 l la Prima Latte inseamna reumplere dupa doua bauturi, in timp ce 0.6 l la Prima Latte II sau 700 ml la Studio Casa si Latkon te duc printr-o dimineata cu musafiri. Contra: spuma iese asa cum a decis producatorul, si ai un circuit in plus de curatat, motiv pentru care programele de curatare automata din fisa nu sunt un moft.</p>
+    <p>Duza manuala e un tub de abur pe care il bagi in cana de lapte si il misti pana obtii textura dorita. Necesita exercitiu: primele incercari dau spuma cu bule mari, care se lasa in cateva secunde. Dupa cateva zeci de cani insa incepi sa obtii microfoam, spuma fina si lucioasa care se amesteca in cafea in loc sa pluteasca deasupra, si de acolo poti face si desene. Nicio carafa automata nu ajunge acolo.</p>
+    <p>Intre cele doua exista o varianta de mijloc, iar De'Longhi EC221 din selectie o foloseste: o duza manuala cu un sistem care ajuta la emulsionare, mai iertatoare decat un tub clasic de otel. E compromisul pentru cine vrea sa invete, dar nu de la zero.</p>
+
+    <h2 id="greseli">Greseli care strica cafeaua</h2>
+    <p>Cele mai multe cafele proaste facute acasa nu vin de la aparat, ci de la cateva obiceiuri usor de corectat.</p>
+    <ul>
+      <li><strong>Cafea veche.</strong> O punga deschisa de trei saptamani da o cafea plata indiferent de aparat. Boabele sau macinatura se tin inchise ermetic, la temperatura camerei, nu in frigider, unde absorb umezeala si mirosuri.</li>
+      <li><strong>Ceasca rece.</strong> Un espresso de 25 ml turnat intr-o ceasca de portelan rece pierde instant o buna parte din temperatura. De asta modelele mai bune au suprafata de sus incalzita, iar daca a ta nu are, clateste ceasca cu apa fierbinte inainte.</li>
+      <li><strong>Tasare inegala.</strong> Daca apesi stramb, apa gaseste drumul cel mai usor prin partea mai subtire si trece pe acolo, lasand restul cafelei neextras. Rezultatul e o cafea in acelasi timp apoasa si amara. Apasa drept, cu forta moderata si constanta.</li>
+      <li><strong>Prima cafea pe aparat rece.</strong> Grupul si portafiltrul sunt din metal si trag caldura din apa. Lasa aparatul sa se incalzeasca cateva minute si trece o cantitate de apa prin portafiltrul gol inainte de prima extractie.</li>
+      <li><strong>Apa de la robinet, in zone cu apa dura.</strong> Nu strica doar gustul, ci si aparatul, prin depunerile de calcar. Apa filtrata rezolva ambele probleme simultan.</li>
+      <li><strong>Duza de abur lasata murdara.</strong> Laptele uscat pe duza se curata mult mai greu si infunda orificiile, iar spuma iese tot mai slaba. Sterge duza imediat dupa spumare, cat laptele e inca lichid.</li>
+    </ul>
+
+    <h2 id="intretinere">Decalcifiere si intretinere</h2>
+    <p>Cea mai frecventa cauza de moarte a unui espressor accesibil nu e o piesa prost facuta, ci calcarul, si e complet evitabila.</p>
+    <p>Apa din majoritatea oraselor din Romania e dura, iar la fiecare incalzire lasa depuneri in boiler si pe circuit. Efectele apar gradual, si tocmai de asta trec neobservate: apa curge tot mai greu, temperatura scade, cafeaua incepe sa iasa slaba, iar la final pompa forteaza si cedeaza. Multi arunca aparatul crezand ca s-a stricat, cand de fapt s-a infundat.</p>
+    <p>La folosire zilnica, o decalcifiere la doua-trei luni e un ritm rezonabil. Se face cu solutie dedicata, dupa instructiunile din manual, care difera de la un model la altul. Dedica Style din selectie vine cu o doza de decalcifiant in cutie, ceea ce spune ceva despre asteptarile producatorului.</p>
+    <p>Dincolo de calcar, intretinerea zilnica e simpla: clatesti portafiltrul si cosul dupa fiecare folosire, ca uleiurile de cafea sa nu se agate si sa devina ranced, si stergi duza de abur imediat dupa spumare, cat laptele e inca lichid. Laptele uscat pe duza se curata mult mai greu si infunda orificiile. La modelele cu carafa, ruleaza programul de curatare a circuitului de lapte cu frecventa recomandata in manual.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia acopera un interval larg si merita citita pe praguri, pentru ca banii nu cumpara acelasi lucru peste tot.</p>
+    <p>Sub 300 de lei stau aparatele cu pompa de la Heinner: Boquette la circa 250 si HEM-850 la 280, ultimul cu rezervor de 1.5 l si carcasa inox. Aici primesti tehnologia corecta si materiale de nivel de intrare. Sub 200 de lei intri in zona aparatelor cu abur, care sunt altceva.</p>
+    <p>Intre 540 si 630 de lei apar carafele automate de lapte si brandurile cu istoric: De'Longhi ECP 31.21, Breville Prima Latte cu cele 1539 de pareri, Studio Casa Barista si Prima Latte II. E pragul cu cel mai bun raport din tot articolul, pentru ca aduce simultan pompa, sistem de lapte si un producator la care gasesti service.</p>
+    <p>Intre 830 si 921 de lei stau doua categorii diferite la acelasi pret. Pe de o parte Latkon si Prima Latte II rosu, cu carafa si dotari complete; pe de alta De'Longhi EC221, Krups XP320830 si Dedica Style, cu spumare manuala si, in cazul Dedica, singura carcasa de metal din selectie. Nu sunt mai bune unele decat altele, sunt pentru oameni diferiti.</p>
+    <p>O observatie de buget care iese din tipar: daca ai in jur de 900 de lei si vrei cea mai buna cafea posibila, un aparat de 550 plus o rasnita cu pietre de 350 iti va da un rezultat mai bun decat un aparat de 900 cu cafea macinata din comert. Daca in schimb vrei comoditate, banii stau mai bine intr-un aparat cu carafa. Tot pentru bucatarie, daca reorganizezi blatul, vezi si <a href="/robot-de-bucatarie-multifunctional/">robotii de bucatarie multifunctionali</a> sau <a href="/plita-cu-inductie-pentru-bucatarie/">plitele cu inductie</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">CP</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
+        <p class="author-role">Specialist Electrocasnice</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-espressoare-manuale" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-espressoare-manuale" currentCategory="electrocasnice-casa" articles={relatedArticles} />
+  </article>
+</Layout>

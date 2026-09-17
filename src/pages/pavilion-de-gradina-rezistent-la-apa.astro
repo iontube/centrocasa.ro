@@ -1,259 +1,305 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Pavilion de gradina rezistent la apa",
-  excerpt: "Daca vrei un pavilion de gradina rezistent la apa care sa te tina si sa-si merite banii, mergi pe structuri cu schelet din aluminiu sau otel galvanizat si cu prelata din poliester gros, tratat UV, de minim 200-250 grame pe metru patrat. Modelele cu acoperis dublu sau cu sistem de ventilatie sunt un plus mare.",
-  image: "/images/articles/pavilion-de-gradina-rezistent-la-apa.webp",
-  category: "Mobilier Gradina",
-  categorySlug: "mobilier-gradina",
-  date: "2026-02-10T13:17:47.767Z",
-  modifiedDate: "2026-02-10T13:17:47.767Z",
-  author: "Maria Ionescu",
-  authorRole: "Designer Interior",
-  authorBio: "Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de gradina si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare."
-};
-
-const faq = [
-  { question: "Cat costa un pavilion de gradina rezistent la apa?", answer: "Un pavilion de gradina rezistent la apa poate costa intre 500 lei pentru modele pliabile simple si peste 5000 lei pentru structuri fixe, din materiale premium. Modelele medii, cele mai populare, se incadreaza intre 1000 si 2500 lei." },
-  { question: "Care e diferenta intre un pavilion de gradina rezistent la apa si unul normal?", answer: "Un pavilion rezistent la apa are prelate din materiale mai dense (minim 200-250 g/m² poliester), tratate UV si adesea cu strat impermeabil (PU). Structura e mai solida, din otel galvanizat sau aluminiu, pentru a rezista la vant si ploaie fara sa se rastoarne sau sa se deterioreze rapid." },
-  { question: "Merita sa cumpar un pavilion de gradina rezistent la apa din poliester?", answer: "Da, merita daca poliesterul este de buna calitate si are un gramaj ridicat (minim 200-250 g/m²), plus tratament UV. Poliesterul dens ofera o buna protectie impotriva ploii si soarelui, fiind si mai accesibil decat alte materiale." },
-  { question: "Ce pavilion de gradina e mai bun pentru vant puternic?", answer: "Pentru vant puternic, alege un pavilion fix, cu o structura solida din otel galvanizat sau aluminiu gros, si cu o baza care se poate ancora foarte bine in sol sau pavaj. Modelele pliabile sunt mai vulnerabile la vanturi puternice." },
-  { question: "De ce se decoloreaza pavilionul de gradina de la soare?", answer: "Se decoloreaza din cauza radiatiilor UV. Daca pavilionul nu are un strat protector UV aplicat pe materialul prelatei, culorile vor palea rapid, iar materialul va deveni casant si se va deteriora. Cauta specificatii clare despre protectia UV." },
-  { question: "Cum sa intretin pavilionul de gradina rezistent la apa?", answer: "Curata prelatele regulat cu apa si sapun neutru, fara detergenti abrazivi. Daca ai un model cu structura metalica, verifica periodic sa nu apara pete de rugina si aplica un strat protector. Asigura-te ca pavilionul este complet uscat inainte de a-l depozita iarna." },
-  { question: "Unde gasesc un pavilion de gradina rezistent la apa de calitate?", answer: "Poti gasi pavilioane de gradina rezistente la apa de calitate in magazinele mari de bricolaj (Leroy Merlin, Dedeman, Hornbach), in magazinele online specializate in mobilier de gradina sau pe platforme precum Emag. Verifica specificatiile tehnice si citeste parerile altor clienti." },
-  { question: "Ce inseamna ca un pavilion de gradina este rezistent la apa?", answer: "Inseamna ca materialul prelatei este tratat pentru a impiedica patrunderea apei. Un pavilion 'rezistent la apa' va proteja impotriva ploii moderate, dar nu este menit sa reziste la inundatii sau la presiunea mare a apei pe perioade indelungate. Pentru plus de siguranta, alege modele cu acoperis in panta sau guri de ventilatie." }
-];
-
-const toc = [
-  { title: "Stai pe uscat si la soare: Pavilionul tau de gradina perfect rezistent la apa", id: "stai-pe-uscat-si-la-soare-pavilionul-tau-de-gradina-perfect-rezistent-la-apa" },
-  { title: "Top 4 Pavilioane de Gradina Rezistente la Apa: Recomandari Concrete (cu Bune si Rele)", id: "top-4-pavilioane-de-gradina-rezistente-la-apa-recomandari-concrete-cu-bune-si-rele" },
-  { title: "Cum Alegi Pavilionul de Gradina Rezistent la Apa Potrivit Pentru Tine: Ghidul Prietenului", id: "cum-alegi-pavilionul-de-gradina-rezistent-la-apa-potrivit-pentru-tine-ghidul-prietenului" },
-  { title: "Pavilion Pliabil vs. Pavilion Fix: Ce Alegi Pentru Grădina Ta?", id: "pavilion-pliabil-vs-pavilion-fix-ce-alegi-pentru-gradina-ta" },
-  { title: "Greșeli De Evitat Când Cumperi un Pavilion de Gradina Rezistent la Apa (Sfaturi de Insider)", id: "greseli-de-evitat-cand-cumperi-un-pavilion-de-gradina-rezistent-la-apa-sfaturi-de-insider" },
-  { title: "Verdictul Pe Buget: Pavilion de Gradina Rezistent la Apa Pentru Fiecare Buzunar", id: "verdictul-pe-buget-pavilion-de-gradina-rezistent-la-apa-pentru-fiecare-buzunar" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['pavilion-gradina'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Impermeabile 3x3 ---
+  { g: 'imperm', id: 'D6LW5KMBM', badge: 'Impermeabil, bine notat', short: 'Danubewd', dim: '3 x 3 m', pereti: 'Fara', material: 'PVC',
+    specs: ['pavilion impermeabil 3x3 m', 'prelata din PVC, rezistenta la ploaie', 'acoperis usor, 4.2 kg', 'nota 4.53 din 17 pareri'],
+    pros: ['Prelata din PVC, cu adevarat impermeabila', 'Nota buna, 4.53, din 17 pareri, bine testat', 'Acoperis usor, 4.2 kg, se manevreaza simplu', 'Dimensiune standard 3x3, acopera o masa mare'],
+    cons: ['Fara pereti laterali, expus pe lateral la vant', 'Brand mai putin cunoscut'],
+    verdict: 'Cel mai bine testat pavilion impermeabil din selectie si o alegere sigura daca pui pret pe rezistenta la ploaie. Danubewd are 3x3 m si o prelata din PVC cu adevarat impermeabila, care tine apa afara la o ploaie de vara, nu doar o stropeste, si un acoperis usor de doar 4.2 kg, deci il montezi si il muti fara efort. Cu 17 pareri si nota 4.53 e unul dintre cele mai apreciate din selectie, un semn bun ca prelata isi face treaba. Dimensiunea standard de 3x3 acopera o masa mare cu scaune, potrivit pentru terasa sau curte. Nu are pereti laterali, deci pe vant sau ploaie oblica esti expus pe margini, dar la o vreme obisnuita protejeaza bine. Il iei cand vrei un pavilion clar impermeabil, usor si bine cotat, pentru umbra si adapost la o ploaie trecatoare, si nu ai nevoie de pereti.' },
+  { g: 'imperm', id: 'DDDYTN2BM', badge: 'Cel mai bine notat', short: 'PEXOR Forte', dim: '3 x 3 m', pereti: 'Fara', material: 'Metal + poliester',
+    specs: ['pavilion impermeabil PEXOR Forte 3x3', 'cadru metalic pliabil, montaj rapid', 'poliester tratat impermeabil', 'nota 4.86, cea mai mare din selectie'],
+    pros: ['Cea mai mare nota din selectie, 4.86', 'Cadru metalic pliabil, se ridica rapid', 'Poliester tratat impermeabil', 'Structura solida, rezistenta'],
+    cons: ['Inca 7 pareri deocamdata', 'Fara pereti laterali inclusi'],
+    verdict: 'Cel mai bine notat pavilion din selectie si alegerea daca vrei calitate si impermeabilitate intr-un pachet solid. PEXOR Forte are 3x3 m, un cadru metalic pliabil care se ridica rapid, tip pop-up, si o prelata din poliester tratat impermeabil, care face fata ploii. Cu nota 4.86, cea mai mare din tot articolul, chiar daca deocamdata din 7 pareri, primii cumparatori sunt foarte multumiti de rezistenta si de montajul simplu. Structura solida il recomanda pentru folosire repetata, la evenimente in curte sau ca umbrar de vara. Nu vine cu pereti laterali, deci pentru protectie completa pe vant adaugi separat, dar acoperisul isi face treaba. Il iei cand vrei cel mai bine cotat pavilion din selectie, cu cadru metalic pliabil si prelata impermeabila, pentru montaj rapid si adapost de calitate.' },
+  { g: 'imperm', id: 'DM56L8MBM', badge: 'Cel mai vandut', short: 'AT Performance', dim: '3 x 3 m', pereti: 'Fara', material: 'Poliester',
+    specs: ['cel mai vandut din selectie, 38 pareri', 'prelata impermeabila, pliabil', '3x3 m, verde, cadru metalic', 'cel mai accesibil pret'],
+    pros: ['Cel mai vandut din selectie, 38 de pareri', 'Prelata impermeabila si cadru pliabil', 'Cel mai accesibil pret din selectie', 'Montaj rapid, tip pop-up'],
+    cons: ['Nota 3.74, medie, verifica recenziile', 'Fara pereti laterali'],
+    verdict: 'Cel mai vandut pavilion din selectie si cea mai accesibila cale de a avea umbra si adapost in curte. AT Performance are 3x3 m, o prelata impermeabila si un cadru metalic pliabil care se ridica rapid, la cel mai mic pret din selectie, ceea ce explica de ce s-a vandut cel mai mult, cu 38 de pareri, cele mai multe de aici. E o alegere practica pentru cine vrea un pavilion functional fara sa dea multi bani, pentru mese in gradina, umbra la piscina sau un eveniment ocazional. Nota de 3.74 e medie, asa ca merita sa citesti recenziile inainte, iar la acest pret te astepti la o constructie de baza, nu premium, si nu are pereti laterali. Il iei cand vrei cel mai ieftin pavilion popular, impermeabil si pliabil, pentru folosire ocazionala, si accepti o constructie simpla in schimbul pretului mic.' },
+  // --- Pliabile accesibile ---
+  { g: 'pliabil', id: 'DN4TR6MBM', badge: 'Pliabil, bine vandut', short: 'JRH alb', dim: '3 x 3 m', pereti: 'Fara', material: 'Poliester',
+    specs: ['pavilion pliabil 3x3 m, alb', 'cadru metalic, montaj rapid', 'poliester, pentru curte si evenimente', 'nota 3.8 din 30 de pareri'],
+    pros: ['Bine vandut, 30 de pareri', 'Cadru metalic pliabil, se ridica repede', 'Culoare alba, eleganta la evenimente', '3x3 m, acopera o masa mare'],
+    cons: ['Nota 3.8, medie', 'Prelata mai putin robusta la vant puternic'],
+    verdict: 'Un pavilion pliabil alb, potrivit pentru evenimente in curte si bine vandut. JRH are 3x3 m si un cadru metalic pliabil care se ridica rapid, tip pop-up, plus o prelata din poliester in nuanta alba, care arata elegant la o petrecere sau o masa festiva in gradina. Cu 30 de pareri e printre cele mai testate din selectie, iar nota de 3.8 e medie, deci merita sa te uiti la recenzii inainte de a comanda. Albul se murdareste mai usor decat culorile inchise, dar da un aspect mai ingrijit la evenimente. Prelata face fata unei vremi obisnuite, dar la vant puternic e bine sa il ancorezi bine. Il iei cand vrei un pavilion pliabil alb pentru evenimente si mese in curte, cu montaj rapid si un pret rezonabil, si nu te deranjeaza o nota medie.' },
+  { g: 'pliabil', id: 'D182ZM2BM', badge: 'Nota mare, accesibil', short: 'OEM pliabil', dim: '3 x 3 m', pereti: 'Fara', material: 'Poliester',
+    specs: ['pavilion pliabil 3x3 m', 'structura metalica, pentru exterior', 'poliester, cort de evenimente', 'nota 4.83 din 6 pareri'],
+    pros: ['Nota mare, 4.83, cea mai buna dintre pliabile', 'Structura metalica pliabila, montaj rapid', 'Pret accesibil', 'Bun pentru evenimente si curte'],
+    cons: ['Doar 6 pareri deocamdata', 'Fara pereti laterali'],
+    verdict: 'Pavilionul pliabil de ales daca vrei o nota mare la un pret accesibil. Acest OEM are 3x3 m si o structura metalica pliabila, tip pop-up, care se ridica rapid, plus o prelata din poliester pentru exterior, potrivita pentru evenimente, mese in gradina sau umbra la piscina. Cu nota 4.83 e cel mai bine cotat dintre pavilioanele pliabile din selectie, chiar daca deocamdata din 6 pareri, deci primii cumparatori sunt multumiti. Pretul accesibil il face o alternativa buna la modelele mai cunoscute, pentru cine cauta raport bun calitate-pret. Nu are pereti laterali, deci pentru protectie pe margini adaugi separat. Il iei cand vrei un pavilion pliabil bine notat si ieftin, cu montaj rapid, pentru folosire in curte si la evenimente, si nu te deranjeaza ca are inca putine pareri.' },
+  { g: 'pliabil', id: 'DQP7KSBBM', badge: 'Design Flippy', short: 'Flippy', dim: '3 x 3 m', pereti: 'Fara', material: 'Poliester',
+    specs: ['pavilion Flippy 300 x 300 cm, alb', 'poliester, pentru gradina', 'cadru pliabil, montaj rapid', 'nota 3.5 din 6 pareri'],
+    pros: ['Dimensiune buna, 300 x 300 cm', 'Cadru pliabil, se ridica repede', 'Culoare alba, potrivita la evenimente', 'Brand cu prezenta la noi'],
+    cons: ['Nota 3.5, medie, din 6 pareri', 'Mai scump decat alte pliabile de baza'],
+    verdict: 'O alternativa pliabila de la un brand cu prezenta la noi, pentru cine vrea un pavilion alb de gradina. Flippy are 300 x 300 cm si un cadru pliabil tip pop-up, cu o prelata din poliester in nuanta alba, potrivit pentru mese in curte, evenimente sau umbra pe terasa. Cu 6 pareri si nota 3.5 e o alegere medie, asa ca te uiti la recenzii inainte, iar pretul e ceva mai ridicat decat al pavilioanelor pliabile de baza din selectie. Albul arata bine la evenimente, dar cere mai multa grija la curatare. E un pavilion functional, fara pretentii premium, de la un nume cunoscut pe piata locala. Il iei cand vrei un pavilion pliabil alb de la Flippy, pentru curte si evenimente, si preferi un brand cu prezenta la noi, acceptand o nota medie si un pret ceva mai mare.' },
+  // --- Cu pereti laterali ---
+  { g: 'pereti', id: 'D1QQN8MBM', badge: 'Cu pereti si ferestre', short: 'Hessa', dim: '3 x 3 m', pereti: 'Da, cu ferestre', material: 'Poliester',
+    specs: ['pavilion 3x3 m cu pereti laterali', 'pereti cu ferestre, pentru petreceri', 'inchizi complet spatiul', 'nota 3.07, marcata onest'],
+    pros: ['Vine cu pereti laterali si ferestre', 'Inchizi complet spatiul, protectie pe toate partile', 'Ferestrele lasa lumina si aer', 'Pret accesibil pentru un model cu pereti'],
+    cons: ['Nota 3.07 din 14 pareri, verifica atent recenziile', 'Peretii cer montaj si prindere in plus'],
+    verdict: 'Pavilionul de ales daca vrei sa inchizi complet spatiul, cu pereti pe toate partile. Hessa are 3x3 m si vine cu pereti laterali cu ferestre, deci il transformi dintr-un simplu umbrar intr-un spatiu inchis, protejat de vant, soare piezis si ploaie oblica, potrivit pentru petreceri sau pentru zile cu vreme schimbatoare. Ferestrele lasa lumina si aer sa intre, ca sa nu para o cutie. Pretul e accesibil pentru un model cu pereti inclusi. Trebuie spus insa clar: cu nota 3.07 din 14 pareri, e printre cele mai slab cotate din selectie, asa ca citeste atent recenziile inainte de a comanda, iar peretii cer montaj si prindere in plus. Il iei cand ai nevoie de un spatiu inchis complet, cu pereti si ferestre, la un pret mic, si esti dispus sa verifici bine recenziile, constient de nota modesta.' },
+  { g: 'pereti', id: 'DY630JMBM', badge: 'Structura de otel', short: 'Sersimo 3 pereti', dim: '3 x 3 m', pereti: 'Da, 3 pereti', material: 'Otel + prelata',
+    specs: ['pavilion cu 3 pereti laterali', 'structura solida din otel', 'acoperis rezistent', 'nota 3.5 din 8 pareri'],
+    pros: ['Structura solida din otel, mai robusta', 'Vine cu 3 pereti laterali', 'Mai rezistent la vant decat cadrele subtiri', 'Acopera si protejeaza bine'],
+    cons: ['Nota 3.5, medie, din 8 pareri', 'Mai greu si mai scump'],
+    verdict: 'Pavilionul de ales daca vrei o structura mai robusta, cu pereti si cadru de otel. Sersimo are 3x3 m, o structura solida din otel, mai rezistenta decat cadrele subtiri ale pavilioanelor pliabile ieftine, si vine cu 3 pereti laterali, care inchid spatiul si il apara de vant si de soarele piezis. E gandit pentru cine vrea ceva mai durabil, care sa stea montat mai mult timp in curte, nu doar ocazional. Cu 8 pareri si nota 3.5 e o alegere medie, asa ca merita sa citesti recenziile, iar structura robusta il face mai greu si mai scump decat pavilioanele pliabile. Il iei cand vrei un pavilion cu pereti si o structura solida din otel, mai rezistent la vant, pentru folosire mai indelungata in gradina, si accepti greutatea si pretul mai mari in schimbul robustetei.' },
+  { g: 'pereti', id: 'DQWGRWMBM', badge: 'Quick tent cu pereti', short: 'PROCART quick', dim: '3 x 3 x 3 m', pereti: 'Da, 3 pereti', material: 'Poliester',
+    specs: ['cort quick tent cu 3 pereti laterali', '3x3x3 m, inaltime generoasa', 'montaj rapid, tip pop-up', 'nota 3.5 din 8 pareri'],
+    pros: ['Sistem quick tent, se ridica foarte rapid', 'Vine cu 3 pereti laterali', 'Inaltime generoasa, 3 m', 'Combina montajul rapid cu peretii'],
+    cons: ['Nota 3.5, medie, din 8 pareri', 'Printre cele mai scumpe din selectie'],
+    verdict: 'Pavilionul de ales daca vrei si pereti, si montaj foarte rapid. PROCART quick tent are 3x3x3 m, cu o inaltime generoasa de 3 m, si un sistem pliabil de tip quick tent, care se ridica foarte repede, dintr-o miscare, plus 3 pereti laterali care inchid spatiul. E combinatia buna intre pavilioanele pliabile simple, care nu au pereti, si cele cu structura fixa, greu de montat: aici primesti si peretii, si rapiditatea. Cu 8 pareri si nota 3.5 e o alegere medie, deci citeste recenziile inainte, iar pretul il pune printre cele mai scumpe din selectie. Il iei cand vrei un pavilion cu pereti laterali care se monteaza foarte rapid, cu inaltime buna, pentru evenimente sau folosire in curte, si esti dispus la un pret mai mare pentru comoditatea sistemului quick tent.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const IMPERM = PICKS.filter(x => x.g === 'imperm');
+const PLIABIL = PICKS.filter(x => x.g === 'pliabil');
+const PERETI = PICKS.filter(x => x.g === 'pereti');
+
+const hero = '/images/articles/pavilion-de-gradina-rezistent-la-apa.webp';
+const figImperm = '/imagini/articole/pavilion-impermeabile.webp';
+const figPliabil = '/imagini/articole/pavilion-pliabile.webp';
+const figPereti = '/imagini/articole/pavilion-pereti.webp';
+const published = '2026-07-19T12:58:55+03:00';
+
+const faq = [
+  { question: 'Ce inseamna un pavilion cu adevarat impermeabil?', answer: 'Inseamna ca prelata acoperisului tine apa afara, nu doar o respinge o vreme. Materialele si tratamentele conteaza: o prelata din PVC sau din poliester tratat impermeabil, ca la Danubewd sau PEXOR din selectie, face fata unei ploi de vara, in timp ce o panza subtire, netratata, lasa apa sa treaca dupa un timp. Cauta in descriere mentiunea clara impermeabil si, daca e trecuta, densitatea materialului: cu cat e mai mare, cu atat prelata e mai groasa si mai rezistenta. Tine minte insa ca un pavilion fara pereti te apara de ploaie doar de sus; la ploaie oblica sau pe vant, apa poate intra pe laterale.' },
+  { question: 'Pavilion pliabil sau cu structura fixa?', answer: 'Pavilionul pliabil, tip pop-up, se ridica in cateva minute, se strange la loc si se muta usor, ideal pentru evenimente ocazionale, mese in curte sau umbra la piscina, cand nu vrei ceva permanent. Structura e mai usoara, deci si mai sensibila la vant. Un pavilion cu structura mai solida, din otel, ca Sersimo din selectie, e mai greu si mai stabil, gandit sa stea montat mai mult timp, dar il montezi mai greu. Daca vrei ceva flexibil, pe care sa il pui si sa il strangi des, alege pliabilul; daca vrei un adapost care sa stea toata vara in curte, o structura mai robusta rezista mai bine.' },
+  { question: 'Am nevoie de pereti laterali?', answer: 'Depinde de cum il folosesti. Un pavilion fara pereti iti da umbra si adapost de ploaie de sus, suficient pentru o masa la umbra intr-o zi obisnuita. Peretii laterali, ca la Hessa sau PROCART din selectie, inchid spatiul si te apara de vant, de soarele piezis de dimineata si seara si de ploaia oblica, si transforma pavilionul intr-un spatiu aproape de camera, potrivit pentru petreceri sau vreme schimbatoare. Multe modele cu pereti au si ferestre, ca sa intre lumina si aer. Daca il folosesti mai ales pe vreme buna, pentru umbra, te descurci fara pereti; daca vrei protectie completa si un spatiu inchis, alege un model cu pereti.' },
+  { question: 'Cum fixez un pavilion sa nu il ia vantul?', answer: 'Ancorarea e cel mai important lucru la un pavilion, mai ales la cele pliabile si usoare. Foloseste picotii, tarusii, care vin de obicei in pachet, si infige-i in pamant la fiecare picior, plus corzi de tensionare intinse spre exterior, ca la un cort. Pe suprafete tari, unde nu poti infige picoti, foloseste greutati, saci de nisip sau greutati speciale, la baza fiecarui picior. Nu lasa niciodata un pavilion nefixat pe vant, pentru ca se poate rasturna sau lua pe sus, si strange-l daca se anunta furtuna. O structura mai grea, din otel, rezista mai bine, dar si aceea trebuie ancorata la vant puternic.' },
+  { question: 'Ce dimensiune de pavilion sa aleg?', answer: 'Cel mai comun format este 3x3 m, dimensiunea majoritatii modelelor din selectie, si e o alegere buna pentru o masa cu 4-6 scaune, pentru umbra la piscina sau pentru un mic eveniment in curte. Acopera suficient spatiu pentru o familie fara sa fie greu de manevrat sau de depozitat. Pentru evenimente mai mari, cu mai multi invitati sau mai multe mese, exista corturi mai mari, dar acelea sunt mai grele, mai scumpe si mai greu de montat singur. Masoara locul din curte inainte si gandeste-te cati oameni vrei sa incapa la umbra: pentru uz casnic obisnuit, 3x3 m e formatul potrivit.' },
+  { question: 'Cum intretin un pavilion de gradina?', answer: 'Cel mai important e sa il strangi curat si uscat. Dupa folosire pe ploaie, lasa prelata sa se usuce complet inainte de a o plia, altfel mucegaieste si miroase. Curata panza de frunze, praf si pete cu apa si o solutie blanda, fara detergenti agresivi care ii pot afecta tratamentul impermeabil. Verifica periodic cadrul, imbinarile si picioarele, si strange suruburile slabite. Iarna sau pe furtuna, strange pavilionul si depoziteaza-l intr-un loc uscat, in husa lui, ca sa nu il strice inghetul sau vantul. Cu aceasta grija simpla, un pavilion tine mai multe veri, iar prelata isi pastreaza rezistenta la apa.' },
+  { question: 'Cat costa un pavilion de gradina rezistent la apa?', answer: 'In selectie, cele mai accesibile pavilioane impermeabile 3x3, pliabile, pornesc de la circa 220 de lei, ca AT Performance, si urca spre 340 de lei pentru modele mai bine notate, ca Danubewd sau PEXOR. Pavilioanele pliabile obisnuite sunt in aceeasi zona, 230-425 de lei, in functie de brand si calitate. Modelele cu pereti laterali si structura mai solida, din otel, sunt mai scumpe, intre circa 300 si 640 de lei, pentru ca inchid spatiul si rezista mai bine. Cel mai bun raport il gasesti alegand dupa nevoie: un pavilion pliabil impermeabil pentru umbra ocazionala, sau unul cu pereti si structura robusta daca vrei protectie completa si folosire indelungata.' },
+];
+
+const images = [hero, figImperm, figPliabil, figPereti, ...PICKS.map(x => x.p.image)];
 ---
 
 <Layout
-  title="Pavilion de gradina rezistent la apa - CentroCasa"
-  description="Daca vrei un pavilion de gradina rezistent la apa care sa te tina si sa-si merite banii, mergi pe structuri cu schelet din aluminiu sau otel galvanizat si cu prelata din poliester gros, tratat UV, de minim 200-250 grame pe metru patrat. Modelele cu acoperis dublu sau cu sistem de ventilatie sunt un plus mare."
-  image="/images/articles/pavilion-de-gradina-rezistent-la-apa.webp"
+  title="Cele mai bune pavilioane de gradina rezistente la vant si ploaie in 2026: impermeabile, pliabile si cu pereti"
+  description="Care sunt cele mai bune pavilioane de gradina rezistente la vant si ploaie in 2026: modele impermeabile 3x3 de la Danubewd si PEXOR, pliabile accesibile si cu pereti laterali de la Hessa si PROCART, comparate pe dimensiune, pereti si material. Plus cum alegi, pliabil vs fix si cum le fixezi pe vant."
+  image={hero}
   type="article"
-  publishedTime="2026-02-10T13:17:47.767Z"
-  modifiedTime="2026-02-10T13:17:47.767Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Maria Ionescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Mobilier Gradina', url: '/mobilier-gradina/' }, { name: 'Cele mai bune pavilioane de gradina rezistente la vant si ploaie' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/mobilier-gradina/">Mobilier Gradina</a>
-      <span class="breadcrumb-separator">/</span>
-      <span>Pavilion de gradina rezistent la apa</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/mobilier-gradina/">Mobilier Gradina</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune pavilioane de gradina rezistente la vant si ploaie</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/mobilier-gradina/" class="article-category">Mobilier Gradina</a>
-        <span class="article-date">10 februarie 2026</span>
-      </div>
-      <h1 class="article-title">Pavilion de gradina rezistent la apa</h1>
-    </header>
+    <h1>Cele mai bune pavilioane de gradina rezistente la vant si ploaie</h1>
+    <p class="rd-byline">de <a href="/autori/maria-ionescu/">Maria Ionescu</a>, Designer Interior · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/pavilion-de-gradina-rezistent-la-apa.webp" alt="Pavilion de gradina rezistent la apa" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Cele mai bune pavilioane de gradina rezistente la vant si ploaie: impermeabile, pliabile si cu pereti laterali" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="stai-pe-uscat-si-la-soare-pavilionul-tau-de-gradina-perfect-rezistent-la-apa">
-        <h2>Stai pe uscat si la soare: Pavilionul tau de gradina perfect rezistent la apa</h2>
-        <p>Bon, hai sa fim directi. Cand zici <strong>pavilion <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">de gradina</a> rezistent la apa</strong>, nu te gandesti la un cort de plaja. Te gandesti la ceva care sa te protejeze de soarele ala arzator, dar si de o ploaie zdravana, fara sa se rastoarne sau sa se strice din prima.</p>
-        <p>Si aici intervine materialul. Daca vrei sa fie cu adevarat rezistent, uita de plasticul ala subtire care se rupe la prima adiere mai serioasa. Cauta structuri din aluminiu, ala e mai usor si nu ruginește.</p>
-        <p>Sau otel galvanizat, ala e mai greu, mai stabil, dar trebuie sa fie bine tratat sa nu-l prinda rugina. Prelata e alta poveste. Aia trebuie sa fie groasa, sa nu fie un simplu nailon.</p>
-        <p>Vorbim de poliester, de alea mai denase, cu tratament UV, ca sa nu se decoloreze si sa nu se crape de la soare. Minim 200-250 grame pe metru patrat e un bun punct de plecare. Si daca are un acoperis dublu, ala ajuta sa circule aerul si sa nu se acumuleze caldura sau apa.</p>
-        <p>E un detaliu mic, dar face diferenta.</p><p>Am vazut multe prin gradini, stii cum e. Unii isi iau cele mai ieftine, ca nah, nu dau multi bani. Si dupa un sezon, arata ca dupa razboi. Prelata decolorata, toata prafuita, scheletul incepe sa rugineasca pe la imbinari. Nu se merita. Mai bine investesti un pic mai mult si iei ceva ce rezista. Mai ales daca vrei un <strong>pavilion <a href="/balansoar-de-gradina-pentru-2-persoane/" class="interlink">de gradina</a> rezistent la apa</strong> care sa fie si frumos, nu doar functional.</p><p>Deci, pe scurt, cand te uiti la un <strong>pavilion de gradina rezistent la apa</strong>, verifica:</p><ul><li>Schelet: Aluminiu sau otel galvanizat de buna calitate.</li><li>Prelata: Poliester dens (minim 200-250 g/m²), cu tratament UV.</li><li>Sistem de prindere: Sa fie solid, sa poti sa-l fixezi bine in pamant.</li><li>Design: Un acoperis dublu sau cu guri de ventilatie e un mare plus.</li></ul><p>Nu te lua dupa poze. Uita-te la specificatii. Si daca poti, mai bine vezi produsul inainte. Sau citeste pareri de la alti oameni care l-au cumparat deja. Nu-ti lua teapa cu ceva ce arata bine in poza, dar e o pacaleala.</p>
-      </section>
-
-      <section id="top-4-pavilioane-de-gradina-rezistente-la-apa-recomandari-concrete-cu-bune-si-rele">
-        <h2>Top 4 Pavilioane de Gradina Rezistente la Apa: Recomandari Concrete (cu Bune si Rele)</h2>
-        <p>Ok, hai sa nu vorbim doar la general. Uite cateva modele care mi s-au parut bune si pe care le-am si vazut la treaba, nu doar in cataloage.</p><p><strong>1. Pavilion Metalic Pliabil (Ex: Modele de la Keter sau similare)</strong></p><p><em>Pret estimat: 700 - 1500 Lei</em></p><p>Asta e varianta buna daca vrei ceva rapid, usor de montat si demontat. Scheletul e de obicei din otel, iar prelate sunt din poliester, dar atentie la gramaj. Unele modele ajung si la 250 g/m², altele sunt mai subțiri. Sunt bune pentru seri cu prietenii, pentru un gratar ocazional. Rezista la o ploaie usoara, dar la vijelie, nah.</p><p><strong>Avantaje:</strong></p><ul><li>Montaj rapid (sub 30 minute)</li><li>Portabil, usor de depozitat</li><li>Pret accesibil</li></ul><p><strong>Dezavantaje:</strong></p><ul><li>Durabilitate mai mică pe termen lung, mai ales la vânt puternic</li><li>Prelata poate fi subțire la modelele foarte ieftine</li><li>Fixarea în sol poate fi precară dacă nu folosești ancore suplimentare.</li></ul><p><strong>2. Pavilion din Aluminiu cu Acoperis Textil (Ex: Modele de la Leroy Merlin sau Dedeman)</strong></p><p><em>Pret estimat: 1800 - 3500 Lei</em></p><p>Aici deja vorbim de altceva. Aluminiul e ușor, nu ruginește. Prelata e de obicei deasupra, textilă, din poliester dens, uneori chiar cu strat de poliuretan pentru extra impermeabilitate. Multe au si sistem de ventilatie in varf. Astea sunt bune pentru o utilizare mai frecventa, pentru terase amenajate. Rezista mult mai bine la intemperii.</p><p><strong>Avantaje:</strong></p><ul><li>Rezistență bună la coroziune (aluminiu)</li><li>Aspect elegant, modern</li><li>Acoperișul textil e adesea mai durabil și mai rezistent la UV</li></ul><p><strong>Dezavantaje:</strong></p><ul><li>Mai scump decât variantele pliabile</li><li>Montajul poate dura mai mult și necesită uneori 2 persoane</li><li>Prelata textilă poate fi mai greu de curățat dacă se murdărește serios.</li></ul><p><strong>3. Pavilion din Otel Galvanizat cu Acoperiș Fix (Ex: Modele de tip <a href="/pergola-din-lemn-pentru-terasa/" class="interlink">pergola din</a> magazine de bricolaj)</strong></p><p><em>Pret estimat: 2500 - 5000 Lei</em></p><p>Asta e varianta mai serioasă, mai permanentă. Scheletul din otel galvanizat e solid, greu, rezistent. Acoperișul poate fi din policarbonat, metalic sau chiar textil, dar de tip «hardtop» (rigid). Astea sunt făcute să stea vara pe terasă și să te protejeze de ploaie și soare fără probleme. Un <strong>pavilion de gradina rezistent la apa</strong> de genul ăsta e o investiție pe termen lung.</p><p><strong>Avantaje:</strong></p><ul><li>Foarte stabil și durabil</li><li>Protecție excelentă împotriva intemperiilor</li><li>Aspect masiv, impunător</li></ul><p><strong>Dezavantaje:</strong></p><ul><li>Preț ridicat</li><li>Montaj complex, adesea necesită fundație sau ancorare solidă</li><li>Greu de mutat odată montat.</li></ul><p><strong>4. Pavilion cu Structură din Lemn și Prelată Impermeabilă</strong></p><p><em>Pret estimat: 3000 - 6000 Lei</em></p><p>Arată superb, nu zic nu. O structură din lemn masiv, tratat, cu o prelată de calitate deasupra. E un fel de compromis între o pergolă și un pavilion clasic. E un <strong>pavilion de gradina rezistent la apa</strong> care aduce un plus de farmec și eleganță. Dar lemnul necesită întreținere, tratamente periodice.</p><p><strong>Avantaje:</strong></p><ul><li>Aspect natural, rustic, deosebit</li><li>Potrivit pentru grădini amenajate în stil clasic sau mediteranean</li><li>Oferă o umbră plăcută, difuză.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li>Necesită întreținere regulată (lăcuire, tratament anti-insecte/fungi)</li><li>Lemnul se poate deteriora dacă nu e tratat corespunzător</li><li>Preț ridicat, mai ales pentru lemn de calitate.</li></ul><p>Asta e o privire generală. Fiecare are locul lui, depinde ce cauți și cât vrei să investești.</p>
-      </section>
-
-      <section id="cum-alegi-pavilionul-de-gradina-rezistent-la-apa-potrivit-pentru-tine-ghidul-prietenului">
-        <h2>Cum Alegi Pavilionul de Gradina Rezistent la Apa Potrivit Pentru Tine: Ghidul Prietenului</h2>
-        <p>Hai sa zicem ca ai decis ca vrei un <strong>pavilion de gradina rezistent la apa</strong>. Super. Acum, cum il alegi pe ala bun? E simplu, te uiti la cateva chestii:</p><p><strong>1. Materialul Structurii: Rezistență și Greutate</strong></p><p>Am zis si mai sus, dar repet, ca e important. Vrei aluminiu sau otel galvanizat. Aluminiul e mai ușor, nu ruginește, bun daca il muti des. Otelul e mai greu, mai stabil, dar trebuie sa fie bine protejat. Verifica sudurile, imbinarile. Nu vrei sa vezi deja pete de rugina pe el cand il cumperi. Un prieten si-a luat unul cu un schelet din tevi prea subțiri, si la prima rafală mai serioasa, l-a indoit. Asta e, nu te uita doar la pret.</p><p><strong>2. Materialul Prelatei: Densitate și Protecție UV</strong></p><p>Asta e ce te protejează de soare și ploaie. Nu te uita la «impermeabil» scris mare, ca pana la urma, majoritatea sunt. Uita-te la gramaj. Minim 200 g/m², ideal 250-300 g/m². Materialul trebuie sa fie poliester sau polietilena de buna calitate. Si tratamentul UV e esential. Altfel, se decoloreaza, se crapa si o sa arate vai de el in 2 sezoane.</p><p><strong>3. Dimensiunea și Forma: Cât spațiu ai și ce vrei să faci cu el</strong></p><p>Nu lua cel mai mare pavilion doar pentru ca «poate». Masoara spatiul unde vrei sa-l pui. Gândește-te: cate scaune incap, daca vrei sa pui si o masa, daca vrei sa te misti liber pe sub el. Formele rotunde sunt dragute, dar cele pătrate sau dreptunghiulare sunt mai <a href="/cum-sa-cureti-eficient-casa/">eficient</a>e la spatiu, mai ales daca le pui langa un perete sau gard.</p><p><strong>4. Sistemul de Montaj și Demontaj: Cât de complicat e?</strong></p><p>Daca vrei sa-l pui si sa-l lasi acolo toata vara, poate nu e asa important. Dar daca vrei sa-l strangi iarna sau sa-l muti in alta parte, trebuie sa fie relativ usor de montat/demontat. Verifica cum se prind picioarele, cum se ataseaza prelatele. Unele au sistem de clic, altele au suruburi. Alea cu clic sunt mai rapide.</p><p><strong>5. Stabilitatea și Fixarea în Sol: Sa nu-l ia vântul!</strong></p><p>Un <strong>pavilion de gradina rezistent la apa</strong> trebuie sa fie stabil. Majoritatea vin cu cuie sau ancore pentru pamant, dar alea sunt de obicei pentru suprafata. Daca ai gazon, e ok. Dar daca ai terasa sau pavaj, ai nevoie de ancore speciale sau de greutăți. Am vazut un pavilion zburând peste curtea vecinului din cauza vântului, pentru ca era prins doar cu cateva cuie. Nu vrei sa ti se intample.</p><p><strong>6. Bugetul: Cât ești dispus să investești?</strong></p><p>Asta e clar. Nu te astepta sa iei un pavilion din otel masiv cu acoperis rigid la 500 de lei. Pune-ți un buget realist. E mai bine sa cumperi un produs de calitate medie, care rezista 3-4 ani, decat unul ieftin care pica dupa primul sezon.</p><p>Pe scurt, nu te grăbi. Citește descrierile, compara, pune intrebari la vânzător dacă ai nelămuriri. E o investiție, nu o cheltuială minoră.</p>
-      </section>
-
-      <section id="pavilion-pliabil-vs-pavilion-fix-ce-alegi-pentru-gradina-ta">
-        <h2>Pavilion Pliabil vs. Pavilion Fix: Ce Alegi Pentru Grădina Ta?</h2>
-        <p>Diferența principală între un pavilion pliabil și unul fix, când vorbim de un <strong>pavilion de gradina rezistent la apa</strong>, e clar la capitolul utilizare și durabilitate. Hai să le luăm pe rând:</p><p><strong>Pavilionul Pliabil (Pop-up):</strong></p><p>Gândește-te la el ca la o soluție rapidă, versatilă. Se montează în 10-20 de minute, fără unelte complicate, de obicei. E perfect dacă ai nevoie de umbră și protecție pentru evenimente ocazionale: un grătar cu prietenii, o petrecere aniversară în curte, sau dacă vrei să-l iei cu tine la mare sau la munte (deși acolo sunt alte reguli).</p><p><em>Prețuri: 500 - 1500 Lei</em></p><p><strong>Avantaje:</strong></p><ul><li>Montaj și demontaj extrem de rapid.</li><li>Ușor de transportat și depozitat.</li><li>Prețuri mai accesibile.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li>Durabilitate mai mică; scheletul poate fi mai subțire, prelatele mai puțin rezistente la vânt puternic sau ploaie torențială.</li><li>Poate necesita ancorare suplimentară pentru stabilitate.</li><li>Aspect mai puțin «permanent» sau elegant.</li></ul><p><strong>Pavilionul Fix (Permanent sau Semipermanent):</strong></p><p>Asta e genul de pavilion pe care îl montezi și îl lași acolo o vară întreagă, sau chiar mai mult. Poate fi din aluminiu, otel, chiar și lemn, cu acoperiș rigid (policarbonat, metal) sau textil, dar mult mai solid decât la cele pliabile. E o investiție pe termen lung pentru amenajarea terasei sau a zonei de relaxare din grădină.</p><p><em>Prețuri: 1800 - 6000+ Lei</em></p><p><strong>Avantaje:</strong></p><ul><li>Mult mai stabil și rezistent la intemperii (vânt, ploaie).</li><li>Durabilitate sporită, aspect mai elegant și integrat în peisaj.</li><li>Protecție mai bună și mai consistentă.</li></ul><p><strong>Dezavantaje:</strong></p><ul><li>Montaj mai complex, necesită uneori unelte și chiar 2 persoane.</li><li>Mai scump.</li><li>Nu este portabil; odată montat, e greu de mutat.</li></ul><p>Deci, dacă mă întrebi pe mine, alegerea depinde de cum vrei să folosești pavilionul. Pentru ocazii, petreceri, flexibilitate, mergi pe pliabil. Pentru o zonă de relaxare permanentă, un spațiu de stat afară pe orice vreme, investește într-unul fix. Ambele pot fi <strong>pavilion de gradina rezistent la apa</strong>, dar la niveluri diferite de performanță.</p>
-      </section>
-
-      <section id="greseli-de-evitat-cand-cumperi-un-pavilion-de-gradina-rezistent-la-apa-sfaturi-de-insider">
-        <h2>Greșeli De Evitat Când Cumperi un Pavilion de Gradina Rezistent la Apa (Sfaturi de Insider)</h2>
-        <p>Na, am văzut destule să știu ce merge și ce nu. Uite câteva greșeli pe care le fac mulți și pe care ar trebui să le eviți:</p><p><strong>1. Să te uiți doar la poze și la preț.</strong></p><p>Asta e clasic. Arată bine în poză, e ieftin, pac! Ajungi acasă cu o epavă. Nu te uita doar la cât de frumos e, uită-te la specificații: gramaj prelată, tip material schelet, grosimea țevilor. Un prieten și-a luat un pavilion «super ieftin» și la prima furtună i-a zburat acoperișul. Asta e, nu te lăsa păcălit de aparențe.</p><p><strong>2. Să ignori importanța ancorării.</strong></p><p>Mulți zic: «A, vine cu cuie, e suficient». Nu, nu e. Mai ales dacă ai vânt puternic în zona ta. Un <strong>pavilion de gradina rezistent la apa</strong> trebuie să fie bine fixat. Gândește-te la greutăți la bază, la ancore specifice pentru pavaj sau terasă, nu te baza doar pe ce vine în cutie dacă vrei să fie cu adevărat stabil.</p><p><strong>3. Să nu verifici sistemul de drenaj al apei.</strong></p><p>Chiar dacă e «rezistent la apa», apa tot se poate aduna pe prelată dacă nu e bine înclinată sau dacă nu are un sistem de scurgere. Un acoperiș cu un «twist» la vârf sau cu găuri de aerisire ajută enorm. Altfel, riști ca apa să se acumuleze și să deformeze structura sau să rupă prelatele.</p><p><strong>4. Să cumperi fără să te gândești la întreținere.</strong></p><p>Un pavilion fix, mai ales unul din lemn sau cu acoperiș textil, necesită întreținere. Dacă nu vrei să pierzi timp cu lăcuirea lemnului sau cu spălarea prelatei, poate un model cu acoperiș din policarbonat e mai bun pentru tine. E un <strong>pavilion de gradina rezistent la apa</strong> care cere mai puțin efort.</p><p><strong>5. Să nu citești recenziile altor cumpărători.</strong></p><p>Asta e o sursă de informații neprețuită. Oamenii care au cumpărat deja pavilionul respectiv pot spune dacă e greu de montat, dacă rezistă la vânt, dacă prelatele se decolorează repede. E ca și cum ai întreba un prieten înainte să cumperi ceva.</p><p><strong>6. Să cumperi un model prea mic sau prea <a href="/jardiniera-mare-pentru-flori/" class="interlink">mare pentru</a> spațiul tău.</strong></p><p>Măsoară de două ori, taie o dată. Un pavilion prea mic nu-ți oferă spațiul dorit, unul prea mare te încurcă în grădină. Gândește-te la cum va arăta odată montat și cât spațiu de circulație rămâne pe lângă el.</p><p>Na, astea sunt cele mai comune greșeli. Dacă le eviți, ai șanse mult mai mari să fii mulțumit de achiziție.</p>
-      </section>
-
-      <section id="verdictul-pe-buget-pavilion-de-gradina-rezistent-la-apa-pentru-fiecare-buzunar">
-        <h2>Verdictul Pe Buget: Pavilion de Gradina Rezistent la Apa Pentru Fiecare Buzunar</h2>
-        <p>Hai să vedem ce <strong>pavilion de gradina rezistent la apa</strong> găsești în funcție de cât vrei să dai pe el. Prețurile sunt orientative, știți cum e piața.</p><p><strong>Buget Mic (Sub 800 Lei):</strong></p><p>Aici vorbim de pavilioane pliabile, de tip pop-up. Cele mai accesibile. De obicei, au schelet din otel, prelate din poliester, dar atentie la gramaj. Cauta modele care promit cel puțin 200 g/m² și tratament UV. Sunt bune pentru uz ocazional, seri de vară, protecție rapidă la soare sau o ploaie scurtă. Nu te aștepta să reziste la furtuni sau la ani mulți de utilizare intensă. Sunt o soluție temporară, bună pentru un eveniment sau două.</p><p><em>Recomandare: Caută modele de la branduri cunoscute pentru produse de grădină (ex: Keter, sau mărci proprii ale magazinelor mari de bricolaj), dar citește recenziile. Nu lua cel mai ieftin model fără să te uiți la specificații.</em></p><p><strong>Buget Mediu (800 - 2500 Lei):</strong></p><p>În această categorie găsești pavilioane pliabile de calitate superioară, cu schelete mai solide (aluminiu, otel galvanizat mai gros) și prelate mai dense (250-300 g/m²), adesea cu strat PU pentru impermeabilitate sporită. Vei găsi și primele modele de pavilioane fixe, mai simple, cu structură din aluminiu și acoperiș textil. Acestea sunt mult mai durabile și rezistente la intemperii.</p>
-        <p>Sunt ideale pentru cei care vor un spațiu de relaxare mai consistent în grădină, dar nu vor să investească o avere.</p><p><em>Recomandare: Pavilioane cu schelet din aluminiu și prelată din poliester dens, cu sistem de ventilatie. Sau modele pliabile «heavy duty» dacă prioritatea e portabilitatea.</em></p><p><strong>Buget Generos (Peste 2500 Lei):</strong></p><p>Aici intrăm în zona de pavilioane fixe, semipermanente sau permanente. Vorbim de structuri solide din otel galvanizat sau aluminiu gros, cu acoperișuri fixe din policarbonat, metal sau textile foarte groase și rezistente. Acestea sunt făcute să reziste ani de zile, oferind protecție maximă împotriva soarelui, ploii și vântului. Sunt adevărate extensii ale casei, transformând o zonă din grădină într-un spațiu de locuit exterior.</p><p><em>Recomandare: Pavilioane cu acoperiș rigid (policarbonat sau metal) pentru durabilitate maximă și întreținere minimă, sau structuri din lemn masiv cu prelate de înaltă calitate dacă aspectul contează cel mai mult.</em></p><p>Deci, înainte de a cumpăra, gândește-te la cât vrei să folosești pavilionul, unde îl vei pune și cât ești dispus să investești pe termen lung. Un <strong>pavilion de gradina rezistent la apa</strong> e o achiziție care merită făcută cu atenție.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat costa un pavilion de gradina rezistent la apa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un pavilion de gradina rezistent la apa poate costa intre 500 lei pentru modele pliabile simple si peste 5000 lei pentru structuri fixe, din materiale premium. Modelele medii, cele mai populare, se incadreaza intre 1000 si 2500 lei.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Care e diferenta intre un pavilion de gradina rezistent la apa si unul normal?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Un pavilion rezistent la apa are prelate din materiale mai dense (minim 200-250 g/m² poliester), tratate UV si adesea cu strat impermeabil (PU). Structura e mai solida, din otel galvanizat sau aluminiu, pentru a rezista la vant si ploaie fara sa se rastoarne sau sa se deterioreze rapid.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Merita sa cumpar un pavilion de gradina rezistent la apa din poliester?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Da, merita daca poliesterul este de buna calitate si are un gramaj ridicat (minim 200-250 g/m²), plus tratament UV. Poliesterul dens ofera o buna protectie impotriva ploii si soarelui, fiind si mai accesibil decat alte materiale.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce pavilion de gradina e mai bun pentru vant puternic?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Pentru vant puternic, alege un pavilion fix, cu o structura solida din otel galvanizat sau aluminiu gros, si cu o baza care se poate ancora foarte bine in sol sau pavaj. Modelele pliabile sunt mai vulnerabile la vanturi puternice.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                De ce se decoloreaza pavilionul de gradina de la soare?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Se decoloreaza din cauza radiatiilor UV. Daca pavilionul nu are un strat protector UV aplicat pe materialul prelatei, culorile vor palea rapid, iar materialul va deveni casant si se va deteriora. Cauta specificatii clare despre protectia UV.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cum sa intretin pavilionul de gradina rezistent la apa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Curata prelatele regulat cu apa si sapun neutru, fara detergenti abrazivi. Daca ai un model cu structura metalica, verifica periodic sa nu apara pete de rugina si aplica un strat protector. Asigura-te ca pavilionul este complet uscat inainte de a-l depozita iarna.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-6">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Unde gasesc un pavilion de gradina rezistent la apa de calitate?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Poti gasi pavilioane de gradina rezistente la apa de calitate in magazinele mari de bricolaj (Leroy Merlin, Dedeman, Hornbach), in magazinele online specializate in mobilier de gradina sau pe platforme precum Emag. Verifica specificatiile tehnice si citeste parerile altor clienti.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-7">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna ca un pavilion de gradina este rezistent la apa?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Inseamna ca materialul prelatei este tratat pentru a impiedica patrunderea apei. Un pavilion 'rezistent la apa' va proteja impotriva ploii moderate, dar nu este menit sa reziste la inundatii sau la presiunea mare a apei pe perioade indelungate. Pentru plus de siguranta, alege modele cu acoperis in panta sau guri de ventilatie.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru un pavilion cu adevarat impermeabil, cel mai bine notat e <strong>PEXOR Forte</strong>, iar <strong>Danubewd</strong> are prelata din PVC, clar rezistenta la ploaie. Cel mai vandut si mai accesibil e <strong>AT Performance</strong>. Daca vrei sa inchizi spatiul de vant, modelele cu pereti laterali, ca <strong>Hessa</strong> sau <strong>PROCART</strong>, ofera protectie completa.</p>
+      <p>La un pavilion de gradina conteaza cat de <strong>impermeabil</strong> e acoperisul, daca are <strong>pereti laterali</strong> pentru protectie pe vant, tipul de <strong>structura</strong> (pliabila sau fixa) si cat de bine il ancorezi. Mai jos gasesti direct recomandarile, pe trei tipuri, iar sub ele un ghid despre cum alegi si cum il fixezi ca sa nu il ia vantul.</p>
+      <p>Am pornit de la pavilioanele in stoc pe eMAG, cu cele mai multe pareri, le-am verificat pe impermeabilitate, dimensiune, pereti si structura, si le-am impartit in impermeabile, pliabile accesibile si cu pereti laterali. E o categorie cu note amestecate, asa ca am fost onesti si am notat clar unde ratingurile sunt slabe sau parerile inca putine. Pentru alte solutii de umbra pe terasa, vezi si <a href="/pergola-din-lemn-pentru-terasa/">pergolele din lemn</a> si <a href="/copertina-retractabila-pentru-terasa/">copertinele retractabile</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#imperm">Pavilioane impermeabile 3x3</a></li>
+        <li><a href="#pliabil">Pavilioane pliabile accesibile</a></li>
+        <li><a href="#pereti">Pavilioane cu pereti laterali</a></li>
+        <li><a href="#de-ce">De ce un pavilion in gradina</a></li>
+        <li><a href="#conteaza">Ce conteaza cand alegi</a></li>
+        <li><a href="#vant">Cum il fixezi pe vant</a></li>
+        <li><a href="#intretinere">Intretinere si depozitare</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Dimensiune</th><th>Pereti</th><th>Material</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.dim}</td>
+              <td>{x.pereti}</td>
+              <td>{x.material}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="imperm">Pavilioane impermeabile 3x3</h2>
+    <p>Accentul cade pe rezistenta la apa: prelate din PVC sau poliester tratat, care tin ploaia afara, nu doar o resping o vreme. Sunt pliabile, se monteaza rapid si acopera o masa mare. Aici e si cel mai bine notat pavilion din selectie.</p>
+    <div class="rd-grid">
+      {IMPERM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figImperm} alt="Pavilioane impermeabile 3x3: Danubewd, PEXOR, AT Performance" width="1200" height="675" loading="lazy" />
+
+    <h2 id="pliabil">Pavilioane pliabile accesibile</h2>
+    <p>Tip pop-up, se ridica in cateva minute si se strang la loc pentru mutare sau depozitare. Ideale pentru evenimente ocazionale, mese in curte si umbra la piscina, cand vrei ceva practic si usor de manevrat.</p>
+    <div class="rd-grid">
+      {PLIABIL.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPliabil} alt="Pavilioane pliabile accesibile: JRH, OEM, Flippy" width="1200" height="675" loading="lazy" />
+
+    <h2 id="pereti">Pavilioane cu pereti laterali</h2>
+    <p>Inchid complet spatiul si te apara de vant, de soarele piezis si de ploaia oblica. Cu structura mai solida sau cu ferestre, sunt alegerea pentru petreceri si pentru vreme schimbatoare, cand un simplu umbrar nu ajunge.</p>
+    <div class="rd-grid">
+      {PERETI.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPereti} alt="Pavilioane cu pereti laterali: Hessa, Sersimo, PROCART" width="1200" height="675" loading="lazy" />
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-pavilion').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate pavilioanele de gradina la oferta</strong>
+        <span>Reducerile din acest moment la pavilioane si corturi de gradina, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="de-ce">De ce un pavilion in gradina</h2>
+    <p>Vara, o curte fara umbra devine repede nefolosibila la orele de mijloc ale zilei. Un pavilion rezolva asta simplu: <strong>creeaza umbra si adapost</strong> exact unde ai nevoie, peste o masa, langa piscina sau intr-un colt de relaxare, si iti extinde spatiul de locuit in aer liber pe tot sezonul cald.</p>
+    <p>Fata de o umbrela, un pavilion acopera o suprafata mult mai mare si mai stabila, suficient pentru o masa cu mai multe scaune, si, daca e impermeabil, te apara si de o ploaie trecatoare, nu doar de soare. Cu pereti laterali, devine aproape o camera in aer liber, buna pentru petreceri, mese festive sau zile cu vant. Iar daca e pliabil, il montezi cand ai nevoie si il strangi cand nu, fara sa ocupe permanent curtea. E una dintre cele mai practice piese pentru cine vrea sa profite de gradina sau de terasa toata vara, pe orice vreme.</p>
+
+    <h2 id="conteaza">Ce conteaza cand alegi</h2>
+    <p>Cateva lucruri fac diferenta reala intre doua pavilioane:</p>
+    <ul>
+      <li><strong>Impermeabilitatea:</strong> cauta o prelata din PVC sau poliester tratat, cu mentiunea clara impermeabil, ca sa te apere si de ploaie, nu doar de soare.</li>
+      <li><strong>Peretii laterali:</strong> fara pereti ai doar umbra de sus; cu pereti inchizi spatiul si te aperi de vant, soare piezis si ploaie oblica.</li>
+      <li><strong>Structura:</strong> pliabila, tip pop-up, pentru montaj rapid si mutare usoara; din otel, mai solida si mai stabila, pentru folosire indelungata.</li>
+      <li><strong>Dimensiunea:</strong> 3x3 m e formatul standard, bun pentru o masa cu 4-6 scaune. Masoara locul si numarul de oameni inainte.</li>
+      <li><strong>Ancorarea:</strong> verifica daca vine cu picoti si corzi de tensionare, esentiale ca sa nu il ia vantul.</li>
+      <li><strong>Numarul de pareri si nota:</strong> in aceasta categorie notele sunt amestecate, deci citeste recenziile cu atentie inainte de a comanda.</li>
+    </ul>
+
+    <h2 id="vant">Cum il fixezi pe vant</h2>
+    <p>Cel mai mare dusman al unui pavilion e <strong>vantul</strong>, mai ales la modelele pliabile si usoare, care se pot rasturna sau lua pe sus daca nu sunt ancorate. De aceea, fixarea nu e optionala, ci obligatorie. Foloseste <strong>picotii</strong>, tarusii care vin de obicei in pachet, si infige-i in pamant la fiecare dintre cele patru picioare, apoi intinde <strong>corzile de tensionare</strong> spre exterior, ca la un cort, pentru stabilitate in plus.</p>
+    <p>Pe suprafete tari, ca o terasa betonata, unde nu poti infige picotii, foloseste <strong>greutati</strong> la baza fiecarui picior: saci de nisip, greutati speciale pentru pavilion sau chiar dale grele. Nu lasa niciodata un pavilion nefixat pe vant si, daca se anunta furtuna, cel mai sigur e sa il strangi de tot. O structura mai grea, din otel, rezista mai bine decat un cadru subtire de aluminiu, dar si aceea trebuie ancorata la vant puternic. Cateva minute de fixare corecta te scapa de un pavilion stricat sau zburat peste gard.</p>
+
+    <h2 id="intretinere">Intretinere si depozitare</h2>
+    <p>Cheia unui pavilion care tine mai multe veri e sa il <strong>strangi curat si uscat</strong>. Dupa o ploaie, lasa prelata sa se usuce complet inainte de a o plia, altfel mucegaieste si capata miros, iar petele sunt greu de scos. Curata panza de frunze, praf si pete cu apa si o solutie blanda, evitand detergentii agresivi, care pot afecta tratamentul impermeabil al prelatei.</p>
+    <p>Verifica periodic <strong>cadrul si imbinarile</strong>, mai ales dupa vant, si strange suruburile slabite sau inlocuieste piesele uzate. Iarna, sau cand nu il mai folosesti, strange pavilionul si depoziteaza-l intr-un loc uscat, in husa lui, ferit de inghet si de umezeala. Nu il lasa montat toata iarna, mai ales pe cele pliabile, pentru ca zapada si vantul il pot deteriora. Cu aceasta grija simpla, prelata isi pastreaza rezistenta la apa, iar cadrul ramane stabil sezon dupa sezon.</p>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Preturile depind de material, pereti si structura:</p>
+    <p><strong>Impermeabile 3x3, pliabile:</strong> de la circa 220 de lei, ca AT Performance, cel mai vandut, si pana spre 340 de lei pentru modele mai bine notate, ca Danubewd sau PEXOR, cu prelate clar impermeabile.</p>
+    <p><strong>Pliabile obisnuite:</strong> in aceeasi zona, circa 230-425 de lei, in functie de brand si calitate, pentru pavilioane pop-up de curte si evenimente.</p>
+    <p><strong>Cu pereti laterali si structura solida:</strong> mai scumpe, intre circa 300 si 640 de lei, pentru ca inchid spatiul si, la modelele din otel, rezista mai bine in timp.</p>
+    <p>Pe langa pret, alege dupa <strong>cum il folosesti</strong>: un pavilion pliabil impermeabil pentru umbra ocazionala si o ploaie trecatoare, sau unul cu pereti si structura robusta daca vrei protectie completa si folosire indelungata. Fiind o categorie cu note amestecate, citeste recenziile de pe pagina inainte de a comanda si alege un model cu impermeabilitate clara si ancorare inclusa. Pentru umbra ocazionala, o alternativa mai simpla e o <a href="/umbrela-de-gradina-rezistenta-la-vant/">umbrela de gradina rezistenta la vant</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">MI</div>
       <div class="author-info">
-        <h4><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></h4>
-        <p class="author-role">Designer <a href="/plante-artificiale-decorative-pentru-interior/">Interior</a></p>
-        <p class="author-bio">Maria lucreaza de 8 ani in designul interior si exterior, specializata in mobilier de <a href="/set-masa-si-scaune-pentru-gradina/">gradina</a> si terase. A colaborat cu peste 200 de clienti pentru transformarea spatiilor exterioare in oaze de relaxare.</p>
+        <p class="author-name"><a href="/autori/maria-ionescu/" class="author-name-link">Maria Ionescu</a></p>
+        <p class="author-role">Designer Interior</p>
+        <p class="author-bio">Maria scrie despre mobilier de gradina si amenajari interioare. Se uita la materiale, dimensiuni si cat rezista lucrurile afara, peste ierni.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="pavilion-de-gradina-rezistent-la-apa"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="pavilion-de-gradina-rezistent-la-apa"
-      currentCategory="mobilier-gradina"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="pavilion-de-gradina-rezistent-la-apa" currentCategory="mobilier-gradina" articles={relatedArticles} />
+    <SimilarArticles currentSlug="pavilion-de-gradina-rezistent-la-apa" currentCategory="mobilier-gradina" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); vertical-align: middle; }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .cmp-prod { display: flex; align-items: center; gap: .65rem; }
+  .cmp-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 2px; }
+  .cmp-prod span { font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

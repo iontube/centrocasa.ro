@@ -1,0 +1,145 @@
+---
+// Fara acest fisier, Cloudflare Pages serveste index.html pentru ORICE ruta negasita,
+// cu status 200. Efectul era un soft-404 pe tot site-ul: fiecare URL gresit, link mort
+// sau sondaj de crawler primea homepage-ul ca pagina valida, adica sute de duplicate
+// potentiale in index si buget de crawl irosit. Prezenta lui face Pages sa raspunda 404 corect.
+import Layout from '../layouts/Layout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { categories } from '../lib/categories.mjs';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+
+const populated = new Set(visibleArticles(keywordsData.completed).map(a => a.categorySlug));
+const cats = categories.filter(c => populated.has(c.slug));
+
+const recente = visibleArticles(keywordsData.completed)
+  .slice()
+  .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  .slice(0, 6)
+  .map(item => {
+    const s = item.slug || slugify(item.keyword);
+    return {
+      title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+      slug: s,
+      excerpt: item.excerpt || '',
+      image: item.image || `/imagini/articole/${s}.webp`,
+      category: item.category,
+      categorySlug: item.categorySlug,
+      date: item.date || '',
+    };
+  });
+---
+
+<Layout
+  title="Pagina nu a fost gasita | CentroCasa"
+  description="Pagina cautata nu exista sau a fost mutata. Vezi categoriile si cele mai noi recenzii de pe CentroCasa."
+>
+  <div class="nf">
+    <div class="nf-hero">
+      <span class="nf-code">404</span>
+      <h1>Pagina asta nu exista</h1>
+      <p class="nf-lead">Linkul e gresit sau pagina a fost mutata intre timp. Ia-o de la o categorie sau vezi ce am publicat recent.</p>
+      <a class="nf-btn" href="/">Inapoi la prima pagina</a>
+    </div>
+
+    <section class="nf-sec">
+      <h2>Cauta pe categorii</h2>
+      <div class="nf-cats">
+        {cats.map(c => (
+          <a class="nf-cat" href={`/${c.slug}/`}>
+            <span class="nf-cat-name">{c.name}</span>
+            <span class="nf-cat-go">›</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="nf-sec">
+      <h2>Cele mai noi articole</h2>
+      <div class="nf-grid">
+        {recente.map(a => <ArticleCard {...a} />)}
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .nf { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+  .nf-hero {
+    text-align: center;
+    padding: 2.5rem 1rem 3rem;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #f0f7f3 0%, #dfeee6 100%);
+    border: 1px solid var(--color-gray-200, #e7e5e4);
+  }
+  .nf-code {
+    display: block;
+    font-size: clamp(3.5rem, 12vw, 6rem);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-primary-700, #15803d);
+    opacity: .22;
+    letter-spacing: -.03em;
+  }
+  .nf-hero h1 { font-size: clamp(1.5rem, 4vw, 2rem); margin: -.4rem 0 .6rem; }
+  .nf-lead {
+    max-width: 46ch;
+    margin: 0 auto 1.5rem;
+    color: var(--color-gray-700, #44403c);
+    line-height: 1.65;
+  }
+  .nf-btn {
+    display: inline-block;
+    background: var(--color-primary-700, #15803d);
+    color: #fff;
+    font-weight: 700;
+    padding: .8rem 1.6rem;
+    border-radius: 10px;
+    transition: transform .12s ease, box-shadow .15s ease;
+    box-shadow: 0 6px 18px rgba(21,128,61,.22);
+  }
+  .nf-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(21,128,61,.3); }
+
+  .nf-sec { margin-top: 3rem; }
+  .nf-sec h2 { font-size: 1.35rem; margin: 0 0 1.1rem; }
+
+  .nf-cats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: .7rem;
+  }
+  .nf-cat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .95rem 1.1rem;
+    border: 1px solid var(--color-gray-200, #e7e5e4);
+    border-radius: 12px;
+    background: #fff;
+    font-weight: 600;
+    color: var(--color-gray-800, #292524);
+    transition: border-color .15s ease, transform .12s ease, box-shadow .15s ease;
+  }
+  .nf-cat:hover {
+    border-color: var(--color-primary-500, #22c55e);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  }
+  .nf-cat-go { color: var(--color-primary-700, #15803d); font-size: 1.3rem; line-height: 1; }
+
+  .nf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.4rem;
+  }
+
+  @media (max-width: 640px) {
+    .nf { padding: 1.2rem .8rem 3rem; }
+    .nf-hero { padding: 2rem .8rem 2.2rem; }
+    .nf-cats { grid-template-columns: 1fr 1fr; }
+    .nf-cat { padding: .8rem .85rem; font-size: .92rem; }
+    .nf-grid { grid-template-columns: 1fr; }
+  }
+</style>

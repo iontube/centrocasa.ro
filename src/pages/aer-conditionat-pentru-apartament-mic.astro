@@ -1,280 +1,299 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Aer conditionat pentru apartament mic",
-  excerpt: "Locuiesti intr-un apartament mai mic si vara te chinui cu caldura, iar iarna frigul isi face simtita prezenta? Alegerea unui aer conditionat potrivit poate face o diferenta uriasa in confortul tau zilnic. Nu e chiar asa complicat cum pare, hai sa vedem impreuna cum gasesti solutia ideala.",
-  image: "/images/articles/aer-conditionat-pentru-apartament-mic.webp",
-  category: "Electrocasnice Casa",
-  categorySlug: "electrocasnice-casa",
-  date: "2026-01-03T06:00:00.000Z",
-  modifiedDate: "2026-01-26T06:00:00.000Z",
-  author: "Cristian Popa",
-  authorRole: "Specialist Electrocasnice",
-  authorBio: "Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne."
-};
-
-const faq = [
-  { question: "Ce inseamna BTU si de ce e important pentru un apartament mic?", answer: "BTU (British Thermal Unit) este unitatea de masura pentru puterea de racire a unui aparat de aer conditionat. Pentru un apartament mic, de obicei o camera de pana in 20-25 mp, un aparat de 9000 BTU este, in general, suficient. Daca alegi un aparat cu prea multi BTU, va porni si se va opri des, consumand mult curent si nu va functiona optim. Daca e prea mic, nu va raci eficient spatiul." },
-  { question: "Cat de mult creste factura la curent daca folosesc aerul conditionat?", answer: "Consumul variaza mult in functie de clasa energetica a aparatului, cat de des il folosesti, temperatura setata si cat de bine este izolat apartamentul. Un aparat cu clasa energetica A+++ va consuma semnificativ mai putin decat unul cu clasa B. Daca il folosesti moderat, la o temperatura rezonabila (24-25 grade), cresterea nu ar trebui sa fie dramatica. Totusi, asteapta-te la o crestere, mai ales in lunile de vara cand il folosesti intens." },
-  { question: "Pot folosi acelasi aparat pentru mai multe camere intr-un apartament mic?", answer: "In general, un aparat de aer conditionat split este proiectat sa raceasca eficient o singura camera. Daca apartamentul tau are un hol deschis sau o bucatarie integrata in living, aerul rece se poate raspandi un pic, dar nu va fi la fel de eficient. Pentru a raci mai multe camere, ai nevoie de aparate separate sau de un sistem multi-split (mai scump si mai complex)." },
-  { question: "Ce inseamna functia 'inverter' la aerul conditionat?", answer: "Tehnologia inverter permite compresorului sa functioneze la viteze variabile, nu doar pornit/oprit. Asta inseamna ca aparatul ajunge mai repede la temperatura dorita, o mentine constant, consuma mai putin curent si e mai silentios. Majoritatea aparatelor moderne au aceasta tehnologie si e un mare plus." },
-  { question: "Cat de des trebuie curatat aerul conditionat?", answer: "Filtrele interioare, cele pe care le vezi cand deschizi capacul unitatii interioare, ar trebui curatate o data pe luna, mai ales in sezonul cald cand le folosesti des. Acestea se pot spala cu apa. Periodic (o data pe an, de preferat inainte de sezonul cald), se recomanda o igienizare profesionala a intregului aparat, inclusiv a vaporizatorului si a clapelor, pentru a elimina bacteriile si mucegaiul." },
-  { question: "Pot monta singur aerul conditionat?", answer: "Nu, montarea unui aer conditionat split necesita cunostinte tehnice specifice si unelte speciale. Este absolut necesar sa apelezi la o firma autorizata pentru instalare. O instalare incorecta poate duce la defectarea aparatului, pierderi de freon, zgomote neplacute si chiar pericole. De asemenea, garantia aparatului este conditionata de instalarea profesionala." }
-];
-
-const toc = [
-  { title: "De ce ai nevoie de aer conditionat, chiar si intr-un apartament mic?", id: "de-ce-ai-nevoie-de-aer-conditionat-chiar-si-intr-un-apartament-mic" },
-  { title: "Topul meu: Aparate de aer conditionat recomandate pentru apartamente mici", id: "topul-meu-aparate-de-aer-conditionat-recomandate-pentru-apartamente-mici" },
-  { title: "Cum alegi aerul conditionat potrivit pentru tine: Criterii esentiale", id: "cum-alegi-aerul-conditionat-potrivit-pentru-tine-criterii-esentiale" },
-  { title: "Avantaje si dezavantaje: Ce castigi si ce pierzi?", id: "avantaje-si-dezavantaje-ce-castigi-si-ce-pierzi" },
-  { title: "Sfaturi practice: Trucuri din experienta mea", id: "sfaturi-practice-trucuri-din-experienta-mea" },
-  { title: "Parerea mea: Alegerea finala pentru apartamentul tau", id: "parerea-mea-alegerea-finala-pentru-apartamentul-tau" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['aer-conditionat'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Accesibile ---
+  { g: 'buget', id: 'DHWT4LBBM', badge: 'Cel mai vandut', short: 'Star-Light ACT-09WIFI', clasa: 'A++', inverter: 'da', camera: '~16 m²', kit: 'nu',
+    specs: ['9000 BTU, clasa A++', 'inverter, silentios', 'control WiFi, functie de incalzire', 'pentru camere pana la ~16 m²'],
+    pros: ['De departe cel mai vandut din selectie, sute de pareri', 'Inverter la un pret mic, silentios si eficient', 'Control WiFi din telefon si functie de incalzire iarna', 'Perfect pentru o camera sau o garsoniera'],
+    cons: ['Fara kit de instalare inclus, il iei separat', 'Brand de buget, nu premium'],
+    verdict: 'Cea mai populara alegere pentru un apartament mic si un bun punct de plecare. Star-Light ACT-09WIFI are 9000 BTU, exact pentru o camera sau o garsoniera de pana la circa 16 m², cu tehnologie inverter, care il face silentios si mai economic decat un model simplu. Il pornesti si il reglezi din telefon prin WiFi, iar iarna incalzeste, deci il folosesti tot anul. E cel mai vandut din selectie, cu sute de pareri, semn ca merge pentru multa lume. Nu vine cu kit de instalare, deci il pui la buget separat, iar brandul e de buget, nu premium. Il iei cand vrei un aer conditionat inverter, ieftin si verificat, pentru o camera mica.' },
+  { g: 'buget', id: 'DSYFDLYBM', badge: 'Daewoo, cu filtre', short: 'Daewoo 9000', clasa: 'A++', inverter: 'da', camera: '~16 m²', kit: 'nu',
+    specs: ['9000 BTU, clasa A++, inverter', 'filtre cu ioni de argint', 'Eco Mode si functia iFeel', 'control WiFi'],
+    pros: ['Daewoo, brand cunoscut, la un pret accesibil', 'Filtre cu ioni de argint, aer mai curat', 'Eco Mode si iFeel, care regleaza dupa temperatura de langa tine', 'Inverter, clasa A++, control WiFi'],
+    cons: ['Fara kit de instalare inclus', 'Diferente mici de dotare fata de alte modele de buget'],
+    verdict: 'O alternativa buna de la un brand mai cunoscut, cu cateva dotari peste modelele de baza. Daewoo de 9000 BTU e inverter, clasa A++, si acopera o camera de pana la circa 16 m², cu filtre cu ioni de argint pentru un aer mai curat si cu functia iFeel, care regleaza temperatura dupa senzorul din telecomanda, de langa tine, nu de la unitate. Are Eco Mode pentru consum mai mic si control WiFi. Nu vine cu kit de instalare, deci il pui la buget separat. Il iei cand vrei un aer conditionat de la un brand cunoscut, cu filtrare buna, pentru o camera mica, la pret accesibil.' },
+  { g: 'buget', id: 'D3QBHYMBM', badge: 'Cel mai ieftin (on/off)', short: 'Heinner 9000', clasa: 'A++', inverter: 'nu', camera: '~15 m²', kit: 'nu',
+    specs: ['9000 BTU, clasa A++', 'tehnologie on/off, nu inverter', 'pentru camere pana la ~15 m²', 'brand Heinner'],
+    pros: ['Cel mai mic pret pentru o camera mica', 'Clasa A++, chiar si fara inverter', 'Heinner, brand cunoscut la noi', 'Simplu si robust, bun ca prim aer conditionat'],
+    cons: ['On/off, nu inverter: mai zgomotos si mai putin economic in folosire', 'Fara kit de instalare inclus'],
+    verdict: 'Cu cel mai mic pret racesti o camera mica, daca nu ai nevoie de inverter. Heinner de 9000 BTU e un model on/off, adica porneste si se opreste la atingerea temperaturii, spre deosebire de un inverter care moduleaza continuu, deci e ceva mai zgomotos si mai putin economic in folosire, dar si mai ieftin la cumparare. E clasa A++ si acopera o camera de pana la circa 15 m². Heinner e un brand cunoscut la noi, cu service accesibil. Nu vine cu kit de instalare. Il iei cand vrei cel mai mic pret si folosesti aerul conditionat ocazional, nu toata ziua, unde diferenta fata de inverter conteaza mai putin.' },
+  // --- Raport bun ---
+  { g: 'raport', id: 'DQT56GYBM', badge: 'Alegerea noastra', short: 'Yamato Optimum YW09', clasa: 'A++/A+', inverter: 'da', camera: '~20 m²', kit: 'da',
+    specs: ['9000 BTU, inverter, gama 2025', 'foarte silentios, de la 22 dB', 'kit de instalare inclus', 'Golden Fin, rezistenta la coroziune'],
+    pros: ['Nota cea mai mare din selectie, aproape de maxim', 'Foarte silentios, de la 22 dB, ideal in dormitor', 'Vine cu kit de instalare inclus, economisesti la montaj', 'Inverter, gama 2025, cu Golden Fin anticoroziune'],
+    cons: ['Yamato e mai putin cunoscut ca Samsung sau LG', 'Pret peste modelele de buget'],
+    verdict: 'Recomandarea mea principala pentru un apartament mic: cel mai bine notat model din selectie si silentiozitate de top. Yamato Optimum YW09 are 9000 BTU, inverter si un nivel de zgomot de la 22 dB, aproape imperceptibil, ceea ce conteaza enorm intr-o garsoniera sau un dormitor unde dormi langa el. Vine cu kit de instalare inclus, deci economisesti la montaj, si are tratament Golden Fin pentru rezistenta la coroziune. Yamato e mai putin cunoscut decat Samsung sau LG, dar nota de la sute de cumparatori il recomanda. Il iei cand vrei cel mai bun echilibru intre silentiozitate, dotari si pret, cu kit inclus.' },
+  { g: 'raport', id: 'DF8DPVMBM', badge: 'Inverter, Follow me', short: 'Ariston PRIOS 25', clasa: 'A++', inverter: 'da', camera: '~20 m²', kit: 'nu',
+    specs: ['9000 BTU, clasa A++, 2D inverter', 'functie Follow me', 'agent frigorific R32', 'brand Ariston'],
+    pros: ['Ariston, brand cunoscut, cu service la noi', '2D inverter, distributie mai buna a aerului', 'Functia Follow me, regleaza dupa telecomanda de langa tine', 'Agent R32, mai eficient si mai prietenos cu mediul'],
+    cons: ['Fara kit de instalare inclus', 'Nivel de zgomot mediu, nu cel mai silentios'],
+    verdict: 'Un inverter de la un brand cunoscut, cu cateva functii utile intr-o camera mica. Ariston PRIOS 25 are 9000 BTU, clasa A++ si un 2D inverter, care distribuie aerul mai uniform in incapere, plus functia Follow me, prin care aparatul urmareste temperatura de la telecomanda, de langa tine, pentru un confort mai bun. Foloseste agent frigorific R32, mai eficient si mai prietenos cu mediul. Ariston e un brand cunoscut, cu service accesibil. Nu vine cu kit de instalare si nu e cel mai silentios din selectie. Il iei cand vrei un inverter de brand, cu distributie buna a aerului si Follow me, pentru o camera mica.' },
+  { g: 'raport', id: 'DQF8PY2BM', badge: 'Samsung, silentios', short: 'Samsung AR35', clasa: 'A++', inverter: 'da', camera: '~25 m²', kit: 'nu',
+    specs: ['9000 BTU, clasa A++, inverter', 'silentios, de la 28 dB', 'SmartThings, Fast cooling, Good Sleep', 'Self clean'],
+    pros: ['Samsung, brand mare, cu retea de service extinsa', 'Silentios, de la 28 dB, bun in dormitor', 'SmartThings, Fast cooling si Good Sleep pentru noapte', 'Self clean, isi usuca singur unitatea interna'],
+    cons: ['Mai scump decat modelele de buget', 'Fara kit de instalare inclus'],
+    verdict: 'Alegerea daca vrei un brand mare, cu aplicatie matura si functii de confort. Samsung AR35 are 9000 BTU, inverter, clasa A++, si e silentios, de la 28 dB, potrivit pentru un dormitor. Il controlezi din SmartThings, ai Fast cooling cand vrei sa racesti repede si Good Sleep, care ajusteaza temperatura peste noapte pentru un somn mai bun, plus Self clean, care usuca unitatea ca sa nu prinda miros. Samsung are cea mai extinsa retea de service, un plus real pe termen lung. E mai scump decat modelele de buget si nu vine cu kit. Il iei cand vrei un aer conditionat de brand mare, silentios, cu functii de somn, pentru o camera mica.' },
+  // --- Premium ---
+  { g: 'premium', id: 'DHXQ3ZBBM', badge: 'Specialist, cu kit', short: 'Gree Bora A4', clasa: 'A++', inverter: 'da', camera: '~25 m²', kit: 'da',
+    specs: ['9000 BTU, G10 inverter', 'silentios, de la 28 dB', 'kit de instalare inclus', 'Buton Turbo, auto-diagnoza'],
+    pros: ['Gree, unul dintre cei mai mari producatori de aer conditionat', 'G10 inverter, silentios de la 28 dB', 'Vine cu kit de instalare inclus', 'Buton Turbo si auto-diagnoza'],
+    cons: ['Mai scump decat modelele de mijloc', 'Brand cunoscut mai ales de instalatori, mai putin de publicul larg'],
+    verdict: 'Alegerea daca vrei un aparat de la un specialist in aer conditionat, cu kit inclus. Gree e unul dintre cei mai mari producatori de climatizare din lume, iar modelul Bora A4 de 9000 BTU are un G10 inverter silentios, de la 28 dB, si vine cu kit de instalare inclus, deci economisesti la montaj. Are buton Turbo pentru racire rapida si auto-diagnoza, care iti spune daca ceva nu e in regula. Gree e cunoscut mai ales de instalatori, care il recomanda des, mai putin de publicul larg. E mai scump decat modelele de mijloc, dar solid. Il iei cand vrei un aparat de la un specialist, silentios si cu kit inclus, pentru o camera mica.' },
+  { g: 'premium', id: 'D14RBWMBM', badge: 'Beko, complet', short: 'Beko 9000', clasa: 'A++/A+', inverter: 'da', camera: '~25 m²', kit: 'da',
+    specs: ['9000 BTU, clasa A++/A+', 'control WiFi HomeWhiz', 'kit de instalare inclus', 'Silver Ion, Self Clean+'],
+    pros: ['Beko, brand mare, cu service la noi', 'Control WiFi HomeWhiz din telefon', 'Vine cu kit de instalare inclus', 'Filtre Silver Ion si Self Clean+ pentru igiena'],
+    cons: ['Cel mai scump din selectie', 'Dotari multe, mai mult decat are nevoie o camera mica'],
+    verdict: 'Cel mai complet aparat din selectie, pentru cine vrea un brand mare si toate dotarile. Beko de 9000 BTU are clasa A++/A+, control WiFi prin HomeWhiz, kit de instalare inclus si functii de igiena ca filtrele Silver Ion si Self Clean+, care mentin unitatea curata. Beko e un brand mare, cu retea de service la noi, un plus pe termen lung. E cel mai scump din selectie si aduce mai multe dotari decat are strict nevoie o camera mica, dar daca vrei sa iei o data si sa uiti, e o alegere sigura. Il iei cand vrei un aer conditionat complet, de brand mare, cu kit inclus, pentru o camera pe care o folosesti mult.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const BUGET = PICKS.filter(x => x.g === 'buget');
+const RAPORT = PICKS.filter(x => x.g === 'raport');
+const PREMIUM = PICKS.filter(x => x.g === 'premium');
+
+const site = 'https://centrocasa.ro';
+const hero = '/images/articles/aer-conditionat-pentru-apartament-mic.webp';
+const figBuget = '/imagini/articole/ac-mic-buget.webp';
+const figRaport = '/imagini/articole/ac-mic-raport.webp';
+const figPremium = '/imagini/articole/ac-mic-premium.webp';
+const published = '2026-07-18T12:40:41+03:00';
+
+const faq = [
+  { question: 'Cati BTU imi trebuie pentru un apartament mic?', answer: 'Pentru o camera sau o garsoniera, 9000 BTU sunt alegerea potrivita, pentru ca acopera o incapere de pana la aproximativ 20-25 m². Regula orientativa e in jur de 350-400 BTU pe metru patrat, deci 9000 BTU racesc bine o camera obisnuita de apartament. Nu lua un aparat prea mare, de 12000 sau 18000 BTU, pentru o camera mica: raceste prea repede, se opreste des, dezumidifica mai prost si consuma inutil. Pentru un spatiu mic, 9000 BTU e sweet spot-ul.' },
+  { question: 'Inverter sau on/off pentru o camera mica?', answer: 'Un aparat inverter isi moduleaza continuu puterea ca sa mentina temperatura, deci e mai silentios, mai economic si mai confortabil, fara pornirile si opririle bruste ale unui on/off. Un aparat on/off e mai ieftin la cumparare, dar mai zgomotos si mai costisitor in folosire, potrivit doar daca il pornesti ocazional. Intr-un apartament mic, unde stai si dormi in aceeasi incapere cu aparatul, inverterul merita aproape mereu diferenta de pret, prin liniste si consum.' },
+  { question: 'Cat de important e zgomotul intr-o garsoniera?', answer: 'Foarte important, pentru ca dormi si stai in aceeasi camera cu aparatul. Un aer conditionat silentios, care porneste de la 22-28 dB, e aproape imperceptibil noaptea, in timp ce unul mai zgomotos te poate deranja la somn. Cauta nivelul de zgomot al unitatii interne in specificatii si tinteste valori mici, mai ales daca il folosesti in dormitor. Modelele inverter, ca Yamato, Samsung sau Gree din aceasta selectie, sunt printre cele mai silentioase.' },
+  { question: 'Kitul de instalare e inclus?', answer: 'Depinde de model. Unele aparate, ca Yamato, Gree si Beko din aceasta selectie, vin cu kit de instalare inclus (tevi, cablu, suporturi), iar altele nu, caz in care il cumperi separat sau il pune instalatorul din materialele lui. Kitul inclus iti economiseste ceva bani la montaj. Oricum, montajul unui aer conditionat il face un instalator autorizat, care vidueaza instalatia si o pune corect; nu e o lucrare de facut singur, pentru ca implica agentul frigorific.' },
+  { question: 'Ce clasa energetica sa aleg?', answer: 'Pentru un aer conditionat, cauta cel putin clasa A++, cum sunt toate modelele din aceasta selectie, iar daca bugetul permite, A+++ consuma si mai putin. Clasa energetica, impreuna cu coeficientii SEER la racire si SCOP la incalzire, iti spun cat de eficient e aparatul si cat vei plati pe curent. Intr-un apartament mic, unde aparatul merge des vara, o clasa buna se simte pe factura in cativa ani si merita diferenta de pret la cumparare.' },
+  { question: 'Unde montez aparatul intr-un apartament mic?', answer: 'Unitatea interna se pune pe un perete liber, cat mai sus, de unde aerul se distribuie bine in camera, ferita de pat sau canapea, ca sa nu sufle direct in tine. Unitatea externa merge de obicei pe balcon, pe fatada sau pe un suport, cat mai aproape de cea interna, ca traseul de tevi sa fie scurt. Intr-un apartament mic conteaza sa alegi din start locul, ca traseul sa fie discret si scurt. Instalatorul iti spune ce e posibil in functie de structura blocului.' },
+];
+
+const images = [hero, figBuget, figRaport, figPremium, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
 ---
 
 <Layout
-  title="Aer conditionat pentru apartament mic - CentroCasa"
-  description="Locuiesti intr-un apartament mai mic si vara te chinui cu caldura, iar iarna frigul isi face simtita prezenta? Alegerea unui aer conditionat potrivit poate face o diferenta uriasa in confortul tau zilnic. Nu e chiar asa complicat cum pare, hai sa vedem impreuna cum gasesti solutia ideala."
-  image="/images/articles/aer-conditionat-pentru-apartament-mic.webp"
+  title="Aer conditionat pentru apartament mic in 2026: cele mai bune de 9000 BTU"
+  description="Ce aer conditionat de apartament mic sa alegi in 2026: aparate de 9000 BTU pentru o camera sau garsoniera, cu inverter, clasa A++ si nivel de zgomot mic, de la Star-Light, Daewoo, Yamato, Samsung, Gree si Beko. Plus cati BTU, inverter vs on/off si montaj."
+  image={hero}
   type="article"
-  publishedTime="2026-01-03T06:00:00.000Z"
-  modifiedTime="2026-01-26T06:00:00.000Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Cristian Popa"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Incalzire si Climatizare', url: '/incalzire-climatizare/' }, { name: 'Aer conditionat pentru apartament mic' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/electrocasnice-casa/">Electrocasnice Casa</a>
-      <span class="breadcrumb-separator">/</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/incalzire-climatizare/">Incalzire si Climatizare</a><span class="breadcrumb-separator">/</span>
       <span>Aer conditionat pentru apartament mic</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/electrocasnice-casa/" class="article-category">Electrocasnice Casa</a>
-        <span class="article-date">24 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Aer conditionat pentru apartament mic</h1>
-    </header>
+    <h1>Aer conditionat pentru apartament mic in 2026</h1>
+    <p class="rd-byline">de <a href="/autori/cristian-popa/">Cristian Popa</a>, Specialist Electrocasnice · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/aer-conditionat-pentru-apartament-mic.webp" alt="Aer conditionat pentru apartament mic" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Aer conditionat pentru apartament mic, de 9000 BTU" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="de-ce-ai-nevoie-de-aer-conditionat-chiar-si-intr-un-apartament-mic">
-        <h2>De ce ai nevoie de aer conditionat, chiar si intr-un apartament mic?</h2>
-        <p>Stiu, poate iti spui ca nu merita sa investesti intr-un aparat de <a href="/aparat-de-aer-conditionat-portabil/" class="interlink">aer conditionat</a> pentru un spatiu mic. Gresit! Un apartament mic se poate incalzi rapid vara, mai ales daca e la ultimul etaj sau nu are umbra. Gandeste-te la zilele alea caniculare cand aerul devine irespirabil.</p>
-        <p>Un aparat de aer conditionat nu face doar aerul mai rece, ci si mai curat si, in multe cazuri, il si dezumidifica, ceea ce face ca senzatia de disconfort sa dispara mult mai repede. In plus, modelele moderne pot si incalzi, transformand aparatul intr-o solutie pentru tot anul. Nu mai trebuie sa te bazezi doar pe ventilatoare care doar misca aerul cald sau pe <a href="/uscator-de-rufe-cu-pompa-de-caldura/">caldura</a> in<a href="/cum-sa-cureti-eficient-casa/">eficient</a>a a unui calorifer.</p>
-        <p>Eu am locuit si intr-un <a href="/purificator-de-aer-pentru-apartament/" class="interlink">apartament</a> mic si stiu exact prin ce treci. Un aparat bun te scapa de griji si iti ofera un mediu de locuit mult mai placut. E o investitie in sanatatea si confortul tau, mai ales daca petreci mult timp acasa.</p>
-        <p>Nu vorbim de un lux, ci de o necesitate in zilele noastre, cand temperaturile extreme devin tot mai frecvente. Si nu te gandi ca va ocupa mult loc sau ca va fi un monstru zgomotos. Tehnologia a avansat mult si acum gasesti solutii compacte si silentionase perfecte pentru spatiile mai restranse.</p>
-        <p>Hai sa vedem ce inseamna asta concret.</p>
-      </section>
-
-      <section id="topul-meu-aparate-de-aer-conditionat-recomandate-pentru-apartamente-mici">
-        <h2>Topul meu: Aparate de aer conditionat recomandate pentru apartamente mici</h2>
-        <p>Dupa ce am testat si am vazut o gramada de modele, am selectat cateva optiuni care mi se par excelente pentru un <a href="/centrala-termica-pe-gaz-pentru-apartament/" class="interlink">apartament</a> mic. Nu am inclus cele mai scumpe sau cele mai complicate, ci pe cele care ofera cel mai bun raport calitate-pret si care sunt usor de folosit, chiar si de catre cineva care nu e expert in tehnologie. </p>
-        <ul>
-  <li><b>Model A (ex: Daikin Stylish):</b> Acesta e un pic mai scump, dar e o investitie excelenta. Pe langa faptul ca arata superb si se integreaza perfect in orice decor, e si incredibil de eficient energetic. Raceste rapid, e foarte silentios si are functii inteligente de purificare a aerului. E ideal pentru o camera de pana in 20-25 mp. Pretul lui poate varia intre 3500-4500 RON, in functie de promotii.</li>
-  <li><b>Model B (ex: Gree Bora):</b> Daca bugetul e mai restrans, Gree Bora e o varianta foarte buna. E un aparat fiabil, performant si usor de intretinut. Nu are atatea functii 'fancy' ca modelele de top, dar isi face treaba excelent. Raceste eficient o camera de dimensiuni medii, pana la 20 mp. M-a impresionat pozitiv raportul pret-performanta, gasindu-l uneori chiar si sub 2000 RON.</li>
-  <li><b>Model C (ex: Samsung WindFree):</b> Samsung vine mereu cu inovatii, iar WindFree e dovada. Tehnologia asta iti permite sa racesti camera fara ca aerul rece sa bata direct in tine, ceea ce e un mare plus, mai ales daca stai mult in camera. E eficient, modern si are si functii smart. Pentru apartamente mici, un model de 9000 BTU e suficient. Pretul se invarte in jur de 2800-3500 RON.</li>
-  <li><b>Model D (ex: Whirlpool SPIW 418):</b> Un alt brand de incredere. Whirlpool ofera modele fiabile si la preturi accesibile. Acesta e un aparat bun pentru o camera de zi sau un dormitor de dimensiuni mai mici, pana in 20 mp. Nu are functii de ultima generatie, dar e robust si isi face treaba. Il gasesti uneori chiar si la 1800-2200 RON.</li>
-</ul>
-        <p>Am ales aceste modele pentru ca le-am testat pe diverse spatii si am vazut cum se comporta. Fiecare dintre ele are punctele lui forte, dar toate sunt potrivite pentru un apartament mic. Important e sa alegi puterea potrivita, despre care vom vorbi imediat.</p>
-      </section>
-
-      <section id="cum-alegi-aerul-conditionat-potrivit-pentru-tine-criterii-esentiale">
-        <h2>Cum alegi aerul conditionat potrivit pentru tine: Criterii esentiale</h2>
-        <p>Alegerea unui aer conditionat nu e ca si cum ai cumpara o pereche de sosete. Trebuie sa te gandesti la cateva aspecte cheie ca sa nu ajungi sa regreti. Primul lucru, si cel mai important, este <strong>puterea de racire (BTU)</strong>.</p>
-        <p>Pentru un apartament mic, de obicei o camera sau doua, nu ai nevoie de un monstru de aparat. Pentru o camera de pana in 20 mp, un aparat cu 9000 BTU este, in general, suficient. Daca spatiul e un pic mai mare sau e la ultimul etaj, poate 12000 BTU ar fi mai potrivit.</p>
-        <p>Nu lua niciodata unul prea puternic, pentru ca va porni si se va opri des, consumand mult curent si fara sa atinga eficienta optima. Al doilea aspect e <strong>clasa energetica</strong>. Cauta neaparat A+++ sau cel putin A++.</p>
-        <p>Diferenta la factura de curent se vede, crede-ma. Un aparat mai eficient consuma mai putin, chiar daca initial pare un pic mai scump. Apoi, <strong>nivelul de zgomot</strong>.</p>
-        <p>Daca vei folosi aparatul si noaptea, in dormitor, asta devine crucial. Cauta modele cu un nivel de zgomot sub 25-30 dB pe treapta de functionare minima. Multe aparate moderne au si mod 'silentios' sau 'noapte'.</p>
-        <p>Nu uita de <strong>functiile suplimentare</strong>: dezumidificare (foarte utila in zilele ploioase de vara), purificarea aerului (filtre de calitate te scapa de praf, alergeni si chiar mirosuri neplacute), auto-restart (revine la setarile anterioare dupa o pana de curent) si telecomanda cu ecran LCD, ca sa nu stai sa te chinui sa citesti butoanele. Din experienta mea, functia de dezumidificare e subestimata, dar face minuni.</p>
-        <p>Si ultima chestie, dar nu cea din urma: <strong>tipul de montaj</strong>. Pentru apartamente mici, cel mai comun si practic e cel de tip split, cu unitate interioara si exterioara. Asigura-te ca ai unde monta unitatea exterioara (pe balcon, perete) si ca esti de acord cu instalarea.</p>
-        <p>Procesul de instalare e important, asa ca apeleaza la profesionisti. Nu te zgarci la asta.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-ce-castigi-si-ce-pierzi">
-        <h2>Avantaje si dezavantaje: Ce castigi si ce pierzi?</h2>
-        <p>Ca la orice achizitie, si la un aer conditionat exista parti bune si mai putin bune. Hai sa le luam pe rand, ca sa stii la ce sa te astepti. </p>
-        <p><strong>Avantaje:</strong></p>
-        <ul>
-  <li><b>Confort termic sporit:</b> Asta e clar. Vara e racoare, iarna e caldura (la modelele cu functie de <a href="/convector-electric-pentru-incalzire/" class="interlink">incalzire</a>). Spui adio zilelor sufocante si noptilor nedormite din cauza caldurii.</li>
-  <li><b>Calitatea aerului imbunatatita:</b> Multe aparate moderne au filtre performante care elimina praful, polenul, bacteriile si chiar si mirosurile neplacute. Pentru cei cu alergii, asta e un beneficiu urias.</li>
-  <li><b>Control asupra umiditatii:</b> Functia de dezumidificare face aerul mult mai placut, mai ales in zilele ploioase sau cand e mult abur. Se previne si aparitia mucegaiului.</li>
-  <li><b>Eficienta energetica:</b> Modelele noi sunt mult mai eficiente decat generatiile mai vechi. Investitia initiala se poate recupera prin factura mai mica la curent.</li>
-  <li><b>Valoare adaugata proprietatii:</b> Un apartament echipat cu aer conditionat este mai atractiv pe piata imobiliara.</li>
-  <li><b>Discretie si estetica:</b> Unitatile interioare sunt din ce in ce mai slim si arata bine, integrandu-se usor in decor. Zgomotul e, de asemenea, mult redus la modelele noi.</li>
-</ul>
-        <p><strong>Dezavantaje:</strong></p>
-        <ul>
-  <li><b>Costul initial:</b> Achizitia aparatului si instalarea pot fi o investitie considerabila. Pretul poate varia mult, de la 1800 RON la peste 4500 RON.</li>
-  <li><b>Consumul de energie:</b> Chiar si cele mai eficiente aparate consuma curent. Daca il folosesti intensiv, factura la electricitate va creste.</li>
-  <li><b>Mentenanta necesara:</b> Curatarea filtrelor si verificarea periodica de catre un specialist sunt necesare pentru buna functionare si igiena.</li>
-  <li><b>Instalarea:</b> Necesita un specialist si, uneori, poate fi o operatie mai complexa, mai ales daca nu ai un loc evident pentru unitatea exterioara.</li>
-  <li><b>Zgomotul (la modelele vechi sau ieftine):</b> Aparatele mai vechi sau cele foarte ieftine pot fi destul de zgomotoase, deranjante mai ales noaptea.</li>
-  <li><b>Factorul estetic al unitatii exterioare:</b> Unii oameni nu sunt multumiti de cum arata unitatea exterioara pe peretele blocului.</li>
-</ul>
-        <p>Analizand aceste puncte, poti decide daca beneficiile depasesc costurile pentru tine si pentru apartamentul tau.</p>
-      </section>
-
-      <section id="sfaturi-practice-trucuri-din-experienta-mea">
-        <h2>Sfaturi practice: Trucuri din experienta mea</h2>
-        <p>Am trecut prin multe cu aparatele de aer conditionat, asa ca am invatat cateva lucruri pe care vreau sa le impartasesc cu tine. In primul rand, <strong>nu lasa aparatul sa mearga la maxim tot timpul</strong>. Daca setezi o temperatura mult prea joasa (ex: 18 grade vara), aparatul va munci in continuu, va consuma enorm si nu va face aerul sa se simta mai rece, doar sa fie rece.</p>
-        <p>O diferenta de 5-7 grade fata de temperatura exterioara e suficienta pentru confort. Eu incerc sa tin aerul conditionat la 24-25 de grade vara, si ma simt perfect. In al doilea rand, <strong>curata filtrele regulat</strong>.</p>
-        <p>Asta e cel mai simplu lucru pe care il poti face. Majoritatea filtrelor se pot spala cu apa. Fa asta o data pe luna, mai ales in sezonul cald.</p>
-        <p>Vei respira aer mai curat si aparatul va functiona mai eficient. Daca nu le cureti, se aduna praf si mizerie care pot dauna sanatatii si pot bloca fluxul de aer. In al treilea rand, <strong>foloseste functia de dezumidificare cand e nevoie</strong>.</p>
-        <p>In zilele cu mult abur, cand simti ca aerul e 'greu', functia asta face minuni. Nu raceste aerul la fel de mult ca modul normal, dar il face mult mai respirabil si confortabil. A patra chestie, <strong>inchide usile si ferestrele cat aparatul functioneaza</strong>.</p>
-        <p>Pare evident, dar multi uita. Nu vrei sa arunci aerul rece pe geam. Daca ai un balcon, poti lasa usa de la balcon deschisa doar pentru scurt timp, dar nu cand aparatul e in functiune.</p>
-        <p>A cincea recomandare: <strong>foloseste modul 'auto' sau 'fan' cand nu ai nevoie de racire intensa</strong>. Daca afara e doar un pic cald, un mod de ventilare mai <a href="/hota-pentru-bucatarie-puternica/">puternica</a> poate fi suficient. Si, in sfarsit, <strong>nu uita de telecomanda</strong>.</p>
-        <p>Multe functii utile, cum ar fi cea de temporizare (sa se opreasca singur dupa un anumit timp) sau modul 'sleep' (care ajusteaza temperatura pe parcursul noptii), sunt accesibile doar prin telecomanda. Citeste manualul, chiar daca pare plictisitor, vei descoperi functii utile.</p>
-      </section>
-
-      <section id="parerea-mea-alegerea-finala-pentru-apartamentul-tau">
-        <h2>Parerea mea: Alegerea finala pentru apartamentul tau</h2>
-        <p>Dupa atatia ani in domeniu, pot sa spun cu mana pe inima ca un aer conditionat bun te poate salva in zilele caniculare. Pentru un apartament mic, cheia este sa nu supraestimezi necesarul de putere si sa nu cumperi cel mai ieftin aparat doar pentru ca pare o afacere. Eu, personal, daca as alege pentru mine acum, m-as orienta spre un model din gama medie spre superioara, cum ar fi cele de la Daikin, Samsung sau LG, chiar daca pretul e un pic mai mare.</p>
-        <p>Motivul? Eficienta energetica pe termen lung, fiabilitatea si functiile de purificare a aerului. Pentru mine, sanatatea e pe primul loc, iar aerul curat conteaza enorm. Daca bugetul e mai limitat, branduri ca Gree sau Whirlpool ofera solutii foarte bune, cu un raport calitate-pret excelent.</p>
-        <p>Important e sa verifici clasa energetica si nivelul de zgomot. Nu te lasa pacalit de design, desi e un plus. Gandeste-te la ce e esential pentru tine: racire rapida, economie la curent, aer curat sau un nivel de zgomot cat mai mic.</p>
-        <p>Inainte de a cumpara, masoara spatiul pe care vrei sa-l acoperi si verifica specificatiile fiecarui aparat. Si nu uita sa ceri oferte de la mai multi instalatori. O instalare corecta e la fel de importanta ca si aparatul in sine.</p>
-        <p>Sper ca sfaturile mele sa te ajute sa faci cea mai buna alegere pentru confortul tau. Un apartament mic nu inseamna un confort mic, mai ales cu ajutorul tehnologiei potrivite.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna BTU si de ce e important pentru un apartament mic?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                BTU (British Thermal Unit) este unitatea de masura pentru puterea de racire a unui aparat de aer conditionat. Pentru un apartament mic, de obicei o camera de pana in 20-25 mp, un aparat de 9000 BTU este, in general, suficient. Daca alegi un aparat cu prea multi BTU, va porni si se va opri des, consumand mult curent si nu va functiona optim. Daca e prea mic, nu va raci eficient spatiul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de mult creste factura la curent daca folosesc aerul conditionat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Consumul variaza mult in functie de clasa energetica a aparatului, cat de des il folosesti, temperatura setata si cat de bine este izolat apartamentul. Un aparat cu clasa energetica A+++ va consuma semnificativ mai putin decat unul cu clasa B. Daca il folosesti moderat, la o temperatura rezonabila (24-25 grade), cresterea nu ar trebui sa fie dramatica. Totusi, asteapta-te la o crestere, mai ales in lunile de vara cand il folosesti intens.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi acelasi aparat pentru mai multe camere intr-un apartament mic?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                In general, un aparat de aer conditionat split este proiectat sa raceasca eficient o singura camera. Daca apartamentul tau are un hol deschis sau o bucatarie integrata in living, aerul rece se poate raspandi un pic, dar nu va fi la fel de eficient. Pentru a raci mai multe camere, ai nevoie de aparate separate sau de un sistem multi-split (mai scump si mai complex).
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna functia 'inverter' la aerul conditionat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Tehnologia inverter permite compresorului sa functioneze la viteze variabile, nu doar pornit/oprit. Asta inseamna ca aparatul ajunge mai repede la temperatura dorita, o mentine constant, consuma mai putin curent si e mai silentios. Majoritatea aparatelor moderne au aceasta tehnologie si e un mare plus.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie curatat aerul conditionat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Filtrele interioare, cele pe care le vezi cand deschizi capacul unitatii interioare, ar trebui curatate o data pe luna, mai ales in sezonul cald cand le folosesti des. Acestea se pot spala cu apa. Periodic (o data pe an, de preferat inainte de sezonul cald), se recomanda o igienizare profesionala a intregului aparat, inclusiv a vaporizatorului si a clapelor, pentru a elimina bacteriile si mucegaiul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot monta singur aerul conditionat?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Nu, montarea unui aer conditionat split necesita cunostinte tehnice specifice si unelte speciale. Este absolut necesar sa apelezi la o firma autorizata pentru instalare. O instalare incorecta poate duce la defectarea aparatului, pierderi de freon, zgomote neplacute si chiar pericole. De asemenea, garantia aparatului este conditionata de instalarea profesionala.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru un apartament mic, cel mai bun aer conditionat e <strong>Yamato Optimum</strong>: 9000 BTU, foarte silentios, de la 22 dB, cu kit de instalare inclus si nota cea mai mare. Cel mai vandut si mai ieftin cu inverter e <strong>Star-Light ACT-09WIFI</strong>. Daca vrei un brand mare cu functii de somn, <strong>Samsung AR35</strong> porneste de la 28 dB, iar cel mai ieftin, on/off, e <strong>Heinner</strong>.</p>
+      <p>Pentru o camera sau o garsoniera, alegerea corecta e un aparat de <strong>9000 BTU</strong>: nici prea mic, nici prea mare. Apoi conteaza doua lucruri, mai mult decat oriunde: <strong>inverter sau on/off</strong>, care decide zgomotul si consumul, si <strong>cat de silentios</strong> e, pentru ca stai si dormi in aceeasi camera cu el.</p>
+      <p>Am pornit de la aparatele de aer conditionat de 9000 BTU vandute pe eMAG, le-am verificat clasa energetica, tehnologia inverter, zgomotul si dotarile, si le-am grupat pe accesibile, raport bun si premium. Vezi si <a href="/cele-mai-bune-aparate-de-aer-conditionat/">comparatia mai larga de aparate de aer conditionat</a>, iar pentru facturi mai mici, <a href="/cele-mai-bune-panouri-solare/">panourile solare</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#btu">De ce 9000 BTU pentru un apartament mic</a></li>
+        <li><a href="#inverter">Inverter sau on/off</a></li>
+        <li><a href="#zgomot">Zgomotul si clasa energetica</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#buget">Aparate accesibile</a></li>
+        <li><a href="#raport">Cel mai bun raport</a></li>
+        <li><a href="#premium">Premium</a></li>
+        <li><a href="#montaj">Montaj intr-un apartament mic</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="btu">De ce 9000 BTU pentru un apartament mic</h2>
+    <p>Prima decizie la un aer conditionat e puterea, masurata in BTU, si pentru un spatiu mic raspunsul e clar. Un aparat de <strong>9000 BTU</strong> raceste bine o camera sau o garsoniera de pana la aproximativ 20-25 m², dupa regula orientativa de circa 350-400 BTU pe metru patrat.</p>
+    <p>Greseala frecventa e sa iei prea mult, un 12000 sau 18000 BTU, pentru o camera mica. Un aparat supradimensionat raceste prea repede, se opreste des, dezumidifica mai prost si consuma inutil, iar tu simti aerul mai umed si mai putin confortabil. Pentru un apartament mic, 9000 BTU e sweet spot-ul: exact cat trebuie, la cel mai bun pret.</p>
+
+    <h2 id="inverter">Inverter sau on/off</h2>
+    <p>A doua decizie conteaza si mai mult intr-un spatiu mic, unde stai langa aparat:</p>
+    <p><strong>Inverter:</strong> isi moduleaza continuu puterea ca sa tina temperatura constanta, deci e mai silentios, mai economic si mai confortabil, fara pornirile si opririle bruste. E alegerea pentru un apartament unde folosesti aerul des si dormi in aceeasi camera.</p>
+    <p><strong>On/off:</strong> porneste la maxim si se opreste cand atinge temperatura, apoi reia. E mai ieftin la cumparare, dar mai zgomotos si mai costisitor in folosire. Merita doar daca il pornesti ocazional.</p>
+    <p>Pe scurt: intr-o garsoniera, inverterul isi merita aproape mereu diferenta de pret, prin liniste si consum mai mic.</p>
+
+    <h2 id="zgomot">Zgomotul si clasa energetica</h2>
+    <p>Doua cifre de verificat inainte sa cumperi, importante intr-o camera mica:</p>
+    <ul>
+      <li><strong>Nivelul de zgomot:</strong> intr-o garsoniera dormi langa aparat, deci cauta valori mici. Modelele silentioase pornesc de la 22-28 dB, aproape imperceptibil noaptea; unele on/off ajung la 50 dB si peste.</li>
+      <li><strong>Clasa energetica:</strong> tinteste macar A++, cum sunt toate modelele de aici. Impreuna cu coeficientii SEER si SCOP, iti spune cat platesti pe curent. Intr-un apartament unde aparatul merge des vara, o clasa buna se simte pe factura.</li>
+    </ul>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Clasa</th><th>Inverter</th><th>Camera</th><th>Kit inclus</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (<tr><td>{x.short}</td><td>{x.clasa}</td><td>{x.inverter}</td><td>{x.camera}</td><td>{x.kit}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="buget">Aparate accesibile</h2>
+    <p>Aer conditionat de 9000 BTU la pret mic, pentru o camera sau o garsoniera. De la inverter accesibil la cel mai ieftin model on/off.</p>
+    <div class="rd-grid">
+      {BUGET.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBuget} alt="Aparate de aer conditionat accesibile de 9000 BTU: Star-Light, Daewoo, Heinner" width="1200" height="675" loading="lazy" />
+
+    <h2 id="raport">Cel mai bun raport</h2>
+    <p>Inverter, silentioase si de la branduri cunoscute, la un pret echilibrat. Aici intra cel mai bine notat model si o varianta Samsung cu functii de somn.</p>
+    <div class="rd-grid">
+      {RAPORT.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figRaport} alt="Aparate de aer conditionat de 9000 BTU: Yamato, Ariston si Samsung" width="1200" height="675" loading="lazy" />
+
+    <h2 id="premium">Premium</h2>
+    <p>De la un specialist in climatizare si un brand mare complet, cu kit de instalare inclus si dotari in plus, pentru cine vrea sa ia o data si sa uite.</p>
+    <div class="rd-grid">
+      {PREMIUM.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figPremium} alt="Aparate de aer conditionat premium de 9000 BTU: Gree si Beko" width="1200" height="675" loading="lazy" />
+
+    <h2 id="montaj">Montaj intr-un apartament mic</h2>
+    <p>Cateva lucruri de stiut inainte de a cumpara si a monta:</p>
+    <ul>
+      <li><strong>Instalator autorizat:</strong> montajul se face de un specialist, care videaza instalatia si o pune corect. Nu e o lucrare de bricolaj, pentru ca implica agentul frigorific.</li>
+      <li><strong>Locul unitatii interne:</strong> pe un perete liber, cat mai sus, ferit de pat sau canapea, ca sa nu sufle direct in tine.</li>
+      <li><strong>Unitatea externa:</strong> pe balcon, fatada sau un suport, cat mai aproape de cea interna, pentru un traseu de tevi scurt.</li>
+      <li><strong>Kitul:</strong> unele aparate vin cu kit inclus (Yamato, Gree, Beko aici), altele nu; verifica, ca sa stii daca il pui la buget separat.</li>
+    </ul>
+
+    <div class="rd-offers rd-offers-alt" data-o={b64('montaj-aer-conditionat')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Ai nevoie de montaj?</strong>
+        <span>Vezi serviciile de instalare aer conditionat disponibile pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi montajul
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <div class="rd-offers" data-o={b64('oferte-aer-conditionat')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate aparatele de aer conditionat la oferta</strong>
+        <span>Reducerile din acest moment la aparate de aer conditionat, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">CP</div>
       <div class="author-info">
-        <h4><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></h4>
+        <p class="author-name"><a href="/autori/cristian-popa/" class="author-name-link">Cristian Popa</a></p>
         <p class="author-role">Specialist Electrocasnice</p>
-        <p class="author-bio">Cristian testeaza si recenzeaza electrocasnice de peste 6 ani, cu focus pe eficienta energetica si raportul calitate-pret. A analizat peste 500 de produse pentru case moderne.</p>
+        <p class="author-bio">Cristian urmareste piata de electrocasnice si compara consum, capacitate si pareri, ca sa vezi rapid ce merita banii si ce nu.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="aer-conditionat-pentru-apartament-mic"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="aer-conditionat-pentru-apartament-mic"
-      currentCategory="electrocasnice-casa"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="aer-conditionat-pentru-apartament-mic" currentCategory="incalzire-climatizare" articles={relatedArticles} />
+    <SimilarArticles currentSlug="aer-conditionat-pentru-apartament-mic" currentCategory="incalzire-climatizare" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .rd-offers-alt { background: linear-gradient(120deg, #2563eb, #1e3a8a); box-shadow: 0 6px 20px rgba(37,99,235,.24); }
+  .rd-offers-alt:hover { box-shadow: 0 10px 28px rgba(37,99,235,.32); }
+  .rd-offers-alt .rd-offers-btn { color: #1e3a8a; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

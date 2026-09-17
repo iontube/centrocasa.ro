@@ -1,294 +1,292 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
 import SimilarArticles from '../components/SimilarArticles.astro';
-import keywordsData from '../../keywords.json';
 import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
 
-export const frontmatter = {
-  title: "Motocoasa electrica sau pe benzina",
-  excerpt: "Alegerea uneia dintre cele doua mari familii de motocoase, cea electrica sau cea pe benzina, poate fi o adevarata provocare pentru multi dintre noi. Fie ca ai o gradina mica si cochet- amenajata sau un teren mai intins, unde iarba creste mai veutata, stiu din proprie experienta cat de important e sa ai unealta potrivita. Hai sa vedem impreuna care e cea mai buna varianta pentru tine.",
-  image: "/images/articles/motocoasa-electrica-sau-pe-benzina.webp",
-  category: "Gradinarit si Unelte",
-  categorySlug: "gradinarit-unelte",
-  date: "2026-01-18T06:58:14.315Z",
-  modifiedDate: "2026-01-31T06:58:14.105Z",
-  author: "Andrei Marinescu",
-  authorRole: "Expert Gradinarit",
-  authorBio: "Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile."
-};
-
-const faq = [
-  { question: "Ce inseamna o motocoasa 'pe acumulator' si cat tine?", answer: "O motocoasa pe acumulator functioneaza cu o baterie reincarcabila, oferindu-ti libertate totala de miscare, fara fir. Autonomia variaza mult in functie de capacitatea bateriei (masurata in Ah - Amperi-ora) si de puterea motocoasei. Modelele mai mici pot tine 20-30 minute, in timp ce cele mai performante, cu baterii mai mari (4Ah sau mai mult), pot ajunge la 45-60 minute de functionare continua. Eu recomand sa ai mereu doua baterii pentru a nu intrerupe lucrul." },
-  { question: "Pot folosi o motocoasa electrica pentru a taia buruieni groase?", answer: "Depinde de model. Motocoasele electrice cu fir sunt, in general, mai putin puternice si se descurca cel mai bine cu iarba obisnuita. Cele pe acumulator, mai ales cele cu motoare mai puternice (peste 600W), pot face fata si buruienilor mai groase, mai ales daca folosesc un fir mai rezistent. Pentru vegetatie foarte deasa sau lemnoasa, o motocoasa pe benzina ramane optiunea cea mai eficienta." },
-  { question: "Cat de zgomotoase sunt motocoasele pe benzina?", answer: "Sunt destul de zgomotoase, din pacate. Asta e unul dintre dezavantajele lor majore. Nu te astepta sa poti discuta cu cineva in timp ce lucrezi. De aceea, castile de protectie auditiva sunt absolut obligatorii. Unele modele mai noi sunt putin mai silentioase, dar tot raman in categoria 'zgomotoase'." },
-  { question: "Ce inseamna 'cc' la o motocoasa pe benzina?", answer: "'Cc' vine de la 'centimetri cubi' si reprezinta cilindreea motorului. Cu cat valoarea 'cc' este mai mare, cu atat motorul este, in general, mai puternic. Pentru uz casnic, modelele cu 25-35 cc sunt, de obicei, suficiente. Daca ai un teren foarte mare sau vegetatie foarte aspra, poti opta pentru modele cu 40 cc sau mai mult." },
-  { question: "Cat de des trebuie sa intretin o motocoasa pe benzina?", answer: "Intretinerea regulata e cruciala. Recomand sa verifici filtrul de aer dupa fiecare utilizare mai intensa si sa-l cureti sau inlocuiesti daca e necesar. Bujia ar trebui verificata si curatata la cateva luni, in functie de utilizare. Schimbarea uleiului de transmisie (daca e cazul) si verificarea nivelului de benzina/ulei amestec sunt, de asemenea, importante. Nu uita sa cureti motocoasa de resturi vegetale dupa fiecare utilizare." },
-  { question: "Care este diferenta de pret intre o motocoasa electrica si una pe benzina?", answer: "In general, motocoasele electrice cu fir sunt cele mai ieftine, pornind de la aproximativ 200-300 RON. Cele pe acumulator sunt mai scumpe, undeva intre 400-1500 RON (in functie de acumulatori). Motocoasele pe benzina sunt, de obicei, cele mai scumpe la achizitie, preturile pornind de la 800-1000 RON pentru modelele de baza si ajungand pana la 2000-3000 RON sau chiar mai mult pentru modele profesionale." }
-];
-
-const toc = [
-  { title: "Motocoasa: Ce inseamna si de ce ti-ar trebui una?", id: "motocoasa-ce-inseamna-si-de-ce-ti-ar-trebui-una" },
-  { title: "Electric sau pe Benzina? Cele mai bune optiuni pe care le-am incercat", id: "electric-sau-pe-benzina-cele-mai-bune-optiuni-pe-care-le-am-incercat" },
-  { title: "Cum alegi corect? Detaliile conteaza!", id: "cum-alegi-corect-detaliile-conteaza" },
-  { title: "Avantaje si Dezavantaje: Motocoasa Electrica vs. Benzina", id: "avantaje-si-dezavantaje-motocoasa-electrica-vs-benzina" },
-  { title: "Sfaturi Practice Direct din Experienta Mea", id: "sfaturi-practice-direct-din-experienta-mea" },
-  { title: "Parerea Mea Finala: Ce As Alege Azi?", id: "parerea-mea-finala-ce-as-alege-azi" }
-];
-
-// Get all articles for similar articles component
-const allArticles = keywordsData.completed.map(item => ({
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
   title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
-  slug: item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  slug: item.slug || slugify(item.keyword),
   excerpt: item.excerpt || '',
-  image: `/images/articles/${item.keyword.toLowerCase()
-    .replace(/ă/g, 'a').replace(/â/g, 'a').replace(/î/g, 'i')
-    .replace(/ș/g, 's').replace(/ț/g, 't')
-    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}.webp`,
+  image: item.image || `/images/articles/${item.slug || slugify(item.keyword)}.webp`,
   category: item.category,
   categorySlug: item.categorySlug,
-  date: item.date || new Date().toISOString()
+  date: item.date || '',
 }));
+
+const pool = emag['motocoasa'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- Benzina ---
+  { g: 'benzina', id: 'D2VX09YBM', badge: 'Cea mai vanduta', short: 'Ruris DAC 510', alim: 'Benzina', putere: '62 cm³', taiere: 'fir + lama', greutate: '9.3 kg',
+    specs: ['motocoasa pe benzina, 62 cm³', 'taie cu fir si cu lama (disc)', 'brand romanesc Ruris', 'pentru iarba inalta si buruieni'],
+    pros: ['Cea mai vanduta din selectie, sute de pareri', 'Vine cu fir si cu lama disc, pentru iarba si buruieni deopotriva', 'Ruris, brand romanesc cu service la indemana', 'Putere buna pentru suprafete mari si teren aspru'],
+    cons: ['Cea mai grea, 9.3 kg, cere ham si obisnuinta', 'Motor pe benzina, cu amestec, zgomot si intretinere'],
+    verdict: 'Alegerea clasica pentru cine are mult de tuns si teren dificil, cu buruieni, nu doar gazon fin. Ruris DAC 510 e o motocoasa pe benzina de 62 cm³, cu cel mai mare numar de pareri din selectie, semn ca s-a vandut foarte mult. Vine cu doua sisteme de taiere, fir pentru iarba si lama disc pentru buruieni si tulpini groase, deci acopera aproape orice in curte. Fiind Ruris, un brand romanesc, ai service si piese usor de gasit. E cea mai grea din selectie, 9.3 kg, deci se poarta cu ham si cere ceva obisnuinta. O iei cand ai suprafete mari, iarba inalta si buruieni de doborat, si vrei un utilaj pe benzina, puternic si de incredere.' },
+  { g: 'benzina', id: 'DYXCH03BM', badge: 'Buget, pe benzina', short: 'Steinhaus PRO-TU430S', alim: 'Benzina', putere: '42.7 cm³', taiere: 'fir + lama', greutate: '8.5 kg',
+    specs: ['motocoasa pe benzina, 2 timpi', 'capacitate 42.7 cm³', 'taie cu fir si cu lama', 'foarte vanduta, pret mic'],
+    pros: ['Pret mic pentru o motocoasa pe benzina', 'Foarte vanduta, cu multe pareri', 'Vine cu fir si cu lama disc', 'Motor in 2 timpi, usor si cu putere buna pe greutate'],
+    cons: ['Motor in 2 timpi, cere amestec benzina cu ulei 2T', 'Steinhaus e o gama de buget, calitate variabila'],
+    verdict: 'Cea mai ieftina motocoasa pe benzina din selectie, si una dintre cele mai vandute. Steinhaus PRO-TU430S are un motor in 2 timpi de 42.7 cm³, care ii da un raport bun putere-greutate, si vine cu fir si cu lama disc, pentru iarba si buruieni. Fiind in 2 timpi, functioneaza cu amestec de benzina si ulei 2T, pe care il faci tu la proportia din manual, in general 1 la 50. Steinhaus e o gama de buget, deci calitatea mai variaza de la bucata la bucata, dar la pretul asta e un bun punct de intrare. O iei cand vrei o motocoasa pe benzina ieftina, pentru o curte cu iarba si buruieni, fara sa dai multi bani.' },
+  { g: 'benzina', id: 'D0SR9MMBM', badge: 'Mai multa putere', short: 'ProCraft T4350', alim: 'Benzina', putere: '58 cm³', taiere: 'fir + lama', greutate: '6 kg',
+    specs: ['benzina, 58 cm³, 6 CP', 'latime de taiere 415 mm', 'fir si 4 sisteme de taiere', 'usoara pentru clasa ei, 6 kg'],
+    pros: ['Motor puternic, 6 CP, pentru buruieni si tulpini groase', 'Latime de taiere mare, 415 mm', 'Vine cu mai multe sisteme de taiere, fir si discuri', 'Doar 6 kg, usoara pentru o motocoasa pe benzina'],
+    cons: ['Brand mai putin cunoscut, verifica service-ul', 'Motor pe benzina, cu amestec si zgomot'],
+    verdict: 'Alegerea cand vrei putere multa pe benzina, dar si un utilaj usor de purtat. ProCraft T4350 are 6 CP si 58 cm³, printre cele mai puternice din selectie, cu o latime de taiere mare de 415 mm, deci doboara buruieni si tulpini groase repede si acopera suprafata din putine treceri. Vine cu mai multe sisteme de taiere, fir pentru iarba si discuri pentru buruieni, si cantareste doar 6 kg, surprinzator de putin pentru clasa ei. ProCraft nu e un brand la fel de cunoscut ca Ruris, deci verifica din timp piesele si service-ul. O iei cand vrei cea mai multa putere pe benzina dintr-un utilaj inca usor de manevrat.' },
+  // --- Electrica cu fir ---
+  { g: 'electric', id: 'DV91RWBBM', badge: 'Cea mai usoara', short: 'Bosch EasyGrassCut', alim: 'Electrica (fir)', putere: '280 W', taiere: 'fir', greutate: '1.9 kg',
+    specs: ['coasa electrica cu fir, la retea', '280 W, latime de taiere 23 cm', 'taie cu fir', 'foarte usoara, 1.9 kg'],
+    pros: ['Doar 1.9 kg, o manevreaza oricine, fara efort', 'Bosch, brand de incredere, nota mare', 'Porneste instant, fara benzina si fara amestec', 'Ideala pentru margini, alei si gazon mic'],
+    cons: ['Depinzi de un cablu si de o priza in apropiere', 'Taie doar cu fir, nu doboara buruieni groase'],
+    verdict: 'Alegerea pentru un gazon mic si pentru margini, cand nu vrei greutatea si bataia de cap ale benzinei. Bosch EasyGrassCut are doar 280 W si 1.9 kg, deci o poarta oricine fara efort, si porneste instant, doar din buton, fara amestec si fara fum. E perfecta pentru finisat marginile, aleile si petecele de iarba pe care masina de tuns nu le prinde. Fiind la retea, depinzi de un cablu si de o priza in apropiere, iar cu fir taie iarba, nu buruieni groase. Bosch e un brand de incredere, cu nota mare de la cumparatori. O iei cand ai o curte mica, vrei ceva usor, silentios si ieftin de intretinut.' },
+  { g: 'electric', id: 'DJ0T2DBBM', badge: 'Raport bun', short: 'Einhell GC-ET 4530', alim: 'Electrica (fir)', putere: '450 W', taiere: 'fir', greutate: '2.65 kg',
+    specs: ['coasa electrica cu fir, 450 W', 'latime de taiere 30 cm', 'taie cu fir', 'usoara, 2.65 kg'],
+    pros: ['Latime de taiere mai mare, 30 cm, tunzi mai repede', 'Mai multa putere, 450 W, pentru iarba mai deasa', 'Einhell, raport bun calitate-pret', 'Usoara si simpla, fara benzina'],
+    cons: ['Tot la retea, cu cablu', 'Cu fir, pentru iarba, nu pentru buruieni'],
+    verdict: 'Un pas peste modelul de baza: mai multa putere si o latime de taiere mai mare, la un pret inca mic. Einhell GC-ET 4530 are 450 W si taie pe 30 cm, deci trece mai repede prin iarba mai deasa decat o coasa de 23 cm, ramanand usoara, la 2.65 kg. E tot o coasa electrica cu fir, la retea, deci depinzi de cablu, si e gandita pentru iarba, nu pentru buruieni groase. Einhell e un brand cu raport bun calitate-pret, cu piese si accesorii usor de gasit. O iei cand vrei o coasa electrica ceva mai capabila, pentru un gazon mic spre mediu, fara sa treci la benzina.' },
+  { g: 'electric', id: 'D410DZBBM', badge: 'Cea mai puternica electrica', short: 'Makita UR3501', alim: 'Electrica (fir)', putere: '1000 W', taiere: 'fir', greutate: '',
+    specs: ['coasa electrica cu fir, 1000 W', 'aproape de o motocoasa, fara benzina', 'Makita, brand profesional', 'nota cea mai mare din selectie'],
+    pros: ['1000 W, cea mai puternica electrica, aproape de o motocoasa', 'Makita, brand profesional, foarte fiabil', 'Nota cea mai mare din selectie, aproape de maxim', 'Fara benzina si fara amestec, dar cu putere serioasa'],
+    cons: ['Cea mai scumpa dintre cele electrice cu fir', 'Tot depinzi de un cablu si de o priza'],
+    verdict: 'Alegerea daca vrei putere de motocoasa fara benzina si fara acumulator. Makita UR3501 are 1000 W, mult peste coasele electrice obisnuite, deci trece si prin iarba inalta si deasa, apropiindu-se de o motocoasa usoara, dar fara amestec, fara fum si mult mai silentioasa. Makita e un brand profesional, printre cele mai fiabile, iar modelul are nota cea mai mare din toata selectia. E cea mai scumpa dintre cele electrice cu fir si, ca oricare, depinde de un cablu si de o priza. O iei cand ai curent la indemana, vrei putere serioasa si preferi comoditatea electricului fata de benzina.' },
+  // --- Acumulator ---
+  { g: 'acumulator', id: 'DB58SK2BM', badge: 'Cea mai vanduta fara fir', short: 'Infiniteea Fara Fir', alim: 'Acumulator', putere: 'acumulator', taiere: 'lama', greutate: '1.8 kg',
+    specs: ['motocoasa pe acumulator, fara fir', 'taie cu lama (disc)', 'foarte usoara, 1.8 kg', 'cea mai vanduta din categoria fara fir'],
+    pros: ['Fara fir si fara benzina, o duci oriunde', 'Cea mai vanduta motocoasa pe acumulator, sute de pareri', 'Foarte usoara si maniabila, 1.8 kg', 'Pret mic, silentioasa, porneste instant'],
+    cons: ['Autonomie limitata de acumulator, pentru suprafete mici', 'Compacta, nu inlocuieste o motocoasa pe benzina'],
+    verdict: 'Cel mai popular mod de a avea o coasa fara fir si fara benzina, la un pret mic. Infiniteea e o motocoasa pe acumulator foarte usoara, 1.8 kg, cu care ajungi oriunde in curte fara cablu si fara sa cari benzina, si care taie cu o lama disc. E cea mai vanduta din categoria fara fir, cu sute de pareri, semn ca isi face treaba pentru multa lume. Fiind pe acumulator, are o autonomie limitata si e gandita pentru suprafete mici si finisaje, nu pentru a dobori buruieni pe teren mare, unde tot benzina castiga. O iei cand vrei ceva usor, silentios si fara fir, pentru o curte mica si lucrari scurte.' },
+  { g: 'acumulator', id: 'DF8WYYYBM', badge: 'Fara fir, de brand', short: 'Makita LXT DUR193Z', alim: 'Acumulator 18 V', putere: '18 V', taiere: 'fir', greutate: '2.5 kg',
+    specs: ['coasa pe acumulator 18 V Makita LXT', 'taie cu fir', 'se leaga la bateriile Makita LXT', 'livrata fara acumulator (doar unealta)'],
+    pros: ['Makita LXT, ecosistem de scule cu acelasi acumulator', 'Fara fir si fara benzina, silentioasa', 'Usoara, 2.5 kg, echilibrata', 'Fiabilitate de brand profesional'],
+    cons: ['Se livreaza fara acumulator, il cumperi separat', 'Inca putine pareri pe acest model'],
+    verdict: 'Alegerea daca ai deja scule Makita sau vrei sa intri in ecosistemul LXT, unde acelasi acumulator merge pe zeci de unelte. Makita LXT DUR193Z e o coasa pe acumulator de 18 V, usoara si echilibrata, care taie cu fir si vine de la un brand profesional, cu fiabilitate cunoscuta. Codul Z inseamna ca se livreaza fara acumulator si incarcator, deci le cumperi separat, ceea ce are sens daca ai deja baterii Makita. Are inca putine pareri, fiind un model de nisa. O iei cand esti deja in sistemul Makita LXT sau vrei o coasa fara fir de brand, pe care sa o alimentezi cu acumulatori pe care ii folosesti si la alte scule.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const BENZINA = PICKS.filter(x => x.g === 'benzina');
+const ELECTRIC = PICKS.filter(x => x.g === 'electric');
+const ACUMULATOR = PICKS.filter(x => x.g === 'acumulator');
+
+const site = 'https://centrocasa.ro';
+const hero = '/images/articles/motocoasa-electrica-sau-pe-benzina.webp';
+const figBenzina = '/imagini/articole/motocoasa-benzina.webp';
+const figElectric = '/imagini/articole/motocoasa-electrica.webp';
+const figAcumulator = '/imagini/articole/motocoasa-acumulator.webp';
+const published = '2026-07-18T10:55:33+03:00';
+
+const faq = [
+  { question: 'Motocoasa electrica sau pe benzina?', answer: 'Depinde de cat si ce ai de tuns. O motocoasa pe benzina e cea mai puternica, nu depinde de priza si doboara buruieni groase pe suprafete mari, dar e grea, zgomotoasa si cere amestec de benzina cu ulei. O coasa electrica e mai usoara, mai silentioasa si porneste instant, dar cea cu fir depinde de un cablu, iar cea pe acumulator are autonomie limitata. Alege benzina pentru teren mare si buruieni, electric pentru un gazon mic si margini.' },
+  { question: 'Cu fir sau cu lama (disc)?', answer: 'Firul de nailon e pentru iarba si finisaje: taie curat langa garduri, pomi si alei, fara sa strice scoarta sau tencuiala daca atinge ceva. Lama sau discul de metal, cu dinti, e pentru buruieni groase, tulpini lemnoase si vegetatie deasa, pe care firul nu le rupe. Multe motocoase pe benzina vin cu ambele si le schimbi dupa nevoie: fir pentru gazon, disc pentru curatat un teren salbaticit. Coasele electrice mici taie de obicei doar cu fir.' },
+  { question: 'Motocoasa in 2 timpi sau 4 timpi?', answer: 'Motorul in 2 timpi e mai usor si are un raport putere-greutate mai bun, bun pentru lucrari rapide si teren denivelat, dar functioneaza cu amestec de benzina si ulei 2T. Motorul in 4 timpi e mai silentios, mai economic si mai eficient pentru folosire indelungata pe suprafete mari, si nu cere amestec, uleiul fiind separat. Pentru o curte obisnuita, un 2 timpi usor e suficient; pentru cine tunde ore intregi, un 4 timpi e mai comod.' },
+  { question: 'Ce amestec de benzina si ulei pune la o motocoasa in 2 timpi?', answer: 'La un motor in 2 timpi, benzina se amesteca cu ulei special pentru motoare in 2 timpi, marcat 2T, in general in proportie de 1 la 50, adica o parte ulei la 50 de parti benzina. Foloseste benzina fara plumb, cu cifra octanica de minimum 95, si ulei 2T, nu ulei auto pentru motoare in 4 timpi, care nu arde complet si lasa depuneri. Verifica intotdeauna proportia exacta din manualul motocoasei tale, pentru ca poate diferi.' },
+  { question: 'O motocoasa pe acumulator e destul de puternica?', answer: 'Pentru o curte mica si pentru finisaje, da: e usoara, silentioasa, porneste instant si nu depinde de un cablu. Pentru suprafete mari, iarba inalta sau buruieni groase, o motocoasa pe acumulator ramane in urma uneia pe benzina, prin putere si prin autonomia limitata a bateriei. Un avantaj real il au sistemele de brand, ca Makita LXT sau Einhell Power X-Change, unde acelasi acumulator merge pe multe scule. Ia acumulator daca vrei fara fir si fara benzina, pentru lucrari scurte.' },
+  { question: 'Ce echipament de protectie folosesc la motocoasa?', answer: 'La orice motocoasa, mai ales pe benzina cu lama, poarta ochelari sau viziera, pentru ca arunca pietre si resturi, si antifoane sau casti, ca sa iti protejezi auzul. Bocancii inchisi si pantalonii lungi sunt obligatorii, iar manusile ajuta la prinderea ferma. Foloseste hamul din dotare, ca sa distribui greutatea si sa lucrezi controlat. Nu tunde cu oameni sau animale in apropiere, pentru ca discul si firul pot arunca obiecte cu putere.' },
+  { question: 'Cat de des fac intretinere la o motocoasa pe benzina?', answer: 'Curata filtrul de aer si verifica bujia regulat, iar dupa sezon goleste rezervorul sau adauga stabilizator, ca sa nu se strice benzina. La 2 timpi, foloseste mereu amestec proaspat, la proportia corecta. Schimba firul cand se toceste si verifica discul sa fie ascutit si fara fisuri. Depoziteaza motocoasa curata, la loc uscat. La cele electrice si pe acumulator, intretinerea e minima: cureti capul de taiere si, la acumulator, pastrezi bateria incarcata partial iarna.' },
+];
+
+const images = [hero, figBenzina, figElectric, figAcumulator, ...PICKS.map(x => x.p.image)];
+const b64 = (s) => Buffer.from(s).toString('base64');
 ---
 
 <Layout
-  title="Motocoasa electrica sau pe benzina - CentroCasa"
-  description="Alegerea uneia dintre cele doua mari familii de motocoase, cea electrica sau cea pe benzina, poate fi o adevarata provocare pentru multi dintre noi. Fie ca ai o gradina mica si cochet- amenajata sau un teren mai intins, unde iarba creste mai veutata, stiu din proprie experienta cat de important e sa ai unealta potrivita. Hai sa vedem impreuna care e cea mai buna varianta pentru tine."
-  image="/images/articles/motocoasa-electrica-sau-pe-benzina.webp"
+  title="Motocoasa electrica sau pe benzina in 2026: cum alegi corect"
+  description="Motocoasa electrica sau pe benzina? Comparam modele pe benzina, coase electrice cu fir si motocoase pe acumulator, pe putere, tip de taiere si greutate. Plus fir vs lama, 2 timpi vs 4 timpi si amestecul de benzina."
+  image={hero}
   type="article"
-  publishedTime="2026-01-18T06:58:14.315Z"
-  modifiedTime="2026-01-31T06:58:14.105Z"
+  publishedTime={published}
+  modifiedTime={published}
   author="Andrei Marinescu"
-  breadcrumb={[{name:'Acasa',url:'/'},{name:frontmatter.category,url:`/${frontmatter.categorySlug}/`},{name:frontmatter.title}]}
-  faq={faq}
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Gradinarit si Unelte', url: '/gradinarit-unelte/' }, { name: 'Motocoasa electrica sau pe benzina' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
 >
-  <article class="article-container">
-    <!-- Breadcrumb -->
+  <article class="rd">
     <nav class="breadcrumb">
-      <a href="/">Acasa</a>
-      <span class="breadcrumb-separator">/</span>
-      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a>
-      <span class="breadcrumb-separator">/</span>
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/gradinarit-unelte/">Gradinarit si Unelte</a><span class="breadcrumb-separator">/</span>
       <span>Motocoasa electrica sau pe benzina</span>
     </nav>
 
-    <!-- Article Header -->
-    <header class="article-header">
-      <div class="article-meta">
-        <a href="/gradinarit-unelte/" class="article-category">Gradinarit si Unelte</a>
-        <span class="article-date">24 ianuarie 2026</span>
-      </div>
-      <h1 class="article-title">Motocoasa electrica sau pe benzina</h1>
-    </header>
+    <h1>Motocoasa electrica sau pe benzina</h1>
+    <p class="rd-byline">de <a href="/autori/andrei-marinescu/">Andrei Marinescu</a>, Expert Gradinarit · actualizat iulie 2026</p>
 
-    <!-- Featured Image -->
-    <img src="/images/articles/motocoasa-electrica-sau-pe-benzina.webp" alt="Motocoasa electrica sau pe benzina" class="article-image" width="800" height="600" loading="eager">
+    <img class="rd-hero" src={hero} alt="Motocoasa electrica sau pe benzina, la tuns iarba" width="1200" height="675" fetchpriority="high" />
 
-    <!-- Table of Contents -->
-    <nav class="toc">
-      <h2 class="toc-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        Cuprins
-      </h2>
-      <ol class="toc-list">
-        {toc.map(item => (
-          <li><a href={`#${item.id}`}>{item.title}</a></li>
-        ))}
-        <li><a href="#faq">Intrebari Frecvente</a></li>
-      </ol>
-    </nav>
-
-    <!-- Article Content -->
-    <div class="article-content">
-      
-      <section id="motocoasa-ce-inseamna-si-de-ce-ti-ar-trebui-una">
-        <h2>Motocoasa: Ce inseamna si de ce ti-ar trebui una?</h2>
-        <p>Stai sa ma gandesc, cand am inceput eu cu <a href="/sistem-de-irigare-automata-pentru-gradina/">gradina</a>ritul, totul era pe  manual. Acum insa, viata e mult mai usoara datorita uneltelor <a href="/fierastrau-electric-pentru-lemne/">electric</a>e si pe benzina. O motocoasa, pe scurt, e un fel de unealta puternica, folosita pentru a tunde iarba in locuri unde masina de tuns clasica nu ajunge sau e greu de manevrat.</p>
-        <p>Ma refer la zonele de langa garduri, copaci, borduri, sau pur si simplu la terenuri cu iarba mai inalta si mai deasa. Daca ai o peluza mica, poate ca o masina de tuns clasica e suficienta. Dar daca ai un teren mai mare, cu denivelari, sau vrei sa intretii o zona mai salbatica, atunci o motocoasa devine aproape indispensabila.</p>
-        <p>Si cand spun indispensabila, ma refer la a economisi timp si efort fizic considerabil. Din experienta mea, o motocoasa bine aleasa iti poate transforma munca de intretinere a gradinii dintr-o corvoada intr-o activitate chiar placuta. Asadar, daca te confrunti cu iarba inalta, buruieni rebele sau pur si simplu vrei sa dai un aspect ingrijit si ordonat curtii tale, o motocoasa este solutia.</p>
-        <p>Pentru cine e potrivita?  Practic, pentru oricine isi doreste sa aiba o gradina frumoasa, fara prea mult efort. Fie ca esti un pasionat de gradinarit cu experienta sau abia incepi sa te ocupi de curtea ta, exista o motocoasa potrivita pentru tine. Am vazut prieteni cu terenuri mici, unde o motocoasa electrica <a href="/bormasina-cu-acumulator-puternica/" class="interlink">cu acumulator</a> a fost exact ce le trebuia.</p>
-        <p>Pe de alta parte, vecinii mei cu terenuri mai mari si mai salbatice au mers pe varianta <a href="/drujba-pe-benzina-pentru-lemne/" class="interlink">pe benzina</a>, fara ezitare. Deci, raspunsul e simplu: daca ai nevoie sa tai iarba in locuri dificile sau sa intretii suprafete mari, ai nevoie de o motocoasa.</p>
-      </section>
-
-      <section id="electric-sau-pe-benzina-cele-mai-bune-optiuni-pe-care-le-am-incercat">
-        <h2>Electric sau pe Benzina? Cele mai bune optiuni pe care le-am incercat</h2>
-        <p>Acum ajungem la partea cea mai interesanta: ce sa alegi?  Am testat si am vazut o gramada de modele de-a lungul anilor, asa ca am o parere destul de formata.  Hai sa va prezint cateva optiuni care mi s-au parut deosebit de bune, impartite pe categorii. </p>
-        <p><strong>Pentru cei cu gradini mici si medii, fara prea multe batai de cap: Motocoasele Electrice (cu fir si cu acumulator)</strong></p>
-        <p><strong>Bosch Art 30 Combitrim:</strong> Mi se pare o optiune excelenta pentru bugete medii. Este usoara, manevrabila si suficient de puternica pentru iarba normala din curte. Vine cu fir, deci trebuie sa ai o priza prin apropiere, dar pentru suprafete mici e perfect. Pretul? Undeva pe la 300-400 RON.</p>
-        <p><strong>Einhell GE-CT 18 Li Kit:</strong> Aici vorbim de libertate de miscare! E pe acumulator, deci uiti de fire. Bateria tine suficient pentru o gradina de dimensiuni medii (cam 30-45 minute, depinde de intensitate). E mai scumpa, undeva pe la 500-700 RON cu tot cu acumulator si incarcator, dar merita fiecare banut daca vrei sa scapi de fire.</p>
-        <p><strong>Makita DUR189Z:</strong> Daca vrei ceva mai <a href="/blender-profesional-pentru-smoothie/" class="interlink">profesional</a>, dar tot electric, Makita e o alegere sigura. E mai puternica, mai robusta, dar si mai scumpa (cam 800-1000 RON, fara acumulator). Tot pe acumulator, bineinteles.</p>
-        <p><strong>Pentru cei cu terenuri mari, iarba deasa si probleme de genul: Motocoasele pe Benzina</strong></p>
-        <p><strong>Stihl FS 40 C-E:</strong> Stihl e un nume de referinta in domeniu, iar acest model e un bun punct de plecare pentru cei ce vor o motocoasa pe benzina. E destul de usoara pentru clasa ei, pornire usoara si suficient de puternica pentru majoritatea treburilor. Pretul e pe la 1200-1500 RON.</p>
-        <p><strong>Husqvarna 128R:</strong> Husqvarna e un alt gigant. Acest model e echilibrat, robust si fiabil. Mi-a placut cum manevreaza si cat de eficient taie. E undeva pe la 1400-1600 RON.</p>
-        <p><strong>McCulloch B26 PS:</strong> Daca ai un buget mai restrans, dar totusi vrei performanta pe benzina, McCulloch poate fi o alternativa. Nu e chiar la nivelul Stihl sau Husqvarna, dar isi face treaba. Gasesti modele pe la 900-1100 RON.</p>
-        <p>Acestea sunt doar cateva exemple, evident. Piata e plina de optiuni, dar astea mi s-au parut a fi printre cele mai echilibrate ca pret, performanta si fiabilitate. Important e sa te gandesti la suprafata pe care o ai si cat de des o vei folosi.</p>
-      </section>
-
-      <section id="cum-alegi-corect-detaliile-conteaza">
-        <h2>Cum alegi corect? Detaliile conteaza!</h2>
-        <p>Alegerea unei motocoase nu e chiar ca si cum ai cumpara o pereche de manusi. Trebuie sa te gandesti la cateva lucruri esentiale ca sa nu dai cu bata-n balta. Din experienta mea, cel mai important e sa iti evaluezi corect nevoile. Nu cumpara cea mai puternica si scumpa motocoasa daca ai doar 50 de metri patrati de gazon. Pe de alta parte, daca ai un teren de 1000 de metri patrati cu buruieni cat palma, o motocoasa electrica mica nu o sa faca fata. </p>
-        <p><strong>Iata la ce ma uit eu cand aleg:</strong></p>
-        <p><strong>Suprafata de lucru:</strong> Asta e cel mai clar indicator. <a href="/motosapa-electrica-pentru-gradina-mica/">Gradina mica</a> (pana la 200 mp) - electrica cu fir sau acumulator. Gradina medie (200-500 mp) - electrica cu acumulator puternic sau benzina usoara. Gradina mare (peste 500 mp) - benzina, cu cat mai mare suprafata, cu atat mai puternica si confortabila (cu ham).</p>
-        <p><strong>Tipul de vegetatie:</strong> Ai doar iarba fina sau te confrunti si cu buruieni mai groase, mici tufisuri? Motocoasele electrice sunt bune pentru iarba, dar pentru vegetatie mai densa, cele pe benzina au un cuvant greu de spus. Unele modele pe benzina vin si cu cutit de taiere, nu doar cu fir, ceea ce e ideal pentru vegetatie mai aspra.</p>
-        <p><strong>Puterea motorului:</strong> La cele electrice, se masoara in Watti (W). Peste 500W e un semn bun. La cele pe benzina, se masoara in centimetri cubi (cc) sau cai putere (CP). Peste 25 cc sau 1 CP e un motor decent.</p>
-        <p><strong>Greutatea si manevrabilitatea:</strong> O motocoasa grea o sa te oboseasca repede, mai ales daca ai de lucru mult. Verifica greutatea si cum se simte in mana. Modelele mai performante vin adesea cu hamuri de purtat pe umeri, care distribuie greutatea si fac munca mult mai usoara. Mi-a placut la modelele mai noi ca sunt tot mai usoare si mai ergonomice.</p>
-        <p><strong>Sursa de alimentare:</strong> Aici e marea dilema: fir, acumulator sau benzina? Firul e cel mai ieftin, dar te limiteaza. Acumulatorul ofera libertate, dar are o autonomie limitata si costa mai mult. Benzina e cea mai puternica si autonoma, dar e mai zgomotoasa, polueaza si necesita intretinere (ulei, benzina).</p>
-        <p><strong>Sistemul de taiere:</strong> Majoritatea folosesc un cap cu fir de nylon. Verifica cat de usor se schimba firul si cat de mare e bobina. Unele modele permit montarea unui disc metalic sau a unui cap cu lame, pentru vegetatie mai groasa.</p>
-        <p><strong>Brandul si garantia:</strong> Nu te zgarci la capitolul asta. Un brand de renume vine de obicei cu produse mai fiabile si un service mai bun. Verifica garantia oferita.</p>
-        <p>Gandeste-te la toate astea inainte de a te arunca. E mai bine sa investesti un pic mai mult acum decat sa te trezesti cu o unealta care nu-ti face treaba.</p>
-      </section>
-
-      <section id="avantaje-si-dezavantaje-motocoasa-electrica-vs-benzina">
-        <h2>Avantaje si Dezavantaje: Motocoasa Electrica vs. Benzina</h2>
-        <p>Hai sa punem pe masa, ca sa zic asa, plusurile si minusurile fiecarui tip de motocoasa. Eu asa imi fac de obicei alegerile, punand totul in balanta. </p>
-        <p><strong>Motocoasa Electrica (cu fir si cu acumulator)</strong></p>
-        <p><strong>Avantaje:</strong></p>
-        <p><strong>Silentioasa:</strong> Asta e un mare plus. Poti sa lucrezi dimineata devreme sau seara tarziu fara sa deranjezi vecinii.</p>
-        <p><strong>Ecologica:</strong> Nu polueaza aerul, ceea ce e important, mai ales daca ai copii sau animale in curte.</p>
-        <p><strong>Usoara si manevrabila:</strong> De obicei, sunt mai usoare decat cele pe benzina, deci mai usor de controlat.</p>
-        <p><strong>Intretinere redusa:</strong> Nu trebuie sa amesteci ulei cu benzina, nu ai filtre de curatat, e mult mai simplu.</p>
-        <p><strong>Pornire usoara:</strong> De obicei, o simpla apasare de buton.</p>
-        <p><strong>Cost de achizitie mai mic (pentru modelele cu fir):</strong> Motocoasele electrice cu fir sunt, in general, cele mai accesibile.</p>
-        <p><strong>Dezavantaje:</strong></p>
-        <p><strong>Limitata de sursa de alimentare:</strong> Aici e marea problema. Cele cu fir depind de priza si lungimea cablului. Cele cu acumulator au o autonomie limitata si trebuie sa astepti sa se incarce.</p>
-        <p><strong>Putere mai mica:</strong> In general, nu sunt la fel de puternice ca cele pe benzina, deci pot avea dificultati cu vegetatia foarte deasa sau lemnoasa.</p>
-        <p><strong>Durata de viata a acumulatorului:</strong> Acumulatorii au o durata de viata limitata si inlocuirea lor poate fi costisitoare.</p>
-        <p><strong>Nu sunt ideale pentru suprafete mari:</strong> Pentru terenuri extinse, autonomia sau lungimea firului devin rapid o problema.</p>
-        <p><strong>Motocoasa pe Benzina</strong></p>
-        <p><strong>Avantaje:</strong></p>
-        <p><strong>Putere mare:</strong> Sunt cele mai puternice si pot face fata oricarui tip de vegetatie, de la iarba inalta la mici tufisuri.</p>
-        <p><strong>Autonomie nelimitata:</strong> Poti alimenta rezervorul si lucra cat ai nevoie, fara grija bateriei sau a firului.</p>
-        <p><strong>Libertate de miscare totala:</strong> Nu esti legat de nicio sursa de curent.</p>
-        <p><strong>Durabile si robuste:</strong> Sunt construite pentru a rezista in conditii mai grele.</p>
-        <p><strong>Dezavantaje:</strong></p>
-        <p><strong>Zgomotoase:</strong> Asta e un dezavantaj major, mai ales in zonele rezidentiale.</p>
-        <p><strong>Poluante:</strong> Emit gaze de esapament, ceea ce nu e ideal pentru mediu.</p>
-        <p><strong>Grele si mai greu de manevrat:</strong> De obicei, sunt mai grele si pot necesita mai mult efort fizic.</p>
-        <p><strong>Intretinere mai complexa:</strong> Necesita amestec de benzina si ulei, curatarea filtrului de aer, verificarea bujiei etc.</p>
-        <p><strong>Pornire mai dificila:</strong> Unele modele pot fi mai greu de pornit, mai ales cand motorul e rece.</p>
-        <p><strong>Cost de achizitie si de operare mai mare:</strong> Sunt, in general, mai scumpe la achizitie, iar benzina si uleiul adauga la costurile de operare.</p>
-        <p>Asadar, cum vezi, fiecare are punctele ei forte si slabe. Alegerea depinde, in mare masura, de tipul <a href="/umbrela-de-gradina-rezistenta-la-vant/" class="interlink">de gradina</a> pe care il ai si de preferintele tale.</p>
-      </section>
-
-      <section id="sfaturi-practice-direct-din-experienta-mea">
-        <h2>Sfaturi Practice Direct din Experienta Mea</h2>
-        <p>Am trecut prin multe cu motocoasele mele, de la prima mea motocoasa electrica cu fir, pana la cea mai recenta pe benzina. Si am invatat cateva lucruri pe care vreau sa le impartasesc cu tine, ca sa nu faci aceleasi greseli ca mine la inceput. </p>
-        <p><strong>1. Nu neglija echipamentul de protectie!</strong> Asta e, pentru mine, cel mai important sfat. Ochelarii de protectie, castile de protectie auditiva si manusi rezistente sunt absolut esentiale. Nu te juca cu asta. Am vazut cum o pietricica ridicata de firul de la motocoasa poate face prapad. Si zgomotul, mai ales la cele pe benzina, te poate afecta pe termen lung. Investeste intr-un ham bun, daca ai o motocoasa mai puternica. Te salveaza de dureri de spate si oboseala excesiva. </p>
-        <p><strong>2. Intretinerea e cheia fiabilitatii.</strong> Fie ca e electrica sau pe benzina, o unealta ingrijita te va tine mai mult. La cele electrice, verifica cablul de alimentare sa nu fie deteriorat. La cele pe benzina, schimba periodic filtrul de aer, bujia si verifica nivelul de ulei. Nu lasa benzina sa stea in rezervor pe perioade lungi, mai ales peste iarna. </p>
-        <p><strong>3. Cumpara firul de taie potrivit.</strong> Nu te lua dupa cel mai ieftin fir. Exista fire mai groase, mai rezistente, pentru vegetatie mai aspra. Si daca ai o motocoasa mai puternica, nu te sfii sa folosesti un fir mai gros. Am observat ca firul de 0.2 mm e bun pentru iarba normala, dar pentru buruieni mai mari, unul de 0.3 mm e mult mai eficient. </p>
-        <p><strong>4. Incearca sa ai doua baterii (la cele electrice).</strong> Daca ai o motocoasa pe acumulator, un sfat de aur e sa ai doua baterii. Cand una se descarca, o pui la incarcat pe cealalta si continui lucrul. Astfel, nu ai pauze lungi si termini treaba mai repede. </p>
-        <p><strong>5. Stocheaza corect unealta.</strong> Dupa folosire, curata motocoasa de resturi vegetale. Daca o depozitezi pe termen lung (peste iarna), goleste rezervorul de benzina (la cele pe benzina) si depoziteaz-o intr-un loc uscat si ferit de umiditate. </p>
-        <p><strong>6. Nu forta unealta.</strong> Daca simti ca motocoasa se chinuie, inseamna ca ori ai pus-o la o treaba prea grea, ori firul s-a incurcat. Opreste, curata si incearca din nou. Fortarea o poate strica rapid. </p>
-        <p><strong>7. Invată să o manevrezi corect.</strong> Nu e greu, dar e important. Tine motocoasa la un unghi potrivit, nu o ridica prea sus, lasa firul sa lucreze. Mi-a luat ceva timp sa prind tehnica, dar acum e floare la ureche. Daca ai posibilitatea, uita-te la cateva filmulete pe YouTube despre cum se manevreaza corect o motocoasa. </p>
-        <p>Acestea sunt, pe scurt, cateva lucruri care mi-au simplificat viata in gradina. Sper sa iti fie de folos si tie.</p>
-      </section>
-
-      <section id="parerea-mea-finala-ce-as-alege-azi">
-        <h2>Parerea Mea Finala: Ce As Alege Azi?</h2>
-        <p>Dupa atatia ani petrecuti in gradina, cu diverse modele de motocoase in mana, pot spune ca am o parere destul de clara. Si daca ar fi sa aleg azi, alegerea mea ar depinde in mare masura de cateva aspecte specifice ale terenului meu. </p>
-        <p>Pentru un teren de dimensiuni medii, cu iarba normala si cateva zone mai greu accesibile, as merge pe o <strong>motocoasa electrica pe acumulator, de la un brand de renume, cu o putere decenta (peste 600W) si cel putin doi acumulatori de 4Ah.</strong> Mi se pare cel mai bun echilibru intre libertate de miscare, putere suficienta pentru treaba de zi cu zi, si un nivel de zgomot acceptabil. E mai usor de intretinut, mai ecologica si, sincer, mai placuta de folosit. Pretul pentru o astfel de combinatie ar fi undeva intre 800 si 1500 RON, in functie de brand si specificatii. </p>
-        <p>Totusi, daca terenul meu ar fi mai mare (peste 500 mp), cu zone unde iarba creste foarte deasa, sau chiar cu mici tufisuri, atunci <strong>nu as sta pe ganduri si as lua o motocoasa pe benzina, de la un producator consacrat, cu un motor de cel putin 30 cc (sau 1.5 CP).</strong> Aici puterea conteaza enorm. Mi-ar placea sa aiba un sistem de pornire rapida si un ham confortabil. Pretul pentru un astfel de model ar fi undeva intre 1200 si 2000 RON.</p>
-        <p>Stiu ca e o investitie mai mare, dar pentru suprafete mari si vegetatie dificila, nu exista alternativa mai buna. </p>
-        <p>Ce NU as alege, decat in cazuri extreme, ar fi o motocoasa electrica cu fir pentru un teren mai mare de 200 mp. Simplul fapt ca te tot impiedici de cablu si ca trebuie sa schimbi prizele devine, pe termen lung, un real impediment. </p>
-        <p>In concluzie (desi am zis ca nu folosesc cuvantul asta), alegerea finala e personala. Dar sfatul meu, bazat pe experienta, este sa tii cont de suprafata, de tipul de vegetatie si de cat de mult vrei sa te complici cu intretinerea. Nu te grabi, cerceteaza putin si vei gasi unealta perfecta pentru tine. Si nu uita de echipamentul de protectie! Asta e cel mai important.</p>
-      </section>
-
-      <!-- FAQ Section -->
-      <section class="faq-section" id="faq">
-        <h2 class="faq-title">Intrebari Frecvente</h2>
-        
-            <div class="faq-item" id="faq-0">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna o motocoasa 'pe acumulator' si cat tine?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                O motocoasa pe acumulator functioneaza cu o baterie reincarcabila, oferindu-ti libertate totala de miscare, fara fir. Autonomia variaza mult in functie de capacitatea bateriei (masurata in Ah - Amperi-ora) si de puterea motocoasei. Modelele mai mici pot tine 20-30 minute, in timp ce cele mai performante, cu baterii mai mari (4Ah sau mai mult), pot ajunge la 45-60 minute de functionare continua. Eu recomand sa ai mereu doua baterii pentru a nu intrerupe lucrul.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-1">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Pot folosi o motocoasa electrica pentru a taia buruieni groase?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Depinde de model. Motocoasele electrice cu fir sunt, in general, mai putin puternice si se descurca cel mai bine cu iarba obisnuita. Cele pe acumulator, mai ales cele cu motoare mai puternice (peste 600W), pot face fata si buruienilor mai groase, mai ales daca folosesc un fir mai rezistent. Pentru vegetatie foarte deasa sau lemnoasa, o motocoasa pe benzina ramane optiunea cea mai eficienta.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-2">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de zgomotoase sunt motocoasele pe benzina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Sunt destul de zgomotoase, din pacate. Asta e unul dintre dezavantajele lor majore. Nu te astepta sa poti discuta cu cineva in timp ce lucrezi. De aceea, castile de protectie auditiva sunt absolut obligatorii. Unele modele mai noi sunt putin mai silentioase, dar tot raman in categoria 'zgomotoase'.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-3">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Ce inseamna 'cc' la o motocoasa pe benzina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                'Cc' vine de la 'centimetri cubi' si reprezinta cilindreea motorului. Cu cat valoarea 'cc' este mai mare, cu atat motorul este, in general, mai puternic. Pentru uz casnic, modelele cu 25-35 cc sunt, de obicei, suficiente. Daca ai un teren foarte mare sau vegetatie foarte aspra, poti opta pentru modele cu 40 cc sau mai mult.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-4">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Cat de des trebuie sa intretin o motocoasa pe benzina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                Intretinerea regulata e cruciala. Recomand sa verifici filtrul de aer dupa fiecare utilizare mai intensa si sa-l cureti sau inlocuiesti daca e necesar. Bujia ar trebui verificata si curatata la cateva luni, in functie de utilizare. Schimbarea uleiului de transmisie (daca e cazul) si verificarea nivelului de benzina/ulei amestec sunt, de asemenea, importante. Nu uita sa cureti motocoasa de resturi vegetale dupa fiecare utilizare.
-              </div>
-            </div>
-
-            <div class="faq-item" id="faq-5">
-              <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                Care este diferenta de pret intre o motocoasa electrica si una pe benzina?
-                <span class="faq-icon">+</span>
-              </button>
-              <div class="faq-answer">
-                In general, motocoasele electrice cu fir sunt cele mai ieftine, pornind de la aproximativ 200-300 RON. Cele pe acumulator sunt mai scumpe, undeva intre 400-1500 RON (in functie de acumulatori). Motocoasele pe benzina sunt, de obicei, cele mai scumpe la achizitie, preturile pornind de la 800-1000 RON pentru modelele de baza si ajungand pana la 2000-3000 RON sau chiar mai mult pentru modele profesionale.
-              </div>
-            </div>
-      </section>
+    <div class="rd-intro">
+      <p>Pentru buruieni si suprafete mari, o <strong>motocoasa pe benzina</strong> ca Ruris DAC 510 e alegerea, cu fir si cu lama. Pentru un gazon mic si margini, o <strong>coasa electrica cu fir</strong> e mai usoara si mai ieftina, ca Bosch EasyGrassCut. Iar daca vrei fara fir si fara benzina, o <strong>motocoasa pe acumulator</strong> ca Infiniteea merge oriunde, silentioasa. Daca vrei putere fara benzina, Makita UR3501 electrica are 1000 W.</p>
+      <p>Toata decizia se invarte in jurul unei intrebari: <strong>benzina, electrica cu fir sau acumulator</strong>. De asta depind puterea, greutatea, zgomotul si cat de liber te misti prin curte. Apoi conteaza <strong>cu ce taie</strong>, fir pentru iarba sau lama pentru buruieni, si ce putere iti trebuie pentru cat ai de tuns.</p>
+      <p>Am pornit de la motocoasele si coasele vandute pe eMAG, le-am verificat tipul de alimentare, puterea, sistemul de taiere si greutatea, si le-am grupat pe benzina, electrice cu fir si pe acumulator. Pentru gazon pe roti, vezi <a href="/masina-de-tuns-gazonul-electrica/">masinile electrice de tuns gazonul</a>, iar pentru gardul viu, <a href="/foarfeca-electrica-pentru-gard-viu/">foarfecile electrice de gard viu</a>.</p>
     </div>
 
-    <!-- Author Box -->
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tip">Benzina, electrica cu fir sau acumulator</a></li>
+        <li><a href="#fir-lama">Cu fir sau cu lama</a></li>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#benzina">Motocoase pe benzina</a></li>
+        <li><a href="#electric">Coase electrice cu fir</a></li>
+        <li><a href="#acumulator">Motocoase pe acumulator</a></li>
+        <li><a href="#intretinere">Intretinere si siguranta</a></li>
+        <li><a href="#cat-costa">Cat costa o motocoasa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tip">Benzina, electrica cu fir sau acumulator</h2>
+    <p>Prima si cea mai importanta alegere e sursa de energie, pentru ca schimba tot: putere, greutate, zgomot si libertate de miscare.</p>
+    <p><strong>Pe benzina:</strong> cea mai puternica, nu depinde de priza si doboara buruieni groase pe suprafete mari. In schimb e cea mai grea, zgomotoasa si cere amestec de benzina cu ulei si mai multa intretinere. Alegerea pentru teren mult si aspru.</p>
+    <p><strong>Electrica cu fir (la retea):</strong> usoara, silentioasa si ieftina, porneste instant din buton, fara amestec. Depinzi insa de un cablu si de o priza in apropiere, deci e pentru gazon mic si margini, langa casa.</p>
+    <p><strong>Pe acumulator (fara fir):</strong> la fel de comoda ca cea electrica, dar fara cablu, deci ajungi oriunde. Are autonomia limitata de baterie si mai putina putere, potrivita pentru suprafete mici si finisaje.</p>
+
+    <h2 id="fir-lama">Cu fir sau cu lama</h2>
+    <p>Al doilea lucru care conteaza e capul de taiere, adica cu ce taie de fapt motocoasa:</p>
+    <ul>
+      <li><strong>Fir de nailon:</strong> pentru iarba si finisaje. Taie curat langa garduri, pomi si alei si nu strica scoarta sau tencuiala daca le atinge. Il gasesti pe toate, de la coase electrice la motocoase.</li>
+      <li><strong>Lama sau disc de metal:</strong> pentru buruieni groase, tulpini lemnoase si vegetatie deasa, pe care firul nu le rupe. Il montezi pe motocoasele pe benzina, la curatat un teren salbaticit.</li>
+    </ul>
+    <p>Multe motocoase pe benzina vin cu ambele si le schimbi dupa nevoie: fir pentru gazon, disc pentru buruieni. Coasele electrice mici, in schimb, taie de obicei doar cu fir.</p>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Alimentare</th><th>Putere</th><th>Taiere</th><th>Greutate</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (<tr><td>{x.short}</td><td>{x.alim}</td><td>{x.putere}</td><td>{x.taiere}</td><td>{x.greutate || '-'}</td></tr>))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="benzina">Motocoase pe benzina</h2>
+    <p>Cele mai puternice, pentru suprafete mari, iarba inalta si buruieni groase. Grele, dar independente de priza si echipate cu fir si lama.</p>
+    <div class="rd-grid">
+      {BENZINA.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figBenzina} alt="Motocoase pe benzina Ruris, Steinhaus si ProCraft" width="1200" height="675" loading="lazy" />
+
+    <h2 id="electric">Coase electrice cu fir</h2>
+    <p>Usoare, silentioase si ieftine, pentru un gazon mic si margini. Pornesc instant, fara benzina, dar depind de un cablu si de o priza.</p>
+    <div class="rd-grid">
+      {ELECTRIC.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figElectric} alt="Coase electrice cu fir Bosch, Einhell si Makita" width="1200" height="675" loading="lazy" />
+
+    <h2 id="acumulator">Motocoase pe acumulator</h2>
+    <p>Comoditatea electricului, fara cablu: ajungi oriunde in curte, silentios si fara benzina. Autonomie limitata, pentru suprafete mici si finisaje.</p>
+    <div class="rd-grid">
+      {ACUMULATOR.map(x => (
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.badge} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      ))}
+    </div>
+
+    <img class="rd-fig" src={figAcumulator} alt="Motocoase pe acumulator Infiniteea si Makita LXT" width="1200" height="675" loading="lazy" />
+
+    <h2 id="intretinere">Intretinere si siguranta</h2>
+    <p>Cateva reguli care conteaza, mai ales la benzina:</p>
+    <ul>
+      <li><strong>Amestec proaspat la 2 timpi:</strong> benzina fara plumb de minimum 95 cu ulei 2T, in general 1 la 50; verifica proportia din manual si nu folosi ulei auto.</li>
+      <li><strong>Intretinere de sezon:</strong> curata filtrul de aer, verifica bujia, schimba firul cand se toceste si verifica discul sa fie ascutit si fara fisuri.</li>
+      <li><strong>Depozitare:</strong> iarna, goleste rezervorul sau pune stabilizator la benzina; la acumulator, pastreaza bateria incarcata partial.</li>
+      <li><strong>Protectie:</strong> ochelari sau viziera si antifoane obligatoriu, plus bocanci si pantaloni lungi. Discul si firul arunca pietre si resturi.</li>
+      <li><strong>Ham si spatiu:</strong> foloseste hamul din dotare si nu tunde cu oameni sau animale in apropiere.</li>
+    </ul>
+
+    <div class="rd-offers" data-o={b64('oferte-motocoasa')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate motocoasele la oferta</strong>
+        <span>Reducerile din acest moment la motocoase pe benzina, electrice si pe acumulator, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cat-costa">Cat costa o motocoasa</h2>
+    <p>Preturile depind mult de sursa de energie si de putere:</p>
+    <p><strong>Coase electrice cu fir:</strong> cele mai ieftine, de la circa 200 de lei pentru un model usor, de margini, pana spre 800 de lei la variantele puternice, de brand, ca Makita.</p>
+    <p><strong>Motocoase pe acumulator:</strong> de la circa 190 de lei la modelele compacte; la cele de brand, pune la buget si acumulatorul plus incarcatorul, daca nu sunt incluse.</p>
+    <p><strong>Motocoase pe benzina:</strong> in general 400-700 de lei pentru un model de curte, cu fir si lama; cele profesionale, de brand, urca la cateva mii de lei.</p>
+    <p>Pe langa pretul motocoasei, pune la buget firul de schimb si, la benzina, uleiul 2T si combustibilul. E o unealta pe care o tii ani intregi, deci alege dupa cat si ce ai de tuns, nu doar dupa pret. Pentru gazonul de pe suprafete deschise, vezi si <a href="/cele-mai-bune-masini-de-tuns-iarba/">selectia de masini de tuns iarba</a>.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
     <div class="author-box">
       <div class="author-avatar">AM</div>
       <div class="author-info">
-        <h4><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></h4>
+        <p class="author-name"><a href="/autori/andrei-marinescu/" class="author-name-link">Andrei Marinescu</a></p>
         <p class="author-role">Expert Gradinarit</p>
-        <p class="author-bio">Cu peste 10 ani de experienta in amenajarea gradinilor si alegerea echipamentelor potrivite, Andrei a testat sute de unelte si utilaje pentru gradinarit. Pasionat de agricultura urbana si gradini sustenabile.</p>
+        <p class="author-bio">Andrei scrie despre unelte si echipamente de gradina. Compara putere, dimensiuni si pareri reale, ca sa gasesti utilajul potrivit curtii tale.</p>
       </div>
     </div>
 
-    <!-- Similar Articles -->
-    <SimilarArticles
-      currentSlug="motocoasa-electrica-sau-pe-benzina"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <p class="rd-disc">Preturile si disponibilitatea se schimba pe eMAG. Apasa pe un model ca sa vezi pretul de acum. CentroCasa poate primi un comision pentru produsele cumparate prin linkurile de pe site, fara cost suplimentar pentru tine.</p>
 
-    <PrevNextNav
-      currentSlug="motocoasa-electrica-sau-pe-benzina"
-      currentCategory="gradinarit-unelte"
-      articles={allArticles}
-    />
+    <PrevNextNav currentSlug="motocoasa-electrica-sau-pe-benzina" currentCategory="gradinarit-unelte" articles={relatedArticles} />
+    <SimilarArticles currentSlug="motocoasa-electrica-sau-pe-benzina" currentCategory="gradinarit-unelte" articles={relatedArticles} />
   </article>
 </Layout>
+
+<style>
+  .rd { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .rd h1 { font-size: 2rem; line-height: 1.2; margin: .6rem 0 .3rem; }
+  .rd-byline { color: var(--color-gray-500); font-size: .9rem; margin: 0 0 1.2rem; }
+  .rd-byline a { font-weight: 600; }
+  .rd-hero { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; }
+  .rd-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--color-gray-700); }
+  .rd h2 { font-size: 1.5rem; margin: 2.2rem 0 1rem; }
+  .rd h3 { font-size: 1.2rem; margin: 1.7rem 0 .5rem; }
+  .rd h2, .rd h3 { scroll-margin-top: 84px; }
+  .rd p { line-height: 1.7; }
+  .rd-toc { border: 1px solid var(--color-gray-200); border-radius: 10px; background: #fff; margin: 0 0 1.5rem; padding: 0 1rem; }
+  .rd-toc summary { font-weight: 700; cursor: pointer; padding: .85rem 0; list-style: none; display: flex; align-items: center; gap: .5rem; }
+  .rd-toc summary::-webkit-details-marker { display: none; }
+  .rd-toc summary::before { content: '\25B8'; color: var(--color-primary-600, #16a34a); transition: transform .15s; }
+  .rd-toc[open] summary::before { transform: rotate(90deg); }
+  .rd-toc ol { margin: 0 .2rem .5rem; padding: 0; list-style: none; counter-reset: toc; }
+  .rd-toc li { counter-increment: toc; border-top: 1px solid var(--color-gray-100); }
+  .rd-toc li a { display: block; padding: .7rem .2rem; color: var(--color-gray-700); }
+  .rd-toc li a::before { content: counter(toc) '. '; color: var(--color-primary-600, #16a34a); font-weight: 700; }
+  .rd-toc a:hover { color: var(--color-primary-700); }
+  .rd ul { margin: 0 0 1.25rem; padding-left: 0; list-style: none; }
+  .rd ul li { position: relative; padding-left: 1.5rem; margin-bottom: .5rem; line-height: 1.6; }
+  .rd ul li::before { content: ''; position: absolute; left: .2rem; top: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-primary-500, #22c55e); }
+  .rd-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .rd-table th, .rd-table td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--color-gray-200); }
+  .rd-table th { background: var(--color-gray-100); font-size: .82rem; text-transform: uppercase; letter-spacing: .02em; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.25rem; }
+  .rd-grid { display: flex; flex-direction: column; gap: 1.5rem; margin: 1rem 0; }
+  .rd-fig { width: 100%; height: auto; border-radius: 12px; margin: 1.8rem 0; }
+  .rd-faq-item { border: 1px solid var(--color-gray-200); border-radius: 10px; padding: .5rem 1rem; margin-bottom: .6rem; background: #fff; }
+  .rd-faq-item summary { font-weight: 600; cursor: pointer; padding: .4rem 0; }
+  .rd-faq-item p { margin: .3rem 0 .6rem; color: var(--color-gray-600); }
+  .rd-offers { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 2.2rem 0 1.5rem; padding: 1.3rem 1.5rem; border-radius: 14px; background: linear-gradient(120deg, var(--color-primary-700, #15803d), var(--color-primary-900, #14532d)); color: #fff; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; box-shadow: 0 6px 20px rgba(21,128,61,.22); }
+  .rd-offers:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(21,128,61,.3); }
+  .rd-offers-txt strong { display: block; font-size: 1.12rem; margin-bottom: .15rem; }
+  .rd-offers-txt span { font-size: .9rem; opacity: .92; }
+  .rd-offers-btn { display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--color-primary-700, #15803d); font-weight: 700; padding: .62rem 1.15rem; border-radius: 9px; white-space: nowrap; }
+  .author-name { font-weight: 700; font-size: 1.05rem; margin: 0 0 .2rem; }
+  .author-name a { color: inherit; }
+  .rd-disc { font-size: .82rem; font-style: italic; color: var(--color-gray-500); margin-top: 1.5rem; }
+  @media (max-width: 640px) {
+    .rd { padding-left: .55rem; padding-right: .55rem; }
+    .rd h1 { font-size: 1.6rem; }
+    .rd-offers { flex-direction: column; align-items: stretch; text-align: center; }
+    .rd-offers-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+  }
+</style>

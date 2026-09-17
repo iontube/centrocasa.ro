@@ -1,0 +1,343 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import RespImage from '../components/RespImage.astro';
+import SimilarArticles from '../components/SimilarArticles.astro';
+import PrevNextNav from '../components/PrevNextNav.astro';
+import emag from '../data/emag-products.json';
+import keywordsData from '../../keywords.json';
+import { visibleArticles, slugify } from '../lib/articles.mjs';
+import { SEO_YEAR } from '../lib/seo.mjs';
+
+const relatedArticles = visibleArticles(keywordsData.completed).map(item => ({
+  title: item.keyword.charAt(0).toUpperCase() + item.keyword.slice(1),
+  slug: item.slug || slugify(item.keyword),
+  excerpt: item.excerpt || '',
+  image: item.image || `/imagini/articole/${item.slug || slugify(item.keyword)}.webp`,
+  category: item.category,
+  categorySlug: item.categorySlug,
+  date: item.date || '',
+}));
+
+const pool = emag['camera-wireless'] || [];
+const byId = Object.fromEntries(pool.map(p => [p.id, p]));
+
+const PICKS = [
+  // --- A. De interior ---
+  { g: 'interior', id: 'D4RHGS3BM', rol: 'Cea mai cumparata din articol', short: 'TP-Link Tapo C232', loc: 'Interior', rez: '5 MP', alim: 'Priza', pret: '231 lei',
+    specs: ['4315 de pareri, cele mai multe din tot articolul', 'senzor de 5 MP, video 2880 x 1620', 'microfon integrat, comunicare bidirectionala', 'card microSD, fara abonament obligatoriu'],
+    pros: ['De departe cea mai cumparata camera din selectie, 4315 de pareri', 'Rezolutie 5 MP, peste media categoriei', 'TP-Link, aplicatie stabila si actualizata', 'Merge complet fara abonament, doar cu card microSD'],
+    cons: ['Are nevoie de priza, nu e fara cabluri', 'Cardul microSD se cumpara separat'],
+    verdict: 'Cu 4315 de pareri, Tapo C232 e camera pe care o cumpara cei mai multi oameni din Romania si e alegerea sigura daca nu vrei sa te complici. Are senzor de 5 MP, adica peste ce ofera majoritatea camerelor de interior la pretul asta, microfon si difuzor pentru comunicare in ambele sensuri, si o aplicatie pe care TP-Link o actualizeaza constant. Punctul cel mai important: functioneaza complet fara abonament, cu un card microSD in care inregistreaza local, iar detectia de miscare si notificarile raman gratuite. Ce trebuie sa stii inainte de comanda e ca "wireless" se refera la transmisia video, nu la alimentare: camera are nevoie de priza. Iar cardul se cumpara separat, deci adauga 30-60 de lei la buget. O iei pentru o camera de interior, ca supraveghere generala sau pentru animalul lasat singur acasa.' },
+  { g: 'interior', id: 'D8V2DYYBM', rol: 'Cel mai bun raport la interior', short: 'TP-Link Tapo C200', loc: 'Interior', rez: '4 MP', alim: 'Priza', pret: '170 lei',
+    specs: ['sub 170 de lei de la un brand mare', '4 MP, rotire si inclinare', 'aceeasi aplicatie Tapo', 'inregistrare pe card, fara abonament'],
+    pros: ['Cel mai bun pret pentru o camera TP-Link de interior', 'Se roteste si se inclina din aplicatie, acoperi toata camera', '4 MP, suficient pentru interior', 'Fara abonament obligatoriu'],
+    cons: ['Rezolutie mai mica decat C232', 'Tot cu cablu de alimentare'],
+    verdict: 'Daca C232 ti se pare scumpa pentru ce vrei sa faci, varianta asta face 90 la suta din treaba cu 60 de lei mai putin. Are 4 MP in loc de 5, diferenta pe care o observi doar daca dai zoom digital pe inregistrare, si aceeasi functie de rotire si inclinare comandata din aplicatie, care conteaza mai mult decat rezolutia: o camera fixa vede un colt, una care se roteste acopera toata incaperea. Foloseste aceeasi aplicatie Tapo ca restul gamei, deci daca ai mai multe camere le vezi pe toate in acelasi loc. Ramane dependenta de priza. O iei cand vrei o camera de interior de la un brand serios, la cel mai mic pret rezonabil, si nu ai nevoie de detalii fine in imagine.' },
+  { g: 'interior', id: 'D0CD9GMBM', rol: 'Cea mai mare rezolutie de interior', short: 'BabyToy AG-D1 8MP', loc: 'Interior', rez: '8 MP', alim: 'Priza', pret: '285 lei',
+    specs: ['senzor de 8 MP, dublu fata de TP-Link', '827 de pareri', 'gandita si pentru supraveghere bebe', 'inregistrare locala pe card'],
+    pros: ['8 MP, cea mai mare rezolutie dintre camerele de interior', '827 de pareri, bine verificata', 'Potrivita si ca monitor pentru bebe', 'Pret sub 300 de lei pentru 8 MP'],
+    cons: ['Nota 4.48, mai modesta decat la TP-Link', 'Brand mai putin cunoscut, aplicatie mai putin rafinata'],
+    verdict: 'Opt megapixeli inseamna dublu fata de cele mai vandute camere TP-Link de interior, iar diferenta se vede cand vrei sa distingi o fata sau un detaliu la trei-patru metri, nu doar sa observi ca s-a miscat ceva. BabyToy AG-D1 e folosita frecvent ca monitor pentru bebe, unde rezolutia mare chiar ajuta, si aduna 827 de pareri, deci nu e un produs netestat. Nota de 4.48 e insa vizibil sub cea a camerelor TP-Link, iar de la un brand mai mic te astepti la o aplicatie mai putin lustruita si la actualizari mai rare, ceea ce la un dispozitiv conectat la internet nu e un detaliu minor. O iei cand rezolutia conteaza mai mult decat ecosistemul, de exemplu pentru camera copilului.' },
+  { g: 'interior', id: 'DZLB90MBM', rol: 'Alternativa cu 5 MP', short: 'BabyToy iC-A 5MP', loc: 'Interior', rez: '5 MP', alim: 'Priza', pret: '275 lei',
+    specs: ['5 MP, Full HD 2560 x 1920', '611 de pareri', 'microfon si difuzor', 'inregistrare pe card microSD'],
+    pros: ['5 MP la un pret apropiat de TP-Link C232', '611 de pareri', 'Comunicare bidirectionala', 'Inregistrare locala'],
+    cons: ['La acelasi pret, TP-Link C232 are de sapte ori mai multe pareri', 'Nota 4.51, sub media TP-Link'],
+    verdict: 'iC-A ofera aceiasi 5 MP ca Tapo C232 la un pret aproape identic, si aici comparatia directa devine utila: la 275 de lei fata de 231, primesti aceeasi rezolutie, dar cu 611 pareri in loc de 4315 si cu nota 4.51 in loc de 4.72. Nu inseamna ca e o camera slaba, cele 611 pareri sunt suficiente cat sa arate un produs functional, ci ca nu exista un motiv clar sa o alegi in locul celei mai vandute, decat daca gasesti o reducere semnificativa sau ai deja alte dispozitive BabyToy in casa. O iei daca o prinzi mai ieftin decat TP-Link sau daca vrei sa eviti ecosistemul TP-Link dintr-un motiv anume.' },
+  // --- B. De exterior, la priza ---
+  { g: 'exterior', id: 'DKQ4NMMBM', rol: 'Cea mai ieftina de exterior', short: 'TP-Link Tapo C100', loc: 'Exterior', rez: '2 MP', alim: 'Priza', pret: '115 lei',
+    specs: ['sub 115 lei, cea mai ieftina camera din articol', '2 MP, Full HD', 'rezistenta la intemperii', 'aplicatie Tapo, fara abonament'],
+    pros: ['Cel mai mic pret din tot articolul', 'TP-Link, aplicatie serioasa la pret de intrare', 'Rezistenta la ploaie si praf', 'Fara abonament obligatoriu'],
+    cons: ['Doar 2 MP, detaliile lipsesc la distanta', 'Necesita priza in exterior'],
+    verdict: 'La sub 115 lei e cea mai ieftina camera din tot articolul si totusi vine de la TP-Link, cu aceeasi aplicatie ca modelele de trei ori mai scumpe. Compromisul e clar si il faci constient: 2 MP inseamna Full HD, suficient ca sa vezi ca cineva a intrat in curte si cum e imbracat, dar nu ca sa distingi o fata la zece metri sau un numar de inmatriculare. Pentru supraveghere de prezenta, adica sa stii daca a fost cineva si cand, e perfect adecvata. Are nevoie de priza in exterior, ceea ce inseamna fie o priza exterioara existenta, fie un electrician. O iei cand vrei sa acoperi mai multe puncte cu buget mic, sau ca prima camera, ca sa vezi daca iti e utila inainte sa investesti.' },
+  { g: 'exterior', id: 'D5T097YBM', rol: 'Cea mai buna vedere pe timp de noapte', short: 'TP-Link Tapo C325WB', loc: 'Exterior', rez: '4 MP', alim: 'Priza', pret: '260 lei',
+    specs: ['ColorPro Night Vision, imagine color noaptea', '4 MP', 'senzor Starlight pentru lumina scazuta', '1890 de pareri pe gama'],
+    pros: ['Filmeaza COLOR noaptea, nu alb-negru', 'Senzor Starlight, performant la lumina putina', '4 MP, detalii bune', 'TP-Link, aplicatie si actualizari'],
+    cons: ['Priza obligatorie', 'Costa dublu fata de modelul de intrare'],
+    verdict: 'Diferenta dintre o camera obisnuita si una cu ColorPro se vede exact atunci cand ai nevoie de camera: noaptea. Camerele normale trec pe infrarosu si dau imagine alb-negru, in care o masina rosie si una albastra arata la fel si o haina inchisa e doar o silueta. C325WB filmeaza color si pe intuneric, folosind un senzor Starlight si iluminare proprie, iar asta transforma o inregistrare din "s-a miscat ceva" in "era cineva in geaca rosie". Are 4 MP si toate avantajele ecosistemului Tapo. Costa dublu fata de modelul de intrare si tot are nevoie de priza. O iei pentru curte sau intrare, unde identificarea conteaza, nu doar detectarea.' },
+  { g: 'exterior', id: 'D1B0JX2BM', rol: 'Cea mai completa, cu PoE', short: 'TP-Link Outdoor PoE', loc: 'Exterior', rez: '5 MP', alim: 'PoE / 12V', pret: '800 lei',
+    specs: ['alimentare PoE: curent si date pe acelasi cablu de retea', '5 MP', 'construita pentru montaj fix, permanent', 'cea mai scumpa din selectie'],
+    pros: ['PoE: un singur cablu duce si curentul, si datele', 'Conexiune prin cablu, mult mai stabila decat Wi-Fi', '5 MP', 'Construita pentru instalare permanenta'],
+    cons: ['800 de lei, cea mai scumpa din articol', 'Cere cablu de retea tras pana la locatie, deci instalare'],
+    verdict: 'PoE inseamna Power over Ethernet: un singur cablu de retea duce si datele, si curentul, deci nu ai nevoie de priza langa camera. E solutia profesionistilor si are doua avantaje reale fata de Wi-Fi. Primul, conexiunea prin cablu nu cade cand routerul are o zi proasta si nu depinde de cat de departe e camera de el, o problema frecventa la camerele montate in fundul curtii. Al doilea, nu poate fi bruiata, spre deosebire de Wi-Fi. Costul e dublu: 800 de lei aparatul, plus cablul tras pana acolo, care inseamna manopera. O iei cand instalezi definitiv, ai unde trage cablu si vrei o camera pe care sa nu o mai atingi ani de zile.' },
+  { g: 'exterior', id: 'DX8BBXYBM', rol: 'Cea mai mare rezolutie', short: 'Sricam SH048 9MP', loc: 'Exterior', rez: '9 MP', alim: 'Priza', pret: '230 lei',
+    specs: ['9 MP, cea mai mare rezolutie din selectie', '1217 de pareri', 'sub 230 de lei pentru 9 MP', 'Wi-Fi, inregistrare pe card'],
+    pros: ['9 MP, cea mai mare rezolutie din tot articolul', '1217 de pareri, bine testata', 'Raport rezolutie-pret imbatabil in selectie', 'Wi-Fi si inregistrare locala'],
+    cons: ['Sricam, brand mai putin cunoscut decat TP-Link', 'Rezolutia mare cere card mai mare si umple spatiul rapid'],
+    verdict: 'Noua megapixeli la 230 de lei e, pe hartie, cel mai bun raport din articol: dublu fata de TP-Link C325WB, care costa cam la fel. Cele 1217 pareri arata un produs real, nu o aparitie de o luna. Merita insa doua precizari. Rezolutia mare inseamna fisiere mari, deci un card de 64 GB se umple mult mai repede decat la o camera de 2 MP, si ai nevoie de card mai mare sau de suprascriere mai deasa. Iar Sricam nu are in spate acelasi efort de actualizare software ca TP-Link, ceea ce la un dispozitiv conectat permanent la internet conteaza pentru securitate. O iei cand vrei detaliu maxim la buget mediu si esti dispus la un brand mai mic.' },
+  { g: 'exterior', id: 'DGJT3TYBM', rol: 'Cu doua obiective', short: 'CCTV dubla 8MP', loc: 'Exterior', rez: '8 MP', alim: '220-230 V', pret: '289 lei',
+    specs: ['doua obiective intr-o singura carcasa', '8 MP', 'acopera doua directii simultan', '613 pareri'],
+    pros: ['Doua obiective, acoperi doua unghiuri cu un singur aparat', '8 MP', 'O singura priza si o singura montare pentru doua camere', 'Nota 4.66'],
+    cons: ['Configurare mai complicata decat la o camera simpla', 'Brand generic, suport incert'],
+    verdict: 'Ideea din spatele camerei duble e practica si rezolva o problema reala: un colt de casa unde vrei sa vezi si aleea, si intrarea in garaj. In loc de doua camere, doua prize si doua montari, ai un singur aparat cu doua obiective care se rotesc independent. Cu 8 MP si 613 pareri cu nota 4.66, e o solutie testata. Reversul e ca setarea e mai complicata decat la o camera obisnuita, iar brandul e generic, deci suportul in caz de problema e o necunoscuta. O iei cand ai exact situatia asta, un punct din care vrei sa vezi in doua directii, si nu vrei doua aparate separate.' },
+  // --- C. Fara curent la locatie ---
+  { g: 'solar', id: 'DGGL9QYBM', rol: 'Cu cartela SIM, fara internet', short: 'TP-Link Tapo C501GW', loc: 'Exterior', rez: '2 MP + 4G', alim: 'Priza + SIM', pret: '280 lei',
+    specs: ['4G LTE: functioneaza cu cartela SIM, fara Wi-Fi', '2 MP', 'de la TP-Link, cu aplicatia Tapo', 'pentru locatii fara internet'],
+    pros: ['Merge fara internet la locatie, doar cu cartela SIM', 'TP-Link, singura camera 4G din selectie de la un brand mare', 'Aplicatia Tapo, cunoscuta si stabila', 'Sub 280 de lei'],
+    cons: ['Cartela SIM inseamna abonament de date lunar', 'Tot are nevoie de priza pentru alimentare'],
+    verdict: 'Asta e camera pentru situatia in care nu ai internet: o casa de vacanta, un teren, o livada, un garaj izolat. In loc de Wi-Fi foloseste o cartela SIM si retea 4G, exact ca un telefon, deci o montezi oriunde exista semnal. Vine de la TP-Link, singurul brand mare din selectie cu o camera 4G, deci primesti aplicatia Tapo si actualizari serioase. Doua lucruri de calculat inainte: cartela inseamna un abonament de date lunar, un cost recurent pe care camerele Wi-Fi nu il au, iar aparatul tot are nevoie de priza. Daca locatia nu are nici curent, uita-te la modelele cu panou solar de mai jos. O iei cand ai curent dar nu ai internet.' },
+  { g: 'solar', id: 'DCKKVMYBM', rol: 'Complet independenta: solar si SIM', short: 'CLAUSTEEL solar', loc: 'Exterior', rez: '3 MP', alim: 'Panou solar', pret: '478 lei',
+    specs: ['panou solar plus acumulator, fara priza', 'accepta cartela SIM, fara Wi-Fi', '3 MP, 2048 x 1536', 'singura din selectie fara niciun cablu'],
+    pros: ['Nu are nevoie nici de curent, nici de internet', 'Panou solar si acumulator, functionare autonoma', 'Cartela SIM pentru transmisie', 'O montezi oriunde, inclusiv pe un stalp in camp'],
+    cons: ['478 de lei plus costul cartelei SIM lunar', 'Doar 211 pareri, cea mai putin testata din grup'],
+    verdict: 'E singura camera din articol care nu are nevoie de absolut nimic la locatie: nici priza, nici internet. Panoul solar incarca un acumulator, iar transmisia se face prin cartela SIM, deci o montezi pe un stalp in mijlocul unui teren, pe un gard la marginea livezii sau pe o casa nelocuita iarna. Cei 3 MP sunt suficienti pentru a vedea cine se apropie. Costurile reale sunt insa mai mari decat pretul de raft: 478 de lei aparatul, plus abonamentul de date lunar pentru SIM. Iar cu 211 pareri e cea mai putin verificata din grupul asta, ceea ce la un aparat lasat nesupravegheat luni intregi conteaza. O iei pentru locatii izolate, unde alternativa e sa nu ai nicio camera.' },
+  { g: 'solar', id: 'D40DSHYBM', rol: 'Cea mai bine notata din articol', short: 'Xenomo X-SAFE solar', loc: 'Exterior', rez: '-', alim: 'Panou solar 6W', pret: '529 lei',
+    specs: ['nota 4.89, cea mai mare din tot articolul', 'panou solar de 6 W inclus', 'vedere nocturna', '285 de pareri'],
+    pros: ['Cea mai buna nota din tot articolul, 4.89', 'Panou solar de 6 W, autonomie reala', 'Vedere nocturna', 'Fara cablu de alimentare'],
+    cons: ['529 de lei, printre cele mai scumpe', 'Fisa nu declara clar rezolutia'],
+    verdict: 'Nota de 4.89 din 285 de pareri e cea mai mare din tot articolul, ceea ce la o camera de exterior alimentata solar spune ceva important: oamenii care au cumparat-o nu s-au trezit cu acumulatorul descarcat in noiembrie. Panoul de 6 W e generos pentru o camera, iar asta explica probabil satisfactia: se incarca suficient chiar si in zile innorate. Are vedere nocturna si nu are nevoie de priza, deci o montezi unde vrei. Doua rezerve. Costa 529 de lei, printre cele mai scumpe din selectie, iar fisa de pe eMAG nu declara clar rezolutia senzorului, ceea ce e o lipsa reala cand compari cu modele care spun 4 sau 9 MP. O iei cand vrei o camera solara verificata si pui pret pe parerile celor care au avut-o o iarna.' },
+  // --- D. Versatile ---
+  { g: 'versatile', id: 'D774BQYBM', rol: 'Cea mai ieftina din articol', short: 'Sricam SH061', loc: 'Interior + exterior', rez: 'Full HD', alim: 'Priza', pret: '130 lei',
+    specs: ['sub 130 de lei', 'se poate folosi si in interior, si in exterior', 'Full HD 1080p', '1217 pareri'],
+    pros: ['Foarte ieftina, sub 130 de lei', 'Poate fi montata si in casa, si afara', '1217 pareri, bine testata pentru pretul ei', 'Inregistrare pe card'],
+    cons: ['Full HD, adica minimul categoriei', 'Sricam, suport software limitat'],
+    verdict: 'La sub 130 de lei si cu 1217 pareri, SH061 e camera cu care testezi daca ai nevoie de supraveghere, inainte sa cheltui serios. Poate fi montata si in interior, si in exterior, ceea ce inseamna ca daca nu iti convine locul o muti fara sa cumperi alta. Full HD e minimul din categorie, adica vezi ca cineva a intrat si cam cum arata, dar nu detalii fine. Sricam nu ofera acelasi nivel de actualizari ca TP-Link, si e bine sa o pui pe o retea separata daca esti atent la securitate. O iei ca prima camera, ca sa vezi daca o folosesti, sau ca a doua camera intr-un punct secundar unde nu vrei sa investesti.' },
+  { g: 'versatile', id: 'DS8DGTYBM', rol: 'Cea mai detaliata imagine', short: 'BabyToy C3 12MP', loc: 'Interior + exterior', rez: '12 MP', alim: 'Priza', pret: '397 lei',
+    specs: ['12 MP, a doua cea mai mare rezolutie din selectie', 'interior si exterior', 'nota 4.73 din 346 de pareri', 'inregistrare pe card'],
+    pros: ['12 MP, detaliu foarte bun', 'Se monteaza si in casa, si afara', 'Nota 4.73', 'Utila si ca monitor pentru bebe'],
+    cons: ['397 de lei, in partea de sus a segmentului', 'Fisierele mari umplu cardul rapid'],
+    verdict: 'Doisprezece megapixeli e a doua cea mai mare rezolutie din articol si inseamna ca poti da zoom pe o inregistrare fara ca imaginea sa se destrame, lucru imposibil la o camera de 2 MP. Nota de 4.73 din 346 de pareri e solida, iar faptul ca merge si in interior, si in exterior, iti lasa optiuni daca te razgandesti asupra locului. Consecinta pe care putini o anticipeaza: cu cat rezolutia e mai mare, cu atat inregistrarea ocupa mai mult, deci un card de 64 GB tine mult mai putin decat la o camera obisnuita si vei suprascrie mai des. Pune in buget un card de 128 GB. O iei cand vrei sa poti identifica oameni si detalii, nu doar sa constati miscare.' },
+].map(x => ({ ...x, p: byId[x.id] })).filter(x => x.p);
+
+const INT = PICKS.filter(x => x.g === 'interior');
+const EXT = PICKS.filter(x => x.g === 'exterior');
+const SOLAR = PICKS.filter(x => x.g === 'solar');
+const VERS = PICKS.filter(x => x.g === 'versatile');
+
+const hero = '/imagini/articole/cele-mai-bune-camere-de-supraveghere-wireless.webp';
+const figInt = '/imagini/articole/camera-wireless-interior.webp';
+const figExt = '/imagini/articole/camera-wireless-exterior.webp';
+const figSolar = '/imagini/articole/camera-wireless-solar.webp';
+const published = '2026-07-20T18:15:19+03:00';
+
+const faq = [
+  { question: 'Wireless inseamna ca nu are niciun cablu?', answer: 'Nu, si e cea mai frecventa confuzie la cumparare. La majoritatea camerelor, wireless se refera doar la transmisia video, care se face prin Wi-Fi in loc de cablu de retea. Alimentarea ramane insa prin cablu, la o priza obisnuita. Din cele 14 camere din selectie, doar doua functioneaza fara niciun cablu, cele cu panou solar si acumulator. Distinctia conteaza enorm cand alegi locul de montaj: o camera Wi-Fi obisnuita trebuie pusa la maximum cativa metri de o priza, sau ai nevoie de un electrician ca sa tragi una. Verifica intotdeauna campul de alimentare din fisa produsului inainte sa comanzi, nu doar denumirea.' },
+  { question: 'Am nevoie de abonament lunar?', answer: 'Nu, si asta e o veste buna pe care producatorii nu o comunica foarte tare. Camerele din selectie inregistreaza pe un card microSD introdus in aparat, iar toate functiile de baza raman gratuite: vizionare live, detectie de miscare, notificari pe telefon si comunicare bidirectionala. La TP-Link, chiar si detectia inteligenta de persoane e inclusa fara abonament. Abonamentul, de exemplu Tapo Care, adauga stocare in cloud, istoric de 30 sau 180 de zile si posibilitatea de a recupera inregistrarile daca aparatul e furat sau distrus, dar ramane optional. Costul real ascuns nu e abonamentul, ci cardul microSD, care se cumpara separat si costa intre 30 si 100 de lei, in functie de capacitate.' },
+  { question: 'Ce rezolutie imi trebuie de fapt?', answer: 'Depinde de ce vrei sa poti spune despre inregistrare. Pentru detectare, adica sa stii ca a fost cineva si cand, 2 MP sau Full HD sunt suficienti si costa cel mai putin. Pentru recunoastere, adica sa distingi o persoana cunoscuta sau culoarea unei masini, ai nevoie de 4-5 MP. Pentru identificare, adica o fata clara sau un numar de inmatriculare la distanta, iti trebuie 8 MP sau mai mult. In selectie, extremele sunt 2 MP la TP-Link C100 de 115 lei si 12 MP la BabyToy C3 de 397 de lei. Retine si consecinta practica: rezolutia mare inseamna fisiere mari, deci cardul se umple mai repede si suprascrii mai des, asa ca bugeteaza si un card mai mare.' },
+  { question: 'Cum aleg intre Wi-Fi, 4G si PoE?', answer: 'Alegerea o face locatia, nu bugetul. Wi-Fi e potrivit cand ai internet in casa si camera e la o distanta rezonabila de router, iar aici intra majoritatea camerelor din selectie. PoE, adica Power over Ethernet, duce si curentul, si datele pe un singur cablu de retea, deci nu iti trebuie priza langa camera, iar conexiunea e mult mai stabila decat Wi-Fi si nu poate fi bruiata; costul e ca trebuie tras cablul. Varianta 4G cu cartela SIM se foloseste unde nu exista internet deloc: casa de vacanta, teren, livada, si vine cu un abonament de date lunar. Daca locatia nu are nici curent, nici internet, singura optiune reala e o camera cu panou solar si cartela SIM.' },
+  { question: 'Camerele astea sunt sigure impotriva hackerilor?', answer: 'Riscul exista si merita tratat serios, pentru ca vorbim de un aparat care filmeaza in casa ta si e conectat la internet. Cateva reguli reduc considerabil problema. Schimba parola implicita imediat dupa instalare si foloseste una lunga, unica pentru camera. Activeaza autentificarea in doi pasi daca aplicatia o ofera. Actualizeaza firmware-ul cand aplicatia anunta o versiune noua, pentru ca acolo se repara vulnerabilitatile. Si, daca poti, pune camerele pe o retea Wi-Fi separata de calculatoare si telefoane, functia de retea pentru oaspeti a routerului fiind cea mai simpla varianta. Brandurile mari, ca TP-Link, publica actualizari mult mai constant decat producatorii mici, iar asta e un argument real in favoarea lor.' },
+  { question: 'Camera merge fara internet?', answer: 'Partial, si depinde ce astepti de la ea. O camera Wi-Fi fara internet poate continua sa inregistreze local pe cardul microSD, deci daca ti se intrerupe conexiunea nu pierzi inregistrarile din acea perioada. Ce nu mai poti face e sa o vezi live de pe telefon si sa primesti notificari, pentru ca acestea trec prin internet. Daca locatia nu are internet deloc, ai doua optiuni reale din selectia asta: o camera cu cartela SIM, care isi face propria conexiune prin reteaua mobila, sau o camera care inregistreaza doar local si pe care o verifici periodic scotand cardul, varianta cea mai ieftina dar si cea mai putin utila, pentru ca afli ce s-a intamplat abia cand ajungi acolo.' },
+  { question: 'Cat costa o camera de supraveghere buna?', answer: 'Selectia acopera de la 115 la 800 de lei. Sub 200 de lei gasesti camere de la branduri mari cu rezolutie de 2 MP, ca TP-Link C100, si modele Sricam versatile la 130 de lei, potrivite pentru detectare simpla. Intre 200 si 300 de lei e zona cu cel mai bun echilibru, unde intra cele mai vandute din articol: TP-Link C232 cu 4315 pareri, C325WB cu vedere nocturna color si Sricam de 9 MP. Peste 450 de lei ajungi la camerele cu panou solar, care nu au nevoie de priza, si la modelul PoE de 800 de lei, pentru instalari permanente. La buget adauga intotdeauna cardul microSD, 30-100 de lei, iar la modelele cu SIM, abonamentul de date lunar.' },
+];
+
+const images = [hero, figInt, figExt, figSolar, ...PICKS.map(x => x.p.image)];
+---
+
+<Layout
+  title={`Cele mai bune camere de supraveghere wireless in ${SEO_YEAR}: cu Wi-Fi, 4G sau solare`}
+  description="14 camere de supraveghere wireless comparate pe rezolutie si alimentare, de la 115 la 800 de lei. Plus de ce wireless nu inseamna fara cabluri."
+  image={hero}
+  preloadImage={hero}
+  preloadSrcset={`${hero.replace('.webp','-960.webp')} 960w, ${hero.replace('.webp','-1280.webp')} 1280w, ${hero} 1920w`}
+  preloadSizes="(max-width: 860px) 100vw, 860px"
+  type="article"
+  publishedTime={published}
+  modifiedTime={published}
+  author="Vlad Georgescu"
+  breadcrumb={[{ name: 'Acasa', url: '/' }, { name: 'Securitate si Smart Home', url: '/securitate-smart-home/' }, { name: 'Cele mai bune camere de supraveghere wireless' }]}
+  faq={faq.map(f => ({ question: f.question, answer: f.answer }))}
+>
+  <article class="rd">
+    <nav class="breadcrumb">
+      <a href="/">Acasa</a><span class="breadcrumb-separator">/</span>
+      <a href="/securitate-smart-home/">Securitate si Smart Home</a><span class="breadcrumb-separator">/</span>
+      <span>Cele mai bune camere de supraveghere wireless</span>
+    </nav>
+
+    <h1>Cele mai bune camere de supraveghere wireless</h1>
+    <p class="rd-byline">de <a href="/autori/vlad-georgescu/">Vlad Georgescu</a>, Specialist Securitate si Smart Home · actualizat iulie 2026</p>
+
+    <RespImage class="rd-hero" src={hero} alt="Cele mai bune camere de supraveghere wireless: modele de interior, de exterior si cu panou solar" width={1920} height={1080} priority={true} />
+
+    <div class="rd-intro">
+      <p>Cea mai cumparata camera din selectie e <strong>TP-Link Tapo C232</strong>, cu 4315 de pareri, la 231 de lei. Cea mai ieftina, tot de la TP-Link, costa 115 lei. Cea mai bine notata, cu 4.89, e <strong>Xenomo X-SAFE</strong>, alimentata solar, iar pentru locatii fara internet, <strong>TP-Link Tapo C501GW</strong> merge cu cartela SIM.</p>
+      <p>Inainte de rezolutie si de pret, verifica un lucru care schimba tot: <strong>wireless nu inseamna fara cabluri</strong>. La aproape toate camerele, cuvantul se refera doar la transmisia video prin Wi-Fi, iar alimentarea ramane la priza. Din cele 14 de aici, doar doua functioneaza complet fara cablu, cele cu panou solar. De aceea le-am grupat dupa <strong>alimentare si loc de montaj</strong>, nu dupa megapixeli.</p>
+      <p>A doua veste buna: <strong>nu ai nevoie de abonament</strong>. Toate inregistreaza pe card microSD, iar detectia de miscare si notificarile raman gratuite.</p>
+    </div>
+
+    <p class="rd-disc">CentroCasa primeste un comision daca finalizezi o comanda prin linkurile din pagina. Pretul tau nu se schimba, iar selectia nu e platita de branduri. Vezi <a href="/cum-testam/">cum alegem produsele</a>.</p>
+
+    <details class="rd-toc">
+      <summary>Cuprins</summary>
+      <ol>
+        <li><a href="#tabel">Comparatie rapida</a></li>
+        <li><a href="#interior">De interior</a></li>
+        <li><a href="#exterior">De exterior, la priza</a></li>
+        <li><a href="#solar">Fara curent la locatie: solar si cartela SIM</a></li>
+        <li><a href="#versatile">Versatile, interior si exterior</a></li>
+        <li><a href="#cabluri">Wireless nu inseamna fara cabluri</a></li>
+        <li><a href="#abonament">Ai nevoie de abonament?</a></li>
+        <li><a href="#solar-sim">Cea mai buna camera cu panou solar si cartela SIM</a></li>
+        <li><a href="#bebe">Cea mai buna camera pentru interior si bebe</a></li>
+        <li><a href="#ieftina">Cea mai ieftina camera care merita</a></li>
+        <li><a href="#cum-am-ales">Cum am ales modelele</a></li>
+        <li><a href="#rezolutie">Ce rezolutie iti trebuie</a></li>
+        <li><a href="#securitate">Securitate: ce faci ca sa nu fii spionat</a></li>
+        <li><a href="#cat-costa">Cat costa</a></li>
+        <li><a href="#faq">Intrebari frecvente</a></li>
+      </ol>
+    </details>
+
+    <h2 id="tabel">Comparatie rapida</h2>
+    <div class="table-wrap">
+      <table class="rd-table">
+        <thead><tr><th>Model</th><th>Loc</th><th>Rezolutie</th><th>Alimentare</th><th>Pret</th></tr></thead>
+        <tbody>
+          {PICKS.map(x => (
+            <tr>
+              <td><div class="cmp-prod"><img class="cmp-thumb" src={x.p.image} alt={x.short} loading="lazy" width="44" height="44" /><span>{x.short}</span></div></td>
+              <td>{x.loc}</td>
+              <td>{x.rez}</td>
+              <td>{x.alim}</td>
+              <td>{x.pret}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="interior">De interior</h2>
+    <p>Pentru living, hol, camera copilului sau supravegherea animalului lasat singur. Toate au nevoie de priza, iar cele care se rotesc si se inclina acopera o incapere intreaga in locul unui singur colt.</p>
+    {INT.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figInt} alt="Camere de supraveghere de interior: TP-Link Tapo si BabyToy" width="1600" height="900" loading="lazy" />
+
+    <h2 id="exterior">De exterior, la priza</h2>
+    <p>Rezistente la intemperii, dar toate cer o priza in apropiere. Aici conteaza vederea nocturna, pentru ca majoritatea evenimentelor pentru care montezi o camera se intampla dupa lasarea intunericului.</p>
+    {EXT.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figExt} alt="Camere de supraveghere de exterior: TP-Link Tapo C325WB, Sricam si PoE" width="1600" height="900" loading="lazy" />
+
+    <h2 id="solar">Fara curent la locatie: solar si cartela SIM</h2>
+    <p>Singurele care rezolva situatia in care nu ai nici priza, nici internet: teren, livada, casa de vacanta, garaj izolat. Panoul solar incarca un acumulator, iar cartela SIM inlocuieste Wi-Fi-ul.</p>
+    {SOLAR.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <img class="rd-fig" src={figSolar} alt="Camere de supraveghere cu panou solar si cartela SIM" width="1600" height="900" loading="lazy" />
+
+    <h2 id="versatile">Versatile, interior si exterior</h2>
+    <p>Doua modele care se monteaza oriunde, utile cand nu esti sigur unde le vei pune sau vrei sa poti muta camera fara sa cumperi alta.</p>
+    {VERS.map(x => (
+      <div>
+        <h3>{x.rol}: {x.short}</h3>
+        <ProductCard name={x.p.name.replace(/’/g, "'")} image={x.p.image} price={x.p.price} rating={x.p.rating} reviews={x.p.reviews} badge={x.rol} specs={x.specs} pros={x.pros} cons={x.cons} verdict={x.verdict} outKey={'p-' + x.id} />
+      </div>
+    ))}
+
+    <div class="rd-offers" data-o={Buffer.from('oferte-camera-wireless').toString('base64')} role="button" tabindex="0">
+      <div class="rd-offers-txt">
+        <strong>Vezi toate camerele de supraveghere la oferta</strong>
+        <span>Reducerile din acest moment, sortate dupa numarul de pareri, direct pe eMAG</span>
+      </div>
+      <span class="rd-offers-btn">Vezi ofertele
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </span>
+    </div>
+
+    <h2 id="cabluri">Wireless nu inseamna fara cabluri</h2>
+    <p>E confuzia care duce la cele mai multe returnari in categoria asta, si vine direct din denumirea produsului.</p>
+    <p>La aproape toate camerele vandute ca wireless, cuvantul se refera exclusiv la <strong>transmisia datelor</strong>: imaginea ajunge la telefonul tau prin Wi-Fi, in loc de un cablu de retea. <strong>Alimentarea ramane prin cablu</strong>, la o priza obisnuita de 230 V.</p>
+    <p>Se vede clar in fisele din selectie: modelele TP-Link declara alimentare 100-240 V, adica adaptor in priza. Din cele 14 camere de aici, doar doua functioneaza fara niciun cablu, cele cu panou solar si acumulator.</p>
+    <p>Consecinta e practica si costa bani: daca vrei o camera in coltul din spate al curtii si nu ai priza acolo, ai trei variante reale.</p>
+    <ul>
+      <li><strong>Tragi o priza exterioara</strong>, cu electrician. Costul manoperei depaseste deseori pretul camerei.</li>
+      <li><strong>Alegi PoE</strong>, ca modelul TP-Link Outdoor din selectie: un singur cablu de retea duce si datele, si curentul, iar conexiunea e mai stabila decat Wi-Fi. Tot trebuie tras cablul, dar unul singur si mai subtire.</li>
+      <li><strong>Alegi panou solar</strong>, ca la CLAUSTEEL sau Xenomo: nimic de tras, dar platesti mai mult pe aparat si depinzi de soare.</li>
+    </ul>
+    <p>Verifica intotdeauna campul de alimentare din fisa produsului inainte de comanda, nu denumirea comerciala. E singura informatie care iti spune unde poti monta camera in realitate.</p>
+
+    <h2 id="abonament">Ai nevoie de abonament?</h2>
+    <p>Nu, si merita spus clar pentru ca multi presupun contrariul si aleg gresit din start.</p>
+    <p>Camerele din selectie inregistreaza pe un <strong>card microSD</strong> introdus in aparat, iar functiile de baza raman gratuite pentru totdeauna: vizionare live de pe telefon, detectie de miscare, notificari si comunicare bidirectionala. La TP-Link, chiar si detectia inteligenta care distinge o persoana de o pisica sau de o creanga miscata de vant e inclusa fara plata.</p>
+    <p>Abonamentele, precum Tapo Care, adauga lucruri reale dar optionale: stocare in cloud cu istoric de 30 sau 180 de zile si, cel mai important, posibilitatea de a recupera inregistrarile <strong>daca aparatul e furat sau distrus</strong>. Un hot care ia camera ia si cardul din ea. Daca asta e scenariul care te ingrijoreaza, abonamentul are sens. Altfel, nu.</p>
+    <p>Costul ascuns real nu e abonamentul, ci <strong>cardul microSD</strong>, care se cumpara separat si nu apare in pretul afisat. Un card de 64 GB costa 30-50 de lei, unul de 128 GB spre 100. La camerele cu rezolutie mare, ca modelele de 9 sau 12 MP din selectie, cardul mic se umple in cateva zile, deci bugeteaza direct 128 GB.</p>
+
+    <h2 id="solar-sim">Cea mai buna camera cu panou solar si cartela SIM</h2>
+    <p>E cea mai cautata combinatie din categorie si rezolva o problema pe care nicio camera obisnuita nu o atinge: supravegherea unui loc fara curent si fara internet.</p>
+    <p><strong>CLAUSTEEL</strong>, la 478 de lei, e singura din selectie care le are pe amandoua: panou solar cu acumulator pentru alimentare si slot de cartela SIM pentru transmisie. O montezi pe un stalp in mijlocul unui teren si functioneaza. Are 3 MP, suficienti ca sa vezi cine se apropie.</p>
+    <p><strong>Xenomo X-SAFE</strong>, la 529 de lei, are panou solar de 6 W si nota 4.89, cea mai mare din tot articolul, ceea ce la un aparat lasat singur luni intregi conteaza mai mult decat specificatiile.</p>
+    <p>Daca ai curent dar nu ai internet, <strong>TP-Link Tapo C501GW</strong> la 280 de lei e mai ieftina si vine de la un brand mare, cu aplicatie serioasa. Are nevoie de priza, dar merge pe cartela SIM.</p>
+    <p>Calculeaza inainte costul recurent: cartela SIM inseamna abonament de date lunar. Pentru o camera care transmite doar la detectie de miscare, un abonament minim e suficient, dar e un cost care nu exista la camerele Wi-Fi.</p>
+
+    <h2 id="bebe">Cea mai buna camera pentru interior si bebe</h2>
+    <p>Pentru camera copilului, criteriile se schimba: rezolutia si comunicarea bidirectionala conteaza mai mult decat rezistenta la intemperii.</p>
+    <p><strong>BabyToy AG-D1</strong>, cu 8 MP la 285 de lei, e cea mai detaliata camera de interior din selectie si e gandita exact pentru asta. <strong>TP-Link Tapo C232</strong>, cea mai cumparata din articol, are 5 MP si avantajul unei aplicatii mult mai bine intretinute, ceea ce pentru un dispozitiv care filmeaza in camera copilului nu e un detaliu minor.</p>
+    <p>Recomandarea de siguranta care se aplica indiferent de model: pune camera pe reteaua de oaspeti a routerului, schimba parola implicita si tine firmware-ul la zi. O camera de bebe compromisa e cel mai neplacut scenariu din toata categoria.</p>
+
+    <h2 id="ieftina">Cea mai ieftina camera care merita</h2>
+    <p><strong>TP-Link Tapo C100</strong>, la 115 lei, e cea mai ieftina din articol si totusi vine de la un brand care actualizeaza software-ul, ceea ce la pretul asta e neobisnuit. Are 2 MP, adica Full HD: vezi ca a fost cineva si cum era imbracat, nu ii distingi fata la zece metri.</p>
+    <p><strong>Sricam SH061</strong>, la 130 de lei, se monteaza si in interior, si in exterior, deci o poti muta daca te razgandesti.</p>
+    <p>Ce sa nu astepti la pretul asta: identificare de persoane, vedere nocturna color sau functionare fara priza. Pentru detectare simpla, adica sa stii ca cineva a intrat in curte si la ce ora, sunt perfect adecvate, si e onest sa spunem ca pentru multi oameni asta e tot ce le trebuie.</p>
+
+    <h2 id="cum-am-ales">Cum am ales modelele</h2>
+    <p>Am pornit de la camerele wireless in stoc pe eMAG, sortate dupa numarul de pareri, si am eliminat soneriile video, interfoanele si kiturile de alarma, care sunt produse diferite chiar daca apar in aceleasi cautari.</p>
+    <p><strong>Am grupat dupa alimentare si loc de montaj, nu dupa rezolutie</strong>, pentru ca aceasta e decizia care nu se poate corecta dupa cumparare: o camera care are nevoie de priza nu poate fi montata unde nu exista curent, oricat de buna ar fi imaginea.</p>
+    <p><strong>O precizare despre pareri.</strong> eMAG afiseaza acelasi numar de pareri pentru toate variantele dintr-o gama. Cele 4219 de pareri apar la sase modele TP-Link diferite, iar cele 1890 la sapte. Cifra e reala, dar apartine gamei, nu exact modelului afisat. Am folosit-o ca semnal de incredere in linia de produs si in brand, nu ca dovada despre un aparat anume.</p>
+    <p>TP-Link domina categoria pe eMAG, iar selectia reflecta asta fara sa o forteze: sase din cele paisprezece modele sunt Tapo. Am inclus insa deliberat si branduri mai mici, Sricam, BabyToy, CLAUSTEEL, Xenomo, acolo unde ofera ceva ce TP-Link nu are la pretul respectiv, cum ar fi 9 sau 12 MP, sau alimentarea solara.</p>
+    <p>Nu testam camerele in laborator si nu pretindem asta. Comparam specificatiile reale din fisele produselor, volumul si nota parerilor, si semnalam diferentele pe care fisa nu le scoate in evidenta, cum e cea dintre wireless si fara cabluri.</p>
+
+    <h2 id="rezolutie">Ce rezolutie iti trebuie</h2>
+    <p>Exista o gradatie practica pe care merita sa o stii inainte sa platesti pentru megapixeli in plus:</p>
+    <ul>
+      <li><strong>Detectare, 2 MP sau Full HD.</strong> Stii ca a fost cineva, cand, si cam cum arata. Suficient pentru majoritatea situatiilor si cel mai ieftin.</li>
+      <li><strong>Recunoastere, 4-5 MP.</strong> Distingi o persoana cunoscuta, culoarea unei masini, ce duce cineva in mana. Zona in care se afla cele mai vandute modele.</li>
+      <li><strong>Identificare, 8 MP si peste.</strong> O fata clara sau un numar de inmatriculare la distanta. Necesar daca vrei o inregistrare utila pentru politie.</li>
+    </ul>
+    <p>Consecinta pe care fisele nu o mentioneaza: cu cat rezolutia e mai mare, cu atat fisierele sunt mai mari. O camera de 12 MP umple un card de 64 GB de cateva ori mai repede decat una de 2 MP, deci suprascrie mai des si ai mai putin istoric disponibil. La modelele de 8-12 MP din selectie, pune direct un card de 128 GB.</p>
+
+    <h2 id="securitate">Securitate: ce faci ca sa nu fii spionat</h2>
+    <p>O camera de supraveghere e un calculator cu obiectiv, conectat permanent la internet, montat in casa ta. Riscul nu e teoretic, iar masurile care il reduc sunt simple.</p>
+    <ul>
+      <li><strong>Schimba parola implicita imediat.</strong> Multe incidente raportate au avut ca punct de plecare parole ramase pe setarea din fabrica.</li>
+      <li><strong>Activeaza autentificarea in doi pasi</strong> daca aplicatia o ofera.</li>
+      <li><strong>Actualizeaza firmware-ul</strong> cand aplicatia anunta o versiune noua. Acolo se repara vulnerabilitatile descoperite.</li>
+      <li><strong>Pune camerele pe reteaua de oaspeti</strong> a routerului, separata de calculatoare si telefoane. Daca o camera e compromisa, atacatorul nu ajunge la restul dispozitivelor.</li>
+      <li><strong>Alege branduri care publica actualizari.</strong> TP-Link o face constant; producatorii mici, mult mai rar sau deloc. Asta e un argument real in favoarea brandurilor mari, dincolo de imagine.</li>
+    </ul>
+
+    <h2 id="cat-costa">Cat costa</h2>
+    <p>Selectia merge de la 115 la 800 de lei.</p>
+    <p><strong>Sub 200 de lei</strong> stau camerele de intrare: TP-Link Tapo C100 la 115 lei si Sricam SH061 la 130, ambele Full HD, plus TP-Link C200 de interior la 170. Potrivite pentru detectare simpla.</p>
+    <p><strong>Intre 200 si 300 de lei</strong> e zona cu cel mai bun echilibru si cele mai multe pareri: Tapo C232 cu 4315 pareri, C325WB cu vedere nocturna color, Sricam de 9 MP si camerele BabyToy. Aici cumpara majoritatea si aici recomand sa te uiti primul.</p>
+    <p><strong>Peste 450 de lei</strong> intra camerele cu panou solar, CLAUSTEEL si Xenomo, care nu au nevoie de priza, si modelul PoE de 800 de lei, pentru instalari permanente cu cablu tras.</p>
+    <p>La buget adauga <strong>cardul microSD</strong>, intre 30 si 100 de lei, care nu e inclus niciodata, iar la modelele cu cartela SIM, <strong>abonamentul de date lunar</strong>. Pentru restul casei, vezi si <a href="/cele-mai-bune-usi-pentru-casa/">usile de exterior</a>, pentru ca o camera inregistreaza o efractie, dar nu o impiedica.</p>
+
+    <h2 id="faq">Intrebari frecvente</h2>
+    <div class="rd-faq">
+      {faq.map(f => (
+        <details class="rd-faq-item">
+          <summary>{f.question}</summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">VG</div>
+      <div class="author-info">
+        <p class="author-name"><a href="/autori/vlad-georgescu/" class="author-name-link">Vlad Georgescu</a></p>
+        <p class="author-role">Specialist Securitate si Smart Home</p>
+        <p class="author-bio">Vlad scrie despre camere, yale si senzori. Verifica ce se monteaza singur, unde apar abonamente ascunse si ce functioneaza fara internet.</p>
+      </div>
+    </div>
+
+    <p class="rd-disc">Preturile si disponibilitatea se schimba. Verifica pe pagina produsului inainte de comanda.</p>
+
+    <PrevNextNav currentSlug="cele-mai-bune-camere-de-supraveghere-wireless" currentCategory="securitate-smart-home" articles={relatedArticles} />
+    <SimilarArticles currentSlug="cele-mai-bune-camere-de-supraveghere-wireless" currentCategory="securitate-smart-home" articles={relatedArticles} />
+  </article>
+</Layout>
